@@ -453,3 +453,112 @@ and reports `y` on line 1. A non-ASCII identifier after a lone CR would therefor
 line number that disagrees with the AST. CRLF is consistent in both. **Decision (decided by Claude under standing delegation, owner review pending):** Formerly a lone CR raised `UnsettledSpec("A-019")`. No current fixture contains a lone CR.
 
 **Decision (decided by Claude under standing delegation, owner review pending):** a source line is a Python physical line, ended by LF, CRLF or a lone CR (Language Reference 2.1.2), which is how `ast.parse` counts lines on 3.11.18. The scanner tokenizes a copy in which each lone CR is replaced by LF; one character replaces one at a line end, so every line prefix and every UTF-8 byte column is unchanged. The source itself is not changed. Reason: the diagnostic's `line` must agree with the AST the rest of the stage uses, and CPython's own compiler translates a lone CR to a newline (so a raw CR inside a quoted string is already a syntax error at SOURCE_AST). Unit test `test_lone_cr_ends_a_line_as_for_ast_parse`.
+
+## A-020 — What PARAMETER_NAMES, PARAMETER_KIND and DEFAULT_OR_VARIADIC each cover (DECIDED BY CLAUDE — owner review pending)
+
+Protocol §3.4 (file 02 L164): "exactly one binding of the required kind proceeds to
+parameter checks in the order `PARAMETER_NAMES`, `PARAMETER_KIND`, then
+`DEFAULT_OR_VARIADIC`." File 30 §3 L33: "parameter checks in the order names, kinds,
+then defaults/variadic/keyword-only shape." File 30 §3 L35/L37 give the required lists:
+`create_driver(seed)`, `Driver.step(self, cycle_index, outputs_after_edge)`,
+`check_trace(trace, metadata)`, each "required positional-or-keyword … not
+positional-only … no default, variadic, keyword-only or extra parameters".
+
+The text does not say which parameters the names check compares. Readings: (a) the
+positional parameters only (positional-only then positional-or-keyword); (b) every
+named parameter, including keyword-only and variadic names. Example: `def
+create_driver(seed, *args)` is `DEFAULT_OR_VARIADIC` under (a) but `PARAMETER_NAMES`
+under (b); `def create_driver(*, seed)` is `PARAMETER_NAMES` under (a) but
+`PARAMETER_KIND` under (b).
+
+**Decision (decided by Claude under standing delegation, owner review pending):** (a).
+- The names check compares the positional parameter names, in order, with the required
+  list.
+- The kind check rejects any positional-only parameter.
+- `DEFAULT_OR_VARIADIC` rejects any default, `*args`, keyword-only parameter or
+  `**kwargs`.
+- Annotations are ignored.
+
+Reason: File 30 groups "keyword-only" with defaults and variadics in the *third*
+check. Under (b), a keyword-only or variadic parameter would already fail the names
+check, which would leave the third check almost unreachable. "Extra" positional
+parameters are a names mismatch under both readings. Unit tests `ParameterTests`.
+
+## A-021 — What counts as a "binding" in the required-symbol pass (DECIDED BY CLAUDE — owner review pending)
+
+Protocol §3.4 (file 02 L164): "count all same-name binding definitions at the required
+scope … more than one binding of any AST kind emits `EXTRA_ENTRY_POINT`; exactly one
+binding with the wrong AST kind emits `WRONG_ENTRY_POINT_KIND`". The text does not list
+which AST kinds bind.
+
+**Decision (decided by Claude under standing delegation, owner review pending):** a
+binding is a statement in the scope's own body (module body, or `Driver`'s class body
+for `step`) that is:
+- a `def`, `async def` or `class` with that name;
+- an assignment, or an annotated assignment *with a value*, whose target binds that
+  name (unpacking included);
+- an import whose bound name is that name.
+
+An annotated name without a value (`create_driver: int`) is not counted, because Python
+creates no binding for it. Definitions nested inside functions are not at the required
+scope.
+
+Reason: "binding" is Python's own term (Language Reference 4.2.1), and these are the
+statements that bind a name in a module or class scope after IMPORT_POLICY. Other
+binding forms (`for`, `with`, `global` from a function) cannot appear at module scope
+by then. Unit tests `test_any_binding_kind_counts_as_extra`,
+`test_annotation_without_value_is_not_a_binding`.
+
+## A-022 — `Driver` class-body statements other than methods and nested classes (DECIDED BY CLAUDE — owner review pending)
+
+File 30 §3 L35: "Its body may contain one docstring, literal-only class constants and
+exactly one synchronous undecorated instance method named `step`". IMPORT_POLICY checks
+module-body statements only. The seven AST_SIGNATURE category ranks cover methods
+(rank 3), nested classes (rank 1), bases and metaclass (rank 4), decorators, async
+definitions and comprehensions. None of them names a class-body statement such as
+`X = f()`, `pass` or `if …:` inside `Driver`.
+
+Readings: (a) not checked statically; later stages (restricted import) see its effects;
+(b) `DRIVER_CLASS_FORM`, the only reason about the `Driver` class's form, at rank 4;
+(c) a new reason — excluded, because "No unlisted value is permitted" (file 02 L125).
+
+**Decision (decided by Claude under standing delegation, owner review pending):** (b).
+Any `Driver` class-body statement other than these is `DRIVER_CLASS_FORM` at rank 4,
+`symbol=Driver`, positioned at the statement:
+- a method or nested class (handled by the other ranks);
+- a first-statement string docstring;
+- an assignment or annotated assignment with a plain-name target and a literal-only value
+  (or no value).
+
+Class constants use the module-constant rules, including the owner's A-015 case 2 rule
+(plain-name targets only). Reason: the stage map assigns "class/method/nesting violation" to
+AST_SIGNATURE, and B5 (file 19 L25, file 30 L52) states the class-body allowance to
+the model, so (a) would leave a stated rule unenforced. Unit test
+`test_driver_body_statements`. No current fixture has such a statement.
+
+## A-023 — Source position of definition violations in the global pass (DECIDED BY CLAUDE — owner review pending)
+
+The global sort key is `(category, file_order, lineno, col_offset, end_lineno,
+end_col_offset)`. The text gives the node only for rank 7 ("the expression node's own
+source position").
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- Ranks 1–3, 5 and 6 use the offending `ClassDef`/`FunctionDef`/`AsyncFunctionDef`
+  node's own position (on CPython 3.11 a decorated definition starts at its `def` or
+  `class` line, not at the decorator).
+- Rank 4 uses the `Driver` `ClassDef`, or the class-body statement for A-022.
+
+Reason: the violation is a property of the definition node, which is how the text
+names it ("any nested class", "any decorator on any function, class or method").
+Only ties between two violations of the same category in the same file depend on this.
+
+## A-024 — Compile errors without a line number (DECIDED BY CLAUDE — owner review pending)
+
+Stage map: `COMPILE_ERROR|file=<FILE>|line=<LINE>`, and `LINE` must be positive. The
+pack does not say what to do if `compile()` raises a SyntaxError with no line, or
+another exception.
+
+**Decision (decided by Claude under standing delegation, owner review pending):** use
+line 1, as A-011 does for SOURCE_AST; any other exception from `compile()` is a compile
+error at line 1. Reason: same as A-011. Sources reaching compilation have already parsed,
+so this is a defensive rule; no known 3.11.18 input reaches it.

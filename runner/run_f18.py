@@ -30,6 +30,7 @@ sys.path.insert(0, str(REPO / "src"))
 from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
 from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
 from openvef.import_policy import check_import_policy  # noqa: E402
+from openvef.ast_signature import check_ast_signature, check_compile  # noqa: E402
 from openvef.source_ast import FILE_ORDER, UnsettledSpec, check_sources, syntax_reject  # noqa: E402
 
 INDEX_REL = "41_F18_Fixture_Inputs/fixture-index.json"
@@ -101,18 +102,21 @@ def failure_record(result: Failure) -> dict:
 
 
 def run_source_ast(driver_source: str, checker_source: str) -> tuple[str, dict | None, str]:
-    """Stages SOURCE_AST then IMPORT_POLICY (Protocol §3.4 evaluation order (2), (3))."""
+    """SOURCE_AST, IMPORT_POLICY, static AST_SIGNATURE, COMPILE_DRIVER, COMPILE_CHECKER
+    (Protocol §3.4 evaluation order (2)-(6))."""
     sources = {"driver.py": driver_source, "checker.py": checker_source}
     try:
         trees = check_sources(list(sources.items()))
         if isinstance(trees, Failure):
             return "EXECUTED", failure_record(trees), ""
-        result = check_import_policy(sources, trees)
+        result = (check_import_policy(sources, trees) or check_ast_signature(trees)
+                  or check_compile(sources))
     except UnsettledSpec as exc:
         return "NOT_IMPLEMENTED", None, f"blocked on docs/ambiguities.md {exc}"
     if isinstance(result, Failure):
         return "EXECUTED", failure_record(result), ""
-    return "NOT_IMPLEMENTED", None, "IMPORT_POLICY passed; next stage (AST_SIGNATURE) not implemented"
+    return "NOT_IMPLEMENTED", None, ("static stages and compilation passed; next: runtime import, "
+                                     "inspect.signature and factory checks (not implemented)")
 
 
 def run_syntax_error_vector(source_file: str, syntax_error: dict) -> tuple[str, dict | None, str]:
