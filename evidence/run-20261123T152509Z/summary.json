@@ -1,0 +1,31 @@
+{
+  "run_started_utc": "20261123T152509Z",
+  "run_class": "DEVELOPMENT - GitHub Codespaces",
+  "python_version": "3.11.18 (main, Nov 23 2026, 15:21:08) [GCC 13.3.0]",
+  "python_executable": "/home/codespace/.pyenv/versions/3.11.18/bin/python3.11",
+  "python_executable_sha256": "518f54d13051b03dd0abec59e0baaab584dad9d7139d7adacbc774d690b75356",
+  "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "fixture_index_sha256": "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54",
+  "git_commit": "7384d01659669529babfb635631983c2b5670fc0+UNCOMMITTED_CHANGES",
+  "source_sha256": {
+    "runner/run_f18.py": "f7cf018a05c60c01f57ab17fcff2eec4b25d9dc5e6efc7a498b13db8d13f82bc",
+    "src/openvef/__init__.py": "6071fa9f7b1f81b634bd32bd0c5c6b1aeb1969c747b8b45ebf7b783c6c73567a",
+    "src/openvef/envelope.py": "856a8385b2bbfd42591500847fb94dbcb9163e1719906e4ba27743c1322d7792"
+  },
+  "command": [
+    "/home/codespace/.pyenv/versions/3.11.18/bin/python3.11",
+    "runner/run_f18.py",
+    "baseline/OpenVEF_Planning_v1_3_6",
+    "evidence",
+    "DEVELOPMENT - GitHub Codespaces"
+  ],
+  "counts": {
+    "PASS": 8,
+    "FAIL": 0,
+    "NOT_IMPLEMENTED": 136,
+    "ERROR": 0
+  },
+  "total": 144,
+  "results_sha256": "674991371ba9954c0d54da90aab4cad98bbeacdbeaf7fecea55e28f50c9aae48"
+}

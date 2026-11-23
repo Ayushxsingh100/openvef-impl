@@ -1,0 +1,6 @@
+recorded_utc: 2026-11-23T15:27:07Z
+Python 3.11.18 (main, Nov 23 2026, 15:21:08) [GCC 13.3.0]
+Linux codespaces-a74d07 6.8.0-1070-azure #78~22.04.1-Ubuntu SMP Thu Sep 24 18:46:45 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+518f54d13051b03dd0abec59e0baaab584dad9d7139d7adacbc774d690b75356  /home/codespace/.pyenv/versions/3.11.18/bin/python3.11
+pyenv_commit: fc6046ccd0721c0ea258e11c9320515cee13f4d7
+source: https://www.python.org/ftp/python/3.11.18/Python-3.11.18.tar.xz (built by pyenv)

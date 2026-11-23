@@ -1,0 +1,22 @@
+{
+  "fixture_id": "M27",
+  "fixture_version": "1.0",
+  "scope": "missing-case",
+  "description": "Driver vector violates a design-specific legal-input predicate",
+  "manifest_clause_ids": [
+    "FIFO-001"
+  ],
+  "input": {
+    "driver_return": {
+      "wr_en": "1",
+      "full": "1"
+    },
+    "legal_input_predicate": "wr_en must be 0 when full is 1"
+  },
+  "expected": {
+    "disposition": "REPAIR",
+    "stage_id": "DRIVER_VECTOR",
+    "error_class": "DRIVER_VECTOR_INVALID",
+    "diagnostic": "DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE"
+  }
+}
