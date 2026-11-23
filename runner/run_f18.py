@@ -105,18 +105,24 @@ def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
         raw = inp["raw_response_utf8"].encode("utf-8")
     elif set(inp) == {"raw_response_base64"}:
         raw = base64.b64decode(inp["raw_response_base64"], validate=True)
-    if raw is None:
-        return "NOT_IMPLEMENTED", None, f"input shape {sorted(inp)} has no implemented adapter (see A-002)"
 
-    envelope = parse_envelope(raw, inp.get("provider_finish_reason"))
-    if isinstance(envelope, Failure):
-        return "EXECUTED", failure_record(envelope), ""
-    assert isinstance(envelope, Envelope)
+    if raw is not None:
+        envelope = parse_envelope(raw, inp.get("provider_finish_reason"))
+        if isinstance(envelope, Failure):
+            return "EXECUTED", failure_record(envelope), ""
+        assert isinstance(envelope, Envelope)
+        obj = envelope.obj
+    elif set(inp) == {"response_object"}:
+        # A-002 (owner decision): skip envelope decoding only; the already-decoded
+        # object goes to schema validation as given.
+        obj = inp["response_object"]
+    else:
+        return "NOT_IMPLEMENTED", None, f"input shape {sorted(inp)} has no implemented adapter (see A-002)"
 
     # PARSE_SCHEMA part 1b: schema, then manifest clause IDs (Protocol §3.4 evaluation
     # order step 1). The manifest clause_ids come from the descriptor's
     # `manifest_clause_ids` field (docs/ambiguities.md A-005).
-    checked = validate_schema(validator, envelope.obj)
+    checked = validate_schema(validator, obj)
     if isinstance(checked, ValidatedResponse):
         checked = validate_clause_ids(checked, desc["manifest_clause_ids"])
     if isinstance(checked, Failure):
