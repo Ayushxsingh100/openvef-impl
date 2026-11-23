@@ -40,14 +40,14 @@ module accepts `NaN`, `Infinity` and `-Infinity`, which are not JSON under RFC 8
 Implemented: rejected as JSON syntax (`SCHEMA_REJECT|pointer=/`). No current fixture
 exercises this. **Owner confirmation needed.**
 
-## D-001 — Pin the Draft 2020-12 validator (DECISION)
+## D-001 — Pin the Draft 2020-12 validator (PENDING — one owner confirmation outstanding)
 
 Protocol §3.4: "Use the pinned Draft 2020-12 validator". Register 16 L40 lists the parser
 version as TO FREEZE. Schema validation (part 1b) needs an exact `jsonschema` version and
 its dependencies, pinned with hashes in `requirements.lock`.
 
-**Decided (owners, 23 Nov 2026, session 2 instruction):** `jsonschema==4.26.0`. Resolved
-with pip-tools 7.7.0 (`pip-compile --generate-hashes`, separate tools venv) on CPython
+**Not fully decided.** Krishika has confirmed `jsonschema==4.26.0`; Ayush Kumar Singh's
+confirmation is pending. Resolved with pip-tools 7.7.0 (`pip-compile --generate-hashes`, separate tools venv) on CPython
 3.11.18: attrs 26.1.0, jsonschema-specifications 2025.9.1, referencing 0.37.0,
 rpds-py 2026.9.1, typing-extensions 4.16.0. Installed into `.venv` with
 `pip --require-hashes`. Register 16 L40 still needs this version recorded as frozen.
