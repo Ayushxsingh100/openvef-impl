@@ -4,7 +4,7 @@ Each item quotes the source, lists the readings, and says what changes. Items ma
 PROVISIONAL are implemented one way so work can continue; the owners must confirm or
 change them before any evidence run counts toward F18.
 
-## A-001 — OUTPUT_TRUNCATED versus envelope rejection (PROVISIONAL)
+## A-001 — OUTPUT_TRUNCATED versus envelope rejection (DECIDED — Ayush's confirmation pending)
 
 - Protocol §3.4 stage map lists "Envelope, schema or clause manifest rejection" first and
   "Provider finish reason explicitly reports max-token truncation" second, and says "The
@@ -19,9 +19,11 @@ Readings: (a) truncation is checked before envelope decoding — matches P11a;
 its expected value. Unspecified either way: finish reason `length` with complete, valid JSON.
 
 Implemented: (a). Also implemented: `length` always yields `OUTPUT_TRUNCATED`, even if the
-JSON is complete. **Owner decision needed.**
+JSON is complete.
 
-## A-002 — How fixture input shapes are fed to the parser (OPEN)
+**Decision:** truncation is checked first (reading (a), as implemented). Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending.
+
+## A-002 — How fixture input shapes are fed to the parser (DECIDED — Ayush's confirmation pending)
 
 The catalog says each descriptor holds "a literal JSON input" but does not define how the
 runner turns each input shape into the call under test. 86 fixtures use `response_object`
@@ -31,14 +33,20 @@ For `response_object`, readings: (a) serialize to UTF-8 JSON bytes and run the f
 parser; (b) skip envelope decoding and start at schema validation. For every current
 `response_object` fixture both readings should give the same result, because the object
 has no duplicate keys and serializes to valid JSON — this is to be confirmed when part 1b
-exists. Not implemented yet. **Owner decision needed before those fixtures run.**
+exists.
 
-## A-003 — NaN / Infinity tokens (PROVISIONAL)
+**Decision:** `response_object` fixtures start at schema validation with the object
+as given (reading (b)). Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending. The decision covers `response_object` only; other input
+shapes are listed in A-012.
+
+## A-003 — NaN / Infinity tokens (DECIDED — Ayush's confirmation pending)
 
 File 30 §1 requires one JSON object and rejection of malformed JSON. Python's `json`
 module accepts `NaN`, `Infinity` and `-Infinity`, which are not JSON under RFC 8259.
 Implemented: rejected as JSON syntax (`SCHEMA_REJECT|pointer=/`). No current fixture
-exercises this. **Owner confirmation needed.**
+exercises this.
+
+**Decision:** `NaN`/`Infinity` are rejected (as implemented). Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending.
 
 ## D-001 — Pin the Draft 2020-12 validator (PENDING — one owner confirmation outstanding)
 
@@ -52,7 +60,7 @@ confirmation is pending. Resolved with pip-tools 7.7.0 (`pip-compile --generate-
 rpds-py 2026.9.1, typing-extensions 4.16.0. Installed into `.venv` with
 `pip --require-hashes`. Register 16 L40 still needs this version recorded as frozen.
 
-## A-004 — `UNSPECIFIED` text must identify the missing behavior (OPEN)
+## A-004 — `UNSPECIFIED` text must identify the missing behavior (DECIDED — Ayush's confirmation pending)
 
 File 30 §1 L9: "`UNSPECIFIED` is permitted only for behavior not specified in the received
 packet, and the text must identify the missing behavior."
@@ -64,9 +72,12 @@ rule is given). Fixture P21 ("UNSPECIFIED used with a non-empty description of m
 behavior") expects acceptance at this stage and is consistent with (a).
 
 Implemented: (a) — `UNSPECIFIED` is accepted with no text check. No pointer exists for a
-failure under (b). **Owner confirmation needed.**
+failure under (b).
 
-## A-005 — Source of the manifest `clause_ids` for fixtures (PROVISIONAL)
+**Decision:** `UNSPECIFIED` text is accepted at parse time (reading (a), as implemented).
+Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending.
+
+## A-005 — Source of the manifest `clause_ids` for fixtures (DECIDED — Ayush's confirmation pending)
 
 File 30 §1 L9 validates clause IDs "against the exact `clause_ids` array and
 `clause_id_regex` in the frozen manifest". No frozen manifest exists yet. Every F18
@@ -82,9 +93,12 @@ L29/L91 applies the regex to each `clause_ids` element at packet freeze. So the 
 check is exact membership; the regex is not re-applied to response values (any member
 already matches it). If the owners read L9 as requiring a separate regex test on response
 values, the outcome is unchanged for every value, because a non-member is rejected
-either way. **Owner confirmation needed for (a).**
+either way.
 
-## A-006 — Sorting array-index tokens in the schema pointer key (PROVISIONAL)
+**Decision:** fixtures use their own `manifest_clause_ids` list (reading (a), as
+implemented). Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending.
+
+## A-006 — Sorting array-index tokens in the schema pointer key (DECIDED — Ayush's confirmation pending)
 
 Protocol §3.4 (file 02 L137): "Sort by: (1) instance-token sequence, Unicode code-point
 order, shorter equal prefix first". RFC 6901 tokens are strings, so array index `10` sorts before `2`. The
@@ -97,4 +111,6 @@ the clause-ID rule.
 Implemented: (a), the literal text (unit test `test_array_index_tokens_compare_as_strings`).
 It matters only when schema errors exist at two array indexes with different digit
 counts (needs ≥ 11 assumptions or dependencies items). No current fixture exercises it.
-**Owner confirmation needed.**
+
+**Decision:** the two rules stay as implemented: schema-error pointers sort tokens by
+Unicode code point (reading (a)); clause-ID rejection uses the lowest numeric index. Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending.
