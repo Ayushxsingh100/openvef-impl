@@ -17,6 +17,7 @@ from openvef.import_policy import (  # noqa: E402
     ALLOWED_ROOTS,
     classify_import,
     classify_import_from,
+    find_global_random_use,
     find_prohibited_names,
     scan_identifiers,
 )
@@ -267,6 +268,45 @@ class ProhibitedNameTests(unittest.TestCase):
     def test_name_inside_fstring_is_found(self):
         # The AST walk sees names inside f-string replacement fields.
         self.assertEqual(self.names('def f():\n    return f"{eval}"\n'), ["PROHIBITED_BUILTIN|name=eval"])
+
+
+class GlobalRandomTests(unittest.TestCase):
+    def uses(self, source):
+        return diagnostics(find_global_random_use(ast.parse(source)))
+
+    def method(self, line):
+        return f"import random\ndef create_driver(seed):\n    return Driver()\nclass Driver:\n    def step(self, c, o):\n        {line}\n        return 'COMPLETE'\n"
+
+    def test_module_global_calls(self):
+        for attr, line in (("random", "value = random.random()"), ("randint", "value = random.randint(0, 1)"),
+                           ("SystemRandom", "value = random.SystemRandom()"), ("seed", "random.seed(1)")):
+            with self.subTest(attr=attr):
+                self.assertEqual(self.uses(self.method(line)), [f"GLOBAL_RANDOM_USE|name=random.{attr}"])
+
+    def test_random_Random_allowed(self):
+        src = "import random\ndef create_driver(seed):\n    driver = Driver()\n    driver.rng = random.Random(seed)\n    return driver\n"
+        self.assertEqual(self.uses(src), [])
+
+    def test_attribute_access_without_call(self):
+        self.assertEqual(self.uses("import random\ndef f():\n    return random.choice\n"),
+                         ["GLOBAL_RANDOM_USE|name=random.choice"])
+
+    def test_methods_of_a_local_generator_allowed(self):
+        self.assertEqual(self.uses("import random\ndef f(seed):\n    rng = random.Random(seed)\n    return rng.random()\n"), [])
+
+    def test_aliases_not_detected(self):
+        # File 30 §2 L20: aliasing and getattr bypass static detection by design.
+        self.assertEqual(self.uses('import random\ndef f():\n    r = random\n    return r.random(), getattr(random, "random")\n'), [])
+
+    def test_a017_syntactic_without_import(self):
+        # Planned reading (A-017): matched whether or not `random` is the imported module.
+        self.assertEqual(self.uses("def f(random):\n    return random.choice\n"), ["GLOBAL_RANDOM_USE|name=random.choice"])
+
+    def test_source_order(self):
+        src = "import random\ndef f():\n    a = random.randint(0, 1)\n    return random.random()\n"
+        found = find_global_random_use(ast.parse(src))
+        self.assertEqual(diagnostics(found), ["GLOBAL_RANDOM_USE|name=random.randint", "GLOBAL_RANDOM_USE|name=random.random"])
+        self.assertEqual([f.key for f in found], [(3, 8, 3, 22), (4, 11, 4, 24)])
 
 
 if __name__ == "__main__":

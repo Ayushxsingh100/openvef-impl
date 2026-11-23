@@ -12,6 +12,8 @@ Implemented so far:
                    classification and its total precedence.
   File 30 §2 L19; Protocol §3.4 (file 02 L133) — prohibited built-in names and
                    `builtins.<name>` (PROHIBITED_BUILTIN|name=<NAME>).
+  File 30 §2 L20; Protocol §3.4 (file 02 L133) — direct `random.<attribute>` use
+                   other than `random.Random` (GLOBAL_RANDOM_USE|name=random.<attr>).
 
 The order between categories inside one file (A-013, A-014) is not decided, so this
 module exposes one function per sub-rule and no combined stage yet. The `find_*`
@@ -217,4 +219,27 @@ def find_prohibited_names(tree: ast.Module) -> list[Finding]:
         else:
             continue
         findings.append(Finding(node_key(node), _reject(f"PROHIBITED_BUILTIN|name={name}")))
+    return sorted(findings, key=lambda f: f.key)
+
+
+# --- Module-global random use (File 30 §2 L20; Protocol §3.4 file 02 L133) --------------
+
+def find_global_random_use(tree: ast.Module) -> list[Finding]:
+    """Every direct `random.<attribute>` other than `random.Random`, in source order.
+
+    "Any direct attribute access on the module name `random` other than
+    `random.Random` is rejected, including module-global PRNG calls and
+    `random.SystemRandom`." (File 30 §2 L20.) `GLOBAL_RANDOM_USE.name` is the
+    qualified name, e.g. `random.random` (Protocol §3.4 file 02 L125).
+
+    A-017 (owner confirmation pending): the match is syntactic,
+    `Attribute(value=Name(id="random"))`, whether or not `random` is the imported
+    module. Aliases such as `r = random; r.random()` and `getattr(random, "random")`
+    are not statically detected, as the text says.
+    """
+    findings = []
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)
+                and node.value.id == "random" and node.attr != "Random"):
+            findings.append(Finding(node_key(node), _reject(f"GLOBAL_RANDOM_USE|name=random.{node.attr}")))
     return sorted(findings, key=lambda f: f.key)
