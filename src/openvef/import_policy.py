@@ -8,6 +8,8 @@ Implemented so far:
                    COLUMN is the one-based UTF-8 byte column of the lexeme start.
   File 30 §2 L16-L17; Protocol §3.4 (file 02 L129) — per-node `ast.Import`
                    classification and its total precedence.
+  File 30 §2 L18; Protocol §3.4 (file 02 L131) — per-node `ast.ImportFrom`
+                   classification and its total precedence.
 
 The order between categories inside one file (A-013, A-014) is not decided, so this
 module exposes one function per sub-rule and no combined stage yet.
@@ -134,3 +136,34 @@ def classify_import(file: str, node: ast.Import) -> Optional[Failure]:
     if alias.asname is not None:
         return _form_reject(file, node, "IMPORT_ALIAS")
     return None
+
+
+def classify_import_from(file: str, node: ast.ImportFrom) -> Optional[Failure]:
+    """Classify one `ast.ImportFrom` node; None means it is accepted.
+
+    Total order (Protocol §3.4 file 02 L131): "(1) `level > 0` -> `RELATIVE_IMPORT`;
+    (2) any `*` alias -> `STAR_IMPORT`; (3) if `len(names) != 1` -> `MULTIPLE_NAMES`;
+    (4) if `module == "__future__"`, accept only exactly one unaliased `annotations`
+    name; any other future feature -> `FUTURE_FEATURE`, while `annotations as alias`
+    -> `IMPORT_ALIAS`; (5) if the first module component is not an allowed root, emit
+    `IMPORT_NOT_ALLOWED|module=<root>`; (6) every remaining non-future `from` import
+    emits `FROM_IMPORT_FORBIDDEN`."
+    """
+    if node.level > 0:
+        return _form_reject(file, node, "RELATIVE_IMPORT")
+    if any(alias.name == "*" for alias in node.names):
+        return _form_reject(file, node, "STAR_IMPORT")
+    if len(node.names) != 1:
+        return _form_reject(file, node, "MULTIPLE_NAMES")
+    alias = node.names[0]
+    # level == 0 here, so `module` is a non-empty string.
+    if node.module == "__future__":
+        if alias.name != "annotations":
+            return _form_reject(file, node, "FUTURE_FEATURE")
+        if alias.asname is not None:
+            return _form_reject(file, node, "IMPORT_ALIAS")
+        return None
+    root = node.module.split(".", 1)[0]
+    if root not in ALLOWED_ROOTS:
+        return _not_allowed(root)
+    return _form_reject(file, node, "FROM_IMPORT_FORBIDDEN")

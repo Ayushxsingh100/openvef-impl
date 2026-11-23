@@ -13,7 +13,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
 
-from openvef.import_policy import ALLOWED_ROOTS, classify_import, scan_identifiers  # noqa: E402
+from openvef.import_policy import ALLOWED_ROOTS, classify_import, classify_import_from, scan_identifiers  # noqa: E402
 from openvef.source_ast import UnsettledSpec  # noqa: E402
 
 
@@ -146,6 +146,69 @@ class ImportClassificationTests(unittest.TestCase):
         node = ast.parse("x = 1\n\nimport math as m\n").body[1]
         self.assertEqual(classify_import("checker.py", node).diagnostic,
                          "IMPORT_FORM_REJECT|file=checker.py|line=3|reason=IMPORT_ALIAS")
+
+
+def classify_from(source, file="driver.py"):
+    node = first_stmt(source)
+    assert isinstance(node, ast.ImportFrom)
+    result = classify_import_from(file, node)
+    if result is None:
+        return None
+    assert (result.stage_id, result.error_class, result.disposition) == ("IMPORT_POLICY", "IMPORT_POLICY_REJECT", "REPAIR")
+    return result.diagnostic
+
+
+def form(reason, line=1, file="driver.py"):
+    return f"IMPORT_FORM_REJECT|file={file}|line={line}|reason={reason}"
+
+
+class ImportFromClassificationTests(unittest.TestCase):
+    def test_spec_examples(self):
+        # Protocol §3.4 L131 "Consequently ..." and File 30 §2 L18 examples.
+        self.assertEqual(classify_from("from collections import abc\n"), form("FROM_IMPORT_FORBIDDEN"))
+        self.assertEqual(classify_from("from collections.abc import Iterable\n"), form("FROM_IMPORT_FORBIDDEN"))
+        self.assertEqual(classify_from("from os import path\n"), "IMPORT_NOT_ALLOWED|module=os")
+        self.assertEqual(classify_from("from os import path as p\n"), "IMPORT_NOT_ALLOWED|module=os")
+        self.assertEqual(classify_from("from . import x\n"), form("RELATIVE_IMPORT"))
+        self.assertEqual(classify_from("from math import *\n"), form("STAR_IMPORT"))
+        self.assertEqual(classify_from("from __future__ import annotations, annotations\n"), form("MULTIPLE_NAMES"))
+        self.assertEqual(classify_from("from __future__ import annotations, division\n"), form("MULTIPLE_NAMES"))
+
+    def test_only_accepted_form(self):
+        # File 30 §2 L18: "The only accepted form is exactly `from __future__ import annotations` without alias."
+        self.assertIsNone(classify_from("from __future__ import annotations\n"))
+
+    def test_future_feature_and_alias(self):
+        self.assertEqual(classify_from("from __future__ import division\n"), form("FUTURE_FEATURE"))
+        self.assertEqual(classify_from("from __future__ import annotations as future_annotations\n"), form("IMPORT_ALIAS"))
+        # Unsupported feature precedes the alias rule.
+        self.assertEqual(classify_from("from __future__ import division as d\n"), form("FUTURE_FEATURE"))
+
+    def test_relative_wins_over_star_and_root(self):
+        self.assertEqual(classify_from("from . import *\n"), form("RELATIVE_IMPORT"))
+        self.assertEqual(classify_from("from .os import x\n"), form("RELATIVE_IMPORT"))
+        self.assertEqual(classify_from("from ..math import a, b\n"), form("RELATIVE_IMPORT"))
+
+    def test_star_wins_over_future_and_root(self):
+        self.assertEqual(classify_from("from __future__ import *\n"), form("STAR_IMPORT"))
+        self.assertEqual(classify_from("from os import *\n"), form("STAR_IMPORT"))
+
+    def test_multiple_names_wins_over_root(self):
+        self.assertEqual(classify_from("from os import path, sep\n"), form("MULTIPLE_NAMES"))
+
+    def test_allowed_root_still_forbidden_with_or_without_alias(self):
+        self.assertEqual(classify_from("from math import ceil\n"), form("FROM_IMPORT_FORBIDDEN"))
+        self.assertEqual(classify_from("from math import ceil as c\n"), form("FROM_IMPORT_FORBIDDEN"))
+        # File 30 §2 L20: "`from random import ...` is not permitted by the general from-import rule."
+        self.assertEqual(classify_from("from random import Random\n"), form("FROM_IMPORT_FORBIDDEN"))
+
+    def test_disallowed_dotted_root_reports_first_component(self):
+        self.assertEqual(classify_from("from os.path import join\n"), "IMPORT_NOT_ALLOWED|module=os")
+
+    def test_line_and_file(self):
+        node = ast.parse("x = 1\nfrom math import ceil\n").body[1]
+        self.assertEqual(classify_import_from("checker.py", node).diagnostic,
+                         form("FROM_IMPORT_FORBIDDEN", line=2, file="checker.py"))
 
 
 if __name__ == "__main__":
