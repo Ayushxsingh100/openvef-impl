@@ -36,17 +36,31 @@
 | Protocol §3.4 L94–L127 grammar, L168 serialization (grammar, 2,048-byte truncation, JSON) | `src/openvef/serializer.py` | M14, M15, M17 — PASS in run-20261123T182731Z | Implemented (A-029, A-032 Claude-decided, owner review pending) |
 | File 31 L11, L27–L30, §8: reserved heading lines, unresolved placeholders, clause-ID near-match and set equality | `src/openvef/assembler.py` | M18, M19, M20, M40 — PASS in run-20261123T182731Z | Implemented (A-030 Claude-decided, owner review pending) |
 | Protocol L175, L183–L185: halt signature, single recovery cycle, operational recovery | `src/openvef/ledger.py` | M41, M42, M47 — PASS in run-20261123T182731Z; change-class vectors: see the L175–L176 row | Implemented (A-031, A-032 Claude-decided, owner review pending; pack inconsistency noted in A-031) |
-| Protocol L175–L176, L181–L183: change-class lifecycle control expectations; `required_action` verbatim from L176; each field cited or marked unsupported | `src/openvef/ledger.py` `LIFECYCLE_CASES`, `lifecycle_expectation`; `tests/test_lifecycle.py` (5 tests) | M53 executed; M48, M50, M54, M58 NOT_IMPLEMENTED (unsupported fields listed in A-033) | Implemented (A-033 revised per owner correction; field derivations Claude-decided, owner review pending) |
+| Protocol L175–L176, L181–L183: change-class lifecycle control expectations; `required_action` verbatim from L176; each field cited or marked unsupported | `src/openvef/ledger.py` `LIFECYCLE_CASES`, `lifecycle_expectation`; `tests/test_lifecycle.py` (5 tests) | M53 — PASS in run-20261123T195936Z; M48, M50, M54, M58 NOT_IMPLEMENTED (unsupported fields listed in A-033) | Implemented (A-033 revised per owner correction; field derivations Claude-decided, owner review pending) |
 
-Latest run: `evidence/run-20261123T183649Z` — commit a8f4631 (clean); host CPython 3.11.18 (SHA-256
-518f54d1…5356) for static stages; sandbox `python@sha256:07d48240…b535`, image
-`sha256:67a6c301…5789`, container CPython 3.11.18 (SHA-256 92d7e40e…6b79), harness SHA-256
-41913187…2e16: 128 PASS, 0 FAIL, 16 NOT_IMPLEMENTED, 0 ERROR (M06 new versus
-run-20261123T182731Z; no earlier result changed). NOT_IMPLEMENTED: 10 need the simulator
-(listed above); M27 needs an executable legal-input predicate (A-027); M48, M50, M53, M54,
-M58 are blocked on A-033. Development run (Codespaces), not pinned-environment evidence.
-Results that depend on Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-037) do not
-count toward F18 until both owners review them.
+Latest run: `evidence/run-20261123T195936Z`. It was started by `runner/run_f18_container.sh` at commit bfc5393, on a
+clean tree:
+- Interpreter status **PINNED** under D-002a: the runner and every artifact ran in the
+  image `python@sha256:07d48240…b535`, image ID `sha256:87219fac…4141`, CPython 3.11.18,
+  SHA-256 92d7e40e…6b79.
+- Toolchain recorded: cocotb 2.1.0; iverilog 12.0-2+b1, "Icarus Verilog version 12.0
+  (stable)".
+- Counts: 129 PASS, 0 FAIL, 15 NOT_IMPLEMENTED, 0 ERROR. M53 is new versus
+  run-20261123T183649Z, and no other result changed.
+- NOT_IMPLEMENTED:
+  - 10 are blocked on design materials absent from the pack (P01, P14, P17, P21, P42, M07,
+    M31, M32, M33, M57; see the L166 (7)–(8) row);
+  - M27 (A-038);
+  - M48, M50, M54, M58 (A-033: unsupported fields).
+- run-20261123T195911Z (commit 81aea65) has identical results. Its files were written
+  with mode 646 and later set to 644; the broker now does this itself.
 
-Evidence: see `evidence/run-*/summary.json`. Development runs are not pinned-environment
-evidence until run on the owners' recorded interpreter.
+Caveats:
+- D-002a and D-003 still await Ayush's confirmation.
+- This was a development host (Codespaces, Docker 29.9.2).
+- Results that depend on Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-039)
+  do not count toward F18 until both owners review them.
+
+Evidence: see `evidence/run-*/summary.json`. Since D-002a, only runs whose
+`interpreter_status` is `PINNED` (started with `runner/run_f18_container.sh`) are on the
+pinned interpreter. Earlier runs used the host interpreter and are development runs only.

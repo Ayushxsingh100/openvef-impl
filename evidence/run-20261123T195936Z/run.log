@@ -1,0 +1,278 @@
+{
+  "run_started_utc": "20261123T195936Z",
+  "run_class": "development",
+  "interpreter_status": "PINNED (D-002a: runner and artifacts in the pinned image)",
+  "python_version": "3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]",
+  "python_executable": "/usr/local/bin/python",
+  "python_executable_sha256": "92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79",
+  "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "fixture_index_sha256": "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54",
+  "response_schema_sha256": "6fb5d282b09540949f21ee134b522841c3345031cb3e118a83bdffc18b4e7c34",
+  "distributions": {
+    "jsonschema": "4.26.0",
+    "attrs": "26.1.0",
+    "jsonschema-specifications": "2025.9.1",
+    "referencing": "0.37.0",
+    "rpds-py": "2026.9.1",
+    "typing_extensions": "4.16.0",
+    "cocotb": "2.1.0",
+    "find-libpython": "0.5.1",
+    "iniconfig": "2.3.1",
+    "packaging": "26.3",
+    "pluggy": "1.7.0",
+    "pygments": "2.21.0",
+    "pytest": "9.2.0"
+  },
+  "git_commit": "bfc5393f406d308482da97d82b8d7384d5e71710",
+  "source_sha256": {
+    "runner/run_f18.py": "2062bbf61217b8f1f6958f34a027bef684c187a8d228ec6be0786424be90a084",
+    "sandbox/Dockerfile": "14dbede3fefff30636d5d2bf7f0ffb43f00d6a42157fa450f7ca8e0f87e68db1",
+    "sandbox/harness.py": "8df6ce5d88626a001b90429eb65c6c670f76992c3f8bf6e526a39bda362e9899",
+    "sandbox/sim.py": "0bfff798706bb693d7451a1a5ec9f1f33b41c39f7098eceaf05f01ab5862ef0c",
+    "sandbox/sim_cocotb.py": "3fd9b6c9469af4a5335aaa601b53671a3be515ffe607be7452d642cf8720c7a1",
+    "src/openvef/__init__.py": "6071fa9f7b1f81b634bd32bd0c5c6b1aeb1969c747b8b45ebf7b783c6c73567a",
+    "src/openvef/assembler.py": "b0c04b93c69035aa4e3eeba9f475d2794dac4894f798463813e9356cb6d2a7fd",
+    "src/openvef/ast_signature.py": "5910f63e57ed3714747a545376feb60a9f5b9e1190b99d048e66812c154bd256",
+    "src/openvef/envelope.py": "af74dc9c80097d9e6f526a54acabcf26041396bee446438bbf915b1a3dd119df",
+    "src/openvef/import_policy.py": "a27f6197ede05db172d4e8e76e928873dbbb3c20fc8e522a5a9e14ee741b72f6",
+    "src/openvef/ledger.py": "3c397c38da3f21f425e5eaa89e81bf4be7f751a5c90d121ed8bc80a5db9db30f",
+    "src/openvef/runtime.py": "4758ff4de83146444aaa9449ebee30aba6089fb197f0f1b64e17435e1699f076",
+    "src/openvef/sandbox.py": "65d7ec289008624fdefe4c0623a923020b923cf875d91b15493a399f742d5ca5",
+    "src/openvef/schema.py": "18a9cebaf5c912b5eaa4edff431d9752dae95b2412d387f26b4084392a06807d",
+    "src/openvef/serializer.py": "9452adae7dbbf56eed2a93752740b8c52f12ca148439e5bf929d9de259ca6b75",
+    "src/openvef/simulation.py": "ea4361eafcca108fb1a5ec25b6b015eb53492c235c5a0ba6547935213616b86a",
+    "src/openvef/source_ast.py": "b58a6914a4ca3ee80c9bc095fc75767cd0235dd085aa2744e30839bbdbecbbaa",
+    "src/openvef/stage_map.py": "ba548253ea222918b774b9e3960616263a307f1f8df7beadca9c79108c209ec1"
+  },
+  "command": [
+    "/usr/local/bin/python",
+    "/opt/openvef-repo/runner/run_f18.py",
+    "/baseline",
+    "/evidence",
+    "development"
+  ],
+  "sandbox": {
+    "mode": "D-002a runner container + host broker",
+    "base_image_digest": "python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535",
+    "image_tag": "openvef-sandbox:3d78c2ba0cd2e8fc",
+    "image_id": "sha256:87219faca1dd9f475868e4559701b4f1de04d9c41e65a2db730dbcc6614b4141",
+    "docker_server_version": "29.9.2-2",
+    "host_kernel": "Linux 6.8.0-1070-azure",
+    "dockerfile_sha256": "14dbede3fefff30636d5d2bf7f0ffb43f00d6a42157fa450f7ca8e0f87e68db1",
+    "requirements_lock_sha256": "4f247120d8e4e91c56a960d063353bba28bc6c766e76892609505c828582e870",
+    "broker_sha256": "07dd753e915e5a32c7690678e3ba5958a4e6fc6aeaa315323d3128606604e917",
+    "runner_container_flags": [
+      "--rm",
+      "-i",
+      "--network=none",
+      "--read-only",
+      "--cap-drop=ALL",
+      "--security-opt=no-new-privileges",
+      "--user=1000:1000",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777",
+      "--pids-limit=128",
+      "--memory=1g",
+      "--memory-swap=1g",
+      "--cpus=2",
+      "--ipc=none",
+      "--hostname=runner",
+      "--env=PYTHONHASHSEED=0",
+      "--env=PYTHONDONTWRITEBYTECODE=1",
+      "--env=PYTHONUNBUFFERED=1",
+      "--env=OPENVEF_BROKER=1",
+      "--volume=/workspaces/openvef-impl/baseline/OpenVEF_Planning_v1_3_6:/baseline:ro",
+      "--volume=/workspaces/openvef-impl/src:/opt/openvef-repo/src:ro",
+      "--volume=/workspaces/openvef-impl/runner:/opt/openvef-repo/runner:ro",
+      "--volume=/workspaces/openvef-impl/sandbox:/opt/openvef-repo/sandbox:ro",
+      "--volume=/workspaces/openvef-impl/evidence/run-20261123T195936Z:/evidence:rw",
+      "--workdir=/tmp",
+      "--name=openvef-runner-e358ff6421ec"
+    ],
+    "artifact_container_flags": [
+      "--rm",
+      "-i",
+      "--network=none",
+      "--read-only",
+      "--cap-drop=ALL",
+      "--security-opt=no-new-privileges",
+      "--user=10001:10001",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777",
+      "--pids-limit=64",
+      "--memory=256m",
+      "--memory-swap=256m",
+      "--cpus=1",
+      "--ulimit=nofile=64:64",
+      "--ipc=none",
+      "--hostname=sandbox",
+      "--env=PYTHONHASHSEED=0",
+      "--env=PYTHONDONTWRITEBYTECODE=1",
+      "--env=PYTHONUNBUFFERED=1",
+      "--volume=/workspaces/openvef-impl/sandbox:/opt/openvef:ro",
+      "--workdir=/tmp",
+      "--name=<name>"
+    ],
+    "artifact_command": [
+      "python",
+      "-I",
+      "/opt/openvef/harness.py"
+    ],
+    "harness_sha256": {
+      "harness.py": "8df6ce5d88626a001b90429eb65c6c670f76992c3f8bf6e526a39bda362e9899",
+      "sim.py": "0bfff798706bb693d7451a1a5ec9f1f33b41c39f7098eceaf05f01ab5862ef0c",
+      "sim_cocotb.py": "3fd9b6c9469af4a5335aaa601b53671a3be515ffe607be7452d642cf8720c7a1"
+    },
+    "toolchain": {
+      "cocotb": "2.1.0",
+      "iverilog_version_line": "Icarus Verilog version 12.0 (stable) ()",
+      "vvp_version_line": "Icarus Verilog runtime version 12.0 (stable) ()",
+      "iverilog_deb_version": "12.0-2+b1",
+      "iverilog_sha256": "99633b21371b5fc6ddc3156c9402c10e2915a94feb99ddc5eb01ba8f02758462",
+      "vvp_sha256": "dc287630d71c187dcf258a9d3c7d4aa77d2c3c2c4c7515debe91d000ea40c1df"
+    }
+  }
+}
+M01: PASS 
+M02: PASS 
+M03: PASS 
+M04a: PASS 
+M04b: PASS 
+M05: PASS 
+M06: PASS 
+M07: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+M08a: PASS 
+M08b: PASS 
+M09: PASS 
+M10: PASS 
+M11: PASS 
+M12: PASS 
+M13: PASS 
+M14: PASS 
+M15: PASS 
+M16: PASS 
+M17: PASS 
+M18: PASS 
+M19: PASS 
+M20: PASS 
+M21: PASS 
+M22: PASS 
+M23: PASS 
+M24: PASS 
+M25: PASS 
+M26: PASS 
+M27: NOT_IMPLEMENTED A-038: executing a prose legal-input predicate would require inventing a predicate language (File 30 L83 (e) defines none); the predicate belongs to the owner-written FIFO reset/legal-input specification; no port set is supplied for checks (a)-(d)
+M28: PASS 
+M29: PASS 
+M30: PASS 
+M31: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+M32: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+M33: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+M34: PASS 
+M35: PASS 
+M36: PASS 
+M37: PASS 
+M38: PASS 
+M39: PASS 
+M40: PASS 
+M41: PASS 
+M42: PASS 
+M43: PASS 
+M44: PASS 
+M45: PASS 
+M46: PASS 
+M47: PASS 
+M48: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for error_class: error class not stated: L175 states error classes only for the M41 (MID_RUN_REEVALUATION), M53 and M54 vectors, and the stage map shows the error class need not equal the diagnostic CODE (L154: SIMULATOR_ERROR under EVALUATOR_INFRASTRUCTURE_FAILURE); rerun_scope_rule: meaning supported (L183 'If the revised evaluator component is shared across FIFO and UART, the affected scope is both designs and every arm x design slot; if it is design-specific, the affected scope is that design in both arms') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M49: PASS 
+M50: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for error_class: error class not stated: L175 states error classes only for the M41 (MID_RUN_REEVALUATION), M53 and M54 vectors, and the stage map shows the error class need not equal the diagnostic CODE (L154: SIMULATOR_ERROR under EVALUATOR_INFRASTRUCTURE_FAILURE); affected_slots: meaning supported (L181 'invalidate every scheduled slot across both designs and both arms') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M51: PASS 
+M52: PASS 
+M53: PASS 
+M54: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for stable_error_class_rule: meaning supported (L185 'a simple exception class name ... for SIMULATOR_ERROR and the literal NONE for the other two halt codes') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4); stable_diagnostic_code_rule: meaning supported (L185 'stable_diagnostic_code is exactly the corresponding halt_code token') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M55: PASS 
+M56: PASS 
+M57: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+M58: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for error_class: error class not stated: L175 states error classes only for the M41 (MID_RUN_REEVALUATION), M53 and M54 vectors, and the stage map shows the error class need not equal the diagnostic CODE (L154: SIMULATOR_ERROR under EVALUATOR_INFRASTRUCTURE_FAILURE); affected_scope: meaning supported (L181 'halt and invalidate every slot for that design in both arms') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4); unaffected_design_scope: meaning supported (L176 'M58 invalidates both arms for the affected design only when membership, estimand and weights remain unchanged') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M59: PASS 
+M60: PASS 
+M61: PASS 
+M62: PASS 
+M63: PASS 
+M64: PASS 
+M65: PASS 
+M66: PASS 
+M67: PASS 
+M68: PASS 
+M69: PASS 
+M70: PASS 
+P01: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+P02: PASS 
+P03: PASS 
+P04: PASS 
+P05: PASS 
+P06a: PASS 
+P06b: PASS 
+P07: PASS 
+P08a: PASS 
+P08b: PASS 
+P08c: PASS 
+P08d: PASS 
+P09: PASS 
+P10: PASS 
+P11a: PASS 
+P11b: PASS 
+P12a: PASS 
+P12b: PASS 
+P13: PASS 
+P14: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+P15: PASS 
+P16: PASS 
+P17: NOT_IMPLEMENTED driver vector checks need Driver.step outputs from an RTL simulation; the port manifest gives names only and the simulator stage is blocked on: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+P18: PASS 
+P19: PASS 
+P20: PASS 
+P21: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+P22: PASS 
+P23: PASS 
+P24a: PASS 
+P24b: PASS 
+P24c: PASS 
+P24d: PASS 
+P25a: PASS 
+P25b: PASS 
+P26: PASS 
+P27: PASS 
+P28: PASS 
+P29a: PASS 
+P29b: PASS 
+P30: PASS 
+P31: PASS 
+P32: PASS 
+P33: PASS 
+P34: PASS 
+P35: PASS 
+P36: PASS 
+P37: PASS 
+P38: PASS 
+P39: PASS 
+P40: PASS 
+P41: PASS 
+P42: NOT_IMPLEMENTED runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator stages are built but blocked on design materials absent from the pack: FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); checker trace schema and metadata (TO FREEZE, L543)
+P43: PASS 
+P44: PASS 
+P45: PASS 
+P46: PASS 
+P47: PASS 
+P48: PASS 
+R01: PASS 
+R02: PASS 
+R03: PASS 
+R04: PASS 
+R05: PASS 
+R06: PASS 
+R07: PASS 
+R08: PASS 
+R09: PASS 
+R10: PASS 
+R11: PASS 
+R12: PASS 
+R13: PASS 
