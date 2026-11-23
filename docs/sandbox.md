@@ -4,8 +4,16 @@ Owner decision **D-002** (Krishika, 23 Nov 2026; Ayush's confirmation pending): 
 artifact execution uses Docker image `python:3.11.18-slim` pinned by digest, run with
 `--network=none --read-only --cap-drop=ALL --security-opt=no-new-privileges`, a non-root
 user, tmpfs for scratch, pids/memory/CPU limits and a wall-clock timeout. The pinned
-`requirements.lock` is installed with `--require-hashes` inside the image. Cocotb and the
-simulator are not pinned, so any fixture that needs them stays NOT_IMPLEMENTED.
+`requirements.lock` is installed with `--require-hashes` inside the image.
+
+Owner decision **D-002a** (Krishika, 23 Nov 2026; Ayush's confirmation pending): the
+pinned interpreter for all F18 evidence is the CPython in that container. The whole
+runner, static stages included, runs in the image; host Python is for development only.
+
+Owner decision **D-003** (Krishika, 23 Nov 2026; Ayush's confirmation pending): toolchain
+per the Charter ("Cocotb; Icarus Verilog initially"), pinned at the latest stable versions
+installable in the image: cocotb from `requirements.lock` with hashes, Icarus Verilog from
+the image's package manager with its exact version recorded.
 
 Pack requirements this implements: File 30 §3 L39 ("Runtime signature checks and the
 `create_driver` return-type check run after import in the restricted execution container.
@@ -25,21 +33,58 @@ configuration is adequate as the security boundary for F16 is for the owners to 
 | Item | Value |
 |---|---|
 | Base image | `python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535` (`python:3.11.18-slim`, linux/amd64, resolved with `docker pull` on 23 Nov 2026) |
-| Container interpreter | `3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]`, SHA-256 `92d7e40e…6b79` |
-| Build | [sandbox/Dockerfile](../sandbox/Dockerfile): base by digest; `pip install --require-hashes --no-deps -r requirements.lock`; user `sandbox` uid/gid 10001 |
+| Pinned interpreter (D-002a) | `3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]`, `/usr/local/bin/python3.11`, SHA-256 `92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79` |
+| Icarus Verilog (D-003) | Debian package `iverilog` `12.0-2+b1` (`iverilog -V`: "Icarus Verilog version 12.0 (stable)"); `.deb` SHA-256 `febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056`, checked with `sha256sum -c` before `dpkg -i`; `/usr/bin/iverilog` SHA-256 `99633b21…8462`, `/usr/bin/vvp` SHA-256 `dc287630…c1df` |
+| cocotb (D-003) | `cocotb==2.1.0` (cp311 manylinux wheel) and its dependencies `find-libpython==0.5.1`, `iniconfig==2.3.1`, `packaging==26.3`, `pluggy==1.7.0`, `pygments==2.21.0`, `pytest==9.2.0`, all with hashes in `requirements.lock` (pip-tools 7.7.0 `pip-compile --generate-hashes`, run in the pinned base image). Earlier pins are unchanged. |
+| Build | [sandbox/Dockerfile](../sandbox/Dockerfile): base by digest; iverilog `.deb` by version and SHA-256; `pip install --require-hashes --no-deps -r requirements.lock`; user `sandbox` uid/gid 10001 |
 | Build context | `.dockerignore` admits only `requirements.lock` |
-| Local tag | `openvef-sandbox:<first 16 hex of SHA-256(Dockerfile, requirements.lock)>`, rebuilt automatically when either changes |
+| Local tag | `openvef-sandbox:<first 16 hex of SHA-256 of the sha256sum listing of sandbox/Dockerfile and requirements.lock>`, rebuilt automatically when either changes |
 
-The container interpreter is CPython 3.11.18, but it is a different binary from the host
-interpreter used for the static stages (host: GCC 13.3.0, SHA-256 `518f54d1…5356`).
-Every evidence run records both: the host interpreter as before, and under
-`sandbox` the base digest, image ID, container `sys.version`, container interpreter
-SHA-256, harness SHA-256 and the exact `docker run` flags.
+"Latest stable" was checked on 23 Nov 2026 in the pinned base image: `pip index versions
+cocotb` lists 2.1.0 as newest; `apt-cache policy iverilog` lists only 12.0-2+b1 (Debian
+13 "trixie"), and Icarus 12.0 is the upstream stable release. Reproducibility limit: the
+`.deb` is fetched from the live Debian archive. If Debian removes that exact version, the
+build fails (the version and hash checks stop it) rather than installing something
+else; a snapshot.debian.org source would remove that dependency (not done; owner call).
+
+## Where things run (D-002a)
+
+| Role | Where | Interpreter |
+|---|---|---|
+| F18 runner: index/hash checks, all static stages, ledger, serializer, comparisons, evidence writing | runner container from the pinned image ([runner/runner-container.args](../runner/runner-container.args)) | pinned |
+| Each artifact execution (factory, checker invocation, later simulation) | a fresh artifact container from the same image ([runner/artifact-container.args](../runner/artifact-container.args)) | pinned |
+| Host | [runner/run_f18_container.sh](../runner/run_f18_container.sh): bash only; builds the image, starts the runner, launches artifact containers on request | none |
+
+The runner container has no Docker access. When it needs an artifact execution it writes
+`OPENVEF_SANDBOX_REQUEST <timeout> <base64 JSON>` on stdout; the broker starts one
+artifact container running the fixed command `python -I /opt/openvef/harness.py` with
+that JSON on stdin and the flags from `artifact-container.args`, and replies with the
+exit code and base64 output, or `TIMEOUT` (after `docker kill` and `docker rm -f`). The
+runner chooses neither the command, the image nor the flags. The broker does not read
+results.
+
+The runner container is isolated like an artifact container (`--network=none`,
+`--read-only`, `--cap-drop=ALL`, `no-new-privileges`, tmpfs `/tmp`) except: it runs as the
+invoking host uid so it can write its one evidence directory, which is the only writable
+mount; the baseline and the `src/`, `runner/`, `sandbox/` trees are mounted read-only; it
+has larger limits (1 GiB, 128 pids, 2 CPUs).
+
+Every run's `summary.json` records `interpreter_status` (`PINNED` only when the runner is
+in the container and `sys.version` and the interpreter SHA-256 equal the pinned values),
+the interpreter, all distributions, and under `sandbox`: base digest, image tag and ID,
+Dockerfile and lock SHA-256, broker SHA-256, both flag lists, the artifact command,
+harness SHA-256s, Docker server version, host kernel, and the toolchain (cocotb version,
+`iverilog -V`/`vvp -V` lines, `.deb` version, binary SHA-256s). A run started with
+`python runner/run_f18.py` on the host records `NOT_PINNED` and is not evidence.
+
+`OPENVEF_EVIDENCE_ROOT` redirects the run directory for smoke tests outside `evidence/`.
 
 ## What is isolated, and how
 
-All flags are built in one function, `docker_argv` in
-[src/openvef/sandbox.py](../src/openvef/sandbox.py). Each execution starts a new
+Artifact-container flags are defined only in
+[runner/artifact-container.args](../runner/artifact-container.args), read by both the
+broker and the development launcher (`docker_argv` in
+[src/openvef/sandbox.py](../src/openvef/sandbox.py)). Each execution starts a new
 container and removes it afterwards (`--rm`).
 
 | Concern | Mechanism | Test (`tests/test_sandbox.py`) |
@@ -51,7 +96,7 @@ container and removes it afterwards (`--rm`).
 | Processes | `--pids-limit=64`; `--ipc=none` | `test_pids_limit`: fork loop stops at the limit |
 | Memory, CPU, files | `--memory=256m --memory-swap=256m` (no swap); `--cpus=1`; `--ulimit nofile=64:64` | — (configuration only) |
 | Wall-clock time | Host timeout (default 20 s per container). On expiry the launcher runs `docker kill` and `docker rm -f` by the container's unique name | `test_timeout_kills_and_removes_container`: a busy loop under a 4 s limit is reported as timed out, and no `openvef-*` container remains |
-| Simulator | No simulator is installed in the image | — |
+| Simulator | Icarus Verilog and cocotb are installed (D-003) for the harness. Artifact code cannot reach them: `cocotb` is not on the import allow-list (static and runtime), and subprocess/`os` are not importable | `test_artifact_cannot_import_cocotb` |
 | Determinism | `PYTHONHASHSEED=0`, so `str`/`bytes` hashing (set iteration order) is the same in every run (A-036) | — |
 | `random` | Standard-library `random` initializes normally; artifacts may only use a local `random.Random(seed)` (enforced statically at IMPORT_POLICY) | `test_seeded_local_random_works`: same sequence as the host for seed 7 |
 
@@ -90,8 +135,9 @@ passed. They run real containers with exactly the flags used for artifacts.
 
 ## Not covered here
 
-- Cocotb and the simulator are not pinned (D-002), so nothing that needs a simulation
-  (driver steps against RTL/null, null traces for the checker) runs in this sandbox yet.
+- The simulator-backed stages need FIFO design materials (RTL, null netlist, port
+  manifest, reset/legal-input rules, cycle cap, safe-idle vector, trace schema, mask)
+  that are owner-written or still TO FREEZE; see docs/traceability.md.
 - The resource limits and timeout values are this build's defaults, not frozen pack
   values.
 - Development host: Docker 29.9.2 (not rootless), default AppArmor profile, built-in

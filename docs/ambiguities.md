@@ -732,6 +732,33 @@ simulator are not pinned: fixtures that need them stay NOT_IMPLEMENTED.
 Resolved digest: `python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535`.
 Details and tests: [docs/sandbox.md](sandbox.md).
 
+## D-002a — Pinned interpreter is the container's (DECIDED — Ayush's confirmation pending)
+
+**Owner decision by Krishika, 23 Nov 2026 (Ayush's confirmation pending):** the pinned
+interpreter for all F18 evidence is the `python:3.11.18-slim` container by digest. The
+whole runner, static stages included, moves into the sandbox image; the host Python is
+for development only. Recorded in docs and in every run's evidence.
+
+Implemented: [runner/run_f18_container.sh](../runner/run_f18_container.sh) (host broker,
+bash only) and the runner in broker mode; `interpreter_status` in every `summary.json`.
+Pinned values: `3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]`, SHA-256
+`92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79`. This supersedes
+CLAUDE.md hard rule 2's host interpreter for evidence. See [docs/sandbox.md](sandbox.md).
+
+## D-003 — Simulation toolchain (DECIDED — Ayush's confirmation pending)
+
+**Owner decision by Krishika, 23 Nov 2026 (Ayush's confirmation pending):** toolchain per
+the Charter ("Cocotb; Icarus Verilog initially"): pin Icarus Verilog and cocotb at the
+latest stable versions installable in that image; cocotb from `requirements.lock` with
+hashes; iverilog via the image's package manager with the exact version recorded. This
+is the owner approval hard rule 3 requires for the new lock entries.
+
+Pinned: `cocotb==2.1.0` (+ `find-libpython==0.5.1`, `iniconfig==2.3.1`,
+`packaging==26.3`, `pluggy==1.7.0`, `pygments==2.21.0`, `pytest==9.2.0`, all hashed);
+Debian `iverilog` `12.0-2+b1`, `.deb` SHA-256
+`febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056`. Details in
+[docs/sandbox.md](sandbox.md).
+
 ## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
 
 File 30 §6 is headed "Import sandbox and deterministic execution". Paired runs compare

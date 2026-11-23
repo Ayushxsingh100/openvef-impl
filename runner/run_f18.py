@@ -8,7 +8,8 @@ Rules (CLAUDE.md): the code path is chosen from the fixture INPUT shape only, ne
 from its ID or expected output. A fixture whose path reaches a stage that is not yet
 implemented is reported NOT_IMPLEMENTED -- never PASS.
 
-Usage:  python3.11 -I runner/run_f18.py <baseline_root> <evidence_dir> <run_class>
+Usage (evidence, D-002a):  runner/run_f18_container.sh <run_class>
+Usage (development only):  python3.11 -I runner/run_f18.py <baseline_root> <evidence_dir> <run_class>
 """
 from __future__ import annotations
 
@@ -34,7 +35,7 @@ from openvef.ast_signature import check_ast_signature, check_compile  # noqa: E4
 from openvef.assembler import (NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, check_reserved_heading_lines,  # noqa: E402
                                check_unresolved_placeholders, check_visible_clause_ids)
 from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
-from openvef.sandbox import SandboxUnavailable, ensure_image  # noqa: E402
+from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
 from openvef.ledger import HaltSignature, halt_after_recovery, operational_recovery  # noqa: E402
 from openvef.serializer import check_diagnostic, serialize, truncate  # noqa: E402
 from openvef.stage_map import (RTL_NULL_CONTROL_FAILURE, EventError, NotDetermined, adjudicate_checker,  # noqa: E402
@@ -49,7 +50,12 @@ COMPARE_KEYS = ("disposition", "stage_id", "error_class", "diagnostic")
 # 27_SHA256SUMS.txt entry for the canonical response schema (File 30 §1).
 SCHEMA_SHA256 = "6fb5d282b09540949f21ee134b522841c3345031cb3e118a83bdffc18b4e7c34"
 PINNED_DISTRIBUTIONS = ("jsonschema", "attrs", "jsonschema-specifications", "referencing", "rpds-py",
-                        "typing_extensions")
+                        "typing_extensions", "cocotb", "find-libpython", "iniconfig", "packaging", "pluggy",
+                        "pygments", "pytest")
+# D-002a: the pinned interpreter for all F18 evidence is CPython 3.11.18 in the
+# python:3.11.18-slim image pinned by digest (docs/sandbox.md).
+PINNED_PYTHON_VERSION = "3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]"
+PINNED_PYTHON_SHA256 = "92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79"
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -376,7 +382,16 @@ def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
     return "EXECUTED", outcome, ""
 
 
+def installed_version(name: str) -> str | None:
+    try:
+        return importlib.metadata.version(name)
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
 def git_commit() -> str:
+    if broker_mode():  # D-002a: the host broker reads git; the runner container has no git
+        return os.environ["OPENVEF_GIT_COMMIT"]
     try:
         out = subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True, check=True)
         dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", "src", "runner", "sandbox"],
@@ -388,9 +403,15 @@ def git_commit() -> str:
 
 def main() -> int:
     root, evidence_root, run_class = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
-    started = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out_dir = evidence_root / f"run-{started}"
-    out_dir.mkdir(parents=True, exist_ok=False)
+    if broker_mode():  # D-002a: the broker created and mounted the (empty) run directory
+        started = os.environ["OPENVEF_RUN_STARTED"]
+        out_dir = evidence_root
+        if any(out_dir.iterdir()):
+            raise IntegrityError("evidence directory is not empty")
+    else:
+        started = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        out_dir = evidence_root / f"run-{started}"
+        out_dir.mkdir(parents=True, exist_ok=False)
 
     source_files = sorted([*(REPO / "src").rglob("*.py"), *(REPO / "runner").rglob("*.py"),
                            *(REPO / "sandbox").glob("*")])
@@ -400,17 +421,23 @@ def main() -> int:
     except (SandboxUnavailable, FileNotFoundError) as exc:
         SANDBOX = None
         print(f"sandbox unavailable: {exc}", file=sys.stderr)
+    if broker_mode() and SANDBOX is None:
+        raise SystemExit("D-002a: the runner container must have the sandbox identity")
+    py_sha = sha256_file(Path(os.path.realpath(sys.executable)))
+    pinned = broker_mode() and sys.version == PINNED_PYTHON_VERSION and py_sha == PINNED_PYTHON_SHA256
     meta = {
         "run_started_utc": started,
         "run_class": run_class,
+        "interpreter_status": ("PINNED (D-002a: runner and artifacts in the pinned image)" if pinned else
+                               "NOT_PINNED: development run, not F18 evidence (D-002a)"),
         "python_version": sys.version,
         "python_executable": sys.executable,
-        "python_executable_sha256": sha256_file(Path(os.path.realpath(sys.executable))),
+        "python_executable_sha256": py_sha,
         "platform": platform.platform(),
         "machine": platform.machine(),
         "fixture_index_sha256": INDEX_SHA256,
         "response_schema_sha256": SCHEMA_SHA256,
-        "distributions": {name: importlib.metadata.version(name) for name in PINNED_DISTRIBUTIONS},
+        "distributions": {name: installed_version(name) for name in PINNED_DISTRIBUTIONS},
         "git_commit": git_commit(),
         "source_sha256": {str(p.relative_to(REPO)): sha256_file(p) for p in source_files},
         "command": [sys.executable, *sys.argv],
@@ -442,7 +469,7 @@ def main() -> int:
     summary = {**meta, "counts": counts, "total": sum(counts.values()),
                "results_sha256": sha256_file(out_dir / "results.jsonl")}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"out_dir": str(out_dir), "counts": counts}, indent=2))
+    print(json.dumps({"out_dir": str(out_dir), "run": f"run-{started}", "counts": counts}), file=sys.stderr)
     return 0 if counts["FAIL"] == 0 and counts["ERROR"] == 0 else 1
 
 

@@ -1,0 +1,30 @@
+# docker run flags for the F18 runner container (D-002a). The runner is trusted
+# evaluator code; it is isolated the same way as artifacts except that it runs as the
+# invoking host uid (so it can write the one evidence directory mounted for it) and has
+# larger limits. {REPO}, {BASELINE}, {OUT}, {UID_GID} and {NAME} are substituted by
+# runner/run_f18_container.sh.
+--rm
+-i
+--network=none
+--read-only
+--cap-drop=ALL
+--security-opt=no-new-privileges
+--user={UID_GID}
+--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+--pids-limit=128
+--memory=1g
+--memory-swap=1g
+--cpus=2
+--ipc=none
+--hostname=runner
+--env=PYTHONHASHSEED=0
+--env=PYTHONDONTWRITEBYTECODE=1
+--env=PYTHONUNBUFFERED=1
+--env=OPENVEF_BROKER=1
+--volume={BASELINE}:/baseline:ro
+--volume={REPO}/src:/opt/openvef-repo/src:ro
+--volume={REPO}/runner:/opt/openvef-repo/runner:ro
+--volume={REPO}/sandbox:/opt/openvef-repo/sandbox:ro
+--volume={OUT}:/evidence:rw
+--workdir=/tmp
+--name={NAME}

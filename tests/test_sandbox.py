@@ -157,6 +157,12 @@ class RuntimeStageTests(unittest.TestCase):
                          "RUNTIME_EXCEPTION|file=driver.py|phase=factory|class=ImportError")
         self.assertIsNone(self.diag(factory_body("    import math, json\n    return Driver()")))
 
+    def test_artifact_cannot_import_cocotb(self):
+        # D-003 installs cocotb in the image for the harness; artifact code still cannot
+        # import it (runtime allow-list, File 30 §6).
+        self.assertEqual(self.diag(factory_body("    import cocotb\n    return Driver()")),
+                         "RUNTIME_EXCEPTION|file=driver.py|phase=factory|class=ImportError")
+
     def test_factory_timeout_is_not_a_verdict(self):
         with self.assertRaises(self.runtime.RuntimeStageError):
             self.runtime.factory_checks(factory_body("    while True:\n        pass"), timeout_s=4.0)

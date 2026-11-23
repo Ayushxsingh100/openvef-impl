@@ -1,0 +1,25 @@
+# docker run flags for every artifact-execution container (D-002). One flag per line;
+# '#' lines are comments. {HARNESS_DIR} and {NAME} are substituted by the launcher
+# (runner/run_f18_container.sh for evidence runs, src/openvef/sandbox.py for development
+# tests). This file is the only place these flags are defined.
+--rm
+-i
+--network=none
+--read-only
+--cap-drop=ALL
+--security-opt=no-new-privileges
+--user=10001:10001
+--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+--pids-limit=64
+--memory=256m
+--memory-swap=256m
+--cpus=1
+--ulimit=nofile=64:64
+--ipc=none
+--hostname=sandbox
+--env=PYTHONHASHSEED=0
+--env=PYTHONDONTWRITEBYTECODE=1
+--env=PYTHONUNBUFFERED=1
+--volume={HARNESS_DIR}:/opt/openvef:ro
+--workdir=/tmp
+--name={NAME}
