@@ -44,6 +44,57 @@ exercises this. **Owner confirmation needed.**
 
 Protocol §3.4: "Use the pinned Draft 2020-12 validator". Register 16 L40 lists the parser
 version as TO FREEZE. Schema validation (part 1b) needs an exact `jsonschema` version and
-its dependencies, pinned with hashes in `requirements.lock`. The development workspace
-cannot install packages; this is done on the owners' WSL machine. **Owner decision needed:
-exact version.**
+its dependencies, pinned with hashes in `requirements.lock`.
+
+**Decided (owners, 23 Nov 2026, session 2 instruction):** `jsonschema==4.26.0`. Resolved
+with pip-tools 7.7.0 (`pip-compile --generate-hashes`, separate tools venv) on CPython
+3.11.18: attrs 26.1.0, jsonschema-specifications 2025.9.1, referencing 0.37.0,
+rpds-py 2026.9.1, typing-extensions 4.16.0. Installed into `.venv` with
+`pip --require-hashes`. Register 16 L40 still needs this version recorded as frozen.
+
+## A-004 — `UNSPECIFIED` text must identify the missing behavior (OPEN)
+
+File 30 §1 L9: "`UNSPECIFIED` is permitted only for behavior not specified in the received
+packet, and the text must identify the missing behavior."
+
+Readings: (a) not mechanically checkable; the parser accepts any `UNSPECIFIED` whose text
+passes the schema (`minLength` 1) and the requirement is reviewed by humans; (b) the parser
+must apply some mechanical test, which the pack does not define (no diagnostic, pointer or
+rule is given). Fixture P21 ("UNSPECIFIED used with a non-empty description of missing
+behavior") expects acceptance at this stage and is consistent with (a).
+
+Implemented: (a) — `UNSPECIFIED` is accepted with no text check. No pointer exists for a
+failure under (b). **Owner confirmation needed.**
+
+## A-005 — Source of the manifest `clause_ids` for fixtures (PROVISIONAL)
+
+File 30 §1 L9 validates clause IDs "against the exact `clause_ids` array and
+`clause_id_regex` in the frozen manifest". No frozen manifest exists yet. Every F18
+descriptor has a top-level `manifest_clause_ids` field outside `input`; the catalog does
+not say how the runner uses it.
+
+Readings: (a) `manifest_clause_ids` is the frozen-manifest `clause_ids` for that fixture;
+(b) the runner should use a frozen manifest file (none exists; File 38 is a template).
+
+Implemented: (a). On `clause_id_regex`: L9's next sentence defines validity completely
+("an exact member of that array or the reserved literal `UNSPECIFIED`"), and File 31
+L29/L91 applies the regex to each `clause_ids` element at packet freeze. So the response
+check is exact membership; the regex is not re-applied to response values (any member
+already matches it). If the owners read L9 as requiring a separate regex test on response
+values, the outcome is unchanged for every value, because a non-member is rejected
+either way. **Owner confirmation needed for (a).**
+
+## A-006 — Sorting array-index tokens in the schema pointer key (PROVISIONAL)
+
+Protocol §3.4 / File 30 §1: sort by "instance token sequence, lexicographically by Unicode
+code point". RFC 6901 tokens are strings, so array index `10` sorts before `2`. The
+clause-ID rule, by contrast, says "the lowest numeric `assumptions` index".
+
+Readings: (a) literal — compare every token as a string, so `/assumptions/10/text` is
+reported before `/assumptions/2/text`; (b) compare array-index tokens numerically, as in
+the clause-ID rule.
+
+Implemented: (a), the literal text (unit test `test_array_index_tokens_compare_as_strings`).
+It matters only when schema errors exist at two array indexes with different digit
+counts (needs ≥ 11 assumptions or dependencies items). No current fixture exercises it.
+**Owner confirmation needed.**
