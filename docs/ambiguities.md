@@ -86,8 +86,8 @@ either way. **Owner confirmation needed for (a).**
 
 ## A-006 — Sorting array-index tokens in the schema pointer key (PROVISIONAL)
 
-Protocol §3.4 / File 30 §1: sort by "instance token sequence, lexicographically by Unicode
-code point". RFC 6901 tokens are strings, so array index `10` sorts before `2`. The
+Protocol §3.4 (file 02 L137): "Sort by: (1) instance-token sequence, Unicode code-point
+order, shorter equal prefix first". RFC 6901 tokens are strings, so array index `10` sorts before `2`. The
 clause-ID rule, by contrast, says "the lowest numeric `assumptions` index".
 
 Readings: (a) literal — compare every token as a string, so `/assumptions/10/text` is
