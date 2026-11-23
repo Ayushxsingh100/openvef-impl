@@ -1,0 +1,178 @@
+{
+  "run_started_utc": "20261123T160656Z",
+  "run_class": "DEVELOPMENT - GitHub Codespaces",
+  "python_version": "3.11.18 (main, Nov 23 2026, 15:21:08) [GCC 13.3.0]",
+  "python_executable": "/workspaces/openvef-impl/.venv/bin/python",
+  "python_executable_sha256": "518f54d13051b03dd0abec59e0baaab584dad9d7139d7adacbc774d690b75356",
+  "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "fixture_index_sha256": "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54",
+  "response_schema_sha256": "6fb5d282b09540949f21ee134b522841c3345031cb3e118a83bdffc18b4e7c34",
+  "distributions": {
+    "jsonschema": "4.26.0",
+    "attrs": "26.1.0",
+    "jsonschema-specifications": "2025.9.1",
+    "referencing": "0.37.0",
+    "rpds-py": "2026.9.1",
+    "typing_extensions": "4.16.0"
+  },
+  "git_commit": "0f93a28b320cdec8905279043768eee6906f0831",
+  "source_sha256": {
+    "runner/run_f18.py": "7af3a9b1629a4839cd8da38af45cf5f2baa2036e87e2cf79bb6c21c9d7684cdc",
+    "src/openvef/__init__.py": "6071fa9f7b1f81b634bd32bd0c5c6b1aeb1969c747b8b45ebf7b783c6c73567a",
+    "src/openvef/envelope.py": "af74dc9c80097d9e6f526a54acabcf26041396bee446438bbf915b1a3dd119df",
+    "src/openvef/schema.py": "18a9cebaf5c912b5eaa4edff431d9752dae95b2412d387f26b4084392a06807d",
+    "src/openvef/source_ast.py": "389ced9c9f9075b49e4268698fab3179dd64ae41b53c73ad1a6617bed86174bd"
+  },
+  "command": [
+    "/workspaces/openvef-impl/.venv/bin/python",
+    "runner/run_f18.py",
+    "baseline/OpenVEF_Planning_v1_3_6",
+    "evidence",
+    "DEVELOPMENT - GitHub Codespaces"
+  ]
+}
+M01: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M02: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M03: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M04a: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M04b: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M05: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M06: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M07: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M08a: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M08b: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M09: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M10: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+M11: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+M12: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+M13: NOT_IMPLEMENTED input shape ['evaluator_repair_attempt', 'event', 'lifecycle', 'slots'] has no implemented adapter (see A-002)
+M14: NOT_IMPLEMENTED input shape ['byte_cap', 'marker', 'raw_diagnostic', 'raw_diagnostic_utf8_bytes', 'test_scope', 'truncate_before_json_escape', 'truncate_on_utf8_boundary'] has no implemented adapter (see A-002)
+M15: NOT_IMPLEMENTED input shape ['allowed_diagnostics', 'diagnostic'] has no implemented adapter (see A-002)
+M16: PASS 
+M17: NOT_IMPLEMENTED input shape ['encoding', 'ensure_ascii', 'feedback_object', 'grammar_exempt_for_primitive_test', 'indent', 'line_endings', 'terminal_newline', 'test_scope'] has no implemented adapter (see A-002)
+M18: NOT_IMPLEMENTED input shape ['payload', 'reserved_headings'] has no implemented adapter (see A-002)
+M19: NOT_IMPLEMENTED input shape ['rendered'] has no implemented adapter (see A-002)
+M20: NOT_IMPLEMENTED input shape ['clause_id_regex', 'manifest_clause_ids', 'visible_payload'] has no implemented adapter (see A-002)
+M21: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M22: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M23: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M24: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M25: NOT_IMPLEMENTED input shape ['runtime_signature'] has no implemented adapter (see A-002)
+M26: NOT_IMPLEMENTED input shape ['driver_return', 'expected_keys'] has no implemented adapter (see A-002)
+M27: NOT_IMPLEMENTED input shape ['driver_return', 'legal_input_predicate'] has no implemented adapter (see A-002)
+M28: NOT_IMPLEMENTED input shape ['paired_runs'] has no implemented adapter (see A-002)
+M29: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M30: PASS 
+M31: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M32: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M33: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M34: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M35: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M36: NOT_IMPLEMENTED blocked on docs/ambiguities.md A-012: no spec rule gives this input's disposition
+M37: NOT_IMPLEMENTED input shape ['response_object', 'runtime_pair'] has no implemented adapter (see A-002)
+M38: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M39: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M40: NOT_IMPLEMENTED input shape ['clause_id_near_match_regex', 'clause_id_regex', 'clause_id_search_regex', 'manifest_clause_ids', 'visible_payload'] has no implemented adapter (see A-002)
+M41: NOT_IMPLEMENTED input shape ['author_visible_materials_changed', 'design_id', 'evaluator_repair_attempt', 'f16_required', 'frozen_evaluator_hashes_unchanged', 'halt_signature', 'new_generation_calls', 'pre_halt_scored_slots', 'recovery_mode', 'required_action', 'same_artifact_bytes', 'same_artifacts_for_all_slots', 'same_slot_seeds', 'scheduled_slots', 'slots'] has no implemented adapter (see A-002)
+M42: NOT_IMPLEMENTED input shape ['design_id', 'first_halt_signature', 'recovery_cycles_used', 'scheduled_slots', 'second_halt_signature'] has no implemented adapter (see A-002)
+M43: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M44: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M45: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M46: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M47: NOT_IMPLEMENTED input shape ['design_id', 'first_halt_signature', 'recovery_cycles_used', 'scheduled_slots', 'second_halt_signature'] has no implemented adapter (see A-002)
+M48: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M49: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M50: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M51: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M52: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M53: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M54: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M55: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M56: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M57: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M58: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M59: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M60: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M61: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M62: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M63: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M64: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M65: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M66: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M67: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M68: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M69: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+M70: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P01: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P02: PASS 
+P03: PASS 
+P04: PASS 
+P05: PASS 
+P06a: PASS 
+P06b: PASS 
+P07: PASS 
+P08a: PASS 
+P08b: PASS 
+P08c: PASS 
+P08d: PASS 
+P09: PASS 
+P10: PASS 
+P11a: PASS 
+P11b: PASS 
+P12a: PASS 
+P12b: PASS 
+P13: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P14: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P15: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P16: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P17: NOT_IMPLEMENTED input shape ['port_manifest', 'response_object'] has no implemented adapter (see A-002)
+P18: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+P19: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+P20: PASS 
+P21: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P22: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+P23: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P24a: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P24b: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P24c: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P24d: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P25a: PASS 
+P25b: PASS 
+P26: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P27: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P28: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P29a: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P29b: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P30: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P31: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P32: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P33: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P34: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P35: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P36: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P37: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P38: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P39: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P40: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P41: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P42: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P43: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P44: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P45: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P46: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P47: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+P48: NOT_IMPLEMENTED SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented
+R01: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R02: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R03: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R04: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R05: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R06: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R07: NOT_IMPLEMENTED input shape ['design_preflight'] has no implemented adapter (see A-002)
+R08: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R09: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R10: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R11: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R12: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R13: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)

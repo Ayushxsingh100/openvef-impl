@@ -15,12 +15,12 @@
 | Runner adapter: `{driver_source, checker_source}` inputs start at SOURCE_AST | `runner/run_f18.py` `execute` | M16; M29 (stops at IMPORT_POLICY) | Implemented (A-012 provisional) |
 | Protocol §3.4: multi-failure precedence (`events` inputs) | — | R13 and other R fixtures | Not started (input adapter undefined) |
 
-Latest run: `evidence/run-20261123T155910Z` — commit e5eb9c0 (clean), CPython 3.11.18
-(interpreter SHA-256 518f54d1…5356), jsonschema 4.26.0: 23 PASS, 0 FAIL, 121
-NOT_IMPLEMENTED, 0 ERROR. No fixture was blocked by an UnsettledSpec. 80 fixtures pass
-SOURCE_AST and stop at the unimplemented IMPORT_POLICY stage (P01 among them). Development
-run (Codespaces), not pinned-environment evidence; M16 and M36 passes rest on provisional
-A-012, M16 also on A-007.
+Latest run: `evidence/run-20261123T160656Z` — commit 0f93a28 (clean), CPython 3.11.18
+(interpreter SHA-256 518f54d1…5356), jsonschema 4.26.0: 22 PASS, 0 FAIL, 122
+NOT_IMPLEMENTED, 0 ERROR. Same as run-20261123T155910Z except M36, now NOT_IMPLEMENTED
+(A-012). No fixture was blocked by an UnsettledSpec. 80 fixtures pass SOURCE_AST and stop
+at the unimplemented IMPORT_POLICY stage (P01 among them). Development run (Codespaces),
+not pinned-environment evidence; M16's pass rests on provisional A-007 and A-012.
 
 Evidence: see `evidence/run-*/summary.json`. Development runs are not pinned-environment
 evidence until run on the owners' recorded interpreter.
