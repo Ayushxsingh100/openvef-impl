@@ -882,3 +882,23 @@ stays NOT_IMPLEMENTED, because executing it would require inventing behaviour:
 What would unblock it: an executable predicate in the FIFO specification's legal-input
 rules (owner-written), plus the port manifest. The vector check then calls it as step (e).
 
+## A-039 — Simulator failures: the `class` token and an overrun outside `step` (DECIDED BY CLAUDE — owner review pending)
+
+The stage-map row is `SIMULATOR_ERROR|target=<RTL_OR_NULL>|class=<EXCEPTION_CLASS>`
+(L154), and `EXCEPTION_CLASS` is "the simple Python exception class name" (L125). A
+failure of the `iverilog`/`vvp` processes is not a Python exception inside the
+simulation. **Decision (decided by Claude under standing delegation, owner review
+pending):**
+- The harness reports the exception its own process handling raises or would raise:
+  - `CalledProcessError` when `iverilog` exits non-zero, or when `vvp` ends without the
+    loop's result;
+  - `TimeoutExpired` when the overall budget runs out while no `step` call is in
+    progress.
+- A budget overrun during driver import or factory stays an evaluator ERROR (A-037).
+- An overrun inside `step` is `WATCHDOG_TIMEOUT|phase=driver_step`.
+
+Reason: these are the simple class names of the Python exceptions that represent those
+failures in the harness process, so the token is a real exception class, as L125
+requires. The alternative, the fallback `Exception`, loses the distinction between a
+design that does not build and a hung simulator. No current fixture depends on this.
+

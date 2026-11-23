@@ -170,8 +170,14 @@ def response_stages(desc: dict, inp: dict, validator) -> Failure | None:
     return source_stages(obj["driver"]["source"], obj["checker"]["source"])
 
 
-RUNTIME_NEXT = ("runtime import, factory and signature checks passed in the sandbox; next: driver "
-                "steps on RTL/null need Cocotb and a simulator, not pinned (D-002)")
+# L166 (7)-(11) are implemented (src/openvef/simulation.py, sandbox/sim.py; D-003 toolchain)
+# but need inputs that are owner-written or TO FREEZE and absent from the pack.
+MISSING_DESIGN_MATERIALS = ("FIFO RTL and null netlist; port manifest with widths; reset sequence; legal-input "
+                            "predicate (owner-written FIFO specification, Scope); cycle cap, safe-idle vector and "
+                            "watchdog formula (TO FREEZE, Protocol L229); observation mask (owner-written); "
+                            "checker trace schema and metadata (TO FREEZE, L543)")
+RUNTIME_NEXT = ("runtime import, factory and signature checks passed in the sandbox; L166 (7)-(11) simulator "
+                "stages are built but blocked on design materials absent from the pack: " + MISSING_DESIGN_MATERIALS)
 
 
 def run_syntax_error_vector(source_file: str, syntax_error: dict) -> Failure:
@@ -279,14 +285,14 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
         pair = inp["runtime_pair"]
         if pair.get("before_first_raw_output_divergence") is True and pair.get("next_input_schedules_equal") is False:
             return paired_run_failure(None, 0)
-        raise Blocked("paired runs agree; later stages need the simulator")
+        raise Blocked("paired runs agree; later stages need a null trace: " + MISSING_DESIGN_MATERIALS)
 
     if keys == {"port_manifest", "response_object"}:
         result = response_stages(desc, {"response_object": inp["response_object"]}, validator)
         if result is not None:
             return result
-        raise Blocked("driver vector checks need Driver.step outputs from an RTL simulation; Cocotb and the "
-                      "simulator are not pinned (D-002)")
+        raise Blocked("driver vector checks need Driver.step outputs from an RTL simulation; the port manifest "
+                      "gives names only and the simulator stage is blocked on: " + MISSING_DESIGN_MATERIALS)
     if keys == {"events"}:  # A-025
         return first_event(inp["events"])
     if keys == {"lifecycle", "event", "slots", "evaluator_repair_attempt"} and inp["lifecycle"] == "MID_RUN":

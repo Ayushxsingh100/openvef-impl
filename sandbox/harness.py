@@ -95,27 +95,34 @@ def entry_reject(file: str, symbol: str, reason: str) -> dict:
     return failure("AST_SIGNATURE", "ENTRY_POINT_REJECT", f"ENTRY_POINT_REJECT|file={file}|symbol={symbol}|reason={reason}")
 
 
-def task_factory(request: dict) -> dict:
-    """Import driver.py, construct the driver, then return-type and signature checks."""
+def construct(driver_source: str, seed: int):
+    """Import driver.py, call create_driver(seed) once, then the return-type and signature
+    checks. Returns (failure_record_or_None, instance_or_None)."""
     try:
-        driver = load("driver", "driver.py", request["driver_source"])
+        driver = load("driver", "driver.py", driver_source)
     except BaseException as exc:  # A-034: import is the first execution of driver code; includes SystemExit
         return failure("DRIVER_RUNTIME", "RUNTIME_EXCEPTION",
-                       f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc_class(exc)}")
+                       f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc_class(exc)}"), None
     try:
-        instance = driver.create_driver(request["seed"])
+        instance = driver.create_driver(seed)
     except BaseException as exc:  # includes SystemExit from exit()
         return failure("DRIVER_RUNTIME", "RUNTIME_EXCEPTION",
-                       f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc_class(exc)}")
+                       f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc_class(exc)}"), None
     # A-035: return type, then create_driver's signature, then Driver.step's.
     driver_class = getattr(driver, "Driver", None)
     if not (isinstance(driver_class, type) and isinstance(instance, driver_class)):
-        return entry_reject("driver.py", "create_driver", "RETURN_TYPE")
+        return entry_reject("driver.py", "create_driver", "RETURN_TYPE"), None
     if not signature_ok(driver.create_driver, REQUIRED_SIGNATURES["create_driver"]):
-        return entry_reject("driver.py", "create_driver", "RUNTIME_SIGNATURE")
+        return entry_reject("driver.py", "create_driver", "RUNTIME_SIGNATURE"), None
     if not signature_ok(driver_class.__dict__.get("step"), REQUIRED_SIGNATURES["Driver.step"]):
-        return entry_reject("driver.py", "Driver.step", "RUNTIME_SIGNATURE")
-    return {"failure": None}
+        return entry_reject("driver.py", "Driver.step", "RUNTIME_SIGNATURE"), None
+    return None, instance
+
+
+def task_factory(request: dict) -> dict:
+    """Import driver.py, construct the driver, then return-type and signature checks."""
+    fail, _ = construct(request["driver_source"], request["seed"])
+    return fail or {"failure": None}
 
 
 def classify_return(value) -> dict:
@@ -158,7 +165,16 @@ def task_checker(request: dict) -> dict:
     return classify_return(value)
 
 
-TASKS = {"factory": task_factory, "checker": task_checker}
+def task_simulate(request: dict) -> dict:
+    """One driver run on one target (rtl or null) through Icarus + cocotb (sim.py)."""
+    # `python -I` leaves the script directory off sys.path; sim.py sits next to this file.
+    # Artifacts still cannot import it: guarded_import admits only the allow-list roots.
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import sim
+    return sim.run(request)
+
+
+TASKS = {"factory": task_factory, "checker": task_checker, "simulate": task_simulate}
 
 
 def main() -> None:

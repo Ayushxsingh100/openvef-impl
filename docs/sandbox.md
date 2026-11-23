@@ -124,10 +124,54 @@ other-writable, or unreadable by the sandbox uid (`check_harness_permissions`). 
 was added after new files in this checkout were found created with mode 646. Directory
 ACLs (the `+` in `ls -l`) were not inspected: `getfacl` is not installed here.
 
+## Simulation stage (Protocol §3.4 L166 (7)-(8); D-003)
+
+Task `simulate` ([sandbox/sim.py](../sandbox/sim.py), [sandbox/sim_cocotb.py](../sandbox/sim_cocotb.py))
+runs one driver on one target (`rtl` or `null`) in its own artifact container:
+`iverilog -g2012` compiles the design sources, `vvp` runs them with cocotb's Icarus VPI
+library, and the cocotb test module runs the cycle loop. The artifact is imported with
+the same restricted import as the factory task, its output is discarded, and `step`
+receives only a dict of strings, never a simulator handle. `sim.py` watches a heartbeat
+file and kills `vvp` when a `step` call exceeds the per-step watchdog (`WATCHDOG_TIMEOUT|phase=driver_step`).
+The runner side is [src/openvef/simulation.py](../src/openvef/simulation.py): RTL run, then
+null run, then the L166 (8) paired comparison.
+
+Request fields (design materials; **all supplied by the caller, no defaults**):
+`toplevel`, `verilog_sources`, `clock_port`, `input_ports` (name → width), `output_ports`,
+`reset_sequence`, `cycle_cap`, `safe_idle`, `legal_input_predicate`, plus `seed`,
+`step_timeout_s`, `budget_s`. The only executable predicate is the literal
+`ALL_INPUTS_LEGAL` (used by the toy tests). Any other value makes the result not
+determined (A-027, A-038), never a pass.
+
+**Build defaults for choices the pack leaves TO FREEZE** (Protocol L229 "Cycle cap,
+safe-idle vectors and timeout formula are **TO FREEZE**"; L542 "Freeze driver API,
+scheduler, alignment, same-row tie, cap, safe-idle and watchdog"). These are not
+readings of the text. Each result records them under `scheduler`, and the owners must
+freeze them:
+- timescale 1ns/1ps;
+- clock period 10 ns, starting low (first active edge at half a period);
+- outputs sampled in the ReadOnly phase after the active (rising) edge;
+- inputs driven at the falling edge before the next active edge;
+- `reset_sequence[i]` is driven before active edge *i*, and the edge after the last
+  vector is the reset-release edge.
+
+**What blocks the 10 fixtures** (P01, P14, P17, P21, P42, M07, M31, M32, M33, M57): the
+FIFO RTL and null netlist, the port manifest with widths, the reset sequence and
+legal-input rules (owner-written FIFO specification), the cycle cap, safe-idle vector
+and watchdog formula (TO FREEZE), the observation mask (owner-written), and the checker
+trace schema and metadata (TO FREEZE, L543). None of these are in the pack. Writing them
+is outside the Scope section and outside the delegation.
+
+Tests: [tests/test_simulation.py](../tests/test_simulation.py) (16). They use
+**test-only** toy designs in `tests/sim_designs/`, which are not a FIFO and not derived
+from any owner material.
+
 ## Running the tests
 
 ```
 .venv/bin/python -I tests/test_sandbox.py -v
+.venv/bin/python -I tests/test_simulation.py -v
+.venv/bin/python -I tests/test_broker.py -v
 ```
 
 Docker must be available; without it the tests are reported as skipped, never as
