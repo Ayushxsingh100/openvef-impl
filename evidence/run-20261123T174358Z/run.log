@@ -1,0 +1,180 @@
+{
+  "run_started_utc": "20261123T174358Z",
+  "run_class": "development",
+  "python_version": "3.11.18 (main, Nov 23 2026, 15:21:08) [GCC 13.3.0]",
+  "python_executable": "/workspaces/openvef-impl/.venv/bin/python",
+  "python_executable_sha256": "518f54d13051b03dd0abec59e0baaab584dad9d7139d7adacbc774d690b75356",
+  "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "fixture_index_sha256": "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54",
+  "response_schema_sha256": "6fb5d282b09540949f21ee134b522841c3345031cb3e118a83bdffc18b4e7c34",
+  "distributions": {
+    "jsonschema": "4.26.0",
+    "attrs": "26.1.0",
+    "jsonschema-specifications": "2025.9.1",
+    "referencing": "0.37.0",
+    "rpds-py": "2026.9.1",
+    "typing_extensions": "4.16.0"
+  },
+  "git_commit": "89bc8df62f468fca79fc74f4ffa011a89ad0beab",
+  "source_sha256": {
+    "runner/run_f18.py": "5fb556c32517f3faaedc4f8eccf755815d1091aaa54bb77fc4012fb835a7a936",
+    "src/openvef/__init__.py": "6071fa9f7b1f81b634bd32bd0c5c6b1aeb1969c747b8b45ebf7b783c6c73567a",
+    "src/openvef/ast_signature.py": "5910f63e57ed3714747a545376feb60a9f5b9e1190b99d048e66812c154bd256",
+    "src/openvef/envelope.py": "af74dc9c80097d9e6f526a54acabcf26041396bee446438bbf915b1a3dd119df",
+    "src/openvef/import_policy.py": "a27f6197ede05db172d4e8e76e928873dbbb3c20fc8e522a5a9e14ee741b72f6",
+    "src/openvef/schema.py": "18a9cebaf5c912b5eaa4edff431d9752dae95b2412d387f26b4084392a06807d",
+    "src/openvef/source_ast.py": "b58a6914a4ca3ee80c9bc095fc75767cd0235dd085aa2744e30839bbdbecbbaa"
+  },
+  "command": [
+    "/workspaces/openvef-impl/.venv/bin/python",
+    "runner/run_f18.py",
+    "baseline/OpenVEF_Planning_v1_3_6",
+    "evidence",
+    "development"
+  ]
+}
+M01: PASS 
+M02: PASS 
+M03: PASS 
+M04a: PASS 
+M04b: PASS 
+M05: PASS 
+M06: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+M07: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+M08a: PASS 
+M08b: PASS 
+M09: PASS 
+M10: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+M11: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+M12: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+M13: NOT_IMPLEMENTED input shape ['evaluator_repair_attempt', 'event', 'lifecycle', 'slots'] has no implemented adapter (see A-002)
+M14: NOT_IMPLEMENTED input shape ['byte_cap', 'marker', 'raw_diagnostic', 'raw_diagnostic_utf8_bytes', 'test_scope', 'truncate_before_json_escape', 'truncate_on_utf8_boundary'] has no implemented adapter (see A-002)
+M15: NOT_IMPLEMENTED input shape ['allowed_diagnostics', 'diagnostic'] has no implemented adapter (see A-002)
+M16: PASS 
+M17: NOT_IMPLEMENTED input shape ['encoding', 'ensure_ascii', 'feedback_object', 'grammar_exempt_for_primitive_test', 'indent', 'line_endings', 'terminal_newline', 'test_scope'] has no implemented adapter (see A-002)
+M18: NOT_IMPLEMENTED input shape ['payload', 'reserved_headings'] has no implemented adapter (see A-002)
+M19: NOT_IMPLEMENTED input shape ['rendered'] has no implemented adapter (see A-002)
+M20: NOT_IMPLEMENTED input shape ['clause_id_regex', 'manifest_clause_ids', 'visible_payload'] has no implemented adapter (see A-002)
+M21: PASS 
+M22: PASS 
+M23: PASS 
+M24: PASS 
+M25: NOT_IMPLEMENTED input shape ['runtime_signature'] has no implemented adapter (see A-002)
+M26: NOT_IMPLEMENTED input shape ['driver_return', 'expected_keys'] has no implemented adapter (see A-002)
+M27: NOT_IMPLEMENTED input shape ['driver_return', 'legal_input_predicate'] has no implemented adapter (see A-002)
+M28: NOT_IMPLEMENTED input shape ['paired_runs'] has no implemented adapter (see A-002)
+M29: PASS 
+M30: PASS 
+M31: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+M32: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+M33: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+M34: PASS 
+M35: PASS 
+M36: PASS 
+M37: NOT_IMPLEMENTED input shape ['response_object', 'runtime_pair'] has no implemented adapter (see A-002)
+M38: PASS 
+M39: PASS 
+M40: NOT_IMPLEMENTED input shape ['clause_id_near_match_regex', 'clause_id_regex', 'clause_id_search_regex', 'manifest_clause_ids', 'visible_payload'] has no implemented adapter (see A-002)
+M41: NOT_IMPLEMENTED input shape ['author_visible_materials_changed', 'design_id', 'evaluator_repair_attempt', 'f16_required', 'frozen_evaluator_hashes_unchanged', 'halt_signature', 'new_generation_calls', 'pre_halt_scored_slots', 'recovery_mode', 'required_action', 'same_artifact_bytes', 'same_artifacts_for_all_slots', 'same_slot_seeds', 'scheduled_slots', 'slots'] has no implemented adapter (see A-002)
+M42: NOT_IMPLEMENTED input shape ['design_id', 'first_halt_signature', 'recovery_cycles_used', 'scheduled_slots', 'second_halt_signature'] has no implemented adapter (see A-002)
+M43: PASS 
+M44: PASS 
+M45: PASS 
+M46: PASS 
+M47: NOT_IMPLEMENTED input shape ['design_id', 'first_halt_signature', 'recovery_cycles_used', 'scheduled_slots', 'second_halt_signature'] has no implemented adapter (see A-002)
+M48: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M49: PASS 
+M50: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M51: PASS 
+M52: PASS 
+M53: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M54: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M55: PASS 
+M56: PASS 
+M57: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+M58: NOT_IMPLEMENTED input shape ['change_class'] has no implemented adapter (see A-002)
+M59: PASS 
+M60: PASS 
+M61: PASS 
+M62: PASS 
+M63: PASS 
+M64: PASS 
+M65: PASS 
+M66: PASS 
+M67: PASS 
+M68: PASS 
+M69: PASS 
+M70: PASS 
+P01: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+P02: PASS 
+P03: PASS 
+P04: PASS 
+P05: PASS 
+P06a: PASS 
+P06b: PASS 
+P07: PASS 
+P08a: PASS 
+P08b: PASS 
+P08c: PASS 
+P08d: PASS 
+P09: PASS 
+P10: PASS 
+P11a: PASS 
+P11b: PASS 
+P12a: PASS 
+P12b: PASS 
+P13: PASS 
+P14: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+P15: PASS 
+P16: PASS 
+P17: NOT_IMPLEMENTED input shape ['port_manifest', 'response_object'] has no implemented adapter (see A-002)
+P18: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+P19: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+P20: PASS 
+P21: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+P22: NOT_IMPLEMENTED input shape ['null_runs', 'response_object'] has no implemented adapter (see A-002)
+P23: PASS 
+P24a: PASS 
+P24b: PASS 
+P24c: PASS 
+P24d: PASS 
+P25a: PASS 
+P25b: PASS 
+P26: PASS 
+P27: PASS 
+P28: PASS 
+P29a: PASS 
+P29b: PASS 
+P30: PASS 
+P31: PASS 
+P32: PASS 
+P33: PASS 
+P34: PASS 
+P35: PASS 
+P36: PASS 
+P37: PASS 
+P38: PASS 
+P39: PASS 
+P40: PASS 
+P41: PASS 
+P42: NOT_IMPLEMENTED static stages and compilation passed; next: runtime import, inspect.signature and factory checks (not implemented)
+P43: PASS 
+P44: PASS 
+P45: PASS 
+P46: PASS 
+P47: PASS 
+P48: PASS 
+R01: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R02: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R03: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R04: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R05: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R06: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R07: NOT_IMPLEMENTED input shape ['design_preflight'] has no implemented adapter (see A-002)
+R08: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R09: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R10: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R11: NOT_IMPLEMENTED input shape ['checker_runs'] has no implemented adapter (see A-002)
+R12: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)
+R13: NOT_IMPLEMENTED input shape ['events'] has no implemented adapter (see A-002)

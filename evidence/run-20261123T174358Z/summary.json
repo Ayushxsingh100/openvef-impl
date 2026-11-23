@@ -1,0 +1,44 @@
+{
+  "run_started_utc": "20261123T174358Z",
+  "run_class": "development",
+  "python_version": "3.11.18 (main, Nov 23 2026, 15:21:08) [GCC 13.3.0]",
+  "python_executable": "/workspaces/openvef-impl/.venv/bin/python",
+  "python_executable_sha256": "518f54d13051b03dd0abec59e0baaab584dad9d7139d7adacbc774d690b75356",
+  "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.39",
+  "machine": "x86_64",
+  "fixture_index_sha256": "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54",
+  "response_schema_sha256": "6fb5d282b09540949f21ee134b522841c3345031cb3e118a83bdffc18b4e7c34",
+  "distributions": {
+    "jsonschema": "4.26.0",
+    "attrs": "26.1.0",
+    "jsonschema-specifications": "2025.9.1",
+    "referencing": "0.37.0",
+    "rpds-py": "2026.9.1",
+    "typing_extensions": "4.16.0"
+  },
+  "git_commit": "89bc8df62f468fca79fc74f4ffa011a89ad0beab",
+  "source_sha256": {
+    "runner/run_f18.py": "5fb556c32517f3faaedc4f8eccf755815d1091aaa54bb77fc4012fb835a7a936",
+    "src/openvef/__init__.py": "6071fa9f7b1f81b634bd32bd0c5c6b1aeb1969c747b8b45ebf7b783c6c73567a",
+    "src/openvef/ast_signature.py": "5910f63e57ed3714747a545376feb60a9f5b9e1190b99d048e66812c154bd256",
+    "src/openvef/envelope.py": "af74dc9c80097d9e6f526a54acabcf26041396bee446438bbf915b1a3dd119df",
+    "src/openvef/import_policy.py": "a27f6197ede05db172d4e8e76e928873dbbb3c20fc8e522a5a9e14ee741b72f6",
+    "src/openvef/schema.py": "18a9cebaf5c912b5eaa4edff431d9752dae95b2412d387f26b4084392a06807d",
+    "src/openvef/source_ast.py": "b58a6914a4ca3ee80c9bc095fc75767cd0235dd085aa2744e30839bbdbecbbaa"
+  },
+  "command": [
+    "/workspaces/openvef-impl/.venv/bin/python",
+    "runner/run_f18.py",
+    "baseline/OpenVEF_Planning_v1_3_6",
+    "evidence",
+    "development"
+  ],
+  "counts": {
+    "PASS": 93,
+    "FAIL": 0,
+    "NOT_IMPLEMENTED": 51,
+    "ERROR": 0
+  },
+  "total": 144,
+  "results_sha256": "f35d1f4e2b3fc3f7fae496e2f2095abc739da527fb5d67debf3e2df6d4e195d1"
+}

@@ -20,18 +20,18 @@
 | File 30 §2 L20; Protocol §3.4 L133: GLOBAL_RANDOM_USE | `import_policy.py` `find_global_random_use` | M09, M22, M23 — PASS in run-20261123T162630Z | Implemented (A-017 Claude-decided under standing delegation, owner review pending) |
 | File 30 §3 L29; Protocol §3.4 L135: module-body statements | `import_policy.py` `classify_module_body` | P28, M04a, M04b — PASS in run-20261123T162630Z; M57 passes through | Implemented; every statement classified (A-015 Claude-decided under standing delegation, owner review pending; case 2 revised by owner Krishika, Ayush pending) |
 | Protocol §3.4 evaluation order (3); File 30 §3 L27: IMPORT_POLICY stage order — driver.py then checker.py; identifier scan first; one source-order pass, first violation wins | `import_policy.py` `check_import_policy`; runner `run_source_ast` | M29, M44 — PASS in run-20261123T162630Z; 32 fixtures pass through to AST_SIGNATURE without false rejection | Implemented (A-013/A-014 decided as (c), Ayush pending; equal-key tie → File 30 L27 stage order, Claude-decided under standing delegation, owner review pending) |
+| Protocol §3.4 L164; File 30 §3 L33–L37: required-symbol pass (fixed sequence, binding count, parameter checks) and global category pass ranks 1–7 (`(category, file_order, position)`) | `src/openvef/ast_signature.py` `check_ast_signature`; `tests/test_ast_signature.py` | 22 AST_SIGNATURE fixtures — PASS in run-20261123T174358Z; M06 (RETURN_TYPE) needs the runtime stage | Static part implemented (A-020–A-023 Claude-decided under standing delegation, owner review pending) |
+| Protocol §3.4 evaluation order (5), (6); stage map COMPILE_DRIVER / COMPILE_CHECKER | `ast_signature.py` `check_compile` | No fixture reaches it with a compile error; 10 fixtures pass compilation and stop at the runtime stage | Implemented (A-024 Claude-decided, owner review pending) |
+| File 30 §3 L39, §6; Protocol §3.4 evaluation order (7)+: restricted import, `inspect.signature`, factory return type, driver/checker execution | — | M06, M07, M31–M33, M57, P01, P14, P21, P42 | **Blocked, outside the delegation**: container sandbox digest, Cocotb and simulator versions are TO FREEZE (File 30 L15, L39; Register 16 L40; Protocol L497) |
 | Protocol §3.4: multi-failure precedence (`events` inputs) | — | R13 and other R fixtures | Not started (input adapter undefined) |
 
-Latest run: `evidence/run-20261123T173956Z` — commit 7c28cc6 (clean); per-fixture results identical to
-run-20261123T173644Z (A-015 case 2 revision changes no fixture). Previous: `evidence/run-20261123T173644Z` — commit 9726127 (clean), CPython 3.11.18
-(interpreter SHA-256 518f54d1…5356), jsonschema 4.26.0: 71 PASS, 0 FAIL, 73
-NOT_IMPLEMENTED, 0 ERROR. Versus run-20261123T162630Z the only change is M36 (now PASS,
-A-012 decided by Claude); no other fixture result changed. No fixture is blocked on an
-ambiguity. 32 fixtures pass IMPORT_POLICY and stop at the unimplemented AST_SIGNATURE
-stage. Development run (Codespaces), not pinned-environment evidence. Results that
-depend on Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-019; M16, M29, M36)
-do not count toward F18 until both owners review those readings; IMPORT_POLICY order
-also rests on A-013/A-014 with Ayush's confirmation pending.
+Latest run: `evidence/run-20261123T174358Z` — commit 89bc8df (clean), CPython 3.11.18 (interpreter SHA-256
+518f54d1…5356), jsonschema 4.26.0: 93 PASS, 0 FAIL, 51 NOT_IMPLEMENTED, 0 ERROR. 22 new
+PASS at AST_SIGNATURE versus run-20261123T173956Z; no earlier result changed. 10 fixtures
+pass every static stage and compilation and stop at the runtime stage, which is blocked
+(see the table). Development run (Codespaces), not pinned-environment evidence. Results that
+depend on Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-024) do not count
+toward F18 until both owners review those readings.
 
 Evidence: see `evidence/run-*/summary.json`. Development runs are not pinned-environment
 evidence until run on the owners' recorded interpreter.
