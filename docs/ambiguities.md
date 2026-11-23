@@ -903,3 +903,47 @@ failures in the harness process, so the token is a real exception class, as L125
 requires. The alternative, the fallback `Exception`, loses the distinction between a
 design that does not build and a hung simulator. No current fixture depends on this.
 
+## A-040 — Trace-row fields the pack names only in prose (DECIDED BY CLAUDE — owner review pending)
+
+Protocol §5.2 gives three exact field names (L217 `inputs_consumed_at_edge_n`, L218
+`outputs_after_edge_n`, L219 `next_inputs_scheduled_for_edge_n_plus_1`). L223 adds "Record
+cycle index, reset, consumed inputs, post-edge outputs, next-input decision, driver
+completion state and run status", without names or value domains. File 30 L92 gives
+`reset_release_cycle` as a non-negative integer in the checker metadata. The trace
+schema itself is TO FREEZE (L543).
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+1. The three given names are used verbatim as keys in every row. In these names, `n`
+   refers to the row's own edge, not to a per-row key suffix: L216 says "For trace row
+   `n`, record three separate fields", and a key that changed per row could not be
+   "three separate fields".
+2. Rows begin at the first reset edge. `cycle_index` is the row's edge number `n`. The
+   reset-release edge is row `reset_release_cycle` (recorded with the trace), and the
+   driver's `step` argument for row `n` is `n − reset_release_cycle`. Reason: a
+   `reset_release_cycle` other than 0 is only meaningful if the trace has rows before
+   release, and L221 says "the initial reset inputs are defined in the design pack". The
+   competing reading, rows from release only, would make `reset_release_cycle` always
+   0 and leave reset windows (L276) out of the trace.
+3. `reset` is a boolean: true for rows before the reset-release edge.
+4. `driver_completed` uses the name in L227 ("records `driver_completed=true`").
+5. `run_status` is recorded once per trace: `COMPLETE_TRACE` when the cap is reached
+   with no failure, otherwise `TRUNCATED_TRACE`. Reason: L328 "A driver/simulator error
+   or timeout produces a truncated trace" and L332 "Reaching the cycle cap is normal
+   termination; the checker is run on the complete trace". The tokens are built from
+   those phrases. The pack gives no per-row status.
+6. The row at the cap edge, and a row whose `step` failed or whose vector was invalid,
+   are recorded with `next_inputs_scheduled_for_edge_n_plus_1: null`. An invalid vector
+   is not driven (File 30 §4).
+7. Consumed inputs are captured passively from the DUT input ports at the active edge
+   (L262 "capture … passively"). If they differ from the prior row's scheduled vector,
+   the run ends with `TRACE_INTEGRITY_FAILURE|reason=ROW_ALIGNMENT` (L221 "must agree
+   with the prior row's scheduled input"; stage-map L155 reason domain). This branch has
+   no runtime test: a correct harness does not produce it.
+8. The waveform is FST through a `$dumpfile`/`$dumpvars` wrapper module (L223 "FST/VCD
+   … where supported"). It is returned with its byte count and SHA-256.
+
+**Open consequence:**
+- `compare_runs` compares every row, including reset rows. Reset windows belong to the
+  mask (L276), which is owner material.
+- Until the mask exists, a raw divergence during reset is compared like any other row.
+

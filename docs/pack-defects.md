@@ -61,6 +61,7 @@ they are listed in [fifo-owner-checklist.md](fifo-owner-checklist.md).
 | PD-20 | U | Serializer emitted set; clause-ID packet check order | M15, M20 | A-029, A-030 (Claude) |
 | PD-21 | U | Non-JSON number tokens | none | A-003 (owner, Ayush pending) |
 | PD-22 | I | Stale planning-pack version label in File 30 | none | none needed (found while preparing this document; not in ambiguities.md) |
+| PD-23 | U | Trace-row fields named only in prose; trace numbering vs `reset_release_cycle`; run-status domain | none today (simulation not exercised by fixtures) | A-040 (Claude) |
 
 "Fixtures affected now" means the fixture's result depends on the interim handling.
 "None" means no current fixture exercises the case, but a real artifact can.
@@ -524,4 +525,35 @@ does not affect any outcome. This was found while preparing this document and is
 an entry in ambiguities.md.
 
 **To settle.** Update the label, or make it version-neutral.
+
+## PD-23 — Trace-row fields named only in prose (U)
+
+> [02 L216] "For trace row `n`, record three separate fields:"
+
+> [02 L223] "Record cycle index, reset, consumed inputs, post-edge outputs, next-input decision, driver completion state and run status."
+
+> [02 L221] "the initial reset inputs are defined in the design pack"
+
+> [30 L92] "`reset_release_cycle`: non-negative integer;"
+
+> [02 L328] "A driver/simulator error or timeout produces a truncated trace"
+
+**Defects.**
+- Only three row fields have exact names. Cycle index, reset and run status have none.
+- Run status has no value domain, and the pack does not say whether it is per row or
+  per trace.
+- The pack does not say whether trace rows begin at reset or at reset release.
+- The numbering is not tied to `reset_release_cycle` or to the driver's `cycle_index`,
+  which is 0 at release (File 30 L48).
+- It is unclear whether `n` in the three field names is part of the key.
+
+**Interim (A-040).**
+- The three names are used verbatim.
+- Rows begin at the first reset edge, with `cycle_index` = `n`.
+- `reset` is a boolean.
+- `run_status` is a per-trace `COMPLETE_TRACE` or `TRUNCATED_TRACE`.
+
+**To settle.** In the trace schema (owner checklist item 11), name every field and its
+domain, fix the row numbering and its relation to `reset_release_cycle`, and say whether
+`n` is literal in the field names.
 

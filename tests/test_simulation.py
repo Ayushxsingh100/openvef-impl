@@ -7,6 +7,8 @@ Skipped only if Docker is absent; a skip is never counted as a pass.
 """
 from __future__ import annotations
 
+import base64
+import hashlib
 import shutil
 import sys
 import unittest
@@ -18,6 +20,8 @@ sys.path.insert(0, str(HERE.parent / "src"))
 from openvef import sandbox  # noqa: E402
 from openvef.simulation import SimulationError, driver_run, driver_stages, run_outcome  # noqa: E402
 from openvef.stage_map import NotDetermined  # noqa: E402
+
+INP, OUT, NXT = "inputs_consumed_at_edge_n", "outputs_after_edge_n", "next_inputs_scheduled_for_edge_n_plus_1"
 
 DOCKER = shutil.which("docker") is not None
 
@@ -61,13 +65,56 @@ class SimulationTests(unittest.TestCase):
     def test_reset_sampling_complete_and_safe_idle(self):
         r = self.run1(COUNTER)
         rows = r["rows"]
-        self.assertEqual(len(rows), 6)  # cycle cap
-        self.assertEqual(rows[0]["outputs_after_edge"], {"flag": "0", "q": "00"})  # after reset-release edge
-        self.assertEqual(rows[2]["outputs_after_edge"], {"flag": "1", "q": "01"})  # cycle 1's vector, one edge later
-        self.assertEqual([row["driver_completed"] for row in rows], [False, False, False, True, True, True])
-        self.assertEqual(rows[4]["next_inputs"], {"rst": "0", "a": "00", "b": "0"})  # safe idle
+        # Row n = active edge n from the first reset edge; one reset row, then the
+        # reset-release row (driver cycle_index 0), 6 driver rows (cap), and the cap row.
+        self.assertEqual(r["reset_release_cycle"], 1)
+        self.assertEqual(len(rows), 1 + 6 + 1)
+        self.assertEqual([row["cycle_index"] for row in rows], list(range(8)))
+        self.assertEqual([row["reset"] for row in rows], [True] + [False] * 7)
+        self.assertEqual(rows[1][OUT], {"flag": "0", "q": "00"})  # after the reset-release edge
+        self.assertEqual(rows[3][OUT], {"flag": "1", "q": "01"})  # driver cycle 1's vector, one edge later
+        self.assertEqual([row["driver_completed"] for row in rows[1:7]], [False, False, False, True, True, True])
+        self.assertEqual(rows[5][NXT], {"rst": "0", "a": "00", "b": "0"})  # safe idle
+        self.assertIsNone(rows[7][NXT])  # cap row: no further decision
+        self.assertEqual(r["run_status"], "COMPLETE_TRACE")
         self.assertTrue(r["driver_completed"])
         self.assertIsNone(run_outcome(r))
+
+    def test_consumed_inputs_are_captured_and_agree_with_prior_schedule(self):
+        rows = self.run1(COUNTER)["rows"]
+        self.assertEqual(rows[0][INP], {"rst": "1", "a": "00", "b": "0"})  # reset inputs from the design pack
+        for prev, row in zip(rows, rows[1:]):
+            self.assertEqual(row[INP], prev[NXT])  # L221
+
+    def test_row_field_names_are_the_pack_names(self):
+        row = self.run1(COUNTER)["rows"][2]
+        self.assertEqual(set(row), {"cycle_index", "reset", "inputs_consumed_at_edge_n", "outputs_after_edge_n",
+                                    "next_inputs_scheduled_for_edge_n_plus_1", "driver_completed"})
+
+    def test_four_state_values_preserved(self):
+        src = ("module toy(input clk, input rst, input [1:0] a, input b, output [1:0] q, output flag);\n"
+               "  assign q = 2'bxz;\n  assign flag = 1'bz;\nendmodule\n")
+        rows = self.run1(COUNTER, design(verilog_sources={"toy.v": src}))["rows"]
+        self.assertEqual(rows[1][OUT], {"flag": "Z", "q": "XZ"})
+
+    def test_waveform_audit_file(self):
+        w = self.run1(COUNTER)["waveform"]
+        self.assertEqual((w["format"], w["status"]), ("fst", "PRESERVED"))
+        data = base64.b64decode(w["base64"])
+        self.assertEqual((len(data), hashlib.sha256(data).hexdigest()), (w["bytes"], w["sha256"]))
+        self.assertGreater(len(data), 0)
+
+    def test_truncated_trace_status(self):
+        r = self.run1(driver("        if cycle_index == 2:\n            return {}['x']\n"
+                             "        return {'rst': '0', 'a': '00', 'b': '0'}\n"))
+        self.assertEqual(r["run_status"], "TRUNCATED_TRACE")
+        self.assertIsNone(r["rows"][-1][NXT])
+        self.assertEqual(r["rows"][-1]["cycle_index"], 3)  # driver cycle_index 2 = row 1 + 2
+
+    def test_scheduler_marks_sources(self):
+        sched = self.run1(COUNTER)["scheduler"]
+        self.assertTrue(sched["sample_point"]["source"].startswith("specified: Protocol §5.2 L218"))
+        self.assertTrue(sched["drive_point"]["source"].startswith("build_default"))
 
     def test_step_exception(self):
         self.assertEqual(self.diag(returns("{}['x']")),
@@ -139,7 +186,7 @@ class CompareRunsTests(unittest.TestCase):
 
     @staticmethod
     def rows(outputs, inputs):
-        return [{"outputs_after_edge": {"o": o, "u": "0"}, "next_inputs": {"i": i}} for o, i in zip(outputs, inputs)]
+        return [{OUT: {"o": o, "u": "0"}, NXT: {"i": i}} for o, i in zip(outputs, inputs)]
 
     def test_next_input_mismatch_before_raw_divergence_is_terminal(self):
         from openvef.simulation import compare_runs
@@ -154,7 +201,7 @@ class CompareRunsTests(unittest.TestCase):
     def test_unobserved_divergence_is_not_a_halt(self):
         from openvef.simulation import compare_runs
         a = self.rows("000", "000")
-        b = [dict(r, outputs_after_edge={"o": "0", "u": "1"}) for r in self.rows("000", "000")]
+        b = [{**r, OUT: {"o": "0", "u": "1"}} for r in self.rows("000", "000")]
         self.assertIsNone(compare_runs(a, b, ["o"]))
 
 

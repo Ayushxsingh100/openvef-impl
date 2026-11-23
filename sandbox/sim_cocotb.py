@@ -27,6 +27,10 @@ from cocotb.types import LogicArray
 import harness
 
 ALL_INPUTS_LEGAL = "ALL_INPUTS_LEGAL"
+# Field names given by Protocol §5.2 L217-L219, used verbatim (A-040).
+INPUTS = "inputs_consumed_at_edge_n"
+OUTPUTS = "outputs_after_edge_n"
+NEXT = "next_inputs_scheduled_for_edge_n_plus_1"
 
 
 def beat(phase: str) -> None:
@@ -103,30 +107,52 @@ async def openvef_driver_run(dut):
     reset = design["reset_sequence"]
     if not reset:
         raise ValueError("design materials must give a non-empty reset_sequence")
-    # reset[i] is driven before active edge i; the active edge after the last vector is
-    # the reset-release edge, after which the first snapshot is sampled (B5).
-    for i, vector in enumerate(reset):
-        if i:
-            await FallingEdge(clk)
-        drive(dut, vector)
-        await RisingEdge(clk)
-    await ReadOnly()
-    snapshot = sample(dut, outputs)
-
+    # Trace rows (Protocol §5.2 L216-L223; A-040). Row n belongs to active edge n, counted
+    # from the first reset edge. reset[i] is driven before edge i ("the initial reset
+    # inputs are defined in the design pack"); edge len(reset)-1 is the reset-release
+    # edge, whose post-edge snapshot is the first `step` input (B5).
+    release = len(reset) - 1
     rows, completed, events = [], False, []
-    for cycle_index in range(cap):
-        if completed:
+    scheduled = dict(reset[0])
+    n = 0
+    drive(dut, scheduled)
+    while True:
+        await RisingEdge(clk)
+        consumed = sample(dut, sorted(widths))  # passive capture at the edge (L262)
+        await ReadOnly()
+        snapshot = sample(dut, outputs)
+        row = {"cycle_index": n, "reset": n < release, INPUTS: consumed, OUTPUTS: snapshot}
+        if consumed != {k: scheduled[k] for k in sorted(widths)}:
+            # L221: "The consumed-input field ... must agree with the prior row's scheduled
+            # input"; a mismatch is a harness fault (stage map L155, reason ROW_ALIGNMENT).
+            row.update({NEXT: None, "driver_completed": completed})
+            rows.append(row)
+            events.append({"kind": "trace_integrity", "reason": "ROW_ALIGNMENT", "cycle": n})
+            break
+        if n < release:
+            vector = dict(reset[n + 1])
+        elif n - release >= cap:
+            # Cap reached (L227): this edge's outputs are recorded; no further decision.
+            row.update({NEXT: None, "driver_completed": completed})
+            rows.append(row)
+            break
+        elif completed:
             vector = dict(safe_idle)
         else:
+            cycle_index = n - release
             beat("step")
             try:
                 value = guarded(driver.step, cycle_index, dict(snapshot))
             except BaseException as exc:  # includes SystemExit
                 events.append({"kind": "driver_runtime", "phase": "step", "exception_class": harness.exc_class(exc),
-                               "cycle": cycle_index})
-                break
+                               "cycle": n})
+                value = None
             finally:
                 beat("sim")
+            if events:
+                row.update({NEXT: None, "driver_completed": completed})
+                rows.append(row)
+                break
             if value == "COMPLETE":
                 completed = True
                 vector = dict(safe_idle)
@@ -134,18 +160,19 @@ async def openvef_driver_run(dut):
                 reason = vector_reason(value, widths, predicate)
                 if reason == "NOT_DETERMINED":
                     finish({"not_determined": "legal-input predicate not executable (A-027, A-038)",
-                            "cycle": cycle_index, "rows": rows, "target": target})
+                            "cycle": n, "rows": rows, "target": target})
                     return
-                if reason is not None:
-                    events.append({"kind": "driver_vector", "reason": reason, "cycle": cycle_index})
+                if reason is not None:  # an invalid vector is not driven (File 30 §4)
+                    events.append({"kind": "driver_vector", "reason": reason, "cycle": n})
+                    row.update({NEXT: None, "driver_completed": completed})
+                    rows.append(row)
                     break
                 vector = {k: value[k] for k in sorted(widths)}
-        rows.append({"cycle": cycle_index, "outputs_after_edge": snapshot, "next_inputs": vector,
-                     "driver_completed": completed})
-        await FallingEdge(clk)
+        row.update({NEXT: vector, "driver_completed": completed})
+        rows.append(row)
+        scheduled = vector
+        await FallingEdge(clk)  # designated drive phase: build default (L219; TO FREEZE, L542)
         drive(dut, vector)
-        await RisingEdge(clk)
-        await ReadOnly()
-        snapshot = sample(dut, outputs)
-    finish({"events": events, "rows": rows, "final_outputs": snapshot, "driver_completed": completed,
-            "target": target})
+        n += 1
+    finish({"events": events, "rows": rows, "reset_release_cycle": release, "driver_completed": completed,
+            "run_status": "TRUNCATED_TRACE" if events else "COMPLETE_TRACE", "target": target})

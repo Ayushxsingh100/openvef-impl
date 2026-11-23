@@ -159,6 +159,8 @@ freeze them:
 - clock period 10 ns, starting low (first active edge at half a period);
 - inputs driven at the falling edge before the next active edge (the pack says only "the
   designated drive phase before edge `n+1`", Protocol L219);
+- (specified, not a default: outputs are sampled in Cocotb `ReadOnly` after the edge,
+  L218);
 - `reset_sequence[i]` is driven before active edge *i*, and the edge after the last
   vector is the reset-release edge.
 
@@ -167,27 +169,23 @@ build default. It is specified by the pack: "`outputs_after_edge_n`: top-level o
 sampled in Cocotb `ReadOnly` after edge `n` settles" (Protocol L218), and the harness
 follows it.
 
-**Known gap against Protocol §5.2 (L217–L223), not yet fixed:** the raw rows that
-`sim_cocotb.py` records have `cycle`, `outputs_after_edge`, `next_inputs` and
-`driver_completed`. §5.2 also requires:
-- `inputs_consumed_at_edge_n`;
-- the reset state;
-- run status;
-- an FST/VCD audit file "where supported".
+**Trace rows (Protocol §5.2 L216–L223; A-040).** Each row records:
+- `cycle_index`;
+- `reset`;
+- `inputs_consumed_at_edge_n`, captured passively at the edge and checked against the
+  prior row's scheduled vector;
+- `outputs_after_edge_n`;
+- `next_inputs_scheduled_for_edge_n_plus_1`;
+- `driver_completed`.
 
-It also names the three row fields `inputs_consumed_at_edge_n`, `outputs_after_edge_n`
-and `next_inputs_scheduled_for_edge_n_plus_1`. No fixture result depends on this today.
-The rows must be brought in line before the trace schema (owner item 11 in
-[fifo-owner-checklist.md](fifo-owner-checklist.md)) is used.
+Each trace also records `reset_release_cycle` and `run_status`
+(`COMPLETE_TRACE`/`TRUNCATED_TRACE`). Four-state values are kept as `0`/`1`/`X`/`Z`. An
+FST waveform is produced for every run and returned with its SHA-256. This closes the
+gap recorded on 23 Nov 2026. Names the pack does not give are A-040 decisions
+(pack-defects PD-23). In each result, `SCHEDULER` marks every entry as `specified` (with
+its Protocol line) or `build_default`.
 
-**What blocks the 10 fixtures** (P01, P14, P17, P21, P42, M07, M31, M32, M33, M57): the
-FIFO RTL and null netlist, the port manifest with widths, the reset sequence and
-legal-input rules (owner-written FIFO specification), the cycle cap, safe-idle vector
-and watchdog formula (TO FREEZE), the observation mask (owner-written), and the checker
-trace schema and metadata (TO FREEZE, L543). None of these are in the pack. Writing them
-is outside the Scope section and outside the delegation.
-
-Tests: [tests/test_simulation.py](../tests/test_simulation.py) (16). They use
+Tests: [tests/test_simulation.py](../tests/test_simulation.py) (22). They use
 **test-only** toy designs in `tests/sim_designs/`, which are not a FIFO and not derived
 from any owner material.
 

@@ -29,6 +29,11 @@ from openvef.envelope import Failure
 from openvef.sandbox import run_harness
 from openvef.stage_map import RTL_NULL_CONTROL_FAILURE, NotDetermined, first_event, paired_run_failure
 
+# Trace-row field names given by Protocol §5.2 L217-L219 (A-040).
+INPUTS = "inputs_consumed_at_edge_n"
+OUTPUTS = "outputs_after_edge_n"
+NEXT = "next_inputs_scheduled_for_edge_n_plus_1"
+
 DESIGN_FIELDS = ("toplevel", "verilog_sources", "clock_port", "input_ports", "output_ports", "reset_sequence",
                  "cycle_cap", "safe_idle", "legal_input_predicate")
 
@@ -72,13 +77,12 @@ def compare_runs(rtl_rows: list, null_rows: list, observed_outputs: Iterable[str
     observed = set(observed_outputs)
     raw_div = next_div = masked_same_input = None
     for i, (a, b) in enumerate(zip(rtl_rows, null_rows)):
-        if raw_div is None and a["outputs_after_edge"] != b["outputs_after_edge"]:
+        if raw_div is None and a[OUTPUTS] != b[OUTPUTS]:
             raw_div = i
-        if next_div is None and a["next_inputs"] != b["next_inputs"]:
+        if next_div is None and a[NEXT] != b[NEXT]:
             next_div = i
         same_inputs_so_far = next_div is None
-        if masked_same_input is None and same_inputs_so_far and any(
-                a["outputs_after_edge"][p] != b["outputs_after_edge"][p] for p in observed):
+        if masked_same_input is None and same_inputs_so_far and any(a[OUTPUTS][p] != b[OUTPUTS][p] for p in observed):
             masked_same_input = i
     nondeterminism = paired_run_failure(raw_div, next_div)
     if nondeterminism is not None:

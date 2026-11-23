@@ -34,15 +34,27 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-# Build defaults for choices the pack leaves TO FREEZE (L229, L542). Not frozen values.
+# Scheduler and recorder parameters, each marked with its source. "specified" values are
+# fixed by the pack; "build_default" values are this build's choices for items the pack
+# leaves TO FREEZE (L229, L542). Recorded in every result.
 SCHEDULER = {
-    "timescale": "1ns/1ps",
-    "clock_period_ns": 10,
-    "first_active_edge": "rising edge at half a period (clock starts low)",
-    "sample_point": "ReadOnly phase after the active (rising) edge",
-    "drive_point": "falling edge before the next active edge",
-    "reset": "reset_sequence[i] is driven before active edge i; the edge after the last vector is the "
-             "reset-release edge",
+    "sample_point": {"value": "Cocotb ReadOnly after the active (rising) edge settles",
+                     "source": "specified: Protocol §5.2 L218"},
+    "ordering": {"value": "sample outputs, invoke driver, record next-input vector, drive before next edge",
+                 "source": "specified: Protocol §5.2 L221"},
+    "consumed_inputs": {"value": "captured passively at the active edge; must equal the prior row's scheduled "
+                                 "vector, else TRACE_INTEGRITY_FAILURE|reason=ROW_ALIGNMENT",
+                        "source": "specified: Protocol L221, L262; failure row L155 (A-040)"},
+    "drive_point": {"value": "falling edge before the next active edge",
+                    "source": "build_default: 'designated drive phase' not given (L219, L542)"},
+    "timescale": {"value": "1ns/1ps", "source": "build_default (L542)"},
+    "clock_period_ns": {"value": 10, "source": "build_default (L542)"},
+    "first_active_edge": {"value": "rising edge at half a period (clock starts low)", "source": "build_default (L542)"},
+    "reset": {"value": "reset_sequence[i] is driven before active edge i; edge len-1 is the reset-release edge; "
+                       "trace rows start at edge 0",
+              "source": "build_default for the convention; reset inputs come from the design pack (L221; A-040)"},
+    "waveform": {"value": "FST via $dumpfile/$dumpvars wrapper, vvp -fst",
+                 "source": "specified: 'Preserve an FST/VCD waveform audit file where supported' (L223)"},
 }
 POLL_S = 0.02
 
@@ -62,13 +74,20 @@ def run(request: dict) -> dict:
             raise ValueError("verilog source names must be plain file names")
         (src_dir / name).write_text(text, encoding="utf-8")
         files.append(str(src_dir / name))
+    # L223: "Preserve an FST/VCD waveform audit file where supported." Icarus supports FST
+    # through a separate top-level dump module (the same technique cocotb's runner uses).
+    wave_file = work / "waves.fst"
+    dump = src_dir / "openvef_waveform_dump.v"
+    dump.write_text(f'module openvef_waveform_dump();\n  initial begin\n    $dumpfile("{wave_file}");\n'
+                    f'    $dumpvars(0, {design["toplevel"]});\n  end\nendmodule\n', encoding="ascii")
+    files.append(str(dump))
     cmd_file = work / "cmds.f"
-    cmd_file.write_text(f"+timescale+{SCHEDULER['timescale']}\n", encoding="ascii")
+    cmd_file.write_text(f"+timescale+{SCHEDULER['timescale']['value']}\n", encoding="ascii")
     vvp_file = work / "sim.vvp"
     budget_s = float(request["budget_s"])
     started = time.monotonic()
 
-    build = subprocess.run(["iverilog", "-g2012", "-c", str(cmd_file), "-s", design["toplevel"], "-o", str(vvp_file),
+    build = subprocess.run(["iverilog", "-g2012", "-c", str(cmd_file), "-s", design["toplevel"], "-s", "openvef_waveform_dump", "-o", str(vvp_file),
                             *files], capture_output=True, text=True, timeout=budget_s)
     if build.returncode != 0:
         # The design materials do not build: an evaluator-side simulator error (L154).
@@ -102,7 +121,7 @@ def run(request: dict) -> dict:
         "OPENVEF_SIM_RESULT": str(result_file),
     }
     log = open(work / "vvp.log", "wb")
-    proc = subprocess.Popen(["vvp", "-m", vpi_entry, str(vvp_file), "-none"], cwd=str(work), env=env,
+    proc = subprocess.Popen(["vvp", "-m", vpi_entry, str(vvp_file), "-fst"], cwd=str(work), env=env,
                             stdout=log, stderr=subprocess.STDOUT)
     step_timeout = float(request["step_timeout_s"])
     while proc.poll() is None:
@@ -127,7 +146,19 @@ def run(request: dict) -> dict:
                                   (work / "vvp.log").read_text("utf-8", "replace")[-1500:]})
     result = json.loads(result_file.read_text(encoding="utf-8"))
     result["scheduler"] = SCHEDULER
+    result["waveform"] = _waveform(wave_file)
     return result
+
+
+def _waveform(path: Path) -> dict:
+    """The waveform audit file, returned with its hash so the caller can preserve it."""
+    import base64
+    import hashlib
+    if not path.exists():
+        return {"format": "fst", "status": "NOT_PRODUCED"}
+    data = path.read_bytes()
+    return {"format": "fst", "status": "PRESERVED", "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
+            "base64": base64.b64encode(data).decode("ascii")}
 
 
 def _read_heartbeat(path: Path):
