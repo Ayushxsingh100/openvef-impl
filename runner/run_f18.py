@@ -28,6 +28,7 @@ sys.path.insert(0, str(REPO / "src"))
 
 from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
 from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
+from openvef.source_ast import FILE_ORDER, UnsettledSpec, check_sources, syntax_reject  # noqa: E402
 
 INDEX_REL = "41_F18_Fixture_Inputs/fixture-index.json"
 INDEX_SHA256 = "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54"
@@ -97,9 +98,36 @@ def failure_record(result: Failure) -> dict:
     }
 
 
+def run_source_ast(driver_source: str, checker_source: str) -> tuple[str, dict | None, str]:
+    """Stage SOURCE_AST (Protocol §3.4 evaluation order (2))."""
+    try:
+        result = check_sources([("driver.py", driver_source), ("checker.py", checker_source)])
+    except UnsettledSpec as exc:
+        return "NOT_IMPLEMENTED", None, f"blocked on docs/ambiguities.md {exc}"
+    if isinstance(result, Failure):
+        return "EXECUTED", failure_record(result), ""
+    return "NOT_IMPLEMENTED", None, "SOURCE_AST passed; next stage (IMPORT_POLICY) not implemented"
+
+
 def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
-    """Return (status, actual, note). Dispatch on input shape only."""
+    """Return (status, actual, note). Dispatch on input shape (and declared fixture_class) only."""
     inp = desc["input"]
+
+    # A-012 (provisional): source-pair inputs start at SOURCE_AST.
+    if set(inp) == {"driver_source", "checker_source"}:
+        return run_source_ast(inp["driver_source"], inp["checker_source"])
+
+    # A-012 (provisional): a parser unit vector for the SOURCE_SYNTAX_REJECT.column
+    # rule. CONTROL_EXPECTATION fixtures are test labels, not feedback events
+    # (Protocol §3.4 L177; Catalog L15, L27).
+    if desc.get("fixture_class") == "parser_unit_vector" and set(inp) == {"source_file", "syntax_error"}:
+        err = inp["syntax_error"]
+        if inp["source_file"] not in FILE_ORDER or not set(err) <= {"lineno", "offset"} \
+                or not isinstance(err.get("lineno"), int) or err["lineno"] < 1:
+            return "NOT_IMPLEMENTED", None, "parser unit vector outside the column rule"
+        record = failure_record(syntax_reject(inp["source_file"], err["lineno"], err.get("offset")))
+        record["disposition"] = "CONTROL_EXPECTATION"
+        return "EXECUTED", record, "unit vector: SOURCE_SYNTAX_REJECT.column rule (A-012 provisional)"
     raw: bytes | None = None
     if set(inp) <= {"raw_response_utf8", "provider_finish_reason"} and "raw_response_utf8" in inp:
         raw = inp["raw_response_utf8"].encode("utf-8")
@@ -127,7 +155,8 @@ def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
         checked = validate_clause_ids(checked, desc["manifest_clause_ids"])
     if isinstance(checked, Failure):
         return "EXECUTED", failure_record(checked), ""
-    return "NOT_IMPLEMENTED", None, "PARSE_SCHEMA passed; next stage (source decode / AST) not implemented"
+    # Schema-valid, so driver.source and checker.source are non-empty strings.
+    return run_source_ast(obj["driver"]["source"], obj["checker"]["source"])
 
 
 def git_commit() -> str:

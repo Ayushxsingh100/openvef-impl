@@ -114,3 +114,104 @@ counts (needs ≥ 11 assumptions or dependencies items). No current fixture exer
 
 **Decision:** the two rules stay as implemented: schema-error pointers sort tokens by
 Unicode code point (reading (a)); clause-ID rejection uses the lowest numeric index. Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending.
+
+## A-007 — SOURCE_AST order across files: per file, or by stage-map row (PROVISIONAL)
+
+- File 30 §3 L27: "For file-local stages, process each source file in this order: strict
+  UTF-8 decode with BOM rejection; empty/whitespace-only rejection; `ast.parse`; …"
+- Protocol §3.4 evaluation order: "(2) Source UTF-8/BOM/empty/syntax checks in file order
+  `driver.py`, then `checker.py`."
+- Protocol §3.4 stage map lists "Invalid UTF-8/BOM or syntax parse error" above
+  "Empty/whitespace-only source", and says "The first applicable row after the exact
+  evaluation order below controls".
+
+Readings: (a) finish all checks on `driver.py`, then `checker.py`; (b) the row order
+decides first, so a syntax error in either file beats an empty file. They differ only
+when `driver.py` is empty and `checker.py` has a syntax error: (a) gives
+`SOURCE_EMPTY|file=driver.py`, (b) gives `SOURCE_SYNTAX_REJECT|file=checker.py|…`.
+Within one file, empty and syntax-error cannot both apply (whitespace-only source
+parses). No fixture covers the cross-file case; M16 (both empty) agrees with both.
+
+Implemented: (a), which File 30 §3 L27 states explicitly (unit test
+`test_driver_checked_before_checker`). **Owner confirmation needed.**
+
+## A-008 — U+FEFF at the start of a source string (OPEN; raises UnsettledSpec)
+
+Stage map: "Invalid UTF-8/BOM or syntax parse error" → `SOURCE_SYNTAX_REJECT`; File 30 §3
+L27: "strict UTF-8 decode with BOM rejection". The source arrives as a JSON string, not
+bytes, so "BOM" has no byte meaning here.
+
+Readings: (a) a leading U+FEFF is the BOM and is rejected before the empty check — but
+the pack gives no line/column for a BOM rejection; (b) U+FEFF is an ordinary character
+and `ast.parse` decides (on 3.11.18 it raises SyntaxError "invalid non-printable
+character U+FEFF", line 1, offset 1, so `…|line=1|column=1`); (c) strip it as Python
+does when reading a UTF-8-SIG file — excluded by "BOM rejection". (a) and (b) both
+reject; they can differ only in the line/column, which the pack does not give for (a).
+Not implemented: a
+leading U+FEFF raises `UnsettledSpec("A-008")`, which the runner reports as
+NOT_IMPLEMENTED. U+FEFF later in the source is left to `ast.parse` (a syntax error).
+**Owner decision needed.**
+
+## A-009 — Source string that is not valid UTF-8 (OPEN; raises UnsettledSpec)
+
+JSON `\ud800` escapes decode to lone surrogates, which cannot be encoded as UTF-8.
+`ast.parse` on 3.11.18 raises `UnicodeEncodeError`, not SyntaxError. The stage map
+puts this under "Invalid UTF-8 …" → `SOURCE_SYNTAX_REJECT|file=<FILE>|line=<LINE>|
+column=<COLUMN>` but says nothing about the line or column. (Raw input of this kind
+also passes PARSE_SCHEMA: Python's `json` accepts lone-surrogate escapes.)
+Not implemented: raises `UnsettledSpec("A-009")`. **Owner decision needed** (line/column
+for this case, or a different rule such as rejecting lone surrogates at PARSE_SCHEMA).
+
+## A-010 — Which characters count as whitespace for SOURCE_EMPTY (OPEN; partly implemented)
+
+Stage map: "Empty/whitespace-only source". The pack does not define whitespace.
+Readings: (a) JSON whitespace (space, tab, LF, CR); (b) `str.isspace()`, which adds
+U+000B, U+000C, U+001C–U+001F, U+0085, U+00A0, U+1680, U+2000–U+200A, U+2028, U+2029,
+U+202F, U+205F, U+3000; (c) Python tokenizer whitespace (space, tab, form feed, newlines).
+What changes: a source of only U+000C parses on 3.11.18 (empty module, so it passes
+SOURCE_AST under (a)), but is SOURCE_EMPTY under (b) and (c); U+000B or U+00A0 alone is
+`SOURCE_SYNTAX_REJECT|…|line=1|column=1` under (a)/(c) but SOURCE_EMPTY under (b).
+
+Implemented: the empty string and sources made only of space/tab/LF/CR are SOURCE_EMPTY
+(every reading agrees; covers P12a, P12b, M16). A source made only of `str.isspace()`
+characters that includes any other character raises `UnsettledSpec("A-010")`. A
+comment-only source is not treated as empty (comments are not whitespace).
+**Owner decision needed.**
+
+## A-011 — SyntaxError with no usable line, or another exception from ast.parse (OPEN; raises UnsettledSpec)
+
+The column rule covers a missing offset ("If `offset` is absent, null or less than 1,
+emit `column=1`") but nothing covers a missing or non-positive `lineno`, although
+`LINE` must be a positive decimal integer. On 3.11.18, a NUL character in the source
+gives SyntaxError "source code string cannot contain null bytes" with `lineno=None`.
+`ast.parse` may also raise exceptions that are not SyntaxError (e.g. `RecursionError`,
+`MemoryError`, `UnicodeEncodeError` — see A-009); the stage map does not say whether
+these are "syntax parse error". Not implemented: both raise `UnsettledSpec("A-011")`.
+**Owner decision needed.**
+
+Related observation (no change): the column rule says to emit "the positive one-based
+source-character column reported by CPython". On 3.11.18 `ast.parse` of a `str` reports
+a character offset (`é = 1; y = )` gives offset 12, the character column, not 13, the
+byte column — unit test `test_column_counts_characters_not_utf8_bytes`). Warnings from
+`ast.parse` (e.g. invalid escape sequences) are not failures; the runner must not be
+started with `-W error`, which would turn them into SyntaxError.
+
+## A-012 — Runner adapters for source-pair inputs and the M36 unit vector (PROVISIONAL)
+
+A-002's decision covers `response_object` only. Two more input shapes reach SOURCE_AST:
+
+- `{driver_source, checker_source}` (M16, M29). Implemented: run SOURCE_AST directly on
+  the two strings (no envelope, schema or clause-ID step), then continue with later
+  stages. Alternative: wrap them in a full response object first — the pack gives no
+  wrapper, so this would need one.
+- `{source_file, syntax_error: {lineno, offset}}` with `fixture_class:
+  "parser_unit_vector"` (M36). Catalog L27: unit vectors "are deliberately
+  grammar-exempt; they test local utilities/policies". Implemented: call the column-rule
+  function `syntax_reject(file, lineno, offset)` directly and report disposition
+  `CONTROL_EXPECTATION`, because Protocol §3.4 L177 says a `CONTROL_EXPECTATION`
+  fixture's "stage and expected diagnostic are test labels, not an artifact feedback
+  event". The disposition comes from the declared `fixture_class` and input shape,
+  never the fixture ID or expected value. Alternative: compare only stage, error class
+  and diagnostic for unit vectors.
+
+**Owner confirmation needed for both adapters.**
