@@ -15,6 +15,7 @@ from __future__ import annotations
 import base64
 import datetime as dt
 import hashlib
+import importlib.metadata
 import json
 import os
 import platform
@@ -26,11 +27,16 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
 
 from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
+from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
 
 INDEX_REL = "41_F18_Fixture_Inputs/fixture-index.json"
 INDEX_SHA256 = "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54"
 EXPECTED_COUNT = 144
 COMPARE_KEYS = ("disposition", "stage_id", "error_class", "diagnostic")
+# 27_SHA256SUMS.txt entry for the canonical response schema (File 30 §1).
+SCHEMA_SHA256 = "6fb5d282b09540949f21ee134b522841c3345031cb3e118a83bdffc18b4e7c34"
+PINNED_DISTRIBUTIONS = ("jsonschema", "attrs", "jsonschema-specifications", "referencing", "rpds-py",
+                        "typing_extensions")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -75,7 +81,23 @@ def load_descriptor(root: Path, entry: dict) -> dict:
     return desc
 
 
-def execute(desc: dict) -> tuple[str, dict | None, str]:
+def load_schema_validator(root: Path):
+    path = root / SCHEMA_REL
+    if sha256_file(path) != SCHEMA_SHA256:
+        raise IntegrityError(f"response schema SHA-256 mismatch: {sha256_file(path)}")
+    return load_validator(path)
+
+
+def failure_record(result: Failure) -> dict:
+    return {
+        "disposition": result.disposition,
+        "stage_id": result.stage_id,
+        "error_class": result.error_class,
+        "diagnostic": result.diagnostic,
+    }
+
+
+def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
     """Return (status, actual, note). Dispatch on input shape only."""
     inp = desc["input"]
     raw: bytes | None = None
@@ -86,17 +108,20 @@ def execute(desc: dict) -> tuple[str, dict | None, str]:
     if raw is None:
         return "NOT_IMPLEMENTED", None, f"input shape {sorted(inp)} has no implemented adapter (see A-002)"
 
-    result = parse_envelope(raw, inp.get("provider_finish_reason"))
-    if isinstance(result, Envelope):
-        return "NOT_IMPLEMENTED", None, "envelope accepted; next stage (schema validation, part 1b) not implemented"
-    assert isinstance(result, Failure)
-    actual = {
-        "disposition": result.disposition,
-        "stage_id": result.stage_id,
-        "error_class": result.error_class,
-        "diagnostic": result.diagnostic,
-    }
-    return "EXECUTED", actual, ""
+    envelope = parse_envelope(raw, inp.get("provider_finish_reason"))
+    if isinstance(envelope, Failure):
+        return "EXECUTED", failure_record(envelope), ""
+    assert isinstance(envelope, Envelope)
+
+    # PARSE_SCHEMA part 1b: schema, then manifest clause IDs (Protocol §3.4 evaluation
+    # order step 1). The manifest clause_ids come from the descriptor's
+    # `manifest_clause_ids` field (docs/ambiguities.md A-005).
+    checked = validate_schema(validator, envelope.obj)
+    if isinstance(checked, ValidatedResponse):
+        checked = validate_clause_ids(checked, desc["manifest_clause_ids"])
+    if isinstance(checked, Failure):
+        return "EXECUTED", failure_record(checked), ""
+    return "NOT_IMPLEMENTED", None, "PARSE_SCHEMA passed; next stage (source decode / AST) not implemented"
 
 
 def git_commit() -> str:
@@ -125,6 +150,8 @@ def main() -> int:
         "platform": platform.platform(),
         "machine": platform.machine(),
         "fixture_index_sha256": INDEX_SHA256,
+        "response_schema_sha256": SCHEMA_SHA256,
+        "distributions": {name: importlib.metadata.version(name) for name in PINNED_DISTRIBUTIONS},
         "git_commit": git_commit(),
         "source_sha256": {str(p.relative_to(REPO)): sha256_file(p) for p in source_files},
         "command": [sys.executable, *sys.argv],
@@ -134,11 +161,12 @@ def main() -> int:
     with open(out_dir / "results.jsonl", "w", encoding="utf-8") as res, open(out_dir / "run.log", "w", encoding="utf-8") as log:
         log.write(json.dumps(meta, indent=2) + "\n")
         fixtures = load_index(root)  # IntegrityError aborts the whole run
+        validator = load_schema_validator(root)
         for entry in fixtures:
             desc = load_descriptor(root, entry)
             expected = desc["expected"]
             try:
-                status, actual, note = execute(desc)
+                status, actual, note = execute(desc, validator)
             except Exception as exc:  # recorded, never hidden
                 status, actual, note = "ERROR", None, f"{type(exc).__name__}: {exc}"
             if status == "EXECUTED":

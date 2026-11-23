@@ -10,8 +10,8 @@ Implements:
                    PARSE_SCHEMA. Precedence versus envelope checks: see
                    docs/ambiguities.md A-001 (provisional, owner confirmation pending).
 
-Not implemented here: Draft 2020-12 schema validation and clause-ID checks (part 1b),
-which need the pinned `jsonschema` validator (docs/ambiguities.md D-001).
+Draft 2020-12 schema validation and clause-ID checks (part 1b) are in
+`openvef.schema`.
 """
 from __future__ import annotations
 
