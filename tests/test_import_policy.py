@@ -13,7 +13,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
 
-from openvef.import_policy import scan_identifiers  # noqa: E402
+from openvef.import_policy import ALLOWED_ROOTS, classify_import, scan_identifiers  # noqa: E402
 from openvef.source_ast import UnsettledSpec  # noqa: E402
 
 
@@ -92,6 +92,60 @@ class IdentifierScanTests(unittest.TestCase):
         src = 'x = f"{café}"\n'
         self.assertIn("café", [n.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Name)])
         self.assertIsNone(scan(src))
+
+
+def first_stmt(source):
+    return ast.parse(source).body[0]
+
+
+def classify(source, file="driver.py"):
+    node = first_stmt(source)
+    assert isinstance(node, ast.Import)
+    result = classify_import(file, node)
+    if result is None:
+        return None
+    assert (result.stage_id, result.error_class, result.disposition) == ("IMPORT_POLICY", "IMPORT_POLICY_REJECT", "REPAIR")
+    return result.diagnostic
+
+
+class ImportClassificationTests(unittest.TestCase):
+    def test_allowed_roots_exact(self):
+        self.assertEqual(ALLOWED_ROOTS, {"__future__", "collections", "copy", "functools", "itertools", "json",
+                                         "math", "operator", "random", "re", "statistics", "typing"})
+
+    def test_spec_examples(self):
+        # File 30 §2 L17 / Protocol §3.4 L129: "Thus `import math, json` is MULTIPLE_NAMES; ..."
+        self.assertEqual(classify("import math, json\n"), "IMPORT_FORM_REJECT|file=driver.py|line=1|reason=MULTIPLE_NAMES")
+        self.assertEqual(classify("import os.path\n"), "IMPORT_NOT_ALLOWED|module=os")
+        self.assertEqual(classify("import collections.abc\n"), "IMPORT_FORM_REJECT|file=driver.py|line=1|reason=SUBMODULE_IMPORT")
+        self.assertEqual(classify("import math as m\n"), "IMPORT_FORM_REJECT|file=driver.py|line=1|reason=IMPORT_ALIAS")
+
+    def test_every_allowed_root_accepted(self):
+        for root in sorted(ALLOWED_ROOTS):
+            with self.subTest(root=root):
+                self.assertIsNone(classify(f"import {root}\n"))
+
+    def test_disallowed_root(self):
+        self.assertEqual(classify("import os\n"), "IMPORT_NOT_ALLOWED|module=os")
+        self.assertEqual(classify("import builtins\n"), "IMPORT_NOT_ALLOWED|module=builtins")
+        # abc, dataclasses, enum are "intentionally not allowed" (File 30 §2 L16).
+        for root in ("abc", "dataclasses", "enum"):
+            self.assertEqual(classify(f"import {root}\n"), f"IMPORT_NOT_ALLOWED|module={root}")
+
+    def test_multiple_names_wins_over_root(self):
+        self.assertEqual(classify("import os, json\n"), "IMPORT_FORM_REJECT|file=driver.py|line=1|reason=MULTIPLE_NAMES")
+
+    def test_root_wins_over_alias(self):
+        self.assertEqual(classify("import os as operating_system\n"), "IMPORT_NOT_ALLOWED|module=os")
+
+    def test_submodule_wins_over_alias(self):
+        self.assertEqual(classify("import collections.abc as c\n"),
+                         "IMPORT_FORM_REJECT|file=driver.py|line=1|reason=SUBMODULE_IMPORT")
+
+    def test_line_is_node_line_and_file_is_passed_through(self):
+        node = ast.parse("x = 1\n\nimport math as m\n").body[1]
+        self.assertEqual(classify_import("checker.py", node).diagnostic,
+                         "IMPORT_FORM_REJECT|file=checker.py|line=3|reason=IMPORT_ALIAS")
 
 
 if __name__ == "__main__":

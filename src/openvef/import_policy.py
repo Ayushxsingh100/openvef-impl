@@ -6,6 +6,8 @@ Implemented so far:
                    `tokenize.ERRORTOKEN` tokens; diagnostic
                    NON_ASCII_IDENTIFIER|file=<FILE>|line=<LINE>|column=<COLUMN>, where
                    COLUMN is the one-based UTF-8 byte column of the lexeme start.
+  File 30 §2 L16-L17; Protocol §3.4 (file 02 L129) — per-node `ast.Import`
+                   classification and its total precedence.
 
 The order between categories inside one file (A-013, A-014) is not decided, so this
 module exposes one function per sub-rule and no combined stage yet.
@@ -18,6 +20,7 @@ is not scanned.
 """
 from __future__ import annotations
 
+import ast
 import io
 import tokenize
 from typing import Optional
@@ -27,6 +30,12 @@ from openvef.source_ast import UnsettledSpec
 
 STAGE = "IMPORT_POLICY"
 ERROR_CLASS = "IMPORT_POLICY_REJECT"
+
+# File 30 §2 L16: "Permitted import roots are exactly: ..."
+ALLOWED_ROOTS = frozenset({
+    "__future__", "collections", "copy", "functools", "itertools", "json", "math",
+    "operator", "random", "re", "statistics", "typing",
+})
 
 
 def _reject(diagnostic: str) -> Failure:
@@ -92,4 +101,36 @@ def scan_identifiers(file: str, source: str) -> Optional[Failure]:
                 if start is not None:
                     return _non_ascii(file, tok.start[0], tok.line, start)
         # STRING and COMMENT tokens are not scanned.
+    return None
+
+
+# --- Import classification (File 30 §2 L17; Protocol §3.4 file 02 L129) ----------------
+
+def _form_reject(file: str, node: ast.stmt, reason: str) -> Failure:
+    return _reject(f"IMPORT_FORM_REJECT|file={file}|line={node.lineno}|reason={reason}")
+
+
+def _not_allowed(root: str) -> Failure:
+    # "`IMPORT_NOT_ALLOWED.module` is the offending root as written"
+    return _reject(f"IMPORT_NOT_ALLOWED|module={root}")
+
+
+def classify_import(file: str, node: ast.Import) -> Optional[Failure]:
+    """Classify one `ast.Import` node; None means the exact single root is accepted.
+
+    Total order: "(1) if `len(names) != 1`, ... MULTIPLE_NAMES; (2) if the first
+    component of the imported name is not an allowed root, `IMPORT_NOT_ALLOWED|
+    module=<root>`; (3) if the imported name is dotted, ... SUBMODULE_IMPORT; (4) if
+    `asname` is present, ... IMPORT_ALIAS; otherwise accept the exact single root."
+    """
+    if len(node.names) != 1:
+        return _form_reject(file, node, "MULTIPLE_NAMES")
+    alias = node.names[0]
+    root = alias.name.split(".", 1)[0]
+    if root not in ALLOWED_ROOTS:
+        return _not_allowed(root)
+    if "." in alias.name:
+        return _form_reject(file, node, "SUBMODULE_IMPORT")
+    if alias.asname is not None:
+        return _form_reject(file, node, "IMPORT_ALIAS")
     return None
