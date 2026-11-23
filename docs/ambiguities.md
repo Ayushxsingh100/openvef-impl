@@ -320,10 +320,32 @@ Unsettled cases (each needs: accept, `NON_LITERAL_CONSTANT` or `MODULE_EXECUTABL
 7. `X = -True` — `bool` is an `int` subclass: is it a "numeric literal"?
 8. `X = -(-1)`, `X = +-1` — unary applied to a unary, not directly to a literal.
 9. The annotation of an annotated assignment (`X: foo() = 1`): the text tests "values"
-   only.
+   only. Implemented boundary: an annotation made only of names, attributes,
+   subscripts, constants, tuples/lists and `|` (e.g. `int`, `dict[str, int] | None`)
+   is not examined; any other annotation node (a call, arithmetic, …) is case 9.
+10. `global x` / `nonlocal x` at module scope (both pass `ast.parse` on 3.11.18) — no
+    effect, like `pass`.
+11. `return`, `break`, `continue` at module scope (all pass `ast.parse` on 3.11.18;
+    `compile()` would reject them) — control transfer, but not in the
+    `MODULE_CONTROL_FLOW` list (`if`, `for`, `while`, `with`, `try`, `match`, `async`).
 
-The step-6 classifier will raise `UnsettledSpec("A-015")` for these. No current fixture
-uses any of them (P28, M04a, M04b and M57 do not). **Owner decision needed.**
+Implemented (step 6, `classify_module_body`): each of these cases is returned as an
+`UnsettledSpec("A-015")` finding at its source position, not raised at once, so a
+settled violation earlier in the file can still win once A-013 is decided. A value with
+a non-literal part is `NON_LITERAL_CONSTANT` even if it also has an unsettled part
+(e.g. `(..., f())`), because every reading rejects it with that reason.
+
+Treated as settled by the text (no entry needed unless the owners disagree): `del`,
+`assert`, `raise` → `MODULE_EXECUTABLE` ("other executable statements"); any
+expression statement that is not the first-statement string docstring, including
+`await`, `yield`, a bytes or f-string first statement → `MODULE_EXECUTABLE` (File 30
+§3 L29: "expressions other than a docstring … are rejected"); `async for`, `async with`
+→ `MODULE_CONTROL_FLOW` ("`async` control flow"); `try`/`except*` (`ast.TryStar`) →
+`MODULE_CONTROL_FLOW` (`try`); tuple/list/starred unpacking targets made only of names
+count as assignments.
+
+No current fixture uses any unsettled case (P28, M04a, M04b and M57 do not).
+**Owner decision needed.**
 
 ## A-016 — Prohibited-name rule: definitions, parameters and `builtins` (OPEN)
 

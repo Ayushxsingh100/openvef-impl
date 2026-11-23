@@ -17,6 +17,7 @@ from openvef.import_policy import (  # noqa: E402
     ALLOWED_ROOTS,
     classify_import,
     classify_import_from,
+    classify_module_body,
     find_global_random_use,
     find_prohibited_names,
     scan_identifiers,
@@ -307,6 +308,105 @@ class GlobalRandomTests(unittest.TestCase):
         found = find_global_random_use(ast.parse(src))
         self.assertEqual(diagnostics(found), ["GLOBAL_RANDOM_USE|name=random.randint", "GLOBAL_RANDOM_USE|name=random.random"])
         self.assertEqual([f.key for f in found], [(3, 8, 3, 22), (4, 11, 4, 24)])
+
+
+class ModuleBodyTests(unittest.TestCase):
+    def body(self, source, file="driver.py"):
+        out = []
+        for f in classify_module_body(file, ast.parse(source)):
+            if isinstance(f.outcome, UnsettledSpec):
+                out.append(("UNSETTLED", f.outcome.ambiguity_id, str(f.outcome)))
+            else:
+                assert (f.outcome.stage_id, f.outcome.error_class) == ("IMPORT_POLICY", "IMPORT_POLICY_REJECT")
+                out.append(f.outcome.diagnostic)
+        return out
+
+    def reason(self, source, line=1):
+        return [f"MODULE_STATEMENT_REJECT|file=driver.py|line={line}|reason={r}" for r in source]
+
+    def assert_case(self, source, case):
+        found = self.body(source)
+        self.assertEqual(len(found), 1, found)
+        self.assertEqual(found[0][:2], ("UNSETTLED", "A-015"))
+        self.assertIn(f"case {case},", found[0][2])
+
+    def test_executable_call_before_definitions(self):
+        self.assertEqual(self.body("print(1)\nimport random\n\ndef create_driver(seed):\n    return None\n"),
+                         self.reason(["MODULE_EXECUTABLE"]))
+
+    def test_non_literal_constant(self):
+        self.assertEqual(self.body("MASK = (1 << 8) - 1\nimport random\n"), self.reason(["NON_LITERAL_CONSTANT"]))
+
+    def test_if_main_guard_is_control_flow_once(self):
+        self.assertEqual(self.body('if __name__ == "__main__":\n    print(1)\nimport random\n'),
+                         self.reason(["MODULE_CONTROL_FLOW"]))
+
+    def test_every_control_flow_statement(self):
+        for src in ("if x:\n    pass\n", "for a in b:\n    pass\n", "while x:\n    pass\n", "with a:\n    pass\n",
+                    "try:\n    pass\nexcept E:\n    pass\n", "try:\n    pass\nexcept* E:\n    pass\n",
+                    "match x:\n    case 1:\n        pass\n", "async for a in b:\n    pass\n", "async with a:\n    pass\n"):
+            with self.subTest(src=src):
+                self.assertEqual(self.body(src), self.reason(["MODULE_CONTROL_FLOW"]))
+
+    def test_other_executable_statements_and_expressions(self):
+        for src in ("del x\n", "assert x\n", "raise E\n", "x\n", "1\n", "f()\n", "await f()\n", "yield 1\n",
+                    "[n for n in ()]\n", 'b"bytes first"\n', 'f"fstring first"\n'):
+            with self.subTest(src=src):
+                self.assertEqual(self.body(src), self.reason(["MODULE_EXECUTABLE"]))
+
+    def test_allowed_module_shape(self):
+        src = ('"""Café and ℘ appear only in the module docstring."""\n# café ℘ in a comment\n'
+               'label = "naïve ℘"\nimport random\nfrom __future__ import annotations\n\n'
+               'def create_driver(seed):\n    print(1)\n    return Driver()\n\n'
+               '@decorated\nclass Driver:\n    def step(self, c, o):\n        return "COMPLETE"\n'
+               'async def deferred():\n    pass\n')
+        self.assertEqual(self.body(src), [])
+
+    def test_literal_values_accepted(self):
+        for value in ("'s'", "b'b'", "1", "1.5", "2j", "True", "None", "-1", "+1.5", "-2j",
+                      "(1, 'a', None)", "[1, [2, (3,)]]", "{1, 2}", "{'a': [1, {'b': -2}]}", "()", "[]", "{}"):
+            with self.subTest(value=value):
+                self.assertEqual(self.body(f"X = {value}\n"), [])
+        self.assertEqual(self.body("A = B = 1\na, *b = (1, 2)\n[c, d] = [3, 4]\nX: int = 1\nY: dict[str, int] | None = None\n"), [])
+
+    def test_non_literal_values(self):
+        for value in ("name", "f()", "a.b", "1 + 2", "1 + 2j", "not 1", "~1", "-'s'", "-x", "-(-x)", "[*a]", "{**d}",
+                      "[n for n in ()]", 'f"x{1}"', "lambda: 1", "(..., f())", "(-True, g())"):
+            with self.subTest(value=value):
+                self.assertEqual(self.body(f"X = {value}\n"), self.reason(["NON_LITERAL_CONSTANT"]))
+
+    def test_annotated_non_literal(self):
+        self.assertEqual(self.body("X: int = f()\n"), self.reason(["NON_LITERAL_CONSTANT"]))
+
+    def test_unsettled_cases(self):
+        self.assert_case("x += 1\n", 1)
+        self.assert_case("a.b = 1\n", 2)
+        self.assert_case("a[0] = 1\n", 2)
+        self.assert_case("a, b.c = 1, 2\n", 2)
+        self.assert_case("a.b: int = 1\n", 2)
+        self.assert_case("x: int\n", 3)
+        self.assert_case("pass\n", 4)
+        self.assert_case('X = 1\n"late string"\n', 5)
+        self.assert_case('"""doc"""\n"""second"""\n', 5)
+        self.assert_case("X = ...\n", 6)
+        self.assert_case("X = (1, ...)\n", 6)
+        self.assert_case("X = -True\n", 7)
+        self.assert_case("X = -(-1)\n", 8)
+        self.assert_case("X = +-1\n", 8)
+        self.assert_case("X: foo() = 1\n", 9)
+        self.assert_case("X: int + 1 = 1\n", 9)
+        self.assert_case("global x\n", 10)
+        self.assert_case("nonlocal x\n", 10)
+        self.assert_case("return 1\n", 11)
+        self.assert_case("break\n", 11)
+        self.assert_case("continue\n", 11)
+
+    def test_all_findings_in_source_order_with_unsettled_kept_in_place(self):
+        found = classify_module_body("checker.py", ast.parse("print(1)\npass\nX = f()\n"))
+        self.assertEqual([f.key[0] for f in found], [1, 2, 3])
+        self.assertEqual(found[0].outcome.diagnostic, "MODULE_STATEMENT_REJECT|file=checker.py|line=1|reason=MODULE_EXECUTABLE")
+        self.assertIsInstance(found[1].outcome, UnsettledSpec)
+        self.assertEqual(found[2].outcome.diagnostic, "MODULE_STATEMENT_REJECT|file=checker.py|line=3|reason=NON_LITERAL_CONSTANT")
 
 
 if __name__ == "__main__":

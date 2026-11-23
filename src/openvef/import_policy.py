@@ -14,6 +14,8 @@ Implemented so far:
                    `builtins.<name>` (PROHIBITED_BUILTIN|name=<NAME>).
   File 30 §2 L20; Protocol §3.4 (file 02 L133) — direct `random.<attribute>` use
                    other than `random.Random` (GLOBAL_RANDOM_USE|name=random.<attr>).
+  File 30 §3 L29; Protocol §3.4 (file 02 L135) — module-body statements
+                   (MODULE_STATEMENT_REJECT|file=<FILE>|line=<LINE>|reason=<REASON>).
 
 The order between categories inside one file (A-013, A-014) is not decided, so this
 module exposes one function per sub-rule and no combined stage yet. The `find_*`
@@ -21,7 +23,9 @@ functions return every violation as a `Finding` keyed by the node's
 `(lineno, col_offset, end_lineno, end_col_offset)` (File 30 §3 L27), sorted by that
 key, so any of the A-013/A-014 readings can be applied when the stage is assembled.
 
-Unsettled inputs raise `UnsettledSpec` (docs/ambiguities.md):
+Unsettled inputs raise or return `UnsettledSpec` (docs/ambiguities.md):
+  A-015 module-body statements the text does not classify (returned as findings, so
+        an earlier settled violation can still win once the order is decided);
   A-019 a lone CR in the source (`ast.parse` and `tokenize` disagree on line numbers).
 Known limitation, as the text is written (A-018): on CPython 3.11 an f-string is a
 single STRING token, so a non-ASCII identifier inside an f-string replacement field
@@ -242,4 +246,167 @@ def find_global_random_use(tree: ast.Module) -> list[Finding]:
         if (isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)
                 and node.value.id == "random" and node.attr != "Random"):
             findings.append(Finding(node_key(node), _reject(f"GLOBAL_RANDOM_USE|name=random.{node.attr}")))
+    return sorted(findings, key=lambda f: f.key)
+
+
+# --- Module-body statements (File 30 §3 L29; Protocol §3.4 file 02 L135) ----------------
+
+_LITERAL, _NON_LITERAL, _UNSETTLED = "literal", "non-literal", "unsettled"
+
+# File 30 §3 L29: "`ast.Constant` values of type string, bytes, integer, float, complex,
+# boolean or `None`". Exact types: Ellipsis is a Constant but not listed (A-015 case 6).
+_LITERAL_TYPES = frozenset({str, bytes, int, float, complex, bool, type(None)})
+_NUMERIC_TYPES = frozenset({int, float, complex})
+
+_CONTROL_FLOW = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith,
+                 ast.Try, ast.TryStar, ast.Match)
+_EXECUTABLE = (ast.Delete, ast.Raise, ast.Assert)
+
+# Annotation nodes that only name a type (A-015 case 9): anything else is unsettled.
+_TYPE_EXPRESSION_NODES = (ast.Name, ast.Attribute, ast.Subscript, ast.Constant, ast.Tuple,
+                          ast.List, ast.expr_context, ast.BitOr)
+
+
+def _combine(states: list[tuple[str, Optional[int]]]) -> tuple[str, Optional[int]]:
+    # Any non-literal part makes the whole value non-literal under every reading;
+    # otherwise any unsettled part makes it unsettled.
+    for state in states:
+        if state[0] == _NON_LITERAL:
+            return state
+    for state in states:
+        if state[0] == _UNSETTLED:
+            return state
+    return (_LITERAL, None)
+
+
+def _literal_state(node: ast.expr) -> tuple[str, Optional[int]]:
+    """(state, A-015 case number) for one value expression.
+
+    File 30 §3 L29: "Literal-only expressions are `ast.Constant` values of type string,
+    bytes, integer, float, complex, boolean or `None`, and recursively nested
+    tuple/list/set/dict literals containing only those values; unary plus/minus
+    applied to a numeric literal is permitted. Names, calls, comprehensions,
+    f-strings, attribute access, binary operations and other expressions are not
+    literal-only."
+    """
+    if isinstance(node, ast.Constant):
+        if type(node.value) in _LITERAL_TYPES:
+            return (_LITERAL, None)
+        if node.value is Ellipsis:
+            return (_UNSETTLED, 6)
+        return (_NON_LITERAL, None)
+    if isinstance(node, (ast.Tuple, ast.List, ast.Set)):
+        return _combine([_literal_state(e) for e in node.elts])
+    if isinstance(node, ast.Dict):
+        if any(k is None for k in node.keys):  # `{**x}`
+            return (_NON_LITERAL, None)
+        return _combine([_literal_state(k) for k in node.keys] + [_literal_state(v) for v in node.values])
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.UAdd, ast.USub)):
+        operand = node.operand
+        if isinstance(operand, ast.Constant):
+            if type(operand.value) is bool:
+                return (_UNSETTLED, 7)
+            return (_LITERAL, None) if type(operand.value) in _NUMERIC_TYPES else (_NON_LITERAL, None)
+        if isinstance(operand, ast.UnaryOp):
+            inner = _literal_state(operand)
+            return inner if inner[0] == _NON_LITERAL else (_UNSETTLED, 8)
+        return (_NON_LITERAL, None)
+    return (_NON_LITERAL, None)
+
+
+def _target_unsettled(target: ast.expr) -> bool:
+    # A-015 case 2: an attribute or subscript anywhere in the target.
+    if isinstance(target, ast.Name):
+        return False
+    if isinstance(target, (ast.Tuple, ast.List)):
+        return any(_target_unsettled(e) for e in target.elts)
+    if isinstance(target, ast.Starred):
+        return _target_unsettled(target.value)
+    return True
+
+
+def _annotation_unsettled(annotation: ast.expr) -> bool:
+    # A-015 case 9: the text tests "values" only; an annotation that does more than
+    # name a type (e.g. contains a call) is not settled.
+    for sub in ast.walk(annotation):
+        if isinstance(sub, ast.BinOp):
+            if not isinstance(sub.op, ast.BitOr):
+                return True
+        elif not isinstance(sub, _TYPE_EXPRESSION_NODES):
+            return True
+    return False
+
+
+def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
+    """Every module-scope violation or unsettled statement, in source order.
+
+    Protocol §3.4 (file 02 L135): "At module scope, allow only permitted imports, one
+    optional docstring expression, synchronous undecorated function definitions
+    (deferred to signature checks), the single permitted `Driver` class in
+    `driver.py` (deferred to signature checks), and assignments/annotated assignments
+    whose values are recursively literal-only. A non-literal assignment is
+    `NON_LITERAL_CONSTANT`; module-level control-flow statements (`if`, `for`,
+    `while`, `with`, `try`, `match`, `async` control flow) are `MODULE_CONTROL_FLOW`;
+    other executable statements/calls/expressions are `MODULE_EXECUTABLE`."
+
+    Imports are classified by `classify_import`/`classify_import_from`; function and
+    class definitions are deferred to AST_SIGNATURE and never classified here.
+    """
+    findings = []
+
+    def reject(stmt: ast.stmt, reason: str) -> None:
+        findings.append(Finding(node_key(stmt), _reject(
+            f"MODULE_STATEMENT_REJECT|file={file}|line={stmt.lineno}|reason={reason}")))
+
+    def unsettled(stmt: ast.stmt, case: int, what: str) -> None:
+        findings.append(Finding(node_key(stmt), UnsettledSpec(
+            "A-015", f"{file} line {stmt.lineno}: case {case}, {what}")))
+
+    def value_outcome(stmt: ast.stmt, value: ast.expr) -> None:
+        state, case = _literal_state(value)
+        if state == _NON_LITERAL:
+            reject(stmt, "NON_LITERAL_CONSTANT")
+        elif state == _UNSETTLED:
+            unsettled(stmt, case, "value")
+
+    for index, stmt in enumerate(tree.body):
+        if isinstance(stmt, (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if isinstance(stmt, ast.Expr):
+            is_string = isinstance(stmt.value, ast.Constant) and type(stmt.value.value) is str
+            if is_string and index == 0:
+                continue  # the optional module docstring
+            if is_string:
+                unsettled(stmt, 5, "string expression that is not the first statement")
+            else:
+                # File 30 §3 L29: "expressions other than a docstring ... are rejected".
+                reject(stmt, "MODULE_EXECUTABLE")
+        elif isinstance(stmt, ast.Assign):
+            if any(_target_unsettled(t) for t in stmt.targets):
+                unsettled(stmt, 2, "attribute or subscript target")
+            else:
+                value_outcome(stmt, stmt.value)
+        elif isinstance(stmt, ast.AnnAssign):
+            if _target_unsettled(stmt.target):
+                unsettled(stmt, 2, "attribute or subscript target")
+            elif stmt.value is None:
+                unsettled(stmt, 3, "annotated assignment without a value")
+            elif _annotation_unsettled(stmt.annotation):
+                unsettled(stmt, 9, "annotation is not a plain type expression")
+            else:
+                value_outcome(stmt, stmt.value)
+        elif isinstance(stmt, ast.AugAssign):
+            unsettled(stmt, 1, "augmented assignment")
+        elif isinstance(stmt, ast.Pass):
+            unsettled(stmt, 4, "pass")
+        elif isinstance(stmt, (ast.Global, ast.Nonlocal)):
+            unsettled(stmt, 10, "global/nonlocal declaration")
+        elif isinstance(stmt, (ast.Return, ast.Break, ast.Continue)):
+            unsettled(stmt, 11, "return/break/continue at module scope")
+        elif isinstance(stmt, _CONTROL_FLOW):
+            reject(stmt, "MODULE_CONTROL_FLOW")
+        elif isinstance(stmt, _EXECUTABLE):
+            reject(stmt, "MODULE_EXECUTABLE")
+        else:
+            unsettled(stmt, 0, f"statement type {type(stmt).__name__} not classified")
     return sorted(findings, key=lambda f: f.key)
