@@ -25,25 +25,30 @@ Each sub-rule function returns every violation as a `Finding` keyed by the node'
 applies reading (c): per file, after the identifier scan, the finding with the
 smallest key wins, whatever its category.
 
-Unsettled inputs raise or return `UnsettledSpec` (docs/ambiguities.md):
-  A-013 two different findings share the smallest key (e.g. a bare module-level `eval`
-        is both an `Expr` and a `Name` with the same span);
-  A-015 module-body statements the text does not classify (returned as findings, so
-        an earlier settled violation can still win once the order is decided);
-  A-019 a lone CR in the source (`ast.parse` and `tokenize` disagree on line numbers).
-Known limitation, as the text is written (A-018): on CPython 3.11 an f-string is a
-single STRING token, so a non-ASCII identifier inside an f-string replacement field
-is not scanned.
+Readings decided by Claude under the standing delegation (docs/ambiguities.md; owner
+review pending):
+  A-013 tie: findings with the same smallest key are ordered by File 30 §3 L27's stage
+        list -- module-level AST policy, then import, then prohibited-name policy (with
+        `random` use after prohibited names, as in File 30 §2 L19-L20). A bare
+        module-level `eval` is MODULE_EXECUTABLE.
+  A-015 every module-scope statement is classified; see `classify_module_body`.
+  A-016, A-017 as planned (only `Name` nodes and `builtins.<name>`; `random` matched
+        syntactically).
+  A-018 the rule as written: on CPython 3.11 an f-string is one STRING token, so a
+        non-ASCII identifier inside an f-string replacement field is not scanned.
+  A-019 lines are Python physical lines (LF, CRLF or a lone CR, Language Reference
+        2.1.2), as `ast.parse` counts them; the tokenizer copy has lone CRs turned
+        into LF, which changes no column.
 """
 from __future__ import annotations
 
 import ast
 import io
+import re
 import tokenize
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple, Optional
 
 from openvef.envelope import Failure
-from openvef.source_ast import UnsettledSpec
 
 STAGE = "IMPORT_POLICY"
 ERROR_CLASS = "IMPORT_POLICY_REJECT"
@@ -60,13 +65,14 @@ def _reject(diagnostic: str) -> Failure:
 
 
 SourceKey = tuple[int, int, int, int]
+_LONE_CR = re.compile(r"\r(?!\n)")
 
 
 class Finding(NamedTuple):
-    """One violation (or one unsettled case) at a source position."""
+    """One violation at a source position."""
 
     key: SourceKey
-    outcome: Union[Failure, UnsettledSpec]
+    outcome: Failure
 
 
 def node_key(node: ast.AST) -> SourceKey:
@@ -117,10 +123,11 @@ def scan_identifiers(file: str, source: str) -> Optional[Failure]:
 
     Call only after `ast.parse(source)` succeeded (Protocol §3.4 evaluation order (3)).
     """
-    if "\r" in source.replace("\r\n", ""):
-        raise UnsettledSpec("A-019", f"{file}: lone CR; ast.parse and tokenize disagree on line numbers")
-
-    for tok in tokenize.generate_tokens(io.StringIO(source).readline):
+    # A-019: a lone CR ends a physical line for `ast.parse` but not for `tokenize`.
+    # Replacing it with LF (one character for one, at a line end) aligns the line
+    # numbers and leaves every line prefix, and so every column, unchanged.
+    lines_source = _LONE_CR.sub("\n", source)
+    for tok in tokenize.generate_tokens(io.StringIO(lines_source).readline):
         if tok.type == tokenize.NAME:
             # "For a `NAME` token, reject it if any code point is above U+007F."
             if not tok.string.isascii():
@@ -213,7 +220,7 @@ def find_prohibited_names(tree: ast.Module) -> list[Finding]:
     one of those names is also rejected." (File 30 §2 L19.) `re.compile` is an
     attribute of `re`, not a `Name`, so it is not matched.
 
-    A-016 (owner confirmation pending): only `ast.Name` nodes (any context) and
+    A-016 (decided by Claude under standing delegation, owner review pending): only `ast.Name` nodes (any context) and
     `Attribute(value=Name(id="builtins"))` are matched; a function or parameter named
     e.g. `open`, and `__builtins__.<name>`, are not.
     """
@@ -240,7 +247,7 @@ def find_global_random_use(tree: ast.Module) -> list[Finding]:
     `random.SystemRandom`." (File 30 §2 L20.) `GLOBAL_RANDOM_USE.name` is the
     qualified name, e.g. `random.random` (Protocol §3.4 file 02 L125).
 
-    A-017 (owner confirmation pending): the match is syntactic,
+    A-017 (decided by Claude under standing delegation, owner review pending): the match is syntactic,
     `Attribute(value=Name(id="random"))`, whether or not `random` is the imported
     module. Aliases such as `r = random; r.random()` and `getattr(random, "random")`
     are not statically detected, as the text says.
@@ -255,94 +262,48 @@ def find_global_random_use(tree: ast.Module) -> list[Finding]:
 
 # --- Module-body statements (File 30 §3 L29; Protocol §3.4 file 02 L135) ----------------
 
-_LITERAL, _NON_LITERAL, _UNSETTLED = "literal", "non-literal", "unsettled"
-
 # File 30 §3 L29: "`ast.Constant` values of type string, bytes, integer, float, complex,
-# boolean or `None`". Exact types: Ellipsis is a Constant but not listed (A-015 case 6).
+# boolean or `None`". The list is exhaustive: Ellipsis is not in it (A-015 case 6).
 _LITERAL_TYPES = frozenset({str, bytes, int, float, complex, bool, type(None)})
+# "unary plus/minus applied to a numeric literal": the type list names boolean
+# separately from integer, so `bool` is not numeric here (A-015 case 7).
 _NUMERIC_TYPES = frozenset({int, float, complex})
 
 _CONTROL_FLOW = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith,
                  ast.Try, ast.TryStar, ast.Match)
-_EXECUTABLE = (ast.Delete, ast.Raise, ast.Assert)
-
-# Annotation nodes that only name a type (A-015 case 9): anything else is unsettled.
-_TYPE_EXPRESSION_NODES = (ast.Name, ast.Attribute, ast.Subscript, ast.Constant, ast.Tuple,
-                          ast.List, ast.expr_context, ast.BitOr)
 
 
-def _combine(states: list[tuple[str, Optional[int]]]) -> tuple[str, Optional[int]]:
-    # Any non-literal part makes the whole value non-literal under every reading;
-    # otherwise any unsettled part makes it unsettled.
-    for state in states:
-        if state[0] == _NON_LITERAL:
-            return state
-    for state in states:
-        if state[0] == _UNSETTLED:
-            return state
-    return (_LITERAL, None)
-
-
-def _literal_state(node: ast.expr) -> tuple[str, Optional[int]]:
-    """(state, A-015 case number) for one value expression.
-
-    File 30 §3 L29: "Literal-only expressions are `ast.Constant` values of type string,
+def is_literal_only(node: ast.expr) -> bool:
+    """File 30 §3 L29: "Literal-only expressions are `ast.Constant` values of type string,
     bytes, integer, float, complex, boolean or `None`, and recursively nested
     tuple/list/set/dict literals containing only those values; unary plus/minus
     applied to a numeric literal is permitted. Names, calls, comprehensions,
     f-strings, attribute access, binary operations and other expressions are not
     literal-only."
+
+    A-015 cases 6-8 (decided by Claude, owner review pending): `...`, `-True` and
+    `-(-1)` are not literal-only; the operand of a unary must itself be a numeric
+    `ast.Constant`.
     """
     if isinstance(node, ast.Constant):
-        if type(node.value) in _LITERAL_TYPES:
-            return (_LITERAL, None)
-        if node.value is Ellipsis:
-            return (_UNSETTLED, 6)
-        return (_NON_LITERAL, None)
+        return type(node.value) in _LITERAL_TYPES
     if isinstance(node, (ast.Tuple, ast.List, ast.Set)):
-        return _combine([_literal_state(e) for e in node.elts])
+        return all(is_literal_only(e) for e in node.elts)
     if isinstance(node, ast.Dict):
-        if any(k is None for k in node.keys):  # `{**x}`
-            return (_NON_LITERAL, None)
-        return _combine([_literal_state(k) for k in node.keys] + [_literal_state(v) for v in node.values])
+        # A `None` key is `{**x}` unpacking.
+        return all(k is not None and is_literal_only(k) for k in node.keys) and all(
+            is_literal_only(v) for v in node.values)
     if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.UAdd, ast.USub)):
-        operand = node.operand
-        if isinstance(operand, ast.Constant):
-            if type(operand.value) is bool:
-                return (_UNSETTLED, 7)
-            return (_LITERAL, None) if type(operand.value) in _NUMERIC_TYPES else (_NON_LITERAL, None)
-        if isinstance(operand, ast.UnaryOp):
-            inner = _literal_state(operand)
-            return inner if inner[0] == _NON_LITERAL else (_UNSETTLED, 8)
-        return (_NON_LITERAL, None)
-    return (_NON_LITERAL, None)
-
-
-def _target_unsettled(target: ast.expr) -> bool:
-    # A-015 case 2: an attribute or subscript anywhere in the target.
-    if isinstance(target, ast.Name):
-        return False
-    if isinstance(target, (ast.Tuple, ast.List)):
-        return any(_target_unsettled(e) for e in target.elts)
-    if isinstance(target, ast.Starred):
-        return _target_unsettled(target.value)
-    return True
-
-
-def _annotation_unsettled(annotation: ast.expr) -> bool:
-    # A-015 case 9: the text tests "values" only; an annotation that does more than
-    # name a type (e.g. contains a call) is not settled.
-    for sub in ast.walk(annotation):
-        if isinstance(sub, ast.BinOp):
-            if not isinstance(sub.op, ast.BitOr):
-                return True
-        elif not isinstance(sub, _TYPE_EXPRESSION_NODES):
-            return True
+        return isinstance(node.operand, ast.Constant) and type(node.operand.value) in _NUMERIC_TYPES
     return False
 
 
+def _contains_call(node: Optional[ast.AST]) -> bool:
+    return node is not None and any(isinstance(sub, ast.Call) for sub in ast.walk(node))
+
+
 def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
-    """Every module-scope violation or unsettled statement, in source order.
+    """Every module-scope violation, in source order.
 
     Protocol §3.4 (file 02 L135): "At module scope, allow only permitted imports, one
     optional docstring expression, synchronous undecorated function definitions
@@ -355,6 +316,19 @@ def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
 
     Imports are classified by `classify_import`/`classify_import_from`; function and
     class definitions are deferred to AST_SIGNATURE and never classified here.
+
+    A-015 (decided by Claude under standing delegation, owner review pending). The
+    allowed list is exhaustive, `MODULE_CONTROL_FLOW` covers only the statements it
+    names, and "assignments/annotated assignments" are `ast.Assign`/`ast.AnnAssign`:
+      - `x += 1`, `pass`, `global`/`nonlocal`, `return`/`break`/`continue` and any
+        other unlisted statement: MODULE_EXECUTABLE (cases 1, 4, 10, 11);
+      - a string expression that is not the first statement: MODULE_EXECUTABLE (a
+        docstring is the first statement; case 5);
+      - the literal test applies to the value only, so an attribute/subscript target
+        or a non-literal annotation is accepted -- unless it contains a call, which
+        the text names as MODULE_EXECUTABLE (cases 2, 9). A non-literal value wins
+        over a call elsewhere in the same statement;
+      - `x: int` (no value) is accepted: there is no value to fail (case 3).
     """
     findings = []
 
@@ -362,57 +336,28 @@ def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
         findings.append(Finding(node_key(stmt), _reject(
             f"MODULE_STATEMENT_REJECT|file={file}|line={stmt.lineno}|reason={reason}")))
 
-    def unsettled(stmt: ast.stmt, case: int, what: str) -> None:
-        findings.append(Finding(node_key(stmt), UnsettledSpec(
-            "A-015", f"{file} line {stmt.lineno}: case {case}, {what}")))
-
-    def value_outcome(stmt: ast.stmt, value: ast.expr) -> None:
-        state, case = _literal_state(value)
-        if state == _NON_LITERAL:
+    def assignment(stmt: ast.stmt, value: Optional[ast.expr], others: list[ast.expr]) -> None:
+        if value is not None and not is_literal_only(value):
             reject(stmt, "NON_LITERAL_CONSTANT")
-        elif state == _UNSETTLED:
-            unsettled(stmt, case, "value")
+        elif any(_contains_call(o) for o in others):
+            reject(stmt, "MODULE_EXECUTABLE")
 
     for index, stmt in enumerate(tree.body):
         if isinstance(stmt, (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             continue
         if isinstance(stmt, ast.Expr):
-            is_string = isinstance(stmt.value, ast.Constant) and type(stmt.value.value) is str
-            if is_string and index == 0:
-                continue  # the optional module docstring
-            if is_string:
-                unsettled(stmt, 5, "string expression that is not the first statement")
-            else:
+            is_docstring = index == 0 and isinstance(stmt.value, ast.Constant) and type(stmt.value.value) is str
+            if not is_docstring:
                 # File 30 §3 L29: "expressions other than a docstring ... are rejected".
                 reject(stmt, "MODULE_EXECUTABLE")
         elif isinstance(stmt, ast.Assign):
-            if any(_target_unsettled(t) for t in stmt.targets):
-                unsettled(stmt, 2, "attribute or subscript target")
-            else:
-                value_outcome(stmt, stmt.value)
+            assignment(stmt, stmt.value, stmt.targets)
         elif isinstance(stmt, ast.AnnAssign):
-            if _target_unsettled(stmt.target):
-                unsettled(stmt, 2, "attribute or subscript target")
-            elif stmt.value is None:
-                unsettled(stmt, 3, "annotated assignment without a value")
-            elif _annotation_unsettled(stmt.annotation):
-                unsettled(stmt, 9, "annotation is not a plain type expression")
-            else:
-                value_outcome(stmt, stmt.value)
-        elif isinstance(stmt, ast.AugAssign):
-            unsettled(stmt, 1, "augmented assignment")
-        elif isinstance(stmt, ast.Pass):
-            unsettled(stmt, 4, "pass")
-        elif isinstance(stmt, (ast.Global, ast.Nonlocal)):
-            unsettled(stmt, 10, "global/nonlocal declaration")
-        elif isinstance(stmt, (ast.Return, ast.Break, ast.Continue)):
-            unsettled(stmt, 11, "return/break/continue at module scope")
+            assignment(stmt, stmt.value, [stmt.target, stmt.annotation])
         elif isinstance(stmt, _CONTROL_FLOW):
             reject(stmt, "MODULE_CONTROL_FLOW")
-        elif isinstance(stmt, _EXECUTABLE):
-            reject(stmt, "MODULE_EXECUTABLE")
         else:
-            unsettled(stmt, 0, f"statement type {type(stmt).__name__} not classified")
+            reject(stmt, "MODULE_EXECUTABLE")
     return sorted(findings, key=lambda f: f.key)
 
 
@@ -445,19 +390,19 @@ def check_file(file: str, source: str, tree: ast.Module) -> Optional[Failure]:
     rejected = scan_identifiers(file, source)
     if rejected is not None:
         return rejected
-    findings = (find_import_violations(file, tree) + find_prohibited_names(tree)
-                + find_global_random_use(tree) + classify_module_body(file, tree))
-    if not findings:
+    # A-013 tie (decided by Claude, owner review pending): equal keys fall back to
+    # File 30 §3 L27's stage order -- module-level AST policy, import policy,
+    # prohibited names -- then `random` use (File 30 §2 L20 follows L19).
+    ranked = [(f.key, rank, f.outcome)
+              for rank, group in enumerate((classify_module_body(file, tree), find_import_violations(file, tree),
+                                            find_prohibited_names(tree), find_global_random_use(tree)))
+              for f in group]
+    if not ranked:
         return None
-    first_key = min(f.key for f in findings)
-    first = [f for f in findings if f.key == first_key]
-    distinct = {f.outcome.diagnostic if isinstance(f.outcome, Failure) else repr(f.outcome) for f in first}
-    if len(distinct) > 1:
-        raise UnsettledSpec("A-013", f"{file}: {len(distinct)} findings share the first source key {first_key}")
-    outcome = first[0].outcome
-    if isinstance(outcome, UnsettledSpec):
-        raise outcome
-    return outcome
+    first = min(ranked, key=lambda r: r[:2])
+    # One node has one span and one category, so (key, rank) picks a single outcome.
+    assert len({r[2] for r in ranked if r[:2] == first[:2]}) == 1, first
+    return first[2]
 
 
 def check_import_policy(sources: dict[str, str], trees: dict[str, ast.Module]) -> Optional[Failure]:

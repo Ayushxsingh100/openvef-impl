@@ -23,7 +23,6 @@ from openvef.import_policy import (  # noqa: E402
     find_prohibited_names,
     scan_identifiers,
 )
-from openvef.source_ast import UnsettledSpec  # noqa: E402
 
 
 def scan(source, file="checker.py"):
@@ -90,13 +89,16 @@ class IdentifierScanTests(unittest.TestCase):
     def test_crlf_line_endings_keep_line_numbers(self):
         self.assertEqual(scan("x = 1\r\ncafé = 2\r\n"), "NON_ASCII_IDENTIFIER|file=checker.py|line=2|column=1")
 
-    def test_lone_cr_is_unsettled(self):
-        with self.assertRaises(UnsettledSpec) as cm:
-            scan("x = 1\ry = 2\n")
-        self.assertEqual(cm.exception.ambiguity_id, "A-019")
+    def test_lone_cr_ends_a_line_as_for_ast_parse(self):
+        # A-019, decided by Claude (owner review pending): Python physical lines.
+        src = "x = 1\rcafé = 2\n"
+        self.assertEqual(ast.parse(src).body[1].lineno, 2)
+        self.assertEqual(scan(src), "NON_ASCII_IDENTIFIER|file=checker.py|line=2|column=1")
+        self.assertEqual(scan("x = 1\ry = 2\r  # é\rz = 1; ab℘ = 3\n"),
+                         "NON_ASCII_IDENTIFIER|file=checker.py|line=4|column=8")
 
     def test_fstring_identifier_not_scanned_on_311(self):
-        # A-018: records CPython 3.11 behaviour of the rule as written; the AST does
+        # A-018 (decided by Claude, owner review pending): the rule as written; the AST does
         # contain the non-ASCII Name.
         src = 'x = f"{café}"\n'
         self.assertIn("café", [n.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Name)])
@@ -258,7 +260,7 @@ class ProhibitedNameTests(unittest.TestCase):
         self.assertEqual(self.names("def f():\n    return builtins.len\n"), [])
 
     def test_a016_not_matched(self):
-        # Planned reading (A-016): definitions/parameters and __builtins__ are not Name nodes.
+        # A-016 (decided by Claude, owner review pending): definitions/parameters and __builtins__ are not Name nodes.
         self.assertEqual(self.names("def open():\n    pass\ndef f(eval):\n    return __builtins__.open\n"), [])
 
     def test_source_order_with_keys(self):
@@ -301,7 +303,7 @@ class GlobalRandomTests(unittest.TestCase):
         self.assertEqual(self.uses('import random\ndef f():\n    r = random\n    return r.random(), getattr(random, "random")\n'), [])
 
     def test_a017_syntactic_without_import(self):
-        # Planned reading (A-017): matched whether or not `random` is the imported module.
+        # A-017 (decided by Claude, owner review pending): matched whether or not `random` is the imported module.
         self.assertEqual(self.uses("def f(random):\n    return random.choice\n"), ["GLOBAL_RANDOM_USE|name=random.choice"])
 
     def test_source_order(self):
@@ -315,21 +317,12 @@ class ModuleBodyTests(unittest.TestCase):
     def body(self, source, file="driver.py"):
         out = []
         for f in classify_module_body(file, ast.parse(source)):
-            if isinstance(f.outcome, UnsettledSpec):
-                out.append(("UNSETTLED", f.outcome.ambiguity_id, str(f.outcome)))
-            else:
-                assert (f.outcome.stage_id, f.outcome.error_class) == ("IMPORT_POLICY", "IMPORT_POLICY_REJECT")
-                out.append(f.outcome.diagnostic)
+            assert (f.outcome.stage_id, f.outcome.error_class) == ("IMPORT_POLICY", "IMPORT_POLICY_REJECT")
+            out.append(f.outcome.diagnostic)
         return out
 
     def reason(self, source, line=1):
         return [f"MODULE_STATEMENT_REJECT|file=driver.py|line={line}|reason={r}" for r in source]
-
-    def assert_case(self, source, case):
-        found = self.body(source)
-        self.assertEqual(len(found), 1, found)
-        self.assertEqual(found[0][:2], ("UNSETTLED", "A-015"))
-        self.assertIn(f"case {case},", found[0][2])
 
     def test_executable_call_before_definitions(self):
         self.assertEqual(self.body("print(1)\nimport random\n\ndef create_driver(seed):\n    return None\n"),
@@ -379,35 +372,29 @@ class ModuleBodyTests(unittest.TestCase):
     def test_annotated_non_literal(self):
         self.assertEqual(self.body("X: int = f()\n"), self.reason(["NON_LITERAL_CONSTANT"]))
 
-    def test_unsettled_cases(self):
-        self.assert_case("x += 1\n", 1)
-        self.assert_case("a.b = 1\n", 2)
-        self.assert_case("a[0] = 1\n", 2)
-        self.assert_case("a, b.c = 1, 2\n", 2)
-        self.assert_case("a.b: int = 1\n", 2)
-        self.assert_case("x: int\n", 3)
-        self.assert_case("pass\n", 4)
-        self.assert_case('X = 1\n"late string"\n', 5)
-        self.assert_case('"""doc"""\n"""second"""\n', 5)
-        self.assert_case("X = ...\n", 6)
-        self.assert_case("X = (1, ...)\n", 6)
-        self.assert_case("X = -True\n", 7)
-        self.assert_case("X = -(-1)\n", 8)
-        self.assert_case("X = +-1\n", 8)
-        self.assert_case("X: foo() = 1\n", 9)
-        self.assert_case("X: int + 1 = 1\n", 9)
-        self.assert_case("global x\n", 10)
-        self.assert_case("nonlocal x\n", 10)
-        self.assert_case("return 1\n", 11)
-        self.assert_case("break\n", 11)
-        self.assert_case("continue\n", 11)
+    def test_a015_decided_cases(self):
+        # A-015, decided by Claude under standing delegation (owner review pending).
+        cases = {
+            "MODULE_EXECUTABLE": ("x += 1\n", "pass\n", 'X = 1\n"late string"\n', '"""doc"""\n"""second"""\n',
+                                  "global x\n", "nonlocal x\n", "return 1\n", "break\n", "continue\n",
+                                  "a[f()] = 1\n", "a.b(1).c = 1\n", "X: foo() = 1\n"),
+            "NON_LITERAL_CONSTANT": ("X = ...\n", "X = (1, ...)\n", "X = -True\n", "X = +False\n",
+                                     "X = -(-1)\n", "X = +-1\n", "a[f()] = g()\n", "X: foo() = g()\n"),
+            None: ("a.b = 1\n", "a[0] = 1\n", "a, b.c = 1, 2\n", "a.b: int = 1\n", "x: int\n",
+                   "X: int + 1 = 1\n", "X: foo = 1\n"),
+        }
+        for reason, sources in cases.items():
+            for src in sources:
+                with self.subTest(src=src):
+                    line = src.count("\n") if "late" in src or "second" in src else 1
+                    self.assertEqual(self.body(src), [] if reason is None else self.reason([reason], line))
 
-    def test_all_findings_in_source_order_with_unsettled_kept_in_place(self):
+    def test_all_findings_in_source_order(self):
         found = classify_module_body("checker.py", ast.parse("print(1)\npass\nX = f()\n"))
-        self.assertEqual([f.key[0] for f in found], [1, 2, 3])
-        self.assertEqual(found[0].outcome.diagnostic, "MODULE_STATEMENT_REJECT|file=checker.py|line=1|reason=MODULE_EXECUTABLE")
-        self.assertIsInstance(found[1].outcome, UnsettledSpec)
-        self.assertEqual(found[2].outcome.diagnostic, "MODULE_STATEMENT_REJECT|file=checker.py|line=3|reason=NON_LITERAL_CONSTANT")
+        self.assertEqual([f.outcome.diagnostic for f in found], [
+            "MODULE_STATEMENT_REJECT|file=checker.py|line=1|reason=MODULE_EXECUTABLE",
+            "MODULE_STATEMENT_REJECT|file=checker.py|line=2|reason=MODULE_EXECUTABLE",
+            "MODULE_STATEMENT_REJECT|file=checker.py|line=3|reason=NON_LITERAL_CONSTANT"])
 
 
 GOOD_DRIVER = ("import random\n\ndef create_driver(seed):\n    driver = Driver()\n"
@@ -447,17 +434,14 @@ class CombinedStageTests(unittest.TestCase):
         self.assertEqual(self.stage("eval('1')\n"), "PROHIBITED_BUILTIN|name=eval")
         self.assertEqual(self.stage("x = eval('1')\n"), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=NON_LITERAL_CONSTANT")
 
-    def test_equal_keys_with_different_outcomes_are_unsettled(self):
-        for src in ("eval\n", "random.seed\n"):
+    def test_equal_key_tie_uses_file30_stage_order(self):
+        # A-013 tie, decided by Claude (owner review pending): module-level policy first.
+        for src in ("eval\n", "random.seed\n", "builtins.open\n"):
             with self.subTest(src=src):
-                with self.assertRaises(UnsettledSpec) as cm:
-                    self.stage(src)
-                self.assertEqual(cm.exception.ambiguity_id, "A-013")
+                self.assertEqual(self.stage(src), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=MODULE_EXECUTABLE")
 
-    def test_unsettled_first_raises_but_later_unsettled_does_not(self):
-        with self.assertRaises(UnsettledSpec) as cm:
-            self.stage("pass\nimport os\n")
-        self.assertEqual(cm.exception.ambiguity_id, "A-015")
+    def test_a015_cases_take_part_in_source_order(self):
+        self.assertEqual(self.stage("pass\nimport os\n"), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=MODULE_EXECUTABLE")
         self.assertEqual(self.stage("import os\npass\n"), "IMPORT_NOT_ALLOWED|module=os")
 
     def test_import_inside_function_is_classified(self):
