@@ -17,7 +17,7 @@
 
 Latest run: `evidence/run-20261123T155910Z` — commit e5eb9c0 (clean), CPython 3.11.18
 (interpreter SHA-256 518f54d1…5356), jsonschema 4.26.0: 23 PASS, 0 FAIL, 121
-NOT_IMPLEMENTED, 0 ERROR. No fixture was blocked by an UnsettledSpec. 81 fixtures pass
+NOT_IMPLEMENTED, 0 ERROR. No fixture was blocked by an UnsettledSpec. 80 fixtures pass
 SOURCE_AST and stop at the unimplemented IMPORT_POLICY stage (P01 among them). Development
 run (Codespaces), not pinned-environment evidence; M16 and M36 passes rest on provisional
 A-012, M16 also on A-007.
