@@ -10,19 +10,22 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 # D-003: Icarus Verilog, latest stable in this image's package manager, exact version and
-# .deb SHA-256 pinned. Its run-time dependencies (libbz2-1.0, libc6, libgcc-s1,
+# .deb SHA-256 pinned. The .deb is fetched from snapshot.debian.org (archive timestamp
+# 20240313T032420Z, the first snapshot containing this file), so the build does not
+# depend on the live Debian archive still carrying this version. The SHA-256 is checked
+# before installation. Its run-time dependencies (libbz2-1.0, libc6, libgcc-s1,
 # libreadline8t64, libstdc++6, zlib1g) are already in the base image; dpkg fails the
-# build if any is missing. If Debian drops this version from the archive the build fails
-# rather than installing a different one.
+# build if any is missing.
 ARG IVERILOG_VERSION=12.0-2+b1
+ARG IVERILOG_DEB_URL=https://snapshot.debian.org/archive/debian/20240313T032420Z/pool/main/i/iverilog/iverilog_12.0-2%2Bb1_amd64.deb
 ARG IVERILOG_DEB_SHA256=febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056
 RUN set -eux; cd /tmp; \
-    apt-get update; \
-    apt-get download "iverilog=${IVERILOG_VERSION}"; \
-    echo "${IVERILOG_DEB_SHA256}  iverilog_${IVERILOG_VERSION}_amd64.deb" | sha256sum -c -; \
-    dpkg -i "iverilog_${IVERILOG_VERSION}_amd64.deb"; \
+    python -I -c 'import sys, urllib.request; urllib.request.urlretrieve(sys.argv[1], sys.argv[2])' \
+        "${IVERILOG_DEB_URL}" iverilog.deb; \
+    echo "${IVERILOG_DEB_SHA256}  iverilog.deb" | sha256sum -c -; \
+    dpkg -i iverilog.deb; \
     test "$(dpkg-query -W -f='${Version}' iverilog)" = "${IVERILOG_VERSION}"; \
-    rm -f /tmp/*.deb; rm -rf /var/lib/apt/lists/*
+    rm -f /tmp/iverilog.deb
 
 # Exactly the pinned lock file, every artifact hash-checked (CLAUDE.md hard rule 3);
 # includes cocotb (D-003). pip settings are scoped to this step so they do not reach the

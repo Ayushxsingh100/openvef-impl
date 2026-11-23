@@ -13,8 +13,13 @@ control mutants. Owners write those by hand; Claude may comment on them in prose
 
 ## Hard rules
 1. The v1.3.6 pack under `baseline/` is read-only. Never edit, reformat or regenerate it.
-2. Runtime: CPython 3.11.18 only (pinned). Record `sys.version` and the interpreter
-   SHA-256 in every evidence run. Results from any other interpreter are not evidence.
+2. Runtime (owner decision D-002a): the pinned interpreter is CPython 3.11.18 inside
+   `python:3.11.18-slim` pinned by digest
+   (`python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535`),
+   built as `sandbox/Dockerfile`. Evidence runs only via `runner/run_f18_container.sh`,
+   which runs the whole runner and every artifact in that image. Record `sys.version`,
+   the interpreter SHA-256 and the image identity in every evidence run. Host Python is
+   for development only; results from any other interpreter are not evidence.
 3. Dependencies: only those pinned in `requirements.lock` with hashes. Adding or changing
    one needs owner approval.
 4. No fixture-specific code: never branch on fixture IDs, file names under

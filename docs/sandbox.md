@@ -34,18 +34,25 @@ configuration is adequate as the security boundary for F16 is for the owners to 
 |---|---|
 | Base image | `python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535` (`python:3.11.18-slim`, linux/amd64, resolved with `docker pull` on 23 Nov 2026) |
 | Pinned interpreter (D-002a) | `3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]`, `/usr/local/bin/python3.11`, SHA-256 `92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79` |
-| Icarus Verilog (D-003) | Debian package `iverilog` `12.0-2+b1` (`iverilog -V`: "Icarus Verilog version 12.0 (stable)"); `.deb` SHA-256 `febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056`, checked with `sha256sum -c` before `dpkg -i`; `/usr/bin/iverilog` SHA-256 `99633b21…8462`, `/usr/bin/vvp` SHA-256 `dc287630…c1df` |
+| Icarus Verilog (D-003) | Debian package `iverilog` `12.0-2+b1` from snapshot.debian.org (`iverilog -V`: "Icarus Verilog version 12.0 (stable)"); `.deb` SHA-256 `febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056`, checked with `sha256sum -c` before `dpkg -i`; `/usr/bin/iverilog` SHA-256 `99633b21…8462`, `/usr/bin/vvp` SHA-256 `dc287630…c1df` |
 | cocotb (D-003) | `cocotb==2.1.0` (cp311 manylinux wheel) and its dependencies `find-libpython==0.5.1`, `iniconfig==2.3.1`, `packaging==26.3`, `pluggy==1.7.0`, `pygments==2.21.0`, `pytest==9.2.0`, all with hashes in `requirements.lock` (pip-tools 7.7.0 `pip-compile --generate-hashes`, run in the pinned base image). Earlier pins are unchanged. |
-| Build | [sandbox/Dockerfile](../sandbox/Dockerfile): base by digest; iverilog `.deb` by version and SHA-256; `pip install --require-hashes --no-deps -r requirements.lock`; user `sandbox` uid/gid 10001 |
+| Build | [sandbox/Dockerfile](../sandbox/Dockerfile): base by digest; iverilog `.deb` from snapshot.debian.org by URL, version and SHA-256; `pip install --require-hashes --no-deps -r requirements.lock`; user `sandbox` uid/gid 10001 |
 | Build context | `.dockerignore` admits only `requirements.lock` |
 | Local tag | `openvef-sandbox:<first 16 hex of SHA-256 of the sha256sum listing of sandbox/Dockerfile and requirements.lock>`, rebuilt automatically when either changes |
 
 "Latest stable" was checked on 23 Nov 2026 in the pinned base image: `pip index versions
 cocotb` lists 2.1.0 as newest; `apt-cache policy iverilog` lists only 12.0-2+b1 (Debian
-13 "trixie"), and Icarus 12.0 is the upstream stable release. Reproducibility limit: the
-`.deb` is fetched from the live Debian archive. If Debian removes that exact version, the
-build fails (the version and hash checks stop it) rather than installing something
-else; a snapshot.debian.org source would remove that dependency (not done; owner call).
+13 "trixie"), and Icarus 12.0 is the upstream stable release.
+
+Source of the `.deb`: snapshot.debian.org,
+`https://snapshot.debian.org/archive/debian/20240313T032420Z/pool/main/i/iverilog/iverilog_12.0-2%2Bb1_amd64.deb`.
+`20240313T032420Z` is the archive timestamp at which this file (SHA-1
+`dfb2b1db5303c41fcb565ab69480165875ad39d3`, 2,046,080 bytes) was first seen, per the
+snapshot `mr/binary/iverilog/12.0-2+b1/binfiles` API. The same SHA-256 check runs before
+`dpkg -i`. The build therefore no longer depends on the live Debian archive. After the
+switch, `/usr/bin/iverilog` and `/usr/bin/vvp` have the same SHA-256 as before, and a
+containerized smoke run gave results identical to run-20261123T195936Z. The image ID
+changes, because the Dockerfile changed, and each run records it.
 
 ## Where things run (D-002a)
 

@@ -784,8 +784,8 @@ for development only. Recorded in docs and in every run's evidence.
 Implemented: [runner/run_f18_container.sh](../runner/run_f18_container.sh) (host broker,
 bash only) and the runner in broker mode; `interpreter_status` in every `summary.json`.
 Pinned values: `3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]`, SHA-256
-`92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79`. This supersedes
-CLAUDE.md hard rule 2's host interpreter for evidence. See [docs/sandbox.md](sandbox.md).
+`92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79`. CLAUDE.md hard
+rule 2 was reworded to match (owner instruction, 23 Nov 2026). See [docs/sandbox.md](sandbox.md).
 
 ## D-003 — Simulation toolchain (DECIDED — Ayush's confirmation pending)
 
@@ -798,7 +798,8 @@ is the owner approval hard rule 3 requires for the new lock entries.
 Pinned: `cocotb==2.1.0` (+ `find-libpython==0.5.1`, `iniconfig==2.3.1`,
 `packaging==26.3`, `pluggy==1.7.0`, `pygments==2.21.0`, `pytest==9.2.0`, all hashed);
 Debian `iverilog` `12.0-2+b1`, `.deb` SHA-256
-`febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056`. Details in
+`febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056`, fetched from
+snapshot.debian.org (owner instruction, 23 Nov 2026). Details in
 [docs/sandbox.md](sandbox.md).
 
 ## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
