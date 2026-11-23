@@ -625,6 +625,8 @@ when full is 1"), and `full` is an output port.
 - A prose predicate is not executed. Turning prose into code would be fixture-specific
   code (rule 4), and the predicate belongs to the owner-written FIFO specification. M27
   stays NOT_IMPLEMENTED until the FIFO specification provides an executable predicate.
+- Re-examined after the owner's correction of 23 Nov 2026: see A-038 (still
+  NOT_IMPLEMENTED; executing it would require inventing behaviour).
 
 ## A-028 — Composite inputs: response plus a later-stage outcome (DECIDED BY CLAUDE — owner review pending)
 
@@ -703,22 +705,62 @@ stage, error class and exact diagnostic bytes". M14, M17 and M41 add keys such a
 - Comparing the four fields only was rejected, because it would report PASS while
   ignoring part of an "exact" expectation.
 
-## A-033 — Change-class lifecycle vectors M48, M50, M53, M54, M58 (OPEN — outside the delegation)
+## A-033 — Change-class lifecycle vectors M48, M50, M53, M54, M58 (REVISED per owner correction; field derivations DECIDED BY CLAUDE — owner review pending)
 
-Their expected objects contain values that appear nowhere in the pack's normative text,
-only in the descriptors:
-- `rerun_scope_rule` (M48);
-- `affected_slots: "all_designs_x_all_arms"` (M50);
-- `stable_error_class_rule: "simple_exception_class_for_SIMULATOR_ERROR_else_NONE"` (M54);
-- `affected_scope`, `unaffected_design_scope` (M58);
-- the `change_class` input labels themselves.
+**History.** First recorded as OPEN, outside the delegation: the expected objects hold
+values that appear only in the descriptors, and the `required_action` literals are
+attached to fixture labels ("`M48` = …"), not to a rule.
 
-The `required_action` literals exist in Protocol L176 but are attached to fixture IDs
-("`M48` = …"), not to a rule. Producing these values would copy expected outputs, which
-hard rule 4 forbids and the delegation does not cover. The five fixtures stay
-NOT_IMPLEMENTED. **Owner decision needed:** either a pack correction that defines the
-change classes and their outcome fields as rules, or an owner ruling on how these
-vectors are to be run.
+**Owner correction (Krishika, 23 Nov 2026; Ayush's confirmation pending):** the
+`required_action` values appear verbatim in the Protocol (L176); encode them from the
+Protocol text. Derive the remaining fields from Protocol sentences under the delegation,
+citing each sentence. Any field with no supporting sentence: say so, and keep that
+fixture NOT_IMPLEMENTED.
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- Each `change_class` label is matched to the Protocol case its words name:
+  - `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` → evaluator revision (L175
+    "a frozen evaluator source/binary/…/configuration changed"; L183 (b));
+  - `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` → shared-item revision
+    (L181 "If any shared study item changes …");
+  - `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` → study
+    reset (L181 "A change in design membership, estimand or any confirmatory weight …");
+  - `HALT_SIGNATURE_COMPONENT_ENUMERATION` → halt-signature schema (L175, L185);
+  - `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` → design-specific revision (L181 "If a
+    design-specific author-visible item changes …").
+- L176 also labels each literal with its case and describes that case ("`M48`
+  re-evaluates the affected scope …", "`M50` invalidates all designs …", "`M53` resets
+  the preregistered design set and weights …", "`M58` invalidates both arms for the
+  affected design only …"). That is how a literal is tied to a change class without
+  reading the fixture ID: the code is keyed by change class, never by fixture ID.
+- A field is produced only from a supporting sentence. "Supporting" means the sentence
+  gives the value: a stated literal or list, or a yes/no/zero that the sentence asserts.
+  A field whose *meaning* is stated but whose exact *token* appears nowhere in the
+  Protocol is unsupported: writing it would mean copying the expected output (hard
+  rule 4).
+- The per-field table, with each citation, is `LIFECYCLE_CASES` in
+  [src/openvef/ledger.py](../src/openvef/ledger.py).
+
+| Fixture | Supported fields (citation) | Unsupported fields | Result |
+|---|---|---|---|
+| M53 | disposition (L176 "closed local control expectation"); stage `DESIGN_HALT` (L172, §7b); error class and diagnostic (L175 "The `M53` study-reset vector uses error class `AUTHORING_REVISION_REQUIRED` and diagnostic …"); `required_action` (L176); `old_confirmatory_artifacts_reusable: false` (L181 "cannot retain old confirmatory artifacts"); `new_preregistration_required: true` (L181 "always requires a new preregistered study"); `all_partial_ledgers_archived_and_disclosed: true` (L181 "archive and disclose all partial confirmatory ledgers"); `fresh_confirmatory_generation_required: true` (L181 "generate fresh confirmatory slots") | none | executed |
+| M48 | disposition, stage, diagnostic (L175), `required_action` (L176), `new_evaluator_version_hashes_required` (L183 "assign a new evaluator version and hashes"), `f16_required` (L183 "run the frozen F16 eligibility procedure"), `reuse_same_artifact_bytes` (L183 "using the same already-generated artifact bytes"), `new_confirmatory_generation_calls: 0` (L183, L176) | `error_class` (see below); `rerun_scope_rule` (meaning in L183, token not in the text) | NOT_IMPLEMENTED |
+| M50 | disposition, stage, diagnostic (L175), `required_action` (L176), `reuse_old_confirmatory_artifacts: false`, `new_confirmatory_generation_required: true`, `archive_and_disclose_partial_ledgers: true`, `new_preregistration_required: true` (all L181) | `error_class`; `affected_slots: "all_designs_x_all_arms"` (meaning in L181, token not in the text) | NOT_IMPLEMENTED |
+| M54 | disposition, stage, error class and diagnostic (L175 "`M54` uses error class `HALT_SIGNATURE_SCHEMA` …"), `required_action` (L176), the three domain lists (L185, in its order) | `stable_error_class_rule`, `stable_diagnostic_code_rule` (meanings in L185, tokens not in the text) | NOT_IMPLEMENTED |
+| M58 | disposition, stage, diagnostic (L175), `required_action` (L176), `reuse_old_artifacts_for_affected_design: false` (L181), `new_study_preregistration_required_if_…: true` (L181 "… even if the changed item is otherwise described as design-specific") | `error_class`; `affected_scope`, `unaffected_design_scope` (meanings in L181/L176, tokens not in the text) | NOT_IMPLEMENTED |
+
+**Error class for M48, M50, M58.** No sentence states it. L175 gives error classes only
+for the M41 vector (`MID_RUN_REEVALUATION`, which is *not* its diagnostic's CODE), M53 and
+M54. The stage map shows that the error class need not equal the CODE (L154:
+`SIMULATOR_ERROR|…` under `EVALUATOR_INFRASTRUCTURE_FAILURE`), so "error class = CODE" is
+not a rule I can cite. The closest text is the v1.3.1 change log ("Corrected M53 to use
+the declared `AUTHORING_REVISION_REQUIRED` error class"), which is historical, not
+normative. The audit tables (file 62) likewise note "Error class … declared (L175–L176)"
+only for M53 and M54.
+
+**For the owners:** M48, M50, M54 and M58 need either a Protocol correction (error classes
+for the three revision vectors, and the scope/rule tokens as literals) or an owner
+ruling that these tokens may be taken from the descriptors.
 
 ## D-002 — Artifact-execution sandbox (DECIDED — Ayush's confirmation pending)
 
@@ -811,3 +853,32 @@ review pending):**
   defined.
 - The factory call for F18 fixtures uses seed 0, since no fixture supplies a slot seed.
 - The 20 s default limit is this build's value, not a frozen pack value.
+
+## A-038 — M27: executing a prose legal-input predicate (DECIDED BY CLAUDE — owner review pending)
+
+**Owner correction (Krishika, 23 Nov 2026; Ayush's confirmation pending):** "implementing
+a check from prose is interpretation; do it under the delegation with citations, unless
+it would require inventing behaviour." This re-examines A-027's M27 part.
+
+M27 supplies `driver_return: {"wr_en": "1", "full": "1"}` and
+`legal_input_predicate: "wr_en must be 0 when full is 1"`, and expects
+`DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE`.
+
+**Decision (decided by Claude under standing delegation, owner review pending):** M27
+stays NOT_IMPLEMENTED, because executing it would require inventing behaviour:
+1. The pack defines no predicate language. File 30 L83 (e) says only that "the full
+   vector satisfies the design-specific legal-input predicate from the author-visible
+   reset/legal-input specification". Turning the sentence into a check means inventing a
+   grammar (`<port> must be <bits> when <port> is <bits>`) whose only known instance is
+   this fixture's string: fixture-shaped code (hard rule 4).
+2. The predicate's source is the author-visible reset/legal-input specification (L83;
+   Protocol L61 "reset protocol and legal-input assumptions"). For FIFO that is the
+   owner-written FIFO specification, which the Scope section reserves to the owners.
+3. Checks (a)–(d) come first (L83 order), and M27 supplies no input-port set or widths.
+   So the precondition that (a)–(d) pass cannot be established either. `full` is
+   conventionally a FIFO output, and if so (a) would report `EXTRA_KEYS`; the pack does
+   not say.
+
+What would unblock it: an executable predicate in the FIFO specification's legal-input
+rules (owner-written), plus the port manifest. The vector check then calls it as step (e).
+

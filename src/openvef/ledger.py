@@ -101,3 +101,146 @@ def operational_recovery(*, scheduled_slots: int, frozen_evaluator_hashes_unchan
     failure = Failure("DESIGN_HALT", "MID_RUN_REEVALUATION", "RERUN_ALL_SCHEDULED_SLOTS_WITH_SAME_FROZEN_ARTIFACTS",
                       "CONTROL_EXPECTATION")
     return OperationalRecovery(failure, True, scheduled_slots, True, 0)
+
+
+# --- Change-class lifecycle control expectations (Protocol L175-L176, L181-L185) -------
+#
+# A-033 (revised per owner correction, 23 Nov 2026; field derivations decided by Claude
+# under standing delegation, owner review pending). Each `change_class` input label is
+# matched to the Protocol case its words name; each output field is either a value with
+# the Protocol sentence that supports it, or UNSUPPORTED with the reason. Field NAMES
+# follow the control-vector expectations (A-032 disclosure); no VALUE is read from an
+# expected object. `required_action` literals are copied verbatim from L176, where the
+# Protocol labels each literal with its lifecycle case (`M48 = ...` etc.).
+
+class Unsupported(NamedTuple):
+    reason: str
+
+
+_ERROR_CLASS_UNSTATED = Unsupported(
+    "error class not stated: L175 states error classes only for the M41 (MID_RUN_REEVALUATION), M53 and M54 "
+    "vectors, and the stage map shows the error class need not equal the diagnostic CODE (L154: SIMULATOR_ERROR "
+    "under EVALUATOR_INFRASTRUCTURE_FAILURE)")
+
+
+def _token_unstated(meaning: str) -> Unsupported:
+    return Unsupported(f"meaning supported ({meaning}) but the exact token appears nowhere in the Protocol; "
+                       "writing it would copy the expected output (hard rule 4)")
+
+
+_CONTROL = ("CONTROL_EXPECTATION", "L176 'Each literal is a closed local control expectation'; L177")
+_STAGE = ("DESIGN_HALT", "L172 stage list; §7b 'Mid-run design halt' L181-L185")
+_AUTHORING_DIAG = ("AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED",
+                   "L175 'means an author-visible or estimand-defining item changed and prior confirmatory artifacts "
+                   "are not reusable'")
+
+LIFECYCLE_CASES: dict[str, dict[str, Any]] = {
+    # L175 "`EVALUATOR_REVISION_REQUIRED|reason=FROZEN_EVALUATOR_CHANGED` means a frozen evaluator
+    # source/binary/tool-version/command/option/configuration changed"; L183 path (b).
+    "FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED": {
+        "disposition": _CONTROL,
+        "stage_id": _STAGE,
+        "error_class": _ERROR_CLASS_UNSTATED,
+        "diagnostic": ("EVALUATOR_REVISION_REQUIRED|reason=FROZEN_EVALUATOR_CHANGED", "L175"),
+        "required_action": ("new_evaluator_hashes_then_F16_then_rerun_every_slot_in_affected_scope_with_same_frozen_"
+                            "artifact_bytes_no_new_confirmatory_generation", "L176 literal labelled M48"),
+        "new_evaluator_version_hashes_required": (True, "L183 'assign a new evaluator version and hashes'"),
+        "f16_required": (True, "L183 'run the frozen F16 eligibility procedure with fresh mutant-blind pilot seeds'"),
+        "reuse_same_artifact_bytes": (True, "L183 'using the same already-generated artifact bytes'"),
+        "new_confirmatory_generation_calls": (0, "L183 'and no new confirmatory generation calls'; L176 'zero new "
+                                                 "confirmatory generation calls'"),
+        "rerun_scope_rule": _token_unstated("L183 'If the revised evaluator component is shared across FIFO and UART, "
+                                            "the affected scope is both designs and every arm x design slot; if it is "
+                                            "design-specific, the affected scope is that design in both arms'"),
+    },
+    # L181 "If any shared study item changes after confirmatory generation begins, halt the
+    # entire study and invalidate every scheduled slot across both designs and both arms".
+    "SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED": {
+        "disposition": _CONTROL,
+        "stage_id": _STAGE,
+        "error_class": _ERROR_CLASS_UNSTATED,
+        "diagnostic": _AUTHORING_DIAG,
+        "required_action": ("halt_study_invalidate_all_designs_and_all_arm_x_design_slots_archive_and_disclose_partial_"
+                            "confirmatory_ledgers_new_preregistration_refreeze_f16_and_fresh_confirmatory_generation",
+                            "L176 literal labelled M50"),
+        "reuse_old_confirmatory_artifacts": (False, "L181 'No invalidated confirmatory artifact may be reused'"),
+        "new_confirmatory_generation_required": (True, "L181 'fresh confirmatory generation for every affected slot'"),
+        "affected_slots": _token_unstated("L181 'invalidate every scheduled slot across both designs and both arms'"),
+        "archive_and_disclose_partial_ledgers": (True, "L181 'Preserve and archive every partial confirmatory ledger "
+                                                       "... disclose the archived partial ledgers'"),
+        "new_preregistration_required": (True, "L181 'A shared-item revision requires a new study preregistration'"),
+    },
+    # L181 "A change in design membership, estimand or any confirmatory weight after
+    # confirmatory generation starts always requires a new preregistered study".
+    "DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START": {
+        "disposition": _CONTROL,
+        "stage_id": _STAGE,
+        "error_class": ("AUTHORING_REVISION_REQUIRED", "L175 'The M53 study-reset vector uses error class "
+                                                       "AUTHORING_REVISION_REQUIRED'"),
+        "diagnostic": (_AUTHORING_DIAG[0], "L175 '... and diagnostic AUTHORING_REVISION_REQUIRED|reason="
+                                           "AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED'"),
+        "required_action": ("archive_and_disclose_all_partial_confirmatory_ledgers_new_preregistration_refreeze_new_"
+                            "design_set_and_weights_F16_then_generate_fresh_slots", "L176 literal labelled M53"),
+        "old_confirmatory_artifacts_reusable": (False, "L181 'A study reset ... cannot retain old confirmatory "
+                                                       "artifacts'"),
+        "new_preregistration_required": (True, "L181 'always requires a new preregistered study'"),
+        "all_partial_ledgers_archived_and_disclosed": (True, "L181 'archive and disclose all partial confirmatory "
+                                                             "ledgers'"),
+        "fresh_confirmatory_generation_required": (True, "L181 'generate fresh confirmatory slots under the newly "
+                                                         "preregistered design set and weights'"),
+    },
+    # L175 "`HALT_SIGNATURE_SCHEMA|reason=COMPONENT_VALUES_ENUMERATED` is the `M54`
+    # control-expectation diagnostic for validating the closed halt-signature component
+    # domains and mapping"; domains from L185.
+    "HALT_SIGNATURE_COMPONENT_ENUMERATION": {
+        "disposition": _CONTROL,
+        "stage_id": _STAGE,
+        "error_class": ("HALT_SIGNATURE_SCHEMA", "L175 'M54 uses error class HALT_SIGNATURE_SCHEMA'"),
+        "diagnostic": ("HALT_SIGNATURE_SCHEMA|reason=COMPONENT_VALUES_ENUMERATED", "L175"),
+        "required_action": ("enforce_design_id_halt_code_evaluator_component_stable_error_class_stable_diagnostic_code_"
+                            "domains_and_reason_to_component_mapping; exclude timestamps_process_ids_attempts_hosts_and_"
+                            "trace_row_indices", "L176 literal labelled M54"),
+        "design_id_values": (list(DESIGN_IDS), "L185 '`design_id` is `FIFO` or `UART`'"),
+        "halt_code_values": (list(HALT_CODES), "L185 '`halt_code` is `SIMULATOR_ERROR`, `TRACE_INTEGRITY_FAILURE` "
+                                               "or `RTL_NULL_CONTROL_FAILURE`'"),
+        "evaluator_component_values": (list(EVALUATOR_COMPONENTS), "L185 '`evaluator_component` is `SIMULATOR`, ... "
+                                                                   "or `RTL_NULL_COMPARATOR`'"),
+        "stable_error_class_rule": _token_unstated("L185 'a simple exception class name ... for SIMULATOR_ERROR and the "
+                                                   "literal NONE for the other two halt codes'"),
+        "stable_diagnostic_code_rule": _token_unstated("L185 'stable_diagnostic_code is exactly the corresponding "
+                                                       "halt_code token'"),
+    },
+    # L181 "If a design-specific author-visible item changes, halt and invalidate every slot
+    # for that design in both arms."
+    "DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED": {
+        "disposition": _CONTROL,
+        "stage_id": _STAGE,
+        "error_class": _ERROR_CLASS_UNSTATED,
+        "diagnostic": _AUTHORING_DIAG,
+        "affected_scope": _token_unstated("L181 'halt and invalidate every slot for that design in both arms'"),
+        "unaffected_design_scope": _token_unstated("L176 'M58 invalidates both arms for the affected design only when "
+                                                   "membership, estimand and weights remain unchanged'"),
+        "required_action": ("halt_affected_design_invalidate_both_arm_slots_refreeze_design_specific_materials_archive_"
+                            "partial_ledgers_generate_fresh_confirmatory_slots_for_affected_design",
+                            "L176 literal labelled M58"),
+        "reuse_old_artifacts_for_affected_design": (False, "L181 'No invalidated confirmatory artifact may be reused'"),
+        "new_study_preregistration_required_if_design_membership_estimand_or_weights_change": (
+            True, "L181 'A change in design membership, estimand or any confirmatory weight after confirmatory "
+                  "generation starts always requires a new preregistered study, even if the changed item is otherwise "
+                  "described as design-specific'"),
+    },
+}
+
+
+def lifecycle_expectation(change_class: str) -> tuple[dict, dict[str, str]]:
+    """(record of supported fields in order, {field: reason} for unsupported fields)."""
+    case = LIFECYCLE_CASES.get(change_class)
+    if case is None:
+        raise ValueError(f"change_class {change_class!r} names no Protocol lifecycle case")
+    record, missing = {}, {}
+    for name, entry in case.items():
+        if isinstance(entry, Unsupported):
+            missing[name] = entry.reason
+        else:
+            record[name] = entry[0]
+    return record, missing

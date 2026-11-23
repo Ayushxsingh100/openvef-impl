@@ -36,7 +36,7 @@ from openvef.assembler import (NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, c
                                check_unresolved_placeholders, check_visible_clause_ids)
 from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
 from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
-from openvef.ledger import HaltSignature, halt_after_recovery, operational_recovery  # noqa: E402
+from openvef.ledger import HaltSignature, halt_after_recovery, lifecycle_expectation, operational_recovery  # noqa: E402
 from openvef.serializer import check_diagnostic, serialize, truncate  # noqa: E402
 from openvef.stage_map import (RTL_NULL_CONTROL_FAILURE, EventError, NotDetermined, adjudicate_checker,  # noqa: E402
                                first_event, outcome_from_record, paired_run_failure, runtime_signature_failure,
@@ -318,8 +318,9 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
             raise Blocked("vector valid")
         return result
     if keys == {"driver_return", "legal_input_predicate"}:
-        raise Blocked("A-027: the legal-input predicate is design-specific prose (owner-authored FIFO "
-                      "specification); no executable predicate is supplied")
+        raise Blocked("A-038: executing a prose legal-input predicate would require inventing a predicate "
+                      "language (File 30 L83 (e) defines none); the predicate belongs to the owner-written "
+                      "FIFO reset/legal-input specification; no port set is supplied for checks (a)-(d)")
 
     if keys == HALT_RECOVERY_KEYS:  # ledger, Protocol L185
         return halt_after_recovery(HaltSignature.given(inp["first_halt_signature"]),
@@ -335,9 +336,15 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
         return control_record(rec.failure, discard_pre_halt_scores=rec.discard_pre_halt_scores,
                               rerun_slots=rec.rerun_slots, reuse_same_artifact_bytes=rec.reuse_same_artifact_bytes,
                               new_confirmatory_generation_calls=rec.new_confirmatory_generation_calls)
-    if keys == {"change_class"}:
-        raise Blocked("A-033 (open, outside the delegation): change-class outcomes include literals defined only "
-                      "in the descriptors (hard rule 4)")
+    if keys == {"change_class"}:  # ledger, Protocol L175-L176, L181-L185 (A-033 revised)
+        try:
+            record, missing = lifecycle_expectation(inp["change_class"])
+        except ValueError as exc:
+            raise Blocked(str(exc)) from exc
+        if missing:
+            raise Blocked("A-033: no supporting Protocol sentence for " +
+                          "; ".join(f"{name}: {reason}" for name, reason in missing.items()))
+        return record
 
     if keys == {"diagnostic", "allowed_diagnostics"}:  # serializer step (1), A-029
         result = check_diagnostic(inp["diagnostic"], inp["allowed_diagnostics"])
