@@ -313,7 +313,7 @@ No current fixture has both.
 
 **Decision:** reading (c), the single source-order pass of A-013. Source: statement typed by Krishika in Claude Code on 23 Nov 2026: "I, Krishika, decide A-013 and A-014 as reading (c): single source-order pass, first violation wins. Ayush's confirmation is pending."
 
-## A-015 — Module-body statements the text does not classify (DECIDED BY CLAUDE — owner review pending)
+## A-015 — Module-body statements the text does not classify (DECIDED BY CLAUDE — owner review pending; case 2 REVISED BY OWNER — Ayush's confirmation pending)
 
 Protocol §3.4 (file 02 L135): "At module scope, allow only permitted imports, one
 optional docstring expression, … and assignments/annotated assignments whose values are
@@ -366,7 +366,7 @@ count as assignments.
 | Case | Outcome |
 |---|---|
 | 1 `x += 1` | `MODULE_EXECUTABLE` (an augmented assignment is its own statement kind, not in the list) |
-| 2 `a.b = 1`, `a[0] = 1` | accepted if the value is literal-only; `MODULE_EXECUTABLE` if the target contains a call (e.g. `a[f()] = 1`); a non-literal value gives `NON_LITERAL_CONSTANT` first |
+| 2 `a.b = 1`, `a[0] = 1` | **revised by owner, see below:** `MODULE_EXECUTABLE` whatever the value. (First decision, superseded: accepted if the value is literal-only.) |
 | 3 `x: int` | accepted (no value to fail) |
 | 4 `pass` | `MODULE_EXECUTABLE` |
 | 5 later string expression | `MODULE_EXECUTABLE` (a docstring is the first statement) |
@@ -378,7 +378,21 @@ count as assignments.
 | 11 `return`/`break`/`continue` | `MODULE_EXECUTABLE` (not in the `MODULE_CONTROL_FLOW` list) |
 | any other statement type | `MODULE_EXECUTABLE` (none remain on 3.11) |
 
-Competing reading not taken for cases 2 and 9: reject every attribute/subscript target or non-type annotation as `MODULE_EXECUTABLE`, since it evaluates code at import time. The text tests values only, so only the explicitly named "calls" are rejected. Unit tests `test_a015_decided_cases`, `test_a015_cases_take_part_in_source_order`.
+Competing reading not taken for case 9: reject every non-type annotation as `MODULE_EXECUTABLE`, since it evaluates code at import time. The text tests values only, so only the explicitly named "calls" are rejected. Unit tests `test_a015_decided_cases`, `test_a015_cases_take_part_in_source_order`.
+
+**Case 2 revised — owner decision by Krishika, 23 Nov 2026 (Ayush's confirmation pending).** Claude's first decision (accept an attribute/subscript target when the value is literal-only, rejecting only a call in the target) is **superseded**. Krishika's instruction: "an assignment whose target is not a plain Name (e.g. a.b = 1, math.pi = 3, d[0] = 1) is not a module constant and is a side effect. Reject as MODULE_STATEMENT_REJECT reason MODULE_EXECUTABLE."
+
+Why the first decision was wrong: it read only L135/L29's literal test, which is on values, and missed the wording on what module-level assignments are *for*. Texts cited (verified in the baseline):
+- File 30 L52 (driver) and L64 (checker): the file may contain "literal-only module constants"; "Module-level executable statements, control flow, calls, comprehensions, non-literal assignments and side effects are prohibited." The same wording is in the model-visible prompt template, file 19 L25 and L40.
+- File 30 L29: "Names, calls, comprehensions, f-strings, attribute access, binary operations and other expressions are not literal-only. Module-level executable statements, … non-literal assignments and other side effects are rejected."
+
+Assigning to an attribute or subscript changes another object instead of defining a constant, so it is a side effect.
+
+Implemented rule: an `ast.Assign` or `ast.AnnAssign` is `MODULE_STATEMENT_REJECT|file=<FILE>|line=<LINE>|reason=MODULE_EXECUTABLE` if any target is not a plain name. Plain names include names unpacked in tuples/lists and starred names, so `a, *b = 1, 2` is still allowed. The rule therefore covers `a, b.c = 1, 2`, `[a, *b[0]] = …`, `X = a.b = 1` and `d[0]: int` (no value).
+
+Detail decided by Claude under the delegation: the target check comes before the value check, so `a.b = f()` is `MODULE_EXECUTABLE`, not `NON_LITERAL_CONSTANT`. Reason: under the owner's rule such a statement is not a module constant at all, so the constant-specific reason does not apply.
+
+Unit tests `test_a015_decided_cases`, `test_attribute_target_is_executable_in_stage`. No current fixture has an attribute or subscript target, so no fixture result changes.
 
 ## A-016 — Prohibited-name rule: definitions, parameters and `builtins` (DECIDED BY CLAUDE — owner review pending)
 

@@ -298,6 +298,17 @@ def is_literal_only(node: ast.expr) -> bool:
     return False
 
 
+def _is_name_target(target: ast.expr) -> bool:
+    """True if the target binds plain names only (names, possibly unpacked/starred)."""
+    if isinstance(target, ast.Name):
+        return True
+    if isinstance(target, (ast.Tuple, ast.List)):
+        return all(_is_name_target(e) for e in target.elts)
+    if isinstance(target, ast.Starred):
+        return _is_name_target(target.value)
+    return False
+
+
 def _contains_call(node: Optional[ast.AST]) -> bool:
     return node is not None and any(isinstance(sub, ast.Call) for sub in ast.walk(node))
 
@@ -324,11 +335,17 @@ def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
         other unlisted statement: MODULE_EXECUTABLE (cases 1, 4, 10, 11);
       - a string expression that is not the first statement: MODULE_EXECUTABLE (a
         docstring is the first statement; case 5);
-      - the literal test applies to the value only, so an attribute/subscript target
-        or a non-literal annotation is accepted -- unless it contains a call, which
-        the text names as MODULE_EXECUTABLE (cases 2, 9). A non-literal value wins
-        over a call elsewhere in the same statement;
+      - a non-literal annotation is accepted unless it contains a call, which the
+        text names as MODULE_EXECUTABLE (case 9); a non-literal value wins over it;
       - `x: int` (no value) is accepted: there is no value to fail (case 3).
+
+    A-015 case 2 (owner decision by Krishika, revising Claude's first decision;
+    Ayush's confirmation pending): a target that is not a plain name -- an attribute
+    or subscript anywhere in it, e.g. `a.b = 1`, `math.pi = 3`, `d[0] = 1`,
+    `a, b.c = 1, 2` -- is not a module constant but a side effect, so
+    MODULE_EXECUTABLE whatever the value. File 30 L29: "attribute access ... are not
+    literal-only", "other side effects are rejected"; File 30 L52/L64 and file 19
+    L25/L40: "literal-only module constants", "side effects are prohibited".
     """
     findings = []
 
@@ -336,10 +353,13 @@ def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
         findings.append(Finding(node_key(stmt), _reject(
             f"MODULE_STATEMENT_REJECT|file={file}|line={stmt.lineno}|reason={reason}")))
 
-    def assignment(stmt: ast.stmt, value: Optional[ast.expr], others: list[ast.expr]) -> None:
-        if value is not None and not is_literal_only(value):
+    def assignment(stmt: ast.stmt, value: Optional[ast.expr], targets: list[ast.expr],
+                   annotation: Optional[ast.expr] = None) -> None:
+        if not all(_is_name_target(t) for t in targets):
+            reject(stmt, "MODULE_EXECUTABLE")  # A-015 case 2: a side effect, not a constant
+        elif value is not None and not is_literal_only(value):
             reject(stmt, "NON_LITERAL_CONSTANT")
-        elif any(_contains_call(o) for o in others):
+        elif _contains_call(annotation):
             reject(stmt, "MODULE_EXECUTABLE")
 
     for index, stmt in enumerate(tree.body):
@@ -353,7 +373,7 @@ def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
         elif isinstance(stmt, ast.Assign):
             assignment(stmt, stmt.value, stmt.targets)
         elif isinstance(stmt, ast.AnnAssign):
-            assignment(stmt, stmt.value, [stmt.target, stmt.annotation])
+            assignment(stmt, stmt.value, [stmt.target], stmt.annotation)
         elif isinstance(stmt, _CONTROL_FLOW):
             reject(stmt, "MODULE_CONTROL_FLOW")
         else:

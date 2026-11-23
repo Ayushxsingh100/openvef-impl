@@ -377,11 +377,14 @@ class ModuleBodyTests(unittest.TestCase):
         cases = {
             "MODULE_EXECUTABLE": ("x += 1\n", "pass\n", 'X = 1\n"late string"\n', '"""doc"""\n"""second"""\n',
                                   "global x\n", "nonlocal x\n", "return 1\n", "break\n", "continue\n",
-                                  "a[f()] = 1\n", "a.b(1).c = 1\n", "X: foo() = 1\n"),
+                                  "a[f()] = 1\n", "a.b(1).c = 1\n", "X: foo() = 1\n",
+                                  # case 2, owner revision: non-name targets are side effects
+                                  "a.b = 1\n", "math.pi = 3\n", "d[0] = 1\n", "a, b.c = 1, 2\n",
+                                  "[a, *b[0]] = 1, 2\n", "a.b: int = 1\n", "d[0]: int\n",
+                                  "a[f()] = g()\n", "a.b = f()\n", "X = a.b = 1\n"),
             "NON_LITERAL_CONSTANT": ("X = ...\n", "X = (1, ...)\n", "X = -True\n", "X = +False\n",
-                                     "X = -(-1)\n", "X = +-1\n", "a[f()] = g()\n", "X: foo() = g()\n"),
-            None: ("a.b = 1\n", "a[0] = 1\n", "a, b.c = 1, 2\n", "a.b: int = 1\n", "x: int\n",
-                   "X: int + 1 = 1\n", "X: foo = 1\n"),
+                                     "X = -(-1)\n", "X = +-1\n", "X: foo() = g()\n"),
+            None: ("x: int\n", "X: int + 1 = 1\n", "X: foo = 1\n", "a, *b = 1, 2\n", "(a, [b, c]) = 1, (2, 3)\n"),
         }
         for reason, sources in cases.items():
             for src in sources:
@@ -439,6 +442,11 @@ class CombinedStageTests(unittest.TestCase):
         for src in ("eval\n", "random.seed\n", "builtins.open\n"):
             with self.subTest(src=src):
                 self.assertEqual(self.stage(src), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=MODULE_EXECUTABLE")
+
+    def test_attribute_target_is_executable_in_stage(self):
+        # A-015 case 2 (owner revision): checked in the combined stage too.
+        self.assertEqual(self.stage("import math\nmath.pi = 3\n"),
+                         "MODULE_STATEMENT_REJECT|file=driver.py|line=2|reason=MODULE_EXECUTABLE")
 
     def test_a015_cases_take_part_in_source_order(self):
         self.assertEqual(self.stage("pass\nimport os\n"), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=MODULE_EXECUTABLE")
