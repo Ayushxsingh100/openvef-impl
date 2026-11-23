@@ -196,22 +196,46 @@ byte column — unit test `test_column_counts_characters_not_utf8_bytes`). Warni
 `ast.parse` (e.g. invalid escape sequences) are not failures; the runner must not be
 started with `-W error`, which would turn them into SyntaxError.
 
-## A-012 — Runner adapters for source-pair inputs and the M36 unit vector (PROVISIONAL)
+## A-012 — Runner adapters for source-pair inputs and the M36 unit vector (source pair PROVISIONAL; M36 OPEN)
 
-A-002's decision covers `response_object` only. Two more input shapes reach SOURCE_AST:
+A-002's decision covers `response_object` only. Two more input shapes reach SOURCE_AST.
 
-- `{driver_source, checker_source}` (M16, M29). Implemented: run SOURCE_AST directly on
-  the two strings (no envelope, schema or clause-ID step), then continue with later
-  stages. Alternative: wrap them in a full response object first — the pack gives no
-  wrapper, so this would need one.
-- `{source_file, syntax_error: {lineno, offset}}` with `fixture_class:
-  "parser_unit_vector"` (M36). Catalog L27: unit vectors "are deliberately
-  grammar-exempt; they test local utilities/policies". Implemented: call the column-rule
-  function `syntax_reject(file, lineno, offset)` directly and report disposition
-  `CONTROL_EXPECTATION`, because Protocol §3.4 L177 says a `CONTROL_EXPECTATION`
-  fixture's "stage and expected diagnostic are test labels, not an artifact feedback
-  event". The disposition comes from the declared `fixture_class` and input shape,
-  never the fixture ID or expected value. Alternative: compare only stage, error class
-  and diagnostic for unit vectors.
+**`{driver_source, checker_source}` (M16, M29) — PROVISIONAL.** Implemented: run
+SOURCE_AST directly on the two strings (no envelope, schema or clause-ID step), then
+continue with later stages. Alternative: wrap them in a full response object first —
+the pack gives no wrapper, so this would need one. **Owner confirmation needed.**
 
-**Owner confirmation needed for both adapters.**
+**`{source_file, syntax_error: {lineno, offset}}` with `fixture_class:
+"parser_unit_vector"` (M36) — OPEN; M36 is NOT_IMPLEMENTED.**
+
+What the pack says (exact text):
+- `fixture_class` value `parser_unit_vector`: **not defined anywhere in the pack.** The
+  string occurs only in `41_F18_Fixture_Inputs/M36.json`. The only text about
+  `fixture_class` is Catalog (file 36) requirement 6: "Serializer unit vectors and
+  lifecycle unit vectors are marked by `fixture_class` and are deliberately
+  grammar-exempt; they test local utilities/policies, not model feedback." It names
+  serializer and lifecycle unit vectors, not parser unit vectors.
+- `CONTROL_EXPECTATION`, Catalog (file 36) dispositions list: "`CONTROL_EXPECTATION`: a
+  serializer, lifecycle or policy test vector; it does not represent an artifact feedback
+  event."
+- `CONTROL_EXPECTATION`, Protocol (file 02 L177): "A `CONTROL_EXPECTATION` fixture
+  exercises a serializer, protocol or lifecycle rule; its stage and expected diagnostic
+  are test labels, not an artifact feedback event."
+- The column rule itself (file 02 L127) is fully defined: "If `offset` is absent, null or
+  less than 1, emit `column=1`".
+
+Finding: neither definition names a parser vector, and no rule maps an input to the
+`CONTROL_EXPECTATION` disposition. The earlier runner (commit e5eb9c0, run
+run-20261123T155910Z) set `record["disposition"] = "CONTROL_EXPECTATION"` as a constant
+whenever `fixture_class == "parser_unit_vector"`. That label occurs only in M36, so the
+disposition was in effect copied from the descriptor, not computed. That PASS is
+withdrawn: the runner now reports M36 NOT_IMPLEMENTED. The column rule is still covered
+by unit tests (`ColumnRuleTests`, hand-built inputs, not F18 evidence).
+
+Readings for the owners: (a) unit vectors of any class have disposition
+`CONTROL_EXPECTATION` (would need a rule saying so, and a definition of
+`parser_unit_vector`); (b) for unit vectors the runner compares stage, error class and
+diagnostic only, and records the disposition label without comparing it (would change
+Catalog requirement 2's "single exact expected disposition/stage/error/diagnostic");
+(c) the pack is corrected so M36's class and disposition are defined.
+**Owner decision needed.**

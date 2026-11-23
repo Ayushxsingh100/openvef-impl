@@ -8,7 +8,8 @@ Implements:
                    malformed envelope or JSON syntax emit SCHEMA_REJECT|pointer=/.
   Protocol §3.4 stage map — provider max-token truncation is OUTPUT_TRUNCATED at
                    PARSE_SCHEMA. Precedence versus envelope checks: see
-                   docs/ambiguities.md A-001 (provisional, owner confirmation pending).
+                   docs/ambiguities.md A-001 (decided: truncation first; Ayush's
+                   confirmation pending).
 
 Draft 2020-12 schema validation and clause-ID checks (part 1b) are in
 `openvef.schema`.
@@ -65,7 +66,7 @@ def _root_reject() -> Failure:
 
 def parse_envelope(raw: bytes, provider_finish_reason: Optional[str] = None) -> Failure | Envelope:
     """Decode the raw provider response bytes into one JSON value, or fail."""
-    # A-001 (provisional): explicit provider max-token truncation is reported
+    # A-001 (decided, Ayush's confirmation pending): explicit provider max-token truncation is reported
     # before envelope decoding, so it is "reported separately" (File 30 §1).
     if provider_finish_reason == "length":
         return Failure(STAGE, "OUTPUT_TRUNCATED", "OUTPUT_TRUNCATED")
