@@ -28,6 +28,7 @@
 | File 30 §3 L27, L35–L39, §6; Protocol §3.4 L166 (7): restricted-runtime import, `create_driver(seed)` return type, runtime `inspect.signature` | `sandbox/harness.py` `task_factory`, `src/openvef/runtime.py` `factory_checks` | M06 — PASS in run-20261123T183649Z; all response fixtures that pass compilation now also pass this stage | Implemented (A-034, A-035, A-037 Claude-decided, owner review pending) |
 | Protocol §3.4 L166 (9)–(10): checker null invocation in a separate process | `harness.py` `task_checker`, `runtime.py` `checker_invocation` | Unit tests only: no fixture supplies a null trace; M31–M33 need one from a simulation | Implemented, not exercised by fixtures |
 | Protocol §3.4 L166 (7)–(8); File 30 B5, §4 (a)–(d); L210, L227: driver steps on RTL then null netlist through Icarus + cocotb in the sandbox (factory checks, per-cycle exception > vector > watchdog, COMPLETE then safe idle to the cap), paired comparison | `sandbox/sim.py`, `sandbox/sim_cocotb.py`, `src/openvef/simulation.py`; `tests/test_simulation.py` (16, test-only toy designs) | **Blocked on design materials absent from the pack** (FIFO RTL/null netlist, port widths, reset and legal-input rules, cycle cap, safe idle, watchdog formula, mask, trace schema/metadata — owner-written or TO FREEZE): P01, P14, P17, P21, P42, M07, M31, M32, M33, M57 stay NOT_IMPLEMENTED | Implemented, not exercised by fixtures (A-039 Claude-decided, owner review pending; scheduler values are build defaults pending owner freeze, docs/sandbox.md) |
+| Protocol §5.2 L217–L223: trace row fields (`inputs_consumed_at_edge_n`, `outputs_after_edge_n`, `next_inputs_scheduled_for_edge_n_plus_1`), reset, run status, four-state values, waveform audit file | `sandbox/sim_cocotb.py` (partial: records cycle, post-edge outputs, next inputs, driver completion) | none today | **Gap, not fixed:** consumed inputs, reset state, run status, field names and the FST/VCD file are missing; see docs/sandbox.md "Known gap" |
 | Protocol §3.4 L139, L141–L162, evaluation order (1)–(11): multi-failure precedence over `events` | `src/openvef/stage_map.py` `first_event` | R01–R06, R12, R13, M13 — PASS in run-20261123T182731Z | Implemented (A-025 Claude-decided, owner review pending) |
 | Protocol §3.4 L166 (8): paired-run comparison; design preflight RTL/null divergence | `stage_map.py` `paired_run_failure`, `RTL_NULL_CONTROL_FAILURE` | M28, M37, R07 — PASS in run-20261123T182731Z | Implemented (A-028 Claude-decided, owner review pending) |
 | File 30 L83: driver vector checks (a)–(e) | `stage_map.py` `validate_vector` | M26 — PASS in run-20261123T182731Z; M27 NOT_IMPLEMENTED (prose predicate; A-027, A-038: would require inventing behaviour); P17 needs the simulator | Implemented (A-027, A-038 Claude-decided, owner review pending) |
@@ -64,3 +65,12 @@ Caveats:
 Evidence: see `evidence/run-*/summary.json`. Since D-002a, only runs whose
 `interpreter_status` is `PINNED` (started with `runner/run_f18_container.sh`) are on the
 pinned interpreter. Earlier runs used the host interpreter and are development runs only.
+
+Related documents:
+- [pack-defects.md](pack-defects.md): pack inconsistencies and under-specifications
+  (PD-01 to PD-22) for a corrected release.
+- [fifo-owner-checklist.md](fifo-owner-checklist.md): FIFO items the owners must write or
+  freeze (requirements only).
+
+Every quote in both documents is checked verbatim by `tests/test_doc_quotes.py`.
+
