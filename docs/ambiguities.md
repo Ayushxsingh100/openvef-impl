@@ -240,7 +240,7 @@ Catalog requirement 2's "single exact expected disposition/stage/error/diagnosti
 (c) the pack is corrected so M36's class and disposition are defined.
 **Owner decision needed.**
 
-## A-013 — Order of IMPORT_POLICY categories within one file (OPEN)
+## A-013 — Order of IMPORT_POLICY categories within one file (DECIDED — Ayush's confirmation pending)
 
 - File 30 §3 L27 (per-file stage list): "`ast.parse`; module-level AST policy;
   import/prohibited-name policy; compilation; …"
@@ -279,9 +279,13 @@ the same start `(1, 0)`; the `Name` ends first, so the key puts it first and giv
 the `Assign` at `(1, 0)` and gives `NON_LITERAL_CONSTANT`.
 
 No current fixture distinguishes the readings: every IMPORT_POLICY fixture has one
-violation. **Owner decision needed before IMPORT_POLICY is connected to the runner.**
+violation.
 
-## A-014 — Order between PROHIBITED_BUILTIN and GLOBAL_RANDOM_USE (OPEN)
+**Decision:** reading (c) — one source-order pass; the first violation of any
+IMPORT_POLICY category wins. Source: statement typed by Krishika in Claude Code on 23 Nov 2026: "I, Krishika, decide A-013 and A-014 as reading (c): single source-order pass, first violation wins. Ayush's confirmation is pending."
+Reading (c) was suggested by Claude (claude.ai session) and relayed by Krishika.
+
+## A-014 — Order between PROHIBITED_BUILTIN and GLOBAL_RANDOM_USE (DECIDED — Ayush's confirmation pending)
 
 - File 30 §2 L19 (prohibited names) and L20 (`random`) are separate bullets; Protocol
   §3.4 (file 02 L133): "Reject AST `Name` nodes whose `id` is `__import__`, `eval`,
@@ -296,7 +300,9 @@ which the text lists them); (b) one source-order pass over both kinds, separate 
 imports and module-body; (c) the single source-order pass of A-013 (c). Example (one
 function body): `v = random.random()` (L5); `exec("x")` (L6) — (a) gives
 `PROHIBITED_BUILTIN|name=exec`; (b) and (c) give `GLOBAL_RANDOM_USE|name=random.random`.
-No current fixture has both. **Owner decision needed** (with A-013).
+No current fixture has both.
+
+**Decision:** reading (c), the single source-order pass of A-013. Source: statement typed by Krishika in Claude Code on 23 Nov 2026: "I, Krishika, decide A-013 and A-014 as reading (c): single source-order pass, first violation wins. Ayush's confirmation is pending."
 
 ## A-015 — Module-body statements the text does not classify (OPEN)
 
