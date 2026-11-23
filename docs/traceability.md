@@ -22,7 +22,10 @@
 | Protocol §3.4 evaluation order (3); File 30 §3 L27: IMPORT_POLICY stage order — driver.py then checker.py; identifier scan first; one source-order pass, first violation wins | `import_policy.py` `check_import_policy`; runner `run_source_ast` | M29, M44 — PASS in run-20261123T162630Z; 32 fixtures pass through to AST_SIGNATURE without false rejection | Implemented (A-013/A-014 decided as (c), Ayush pending; equal-key tie → File 30 L27 stage order, Claude-decided under standing delegation, owner review pending) |
 | Protocol §3.4 L164; File 30 §3 L33–L37: required-symbol pass (fixed sequence, binding count, parameter checks) and global category pass ranks 1–7 (`(category, file_order, position)`) | `src/openvef/ast_signature.py` `check_ast_signature`; `tests/test_ast_signature.py` | 22 AST_SIGNATURE fixtures — PASS in run-20261123T174358Z; M06 (RETURN_TYPE) needs the runtime stage | Static part implemented (A-020–A-023 Claude-decided under standing delegation, owner review pending) |
 | Protocol §3.4 evaluation order (5), (6); stage map COMPILE_DRIVER / COMPILE_CHECKER | `ast_signature.py` `check_compile` | No fixture reaches it with a compile error; 10 fixtures pass compilation and stop at the runtime stage | Implemented (A-024 Claude-decided, owner review pending) |
-| File 30 §3 L39, §6; Protocol §3.4 evaluation order (7)+: restricted import, `inspect.signature`, factory return type, driver/checker execution | — | M06, M07, M31–M33, M57, P01, P14, P21, P42 | **Blocked, outside the delegation**: container sandbox digest, Cocotb and simulator versions are TO FREEZE (File 30 L15, L39; Register 16 L40; Protocol L497) |
+| File 30 §3 L39, §6; D-002: pinned sandbox (digest, non-root, no network, read-only root, noexec tmpfs, limits, wall-clock kill) | `sandbox/Dockerfile`, `src/openvef/sandbox.py`, `docs/sandbox.md`; `tests/test_sandbox.py` (17 tests) | — (isolation tests, not fixtures) | Implemented (D-002 owner decision, Ayush pending; A-036 Claude-decided) |
+| File 30 §3 L27, L35–L39, §6; Protocol §3.4 L166 (7): restricted-runtime import, `create_driver(seed)` return type, runtime `inspect.signature` | `sandbox/harness.py` `task_factory`, `src/openvef/runtime.py` `factory_checks` | M06 — PASS in run-20261123T183649Z; all response fixtures that pass compilation now also pass this stage | Implemented (A-034, A-035, A-037 Claude-decided, owner review pending) |
+| Protocol §3.4 L166 (9)–(10): checker null invocation in a separate process | `harness.py` `task_checker`, `runtime.py` `checker_invocation` | Unit tests only: no fixture supplies a null trace; M31–M33 need one from a simulation | Implemented, not exercised by fixtures |
+| Protocol §3.4 L166 (7)–(8): driver steps on RTL and null netlist; null trace for the checker | — | **Need Cocotb/simulator (not pinned, D-002):** P01, P14, P17, P21, P42, M07, M31, M32, M33, M57 | Not started (blocked: simulator) |
 | Protocol §3.4 L139, L141–L162, evaluation order (1)–(11): multi-failure precedence over `events` | `src/openvef/stage_map.py` `first_event` | R01–R06, R12, R13, M13 — PASS in run-20261123T182731Z | Implemented (A-025 Claude-decided, owner review pending) |
 | Protocol §3.4 L166 (8): paired-run comparison; design preflight RTL/null divergence | `stage_map.py` `paired_run_failure`, `RTL_NULL_CONTROL_FAILURE` | M28, M37, R07 — PASS in run-20261123T182731Z | Implemented (A-028 Claude-decided, owner review pending) |
 | File 30 L83: driver vector checks (a)–(e) | `stage_map.py` `validate_vector` | M26 — PASS in run-20261123T182731Z; M27 NOT_IMPLEMENTED (prose predicate, A-027); P17 needs the simulator | Implemented (A-027 Claude-decided, owner review pending) |
@@ -32,14 +35,15 @@
 | File 31 L11, L27–L30, §8: reserved heading lines, unresolved placeholders, clause-ID near-match and set equality | `src/openvef/assembler.py` | M18, M19, M20, M40 — PASS in run-20261123T182731Z | Implemented (A-030 Claude-decided, owner review pending) |
 | Protocol L175, L183–L185: halt signature, single recovery cycle, operational recovery | `src/openvef/ledger.py` | M41, M42, M47 — PASS in run-20261123T182731Z; M48, M50, M53, M54, M58 NOT_IMPLEMENTED (A-033 open, outside the delegation) | Implemented (A-031, A-032 Claude-decided, owner review pending; pack inconsistency noted in A-031) |
 
-Latest run: `evidence/run-20261123T182731Z` — commit 189bddf (clean), CPython 3.11.18 (interpreter SHA-256
-518f54d1…5356), jsonschema 4.26.0: 127 PASS, 0 FAIL, 17 NOT_IMPLEMENTED, 0 ERROR (34 new PASS
-versus run-20261123T174358Z; no earlier result changed). NOT_IMPLEMENTED: 10 need the runtime
-stage (M06, M07, M31–M33, M57, P01, P14, P21, P42); P17 needs the simulator; M27 needs an
-executable legal-input predicate (A-027); M48, M50, M53, M54, M58 are blocked on A-033.
-Development run (Codespaces), not pinned-environment evidence. Results that depend on
-Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-032) do not count toward F18 until
-both owners review those readings.
+Latest run: `evidence/run-20261123T183649Z` — commit a8f4631 (clean); host CPython 3.11.18 (SHA-256
+518f54d1…5356) for static stages; sandbox `python@sha256:07d48240…b535`, image
+`sha256:67a6c301…5789`, container CPython 3.11.18 (SHA-256 92d7e40e…6b79), harness SHA-256
+41913187…2e16: 128 PASS, 0 FAIL, 16 NOT_IMPLEMENTED, 0 ERROR (M06 new versus
+run-20261123T182731Z; no earlier result changed). NOT_IMPLEMENTED: 10 need the simulator
+(listed above); M27 needs an executable legal-input predicate (A-027); M48, M50, M53, M54,
+M58 are blocked on A-033. Development run (Codespaces), not pinned-environment evidence.
+Results that depend on Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-037) do not
+count toward F18 until both owners review them.
 
 Evidence: see `evidence/run-*/summary.json`. Development runs are not pinned-environment
 evidence until run on the owners' recorded interpreter.
