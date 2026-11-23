@@ -239,3 +239,127 @@ diagnostic only, and records the disposition label without comparing it (would c
 Catalog requirement 2's "single exact expected disposition/stage/error/diagnostic");
 (c) the pack is corrected so M36's class and disposition are defined.
 **Owner decision needed.**
+
+## A-013 — Order of IMPORT_POLICY categories within one file (OPEN)
+
+- File 30 §3 L27 (per-file stage list): "`ast.parse`; module-level AST policy;
+  import/prohibited-name policy; compilation; …"
+- File 30 §3 L27 (node order): "within a file, source nodes use ascending `(lineno,
+  col_offset, end_lineno, end_col_offset)`."
+- Protocol §3.4 evaluation order (3): "If the identifier scan passes, complete that
+  file's import, prohibited-name and module-body checks before advancing to the next
+  file. AST import nodes use ascending source-position order and the per-node import
+  precedence above."
+- Protocol §3.4 (file 02 L129): "Nodes are visited by `(lineno, col_offset, end_lineno,
+  end_col_offset)` within `driver.py`, then `checker.py`."
+
+The identifier scan runs first (settled by step (3)) and files run `driver.py` first
+(settled). Not settled: which of the remaining categories wins inside one file.
+
+Readings:
+- (a) Module-body policy first, then import and prohibited-name checks — the order of
+  File 30 L27's stage list.
+- (b) Imports, then prohibited names, then module-body — the order of Protocol step (3)'s
+  sentence.
+- (c) One source-order pass: every IMPORT_POLICY violation in the file is placed by its
+  node's `(lineno, col_offset, end_lineno, end_col_offset)` and the first wins, whatever
+  its category — File 30 L27's node-order sentence.
+
+What changes (driver.py examples):
+
+| Source | (a) | (b) | (c) |
+|---|---|---|---|
+| `import os` (L1); `print(1)` (L2) | `MODULE_STATEMENT_REJECT\|…\|line=2\|reason=MODULE_EXECUTABLE` | `IMPORT_NOT_ALLOWED\|module=os` | `IMPORT_NOT_ALLOWED\|module=os` |
+| `print(1)` (L1); `import os` (L2) | `MODULE_EXECUTABLE`, line 1 | `IMPORT_NOT_ALLOWED\|module=os` | `MODULE_EXECUTABLE`, line 1 |
+| function using `eval` (L3); `X = [n for n in ()]` (L9) | `NON_LITERAL_CONSTANT`, line 9 | `PROHIBITED_BUILTIN\|name=eval` | `PROHIBITED_BUILTIN\|name=eval` |
+
+Detail under (c): a module-level `eval("1")` is an `Expr` node and a `Name` node with
+the same start `(1, 0)`; the `Name` ends first, so the key puts it first and gives
+`PROHIBITED_BUILTIN`, not `MODULE_EXECUTABLE`. A module-level `x = eval("1")` starts with
+the `Assign` at `(1, 0)` and gives `NON_LITERAL_CONSTANT`.
+
+No current fixture distinguishes the readings: every IMPORT_POLICY fixture has one
+violation. **Owner decision needed before IMPORT_POLICY is connected to the runner.**
+
+## A-014 — Order between PROHIBITED_BUILTIN and GLOBAL_RANDOM_USE (OPEN)
+
+- File 30 §2 L19 (prohibited names) and L20 (`random`) are separate bullets; Protocol
+  §3.4 (file 02 L133): "Reject AST `Name` nodes whose `id` is `__import__`, `eval`,
+  `exec`, `compile` or `open`, and reject access through `builtins.<name>` for those
+  same names. … direct `random.<attribute>` use other than `random.Random` emits
+  `GLOBAL_RANDOM_USE`."
+- Neither diagnostic carries a file or line (`PROHIBITED_BUILTIN|name=<NAME>`,
+  `GLOBAL_RANDOM_USE|name=<NAME>`), so the order decides which name is reported.
+
+Readings: (a) all prohibited-name violations before any random violation (the order in
+which the text lists them); (b) one source-order pass over both kinds, separate from
+imports and module-body; (c) the single source-order pass of A-013 (c). Example (one
+function body): `v = random.random()` (L5); `exec("x")` (L6) — (a) gives
+`PROHIBITED_BUILTIN|name=exec`; (b) and (c) give `GLOBAL_RANDOM_USE|name=random.random`.
+No current fixture has both. **Owner decision needed** (with A-013).
+
+## A-015 — Module-body statements the text does not classify (OPEN)
+
+Protocol §3.4 (file 02 L135): "At module scope, allow only permitted imports, one
+optional docstring expression, … and assignments/annotated assignments whose values are
+recursively literal-only. A non-literal assignment is `NON_LITERAL_CONSTANT`;
+module-level control-flow statements (…) are `MODULE_CONTROL_FLOW`; other executable
+statements/calls/expressions are `MODULE_EXECUTABLE`." File 30 §3 L29: "Literal-only
+expressions are `ast.Constant` values of type string, bytes, integer, float, complex,
+boolean or `None`, and recursively nested tuple/list/set/dict literals containing only
+those values; unary plus/minus applied to a numeric literal is permitted."
+
+Unsettled cases (each needs: accept, `NON_LITERAL_CONSTANT` or `MODULE_EXECUTABLE`):
+1. `x += 1` — `ast.AugAssign` is not "assignment/annotated assignment" by name.
+2. `a.b = 1`, `a[0] = 1` — literal value, but the target is not a plain name.
+3. `x: int` — `ast.AnnAssign` with no value: nothing to test for literal-only.
+4. `pass` — not executable in effect, but not in the allowed list.
+5. A string expression that is not the first statement, or a second one — is "one
+   optional docstring expression" only the first statement?
+6. `X = ...` — `Ellipsis` is an `ast.Constant` but not one of the listed types.
+7. `X = -True` — `bool` is an `int` subclass: is it a "numeric literal"?
+8. `X = -(-1)`, `X = +-1` — unary applied to a unary, not directly to a literal.
+9. The annotation of an annotated assignment (`X: foo() = 1`): the text tests "values"
+   only.
+
+The step-6 classifier will raise `UnsettledSpec("A-015")` for these. No current fixture
+uses any of them (P28, M04a, M04b and M57 do not). **Owner decision needed.**
+
+## A-016 — Prohibited-name rule: definitions, parameters and `builtins` (OPEN)
+
+File 30 §2 L19: "AST `Name` nodes whose `id` is `__import__`, `eval`, `exec`, `compile`
+or `open` are rejected, regardless of call context. A `builtins` attribute whose
+attribute is one of those names is also rejected. `builtins` itself is not an allowed
+import root."
+
+Unsettled: (1) `def open(): …` or `def f(eval): …` binds the name through `ast.FunctionDef.name`
+or `ast.arg`, not an `ast.Name` node — rejected or not? Function definitions are
+otherwise deferred to AST_SIGNATURE. (2) `import builtins` followed by `builtins.open`:
+`IMPORT_NOT_ALLOWED|module=builtins` or `PROHIBITED_BUILTIN|name=open` (same as A-013).
+(3) "A `builtins` attribute" — is it only `Attribute(value=Name("builtins"))`, or also
+e.g. `__builtins__.open`? M24 (`builtins.open` with no import) expects
+`PROHIBITED_BUILTIN|name=open`, consistent with the first form. Planned implementation:
+`ast.Name` nodes in any context, and `Attribute(value=Name(id="builtins"))` only; (1)
+and `__builtins__` are not flagged. **Owner confirmation needed.**
+
+## A-017 — `random.<attribute>` when `random` is not the imported module (OPEN)
+
+File 30 §2 L20: "Any direct attribute access on the module name `random` other than
+`random.Random` is rejected". Protocol §3.4 (file 02 L133): "direct `random.<attribute>`
+use other than `random.Random` emits `GLOBAL_RANDOM_USE`."
+
+Unsettled: whether the check is purely syntactic (`Attribute(value=Name(id="random"))`
+anywhere) or applies only when `random` is the imported module — e.g. a parameter named
+`random`, or a file without `import random`. M09, M22, M23 all `import random` and use
+it inside a method, so both readings pass them. Planned implementation: syntactic.
+**Owner confirmation needed.**
+
+## A-018 — Non-ASCII identifiers inside f-string replacement fields (OPEN)
+
+File 30 §2 L21: "Every Python identifier lexeme must be ASCII. … Unicode in STRING and
+COMMENT tokens is permitted." Protocol §3.4 (file 02 L133): "STRING and COMMENT tokens
+are not scanned".
+
+Question: in `f"{café}"` the identifier `café` is a real `ast.Name` node, but before
+Python 3.12 (PEP 701) the whole f-string is one STRING token. Probe result: pending
+(step 1).
