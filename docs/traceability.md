@@ -23,15 +23,23 @@
 | Protocol §3.4 L164; File 30 §3 L33–L37: required-symbol pass (fixed sequence, binding count, parameter checks) and global category pass ranks 1–7 (`(category, file_order, position)`) | `src/openvef/ast_signature.py` `check_ast_signature`; `tests/test_ast_signature.py` | 22 AST_SIGNATURE fixtures — PASS in run-20261123T174358Z; M06 (RETURN_TYPE) needs the runtime stage | Static part implemented (A-020–A-023 Claude-decided under standing delegation, owner review pending) |
 | Protocol §3.4 evaluation order (5), (6); stage map COMPILE_DRIVER / COMPILE_CHECKER | `ast_signature.py` `check_compile` | No fixture reaches it with a compile error; 10 fixtures pass compilation and stop at the runtime stage | Implemented (A-024 Claude-decided, owner review pending) |
 | File 30 §3 L39, §6; Protocol §3.4 evaluation order (7)+: restricted import, `inspect.signature`, factory return type, driver/checker execution | — | M06, M07, M31–M33, M57, P01, P14, P21, P42 | **Blocked, outside the delegation**: container sandbox digest, Cocotb and simulator versions are TO FREEZE (File 30 L15, L39; Register 16 L40; Protocol L497) |
-| Protocol §3.4: multi-failure precedence (`events` inputs) | — | R13 and other R fixtures | Not started (input adapter undefined) |
+| Protocol §3.4 L139, L141–L162, evaluation order (1)–(11): multi-failure precedence over `events` | `src/openvef/stage_map.py` `first_event` | R01–R06, R12, R13, M13 — PASS in run-20261123T182731Z | Implemented (A-025 Claude-decided, owner review pending) |
+| Protocol §3.4 L166 (8): paired-run comparison; design preflight RTL/null divergence | `stage_map.py` `paired_run_failure`, `RTL_NULL_CONTROL_FAILURE` | M28, M37, R07 — PASS in run-20261123T182731Z | Implemented (A-028 Claude-decided, owner review pending) |
+| File 30 L83: driver vector checks (a)–(e) | `stage_map.py` `validate_vector` | M26 — PASS in run-20261123T182731Z; M27 NOT_IMPLEMENTED (prose predicate, A-027); P17 needs the simulator | Implemented (A-027 Claude-decided, owner review pending) |
+| File 30 §3 L35/L37: runtime `inspect.signature` comparison | `stage_map.py` `runtime_signature_failure` | M25 — PASS in run-20261123T182731Z | Comparison implemented; live signature capture is step 4 (sandbox) |
+| Protocol §3.4 L166 (9)–(11), CHECKER rows; File 30 L97: checker return classification and null-run adjudication | `stage_map.py` `classify_return`, `adjudicate_checker`, `outcome_from_record` | R08–R11, M10–M12, P18, P19, P22 — PASS in run-20261123T182731Z; M31–M33 need live checker execution | Implemented (A-026, A-028 Claude-decided, owner review pending) |
+| Protocol §3.4 L94–L127 grammar, L168 serialization (grammar, 2,048-byte truncation, JSON) | `src/openvef/serializer.py` | M14, M15, M17 — PASS in run-20261123T182731Z | Implemented (A-029, A-032 Claude-decided, owner review pending) |
+| File 31 L11, L27–L30, §8: reserved heading lines, unresolved placeholders, clause-ID near-match and set equality | `src/openvef/assembler.py` | M18, M19, M20, M40 — PASS in run-20261123T182731Z | Implemented (A-030 Claude-decided, owner review pending) |
+| Protocol L175, L183–L185: halt signature, single recovery cycle, operational recovery | `src/openvef/ledger.py` | M41, M42, M47 — PASS in run-20261123T182731Z; M48, M50, M53, M54, M58 NOT_IMPLEMENTED (A-033 open, outside the delegation) | Implemented (A-031, A-032 Claude-decided, owner review pending; pack inconsistency noted in A-031) |
 
-Latest run: `evidence/run-20261123T174358Z` — commit 89bc8df (clean), CPython 3.11.18 (interpreter SHA-256
-518f54d1…5356), jsonschema 4.26.0: 93 PASS, 0 FAIL, 51 NOT_IMPLEMENTED, 0 ERROR. 22 new
-PASS at AST_SIGNATURE versus run-20261123T173956Z; no earlier result changed. 10 fixtures
-pass every static stage and compilation and stop at the runtime stage, which is blocked
-(see the table). Development run (Codespaces), not pinned-environment evidence. Results that
-depend on Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-024) do not count
-toward F18 until both owners review those readings.
+Latest run: `evidence/run-20261123T182731Z` — commit 189bddf (clean), CPython 3.11.18 (interpreter SHA-256
+518f54d1…5356), jsonschema 4.26.0: 127 PASS, 0 FAIL, 17 NOT_IMPLEMENTED, 0 ERROR (34 new PASS
+versus run-20261123T174358Z; no earlier result changed). NOT_IMPLEMENTED: 10 need the runtime
+stage (M06, M07, M31–M33, M57, P01, P14, P21, P42); P17 needs the simulator; M27 needs an
+executable legal-input predicate (A-027); M48, M50, M53, M54, M58 are blocked on A-033.
+Development run (Codespaces), not pinned-environment evidence. Results that depend on
+Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-032) do not count toward F18 until
+both owners review those readings.
 
 Evidence: see `evidence/run-*/summary.json`. Development runs are not pinned-environment
 evidence until run on the owners' recorded interpreter.
