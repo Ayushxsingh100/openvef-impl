@@ -562,3 +562,160 @@ another exception.
 line 1, as A-011 does for SOURCE_AST; any other exception from `compile()` is a compile
 error at line 1. Reason: same as A-011. Sources reaching compilation have already parsed,
 so this is a defensive rule; no known 3.11.18 input reaches it.
+
+## A-025 — The `events` input vocabulary and multi-failure precedence (DECIDED BY CLAUDE — owner review pending)
+
+R01–R06, R12 and R13 give a list of observed `events` (`{"kind": …, …}`). The pack
+defines neither the event vocabulary nor how several events are ranked, beyond the
+evaluation order (Protocol §3.4 L166) and "The first applicable row after the exact
+evaluation order below controls" (L139).
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- Each event kind names one stage-map row, and its fields fill that row's diagnostic
+  template. The table is `EVENT_ROWS` in `src/openvef/stage_map.py`: `schema_reject`,
+  `output_truncated`, `import_not_allowed`, `compile_error`, `driver_runtime`,
+  `driver_vector`, `driver_watchdog`, `simulator_error`, `trace_integrity`.
+- Fields are checked against the enumerated domains (file 02 L125). An unknown kind or
+  out-of-domain field is NOT_IMPLEMENTED, never guessed.
+- Ranking uses (evaluation step, stage-map row, file order, line). Compile errors take
+  step 5 (driver) or 6 (checker).
+- Within one step the first applicable row wins. This reproduces L166 (7) "exception
+  wins over vector validation, which wins over watchdog". It also places simulator and
+  trace-integrity faults, which have no in-cycle rule, after them.
+- Two different events with an identical key are reported as outside the vocabulary.
+
+Reason: the evaluation order is called "exact" and the row rule is the only tiebreak the
+text gives.
+
+## A-026 — Checker run-outcome records (DECIDED BY CLAUDE — owner review pending)
+
+`checker_runs` (R08–R11) and `null_runs` (M10–M12, P18, P19, P22) give two records per
+fixture in four forms the pack does not define. **Decision (decided by Claude under
+standing delegation, owner review pending):**
+
+| Record | Outcome |
+|---|---|
+| `{"timeout": true}` | `CHECKER_TIMEOUT\|phase=null_check` |
+| `{"error_code": "CHECKER_RUNTIME_ERROR", "exception_class": C}` | `CHECKER_RUNTIME_ERROR\|class=C` |
+| `{"type": "return_invalid", "reason": R}` | `CHECKER_RETURN_INVALID\|reason=R` |
+| `{"verdict": V}` or `{"verdict": V, "diagnostics": [...]}` | a valid return with verdict V; each item is checked against B7's item form (File 30 L74) and counted as malformed if it fails |
+
+These are outcome summaries, not literal return values: R09's `{"verdict": "FAIL"}` has
+no `diagnostics` key and must not be classified as `MISSING_DIAGNOSTICS`. Real checker
+returns use `classify_return` (File 30 L97 order). Adjudication follows L166 step (11)
+and the CHECKER rows. A malformed item with both verdicts `PASS` gives
+`ACCEPT_WITH_WARNING` with null stage and error class and diagnostic
+`DIAGNOSTIC_FORMAT_WARNING` (Catalog L10). With both verdicts `FAIL`, the item is
+discarded and `CHECKER_NULL_REJECT` stands ("verdict retained").
+
+## A-027 — Driver-vector checks whose parameters are not supplied (DECIDED BY CLAUDE — owner review pending)
+
+File 30 L83 orders the vector checks: (a) key set, (b) string values, (c) width,
+(d) `0`/`1`, (e) "the design-specific legal-input predicate". M26 supplies only the
+expected keys (no widths). M27 supplies the predicate as English prose ("wr_en must be 0
+when full is 1"), and `full` is an output port.
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- Checks run in order. A check whose parameters are not supplied cannot be run.
+- If an earlier check fails, that is the result (M26: `EXTRA_KEYS`). If every runnable
+  check passes, the outcome is not determined and the fixture is NOT_IMPLEMENTED,
+  never ACCEPT.
+- Within (a), missing keys are reported before extra keys, following the order of the
+  reason enumeration (file 02 L125).
+- A prose predicate is not executed. Turning prose into code would be fixture-specific
+  code (rule 4), and the predicate belongs to the owner-written FIFO specification. M27
+  stays NOT_IMPLEMENTED until the FIFO specification provides an executable predicate.
+
+## A-028 — Composite inputs: response plus a later-stage outcome (DECIDED BY CLAUDE — owner review pending)
+
+`null_runs` + `response_object` (M10–M12, P18, P19, P22) and `runtime_pair` +
+`response_object` (M37) supply a response and the outcome of a stage that needs the
+simulator. **Decision (decided by Claude under standing delegation, owner review
+pending):**
+- The response is first run through every stage that can run in this environment. Today
+  that is PARSE_SCHEMA through COMPILE_CHECKER; after step 4, also the sandboxed runtime
+  import, `inspect.signature` and factory checks.
+- A failure there is the result.
+- Otherwise the supplied outcome stands in for the simulator-dependent stages (L166
+  steps (7)–(10)) and is adjudicated.
+
+Reason: these fixtures test the adjudication rule; the descriptor deliberately supplies
+what a simulator would produce. Limitation: the driver's simulator runs are not
+executed.
+
+## A-029 — Serializer: grammar and the emitted-diagnostic set (DECIDED BY CLAUDE — owner review pending)
+
+Protocol L168: "The serializer accepts only a complete diagnostic emitted by the
+authoritative stage map"; step (1) validates against "the normative closed grammar and
+its enumerated values". M15 also supplies `allowed_diagnostics`. **Decision (decided by
+Claude under standing delegation, owner review pending):** the diagnostic must match the
+closed grammar (L94–L123 templates with L125 domains, `src/openvef/serializer.py`
+`GRAMMAR`), and, when the emitted set is supplied, be a member of it. Either failure is
+`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` at stage
+`FEEDBACK_SERIALIZER` with disposition `CONTROL_EXPECTATION` (Catalog L18).
+
+## A-030 — Clause-ID packet checks: order and default regexes (DECIDED BY CLAUDE — owner review pending)
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- The near-match check (`MALFORMED_CLAUSE_ID_TOKEN`) runs before set equality
+  (`VISIBLE_CLAUSE_ID_SET_MISMATCH`), in the order File 31 L30 states them.
+- A descriptor that omits a regex (M20 has no search or near-match regex) uses the value
+  File 31 §8 fixes.
+- Reserved-heading lines are compared after LF normalization (CRLF and lone CR → LF,
+  File 31 L11, L27). Unresolved placeholders match `\{\{[A-Z0-9_]+\}\}` (File 31 L28).
+
+## A-031 — Halt-signature domains versus supplied signatures (DECIDED BY CLAUDE — owner review pending; pack inconsistency found)
+
+Protocol L185 gives exact domains: `evaluator_component` is one of `SIMULATOR`, …,
+`RTL_NULL_COMPARATOR`, and `stable_error_class` is the literal `NONE` for
+`TRACE_INTEGRITY_FAILURE`. M42 and M47 supply signatures with
+`"evaluator_component": "simulator"` and `"recorder"` (lower case), and M47's
+trace-integrity signature has `"stable_error_class": "RecorderFault"`. These values are
+outside the L185 domains.
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- `HaltSignature.build` enforces the L185 domains for signatures the ledger constructs
+  from halt events.
+- Ready-made signatures in a descriptor are compared for identity as given, because L185's
+  recurrence rule needs only tuple equality.
+- Under this reading M42 and M47 pass. **For the owners:** the descriptors disagree with
+  L185's domains. If they should be invalid input, the pack needs a correction and a
+  defined outcome for an invalid signature.
+
+## A-032 — Control-vector expectations with extra keys (DECIDED BY CLAUDE — owner review pending)
+
+Catalog requirement 2 allows "a single exact expected disposition/stage/error/diagnostic
+(or exact control-vector expectation)". L176 says the runner compares "disposition,
+stage, error class and exact diagnostic bytes". M14, M17 and M41 add keys such as
+`output_diagnostic_bytes` and `rerun_slots`, and M14/M17 have no `diagnostic` key.
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- A control-vector expectation is compared as a whole object: the runner's record must
+  have exactly the same keys and values.
+- Each extra key is a named property computed by a rule from the text:
+  - M14: Protocol L168 step (2);
+  - M17: L168 step (3);
+  - M41: L183–L185 ("Discard all pre-halt partial scores", "every scheduled slot", "same
+    frozen artifact bytes", "no confirmatory generation call").
+- **Disclosure:** the property *names* come from the descriptors' expected objects,
+  because the pack gives no output schema for control vectors. No *value* is read from
+  an expected object.
+- Comparing the four fields only was rejected, because it would report PASS while
+  ignoring part of an "exact" expectation.
+
+## A-033 — Change-class lifecycle vectors M48, M50, M53, M54, M58 (OPEN — outside the delegation)
+
+Their expected objects contain values that appear nowhere in the pack's normative text,
+only in the descriptors:
+- `rerun_scope_rule` (M48);
+- `affected_slots: "all_designs_x_all_arms"` (M50);
+- `stable_error_class_rule: "simple_exception_class_for_SIMULATOR_ERROR_else_NONE"` (M54);
+- `affected_scope`, `unaffected_design_scope` (M58);
+- the `change_class` input labels themselves.
+
+The `required_action` literals exist in Protocol L176 but are attached to fixture IDs
+("`M48` = …"), not to a rule. Producing these values would copy expected outputs, which
+hard rule 4 forbids and the delegation does not cover. The five fixtures stay
+NOT_IMPLEMENTED. **Owner decision needed:** either a pack correction that defines the
+change classes and their outcome fields as rules, or an owner ruling on how these
+vectors are to be run.
