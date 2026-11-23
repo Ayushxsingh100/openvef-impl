@@ -21,6 +21,7 @@ import os
 import platform
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -29,7 +30,7 @@ sys.path.insert(0, str(REPO / "src"))
 from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
 from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
 from openvef.import_policy import check_import_policy  # noqa: E402
-from openvef.source_ast import UnsettledSpec, check_sources  # noqa: E402
+from openvef.source_ast import FILE_ORDER, UnsettledSpec, check_sources, syntax_reject  # noqa: E402
 
 INDEX_REL = "41_F18_Fixture_Inputs/fixture-index.json"
 INDEX_SHA256 = "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54"
@@ -114,18 +115,36 @@ def run_source_ast(driver_source: str, checker_source: str) -> tuple[str, dict |
     return "NOT_IMPLEMENTED", None, "IMPORT_POLICY passed; next stage (AST_SIGNATURE) not implemented"
 
 
+def run_syntax_error_vector(source_file: str, syntax_error: dict) -> tuple[str, dict | None, str]:
+    """Apply the column rule to a given SyntaxError position (A-012, Protocol L177)."""
+    lineno = syntax_error.get("lineno")
+    if (source_file not in FILE_ORDER or set(syntax_error) - {"lineno", "offset"}
+            or not isinstance(lineno, int) or isinstance(lineno, bool) or lineno < 1):
+        return "NOT_IMPLEMENTED", None, "syntax_error vector outside the shape the column rule covers"
+    offset = syntax_error.get("offset")
+    if offset is not None and (not isinstance(offset, int) or isinstance(offset, bool)):
+        return "NOT_IMPLEMENTED", None, "syntax_error offset is neither an integer nor null"
+    result = replace(syntax_reject(source_file, lineno, offset), disposition="CONTROL_EXPECTATION")
+    return "EXECUTED", failure_record(result), ""
+
+
 def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
     """Return (status, actual, note). Dispatch on input shape (and declared fixture_class) only."""
     inp = desc["input"]
 
-    # A-012 (provisional): source-pair inputs start at SOURCE_AST.
+    # A-012 (decided by Claude under standing delegation, owner review pending):
+    # source-pair inputs start at SOURCE_AST; the pack defines no wrapper object.
     if set(inp) == {"driver_source", "checker_source"}:
         return run_source_ast(inp["driver_source"], inp["checker_source"])
 
-    # A-012 (open): a synthetic SyntaxError vector. The pack defines no rule that
-    # yields its disposition, so it is not executed until the owners decide.
+    # A-012 (decided by Claude under standing delegation, owner review pending): a
+    # synthetic SyntaxError position is not a model response, so it is not an artifact
+    # feedback event; it exercises the Protocol §3.4 SOURCE_SYNTAX_REJECT.column rule
+    # directly. Protocol L177: "A `CONTROL_EXPECTATION` fixture exercises a serializer,
+    # protocol or lifecycle rule". The disposition follows from the input shape, not
+    # from `fixture_class` (whose values do not determine dispositions in the pack).
     if set(inp) == {"source_file", "syntax_error"}:
-        return "NOT_IMPLEMENTED", None, "blocked on docs/ambiguities.md A-012: no spec rule gives this input's disposition"
+        return run_syntax_error_vector(inp["source_file"], inp["syntax_error"])
     raw: bytes | None = None
     if set(inp) <= {"raw_response_utf8", "provider_finish_reason"} and "raw_response_utf8" in inp:
         raw = inp["raw_response_utf8"].encode("utf-8")
