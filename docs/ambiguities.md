@@ -361,5 +361,29 @@ COMMENT tokens is permitted." Protocol §3.4 (file 02 L133): "STRING and COMMENT
 are not scanned".
 
 Question: in `f"{café}"` the identifier `café` is a real `ast.Name` node, but before
-Python 3.12 (PEP 701) the whole f-string is one STRING token. Probe result: pending
-(step 1).
+Python 3.12 (PEP 701) the whole f-string is one STRING token.
+
+Probe result (CPython 3.11.18, pinned interpreter, step 1): `ast.parse('x = f"{café}"')`
+contains `Name(id="café")`, and `tokenize` emits `NAME 'x'` then `STRING 'f"{café}"'`;
+the same holds for `f"{a℘}"`. So, as the rule is written, a non-ASCII identifier inside
+an f-string replacement field is **not rejected**. **This is CPython 3.11-specific:**
+from 3.12, f-strings are tokenized into parts (PEP 701) and the identifier would be a
+`NAME` token. Unit test `test_fstring_identifier_not_scanned_on_311` records the
+behaviour.
+
+Readings: (a) literal text — the scan covers tokens only, so f-string identifiers pass;
+(b) "Every Python identifier lexeme must be ASCII" governs, so the scan must also check
+`ast.Name`/`ast.Attribute` nodes inside `ast.JoinedStr` (the text gives no column rule
+for that). No current fixture uses an f-string with a non-ASCII identifier.
+Implemented: (a). **Owner decision needed.**
+
+## A-019 — Line breaks for the identifier scan: lone CR (OPEN; raises UnsettledSpec)
+
+File 30 §2 L21 / Protocol §3.4 (file 02 L133): the column is computed "from the UTF-8
+byte length of the source-line prefix"; the pack does not define a source line. Probe
+on CPython 3.11.18: for `"x = 1\ry = 2\n"`, `ast.parse` puts `y = 2` on line 2, but
+`tokenize.generate_tokens` over the same string treats the lone CR as an `ERRORTOKEN`
+and reports `y` on line 1. A non-ASCII identifier after a lone CR would therefore get a
+line number that disagrees with the AST. CRLF is consistent in both. Not implemented: a
+source with a CR not followed by LF raises `UnsettledSpec("A-019")`. No current fixture
+contains a lone CR. **Owner decision needed.**
