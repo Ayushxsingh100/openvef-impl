@@ -15,6 +15,7 @@ sys.path.insert(0, str(REPO / "src"))
 
 from openvef.import_policy import (  # noqa: E402
     ALLOWED_ROOTS,
+    check_import_policy,
     classify_import,
     classify_import_from,
     classify_module_body,
@@ -407,6 +408,60 @@ class ModuleBodyTests(unittest.TestCase):
         self.assertEqual(found[0].outcome.diagnostic, "MODULE_STATEMENT_REJECT|file=checker.py|line=1|reason=MODULE_EXECUTABLE")
         self.assertIsInstance(found[1].outcome, UnsettledSpec)
         self.assertEqual(found[2].outcome.diagnostic, "MODULE_STATEMENT_REJECT|file=checker.py|line=3|reason=NON_LITERAL_CONSTANT")
+
+
+GOOD_DRIVER = ("import random\n\ndef create_driver(seed):\n    driver = Driver()\n"
+               "    driver.rng = random.Random(seed)\n    return driver\n\nclass Driver:\n"
+               "    def step(self, cycle_index, outputs_after_edge):\n        return \"COMPLETE\"\n")
+GOOD_CHECKER = 'def check_trace(trace, metadata):\n    return {"verdict": "PASS", "diagnostics": []}\n'
+
+
+class CombinedStageTests(unittest.TestCase):
+    def stage(self, driver=GOOD_DRIVER, checker=GOOD_CHECKER):
+        sources = {"driver.py": driver, "checker.py": checker}
+        result = check_import_policy(sources, {k: ast.parse(v) for k, v in sources.items()})
+        return None if result is None else result.diagnostic
+
+    def test_valid_pair_passes(self):
+        self.assertIsNone(self.stage())
+
+    def test_driver_before_checker(self):
+        self.assertEqual(self.stage("import os\n", "import sys\n"), "IMPORT_NOT_ALLOWED|module=os")
+
+    def test_driver_import_beats_checker_identifier(self):
+        self.assertEqual(self.stage("import os\n", "def f():\n    café = 1\n"), "IMPORT_NOT_ALLOWED|module=os")
+
+    def test_identifier_scan_beats_earlier_import_in_same_file(self):
+        self.assertEqual(self.stage("import os\nimport módulo\n"), "NON_ASCII_IDENTIFIER|file=driver.py|line=2|column=8")
+
+    def test_reading_c_examples_from_a013(self):
+        self.assertEqual(self.stage("import os\nprint(1)\n"), "IMPORT_NOT_ALLOWED|module=os")
+        self.assertEqual(self.stage("print(1)\nimport os\n"), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=MODULE_EXECUTABLE")
+        self.assertEqual(self.stage("def f():\n    return eval('1')\nX = [n for n in ()]\n"), "PROHIBITED_BUILTIN|name=eval")
+
+    def test_reading_c_example_from_a014(self):
+        src = "import random\ndef f():\n    v = random.random()\n    exec('x')\n"
+        self.assertEqual(self.stage(src), "GLOBAL_RANDOM_USE|name=random.random")
+
+    def test_nested_node_with_same_start_ends_first(self):
+        self.assertEqual(self.stage("eval('1')\n"), "PROHIBITED_BUILTIN|name=eval")
+        self.assertEqual(self.stage("x = eval('1')\n"), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=NON_LITERAL_CONSTANT")
+
+    def test_equal_keys_with_different_outcomes_are_unsettled(self):
+        for src in ("eval\n", "random.seed\n"):
+            with self.subTest(src=src):
+                with self.assertRaises(UnsettledSpec) as cm:
+                    self.stage(src)
+                self.assertEqual(cm.exception.ambiguity_id, "A-013")
+
+    def test_unsettled_first_raises_but_later_unsettled_does_not(self):
+        with self.assertRaises(UnsettledSpec) as cm:
+            self.stage("pass\nimport os\n")
+        self.assertEqual(cm.exception.ambiguity_id, "A-015")
+        self.assertEqual(self.stage("import os\npass\n"), "IMPORT_NOT_ALLOWED|module=os")
+
+    def test_import_inside_function_is_classified(self):
+        self.assertEqual(self.stage("def f():\n    import os\n"), "IMPORT_NOT_ALLOWED|module=os")
 
 
 if __name__ == "__main__":

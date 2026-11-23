@@ -1,6 +1,6 @@
-"""Stage IMPORT_POLICY: building blocks (not yet connected to the runner).
+"""Stage IMPORT_POLICY.
 
-Implemented so far:
+Implemented:
   File 30 §2 L21; Protocol §3.4 (file 02 L133) and evaluation order (3) — non-ASCII
                    identifier scan over `tokenize.NAME` and identifier-relevant
                    `tokenize.ERRORTOKEN` tokens; diagnostic
@@ -17,13 +17,17 @@ Implemented so far:
   File 30 §3 L29; Protocol §3.4 (file 02 L135) — module-body statements
                    (MODULE_STATEMENT_REJECT|file=<FILE>|line=<LINE>|reason=<REASON>).
 
-The order between categories inside one file (A-013, A-014) is not decided, so this
-module exposes one function per sub-rule and no combined stage yet. The `find_*`
-functions return every violation as a `Finding` keyed by the node's
-`(lineno, col_offset, end_lineno, end_col_offset)` (File 30 §3 L27), sorted by that
-key, so any of the A-013/A-014 readings can be applied when the stage is assembled.
+  `check_import_policy` — the combined stage: Protocol §3.4 evaluation order (3) and
+                   owner decision A-013/A-014 reading (c) (Ayush's confirmation pending).
+
+Each sub-rule function returns every violation as a `Finding` keyed by the node's
+`(lineno, col_offset, end_lineno, end_col_offset)` (File 30 §3 L27). The stage
+applies reading (c): per file, after the identifier scan, the finding with the
+smallest key wins, whatever its category.
 
 Unsettled inputs raise or return `UnsettledSpec` (docs/ambiguities.md):
+  A-013 two different findings share the smallest key (e.g. a bare module-level `eval`
+        is both an `Expr` and a `Name` with the same span);
   A-015 module-body statements the text does not classify (returned as findings, so
         an earlier settled violation can still win once the order is decided);
   A-019 a lone CR in the source (`ast.parse` and `tokenize` disagree on line numbers).
@@ -410,3 +414,60 @@ def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
         else:
             unsettled(stmt, 0, f"statement type {type(stmt).__name__} not classified")
     return sorted(findings, key=lambda f: f.key)
+
+
+# --- Combined stage (Protocol §3.4 evaluation order (3); A-013/A-014 reading (c)) -------
+
+def find_import_violations(file: str, tree: ast.Module) -> list[Finding]:
+    """Every `ast.Import`/`ast.ImportFrom` node at any depth, classified per node."""
+    findings = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            result = classify_import(file, node)
+        elif isinstance(node, ast.ImportFrom):
+            result = classify_import_from(file, node)
+        else:
+            continue
+        if result is not None:
+            findings.append(Finding(node_key(node), result))
+    return sorted(findings, key=lambda f: f.key)
+
+
+def check_file(file: str, source: str, tree: ast.Module) -> Optional[Failure]:
+    """IMPORT_POLICY for one file; None if the file passes.
+
+    Protocol §3.4 evaluation order (3): "after successful `ast.parse`, scan ...;
+    reject the first identifier lexeme containing a non-ASCII code point before
+    classifying imports, prohibited names or module-body statements in that file."
+    Then reading (c) (A-013/A-014, owner decision): one source-order pass, the first
+    violation of any category wins.
+    """
+    rejected = scan_identifiers(file, source)
+    if rejected is not None:
+        return rejected
+    findings = (find_import_violations(file, tree) + find_prohibited_names(tree)
+                + find_global_random_use(tree) + classify_module_body(file, tree))
+    if not findings:
+        return None
+    first_key = min(f.key for f in findings)
+    first = [f for f in findings if f.key == first_key]
+    distinct = {f.outcome.diagnostic if isinstance(f.outcome, Failure) else repr(f.outcome) for f in first}
+    if len(distinct) > 1:
+        raise UnsettledSpec("A-013", f"{file}: {len(distinct)} findings share the first source key {first_key}")
+    outcome = first[0].outcome
+    if isinstance(outcome, UnsettledSpec):
+        raise outcome
+    return outcome
+
+
+def check_import_policy(sources: dict[str, str], trees: dict[str, ast.Module]) -> Optional[Failure]:
+    """Run IMPORT_POLICY on driver.py, then checker.py; the first failing file wins.
+
+    "If the identifier scan passes, complete that file's import, prohibited-name and
+    module-body checks before advancing to the next file." (Protocol §3.4 (3).)
+    """
+    for file in ("driver.py", "checker.py"):
+        result = check_file(file, sources[file], trees[file])
+        if result is not None:
+            return result
+    return None

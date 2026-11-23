@@ -285,6 +285,14 @@ violation.
 IMPORT_POLICY category wins. Source: statement typed by Krishika in Claude Code on 23 Nov 2026: "I, Krishika, decide A-013 and A-014 as reading (c): single source-order pass, first violation wins. Ayush's confirmation is pending."
 Reading (c) was suggested by Claude (claude.ai session) and relayed by Krishika.
 
+Residual gap under (c), found when building step 7: two different findings can share
+the smallest key. A bare module-level `eval` or `random.seed` statement is an `Expr`
+node and a `Name`/`Attribute` node with identical spans (CPython 3.11.18:
+`(1, 0, 1, 4)` for both), so "first violation wins" does not choose between
+`MODULE_EXECUTABLE` and `PROHIBITED_BUILTIN`/`GLOBAL_RANDOM_USE`. Implemented: such a
+tie raises `UnsettledSpec("A-013")`. Ties with an identical outcome are not a problem.
+No current fixture has a tie. **Owner decision needed for the tie case only.**
+
 ## A-014 — Order between PROHIBITED_BUILTIN and GLOBAL_RANDOM_USE (DECIDED — Ayush's confirmation pending)
 
 - File 30 §2 L19 (prohibited names) and L20 (`random`) are separate bullets; Protocol
