@@ -101,9 +101,23 @@ def docker_argv(image: str, command: Sequence[str], name: Optional[str] = None) 
     return argv + [image, *command]
 
 
+def check_harness_permissions() -> None:
+    """Refuse to run if the bind-mounted harness could be changed by another local user,
+    or cannot be read by the container's uid (it is neither owner nor group)."""
+    import stat
+    for path in [HARNESS_DIR, *HARNESS_DIR.iterdir()]:
+        mode = path.stat().st_mode
+        if mode & (stat.S_IWGRP | stat.S_IWOTH):
+            raise SandboxUnavailable(f"{path} is group- or other-writable")
+        needed = (stat.S_IROTH | stat.S_IXOTH) if path.is_dir() else stat.S_IROTH
+        if mode & needed != needed:
+            raise SandboxUnavailable(f"{path} is not readable by the sandbox uid")
+
+
 def run_in_sandbox(command: Sequence[str], stdin: bytes = b"", timeout_s: float = DEFAULT_TIMEOUT_S,
                    image: Optional[str] = None) -> SandboxResult:
     """Run `command` in a fresh container; kill and remove it at the wall-clock limit."""
+    check_harness_permissions()
     image = image or image_tag()
     name = f"openvef-{uuid.uuid4().hex[:12]}"
     try:

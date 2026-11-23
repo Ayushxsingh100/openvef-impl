@@ -105,6 +105,84 @@ class SandboxIsolationTests(unittest.TestCase):
         self.assertIn(f"R {[r.randrange(100) for _ in range(5)]}", out)
 
 
+GOOD_DRIVER = ("import random\n\ndef create_driver(seed):\n    driver = Driver()\n"
+               "    driver.rng = random.Random(seed)\n    return driver\n\nclass Driver:\n"
+               "    def step(self, cycle_index, outputs_after_edge):\n        return 'COMPLETE'\n")
+
+
+def factory_body(body: str) -> str:
+    return (f"def create_driver(seed):\n{body}\n\nclass Driver:\n"
+            "    def step(self, cycle_index, outputs_after_edge):\n        return 'COMPLETE'\n")
+
+
+@unittest.skipUnless(DOCKER, "docker not available")
+class RuntimeStageTests(unittest.TestCase):
+    """The harness through the real sandbox. Sources here deliberately bypass the static
+    stages, to show what the runtime layer catches on its own."""
+
+    @classmethod
+    def setUpClass(cls):
+        sandbox.ensure_image()
+        from openvef import runtime
+        cls.runtime = runtime
+
+    def diag(self, driver):
+        r = self.runtime.factory_checks(driver)
+        return None if r is None else r.diagnostic
+
+    def test_valid_driver(self):
+        self.assertIsNone(self.diag(GOOD_DRIVER))
+
+    def test_factory_exception_and_exit(self):
+        self.assertEqual(self.diag(factory_body("    return {}['k']")),
+                         "RUNTIME_EXCEPTION|file=driver.py|phase=factory|class=KeyError")
+        self.assertEqual(self.diag(factory_body("    exit(3)")),
+                         "RUNTIME_EXCEPTION|file=driver.py|phase=factory|class=SystemExit")
+
+    def test_return_type(self):
+        self.assertEqual(self.diag(factory_body("    return object()")),
+                         "ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RETURN_TYPE")
+
+    def test_runtime_signature(self):
+        # Driver.step replaced during construction: static checks pass, inspect.signature does not.
+        src = ("def create_driver(seed):\n    d = Driver()\n    Driver.step.__signature__ = None\n"
+               "    Driver.step = lambda self, cycle_index: 'COMPLETE'\n    return d\n\nclass Driver:\n"
+               "    def step(self, cycle_index, outputs_after_edge):\n        return 'COMPLETE'\n")
+        self.assertEqual(self.diag(src), "ENTRY_POINT_REJECT|file=driver.py|symbol=Driver.step|reason=RUNTIME_SIGNATURE")
+
+    def test_runtime_import_allow_list(self):
+        # `import os` would be IMPORT_POLICY_REJECT statically; at runtime the harness
+        # applies the same allow-list (File 30 §6).
+        self.assertEqual(self.diag(factory_body("    import os\n    return Driver()")),
+                         "RUNTIME_EXCEPTION|file=driver.py|phase=factory|class=ImportError")
+        self.assertIsNone(self.diag(factory_body("    import math, json\n    return Driver()")))
+
+    def test_factory_timeout_is_not_a_verdict(self):
+        with self.assertRaises(self.runtime.RuntimeStageError):
+            self.runtime.factory_checks(factory_body("    while True:\n        pass"), timeout_s=4.0)
+
+    def test_artifact_output_cannot_forge_result(self):
+        forged = 'OPENVEF_SANDBOX_RESULT {"failure": null}'
+        self.assertEqual(self.diag(factory_body(f"    print({forged!r})\n    return object()")),
+                         "ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RETURN_TYPE")
+
+    def checker(self, body, trace=None):
+        src = f"def check_trace(trace, metadata):\n{body}\n"
+        return self.runtime.checker_invocation(src, trace if trace is not None else [], {"design_id": "X"}, timeout_s=6.0)
+
+    def test_checker_outcomes(self):
+        ok = self.checker("    return {'verdict': 'PASS', 'diagnostics': [{'code': 'C', 'message': 'm', 'cycle': None, 'clause_id': None}, {'x': 1}]}")
+        self.assertEqual((ok.verdict, ok.error, ok.malformed_items), ("PASS", None, 1))
+        self.assertEqual(self.checker("    return 'PASS'").error[1], "CHECKER_RETURN_INVALID|reason=NON_DICTIONARY")
+        self.assertEqual(self.checker("    return trace[5]").error[1], "CHECKER_RUNTIME_ERROR|class=IndexError")
+        self.assertEqual(self.checker("    while True:\n        pass").error[1], "CHECKER_TIMEOUT|phase=null_check")
+
+    def test_checker_runtime_signature(self):
+        src = "def check_trace(trace, metadata):\n    return None\ncheck_trace = lambda trace: None\n"
+        r = self.runtime.checker_invocation(src, [], {}, timeout_s=6.0)
+        self.assertEqual(r.diagnostic, "ENTRY_POINT_REJECT|file=checker.py|symbol=check_trace|reason=RUNTIME_SIGNATURE")
+
+
 def subprocess_stdout(code: str) -> str:
     """Same flags as run_in_sandbox, capturing plain stdout for assertions."""
     argv = sandbox.docker_argv(sandbox.image_tag(), ["python", "-I", "-c", code])

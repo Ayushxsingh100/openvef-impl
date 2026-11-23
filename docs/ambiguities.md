@@ -743,3 +743,44 @@ deterministic execution, and the variable is set by the evaluator, so artifacts 
 observe or change it (no `os`/`sys` import is allowed). The alternative, leaving
 randomization on, would let evaluator configuration turn an honest artifact into
 `DRIVER_NONDETERMINISM`.
+
+## A-034 — An exception while importing an artifact module (DECIDED BY CLAUDE — owner review pending)
+
+After IMPORT_POLICY a module body holds only allowed imports, literal constants, a
+docstring and definitions, so raising during import is close to impossible. The stage
+map still has no row for it. **Decision (decided by Claude under standing delegation,
+owner review pending):** an exception while importing `driver.py` is
+`RUNTIME_EXCEPTION|file=driver.py|phase=factory|class=<C>` at DRIVER_RUNTIME. Import is
+the first execution of driver code, and the `factory` phase is the stage map's earliest
+driver phase. The same rule applies to an import denied by the runtime allow-list. An
+exception while importing `checker.py` in a checker invocation is
+`CHECKER_RUNTIME_ERROR|class=<C>`: it is a checker process exception (File 30 L97).
+Exceptions that are not `Exception` subclasses (e.g. `SystemExit` from `exit()`) are
+treated the same way.
+
+## A-035 — Order of post-construction checks; when `check_trace`'s signature is checked (DECIDED BY CLAUDE — owner review pending)
+
+Protocol L166 (7): "Factory return type and runtime signatures are checked immediately
+after factory construction." The order between them is not given, and `check_trace`
+lives in a file that runs "in a separate process after the trace is immutable" (B7).
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- After construction, check the return type, then `create_driver`'s signature, then
+  `Driver.step`'s. This follows the sentence's order and the required-symbol sequence.
+- `check_trace`'s runtime signature is checked in the checker's own process, before its
+  first call. Loading checker code into the driver process would break the B7 separation.
+- A runtime signature must have exactly the required names, all
+  `POSITIONAL_OR_KEYWORD`, no defaults (File 30 L35/L37 "the same parameter
+  names/kinds/counts").
+
+## A-037 — Wall-clock limit during driver import or factory; F18 factory seed (DECIDED BY CLAUDE — owner review pending)
+
+The watchdog row is `WATCHDOG_TIMEOUT|phase=driver_step`, and `PHASE` for
+`RUNTIME_EXCEPTION` is `factory` or `step`. No row covers a driver import or factory call
+that never returns. **Decision (decided by Claude under standing delegation, owner
+review pending):**
+- That case is an evaluator-side error: the runner records ERROR, never a REPAIR verdict
+  or a made-up exception class.
+- A checker invocation that exceeds the limit is `CHECKER_TIMEOUT|phase=null_check`, as
+  defined.
+- The factory call for F18 fixtures uses seed 0, since no fixture supplies a slot seed.
+- The 20 s default limit is this build's value, not a frozen pack value.

@@ -63,6 +63,22 @@ harness enforces the same import allow-list for imports made by artifact code (F
 `sandbox/harness.py`). The container flags are what contain anything the static and
 runtime checks miss.
 
+## Harness and integrity guard
+
+[sandbox/harness.py](../sandbox/harness.py) runs inside each container (standard library
+only). Each request runs one task:
+- `factory`: restricted import of `driver.py`, `create_driver(0)`, return type, runtime
+  signatures;
+- `checker`: one null invocation of `check_trace`.
+
+It writes one framed result line to the original stdout. Artifact stdout/stderr is
+captured and discarded, so an artifact cannot forge a result
+(`test_artifact_output_cannot_forge_result`). The harness directory is bind-mounted
+read-only. Before every run the launcher refuses to start if any file in it is group- or
+other-writable, or unreadable by the sandbox uid (`check_harness_permissions`). That guard
+was added after new files in this checkout were found created with mode 646. Directory
+ACLs (the `+` in `ls -l`) were not inspected: `getfacl` is not installed here.
+
 ## Running the tests
 
 ```

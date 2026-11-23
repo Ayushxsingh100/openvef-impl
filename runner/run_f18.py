@@ -33,6 +33,8 @@ from openvef.import_policy import check_import_policy  # noqa: E402
 from openvef.ast_signature import check_ast_signature, check_compile  # noqa: E402
 from openvef.assembler import (NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, check_reserved_heading_lines,  # noqa: E402
                                check_unresolved_placeholders, check_visible_clause_ids)
+from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
+from openvef.sandbox import SandboxUnavailable, ensure_image  # noqa: E402
 from openvef.ledger import HaltSignature, halt_after_recovery, operational_recovery  # noqa: E402
 from openvef.serializer import check_diagnostic, serialize, truncate  # noqa: E402
 from openvef.stage_map import (RTL_NULL_CONTROL_FAILURE, EventError, NotDetermined, adjudicate_checker,  # noqa: E402
@@ -115,17 +117,27 @@ class Blocked(Exception):
 ACCEPT = {"disposition": "ACCEPT", "stage_id": None, "error_class": None, "diagnostic": None}
 
 
+SANDBOX: dict | None = None  # set by main() once the pinned image is verified
+
+
 def source_stages(driver_source: str, checker_source: str) -> Failure | None:
     """SOURCE_AST, IMPORT_POLICY, static AST_SIGNATURE, COMPILE_DRIVER, COMPILE_CHECKER
-    (Protocol §3.4 evaluation order (2)-(6)). None means every implemented stage passed."""
+    (Protocol §3.4 evaluation order (2)-(6)), then the sandboxed runtime import, factory
+    return-type and signature checks (File 30 §3 L27, L39; L166 (7)). None means every
+    implemented stage passed."""
     sources = {"driver.py": driver_source, "checker.py": checker_source}
     try:
         trees = check_sources(list(sources.items()))
         if isinstance(trees, Failure):
             return trees
-        return check_import_policy(sources, trees) or check_ast_signature(trees) or check_compile(sources)
+        static = check_import_policy(sources, trees) or check_ast_signature(trees) or check_compile(sources)
     except UnsettledSpec as exc:
         raise Blocked(f"blocked on docs/ambiguities.md {exc}") from exc
+    if static is not None:
+        return static
+    if SANDBOX is None:
+        raise Blocked("static stages and compilation passed; sandbox unavailable, runtime stage not run")
+    return factory_checks(driver_source)
 
 
 def response_stages(desc: dict, inp: dict, validator) -> Failure | None:
@@ -152,8 +164,8 @@ def response_stages(desc: dict, inp: dict, validator) -> Failure | None:
     return source_stages(obj["driver"]["source"], obj["checker"]["source"])
 
 
-RUNTIME_NEXT = ("static stages and compilation passed; next: runtime import, inspect.signature "
-                "and factory checks (not implemented)")
+RUNTIME_NEXT = ("runtime import, factory and signature checks passed in the sandbox; next: driver "
+                "steps on RTL/null need Cocotb and a simulator, not pinned (D-002)")
 
 
 def run_syntax_error_vector(source_file: str, syntax_error: dict) -> Failure:
@@ -263,6 +275,12 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
             return paired_run_failure(None, 0)
         raise Blocked("paired runs agree; later stages need the simulator")
 
+    if keys == {"port_manifest", "response_object"}:
+        result = response_stages(desc, {"response_object": inp["response_object"]}, validator)
+        if result is not None:
+            return result
+        raise Blocked("driver vector checks need Driver.step outputs from an RTL simulation; Cocotb and the "
+                      "simulator are not pinned (D-002)")
     if keys == {"events"}:  # A-025
         return first_event(inp["events"])
     if keys == {"lifecycle", "event", "slots", "evaluator_repair_attempt"} and inp["lifecycle"] == "MID_RUN":
@@ -361,7 +379,7 @@ def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
 def git_commit() -> str:
     try:
         out = subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True, check=True)
-        dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", "src", "runner"],
+        dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", "src", "runner", "sandbox"],
                                capture_output=True, text=True, check=True).stdout.strip()
         return out.stdout.strip() + ("+UNCOMMITTED_CHANGES" if dirty else "")
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -374,7 +392,14 @@ def main() -> int:
     out_dir = evidence_root / f"run-{started}"
     out_dir.mkdir(parents=True, exist_ok=False)
 
-    source_files = sorted([*(REPO / "src").rglob("*.py"), *(REPO / "runner").rglob("*.py")])
+    source_files = sorted([*(REPO / "src").rglob("*.py"), *(REPO / "runner").rglob("*.py"),
+                           *(REPO / "sandbox").glob("*")])
+    global SANDBOX
+    try:
+        SANDBOX = ensure_image()
+    except (SandboxUnavailable, FileNotFoundError) as exc:
+        SANDBOX = None
+        print(f"sandbox unavailable: {exc}", file=sys.stderr)
     meta = {
         "run_started_utc": started,
         "run_class": run_class,
@@ -389,6 +414,7 @@ def main() -> int:
         "git_commit": git_commit(),
         "source_sha256": {str(p.relative_to(REPO)): sha256_file(p) for p in source_files},
         "command": [sys.executable, *sys.argv],
+        "sandbox": SANDBOX,
     }
 
     counts = {"PASS": 0, "FAIL": 0, "NOT_IMPLEMENTED": 0, "ERROR": 0}
