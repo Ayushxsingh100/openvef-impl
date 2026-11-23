@@ -12,12 +12,16 @@ Implements:
                    null or < 1 gives column=1; otherwise the one-based source-character
                    column CPython reports.
 
-Inputs the pack text does not settle raise `UnsettledSpec` naming the
-docs/ambiguities.md item, instead of picking a reading:
-  A-008 leading U+FEFF in a source string; A-009 a source string that cannot be
-  encoded as UTF-8 (lone surrogates); A-010 whitespace characters beyond
-  space/tab/LF/CR; A-011 SyntaxError without a positive line number, or a
-  non-SyntaxError exception from `ast.parse`.
+Readings decided by Claude under the standing delegation (docs/ambiguities.md;
+owner review pending):
+  A-008 a leading U+FEFF is the BOM: SOURCE_SYNTAX_REJECT at line 1, column 1.
+  A-009 a source that cannot be encoded as UTF-8 (lone surrogates) is invalid UTF-8:
+        SOURCE_SYNTAX_REJECT with no position, so line 1, column 1 (A-011 fallback).
+  A-010 whitespace is Python's (space, tab, form feed, CR, LF); any other character
+        goes to `ast.parse`.
+  A-011 a parse failure without a positive line number uses line=1, by the same
+        fallback the column rule gives for a missing offset; any other exception from
+        `ast.parse` is a parse error with line=1, column=1.
 
 `ast.parse` must run on the pinned CPython 3.11.18 interpreter. Warnings that
 `ast.parse` emits (e.g. invalid escape sequences) are not failures here; the runner
@@ -34,11 +38,11 @@ STAGE = "SOURCE_AST"
 FILE_ORDER = ("driver.py", "checker.py")
 BOM_CHAR = "\ufeff"
 
-# Characters every reading treats as whitespace: they are whitespace in JSON
-# (RFC 8259), for str.isspace() and for the Python tokenizer. Other str.isspace()
-# characters (U+000B, U+000C, U+001C–U+001F, U+0085, U+00A0, U+2000–U+200A, ...) are
-# not settled by the text: see A-010.
-_AGREED_WHITESPACE = frozenset(" \t\n\r")
+# A-010 (decided by Claude, owner review pending): Python source whitespace -- space,
+# tab and form feed between tokens (Language Reference 2.1.9) plus the line terminators
+# CR and LF (2.1.2). Other str.isspace() characters (U+000B, U+00A0, U+3000, ...) are
+# not whitespace in Python source; `ast.parse` decides them.
+PYTHON_WHITESPACE = frozenset(" \t\f\r\n")
 
 
 class UnsettledSpec(Exception):
@@ -51,7 +55,7 @@ class UnsettledSpec(Exception):
 
 def syntax_reject(file: str, lineno: int, offset: Optional[int]) -> Failure:
     """Build SOURCE_SYNTAX_REJECT from SyntaxError line and offset (Protocol §3.4)."""
-    column = 1 if offset is None or offset < 1 else offset
+    column = 1 if not isinstance(offset, int) or offset < 1 else offset
     return Failure(STAGE, "SOURCE_SYNTAX_REJECT", f"SOURCE_SYNTAX_REJECT|file={file}|line={lineno}|column={column}")
 
 
@@ -64,26 +68,24 @@ def check_source(file: str, source: str) -> Failure | ast.Module:
     # 1. Strict UTF-8 with BOM rejection.
     try:
         source.encode("utf-8", errors="strict")
-    except UnicodeEncodeError as exc:
-        raise UnsettledSpec("A-009", f"{file}: source not encodable as UTF-8") from exc
+    except UnicodeEncodeError:
+        return syntax_reject(file, 1, None)  # A-009: no position, so line 1, column 1
     if source.startswith(BOM_CHAR):
-        raise UnsettledSpec("A-008", f"{file}: source starts with U+FEFF")
+        return syntax_reject(file, 1, 1)  # A-008: the BOM is at line 1, column 1
 
-    # 2. Empty / whitespace-only.
-    if all(c in _AGREED_WHITESPACE for c in source):
+    # 2. Empty / whitespace-only (A-010: Python source whitespace).
+    if all(c in PYTHON_WHITESPACE for c in source):
         return _empty(file)
-    if all(c.isspace() for c in source):
-        raise UnsettledSpec("A-010", f"{file}: whitespace-only under str.isspace() but not under every reading")
 
     # 3. ast.parse on the pinned interpreter.
     try:
         return ast.parse(source, filename=file, mode="exec")
     except SyntaxError as exc:  # includes IndentationError and TabError
-        if not isinstance(exc.lineno, int) or exc.lineno < 1:
-            raise UnsettledSpec("A-011", f"{file}: SyntaxError without a positive lineno") from exc
-        return syntax_reject(file, exc.lineno, exc.offset)
-    except Exception as exc:
-        raise UnsettledSpec("A-011", f"{file}: ast.parse raised {type(exc).__name__}") from exc
+        # A-011: a missing or non-positive line number falls back to line 1.
+        lineno = exc.lineno if isinstance(exc.lineno, int) and exc.lineno >= 1 else 1
+        return syntax_reject(file, lineno, exc.offset)
+    except Exception:  # e.g. MemoryError for very deep nesting: A-011, no position
+        return syntax_reject(file, 1, None)
 
 
 def check_sources(sources: Sequence[tuple[str, str]]) -> Failure | dict[str, ast.Module]:

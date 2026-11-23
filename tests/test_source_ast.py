@@ -55,14 +55,26 @@ class SingleFileTests(unittest.TestCase):
     def test_indentation_error_is_syntax_reject(self):
         self.assertEqual(check_source("driver.py", "  x = 1\n").error_class, "SOURCE_SYNTAX_REJECT")
 
-    def test_unsettled_inputs_raise(self):
-        cases = {"\ufeffx = 1\n": "A-008", "x = '\ud800'\n": "A-009", "\x0b": "A-010",
-                 " \xa0\n": "A-010", "\x0c": "A-010", "x = 1\x00\n": "A-011"}
-        for src, ident in cases.items():
+    def test_claude_decided_cases(self):
+        # A-008..A-011, decided by Claude under standing delegation (owner review pending).
+        rej = "SOURCE_SYNTAX_REJECT|file=driver.py|line={}|column={}"
+        cases = {
+            "\ufeffx = 1\n": rej.format(1, 1),          # A-008: BOM at line 1, column 1
+            "x = 1\ny = '\ud800'\n": rej.format(1, 1),  # A-009: no position given
+            "\x0c": "SOURCE_EMPTY|file=driver.py",       # A-010: form feed is Python whitespace
+            " \f\r\n\t": "SOURCE_EMPTY|file=driver.py",
+            "\x0b": rej.format(1, 1),                    # A-010: not Python whitespace
+            " \xa0\n": rej.format(1, 1),                 # CPython: unexpected indent, offset 1
+            "x = 1\x00\n": rej.format(1, 1),            # A-011: SyntaxError without lineno
+        }
+        for src, diagnostic in cases.items():
             with self.subTest(src=repr(src)):
-                with self.assertRaises(UnsettledSpec) as cm:
-                    check_source("driver.py", src)
-                self.assertEqual(cm.exception.ambiguity_id, ident)
+                self.assertEqual(check_source("driver.py", src).diagnostic, diagnostic)
+
+    def test_non_syntax_error_from_parse_is_line_1_column_1(self):
+        # A-011: CPython 3.11.18 raises MemoryError (no position) for very deep nesting.
+        r = check_source("checker.py", "-" * 200000 + "1\n")
+        self.assertEqual(r.diagnostic, "SOURCE_SYNTAX_REJECT|file=checker.py|line=1|column=1")
 
 
 class FileOrderTests(unittest.TestCase):
