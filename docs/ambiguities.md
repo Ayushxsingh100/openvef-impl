@@ -719,3 +719,27 @@ hard rule 4 forbids and the delegation does not cover. The five fixtures stay
 NOT_IMPLEMENTED. **Owner decision needed:** either a pack correction that defines the
 change classes and their outcome fields as rules, or an owner ruling on how these
 vectors are to be run.
+
+## D-002 — Artifact-execution sandbox (DECIDED — Ayush's confirmation pending)
+
+**Owner decision by Krishika, 23 Nov 2026 (Ayush's confirmation pending):** F18 artifact
+execution uses Docker image `python:3.11.18-slim` pinned by digest, with
+`--network=none --read-only --cap-drop=ALL --security-opt=no-new-privileges`, a non-root
+user, tmpfs for scratch, pids/memory/CPU limits and a wall-clock timeout. The pinned
+`requirements.lock` is installed with `--require-hashes` inside the image. Cocotb and the
+simulator are not pinned: fixtures that need them stay NOT_IMPLEMENTED.
+
+Resolved digest: `python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535`.
+Details and tests: [docs/sandbox.md](sandbox.md).
+
+## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
+
+File 30 §6 is headed "Import sandbox and deterministic execution". Paired runs compare
+next-input schedules (Protocol L166 (8)), so a driver that iterates over a `set` of
+strings would diverge between runs only because of Python's per-process hash
+randomization. **Decision (decided by Claude under standing delegation, owner review
+pending):** the sandbox sets `PYTHONHASHSEED=0`. Reason: the section requires
+deterministic execution, and the variable is set by the evaluator, so artifacts cannot
+observe or change it (no `os`/`sys` import is allowed). The alternative, leaving
+randomization on, would let evaluator configuration turn an honest artifact into
+`DRIVER_NONDETERMINISM`.

@@ -1,0 +1,3 @@
+# Only the lock file enters the sandbox image build context (docs/sandbox.md).
+*
+!requirements.lock
