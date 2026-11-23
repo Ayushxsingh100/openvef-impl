@@ -13,7 +13,13 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
 
-from openvef.import_policy import ALLOWED_ROOTS, classify_import, classify_import_from, scan_identifiers  # noqa: E402
+from openvef.import_policy import (  # noqa: E402
+    ALLOWED_ROOTS,
+    classify_import,
+    classify_import_from,
+    find_prohibited_names,
+    scan_identifiers,
+)
 from openvef.source_ast import UnsettledSpec  # noqa: E402
 
 
@@ -209,6 +215,58 @@ class ImportFromClassificationTests(unittest.TestCase):
         node = ast.parse("x = 1\nfrom math import ceil\n").body[1]
         self.assertEqual(classify_import_from("checker.py", node).diagnostic,
                          form("FROM_IMPORT_FORBIDDEN", line=2, file="checker.py"))
+
+
+def diagnostics(findings):
+    out = []
+    for f in findings:
+        assert (f.outcome.stage_id, f.outcome.error_class, f.outcome.disposition) == \
+            ("IMPORT_POLICY", "IMPORT_POLICY_REJECT", "REPAIR")
+        out.append(f.outcome.diagnostic)
+    return out
+
+
+class ProhibitedNameTests(unittest.TestCase):
+    def names(self, source):
+        return diagnostics(find_prohibited_names(ast.parse(source)))
+
+    def test_each_prohibited_name_called_in_a_method(self):
+        for name in ("exec", "eval", "compile", "open", "__import__"):
+            src = f"class Driver:\n    def step(self, c, o):\n        {name}('x')\n        return 'COMPLETE'\n"
+            with self.subTest(name=name):
+                self.assertEqual(self.names(src), [f"PROHIBITED_BUILTIN|name={name}"])
+
+    def test_inside_checker_function(self):
+        self.assertEqual(self.names('def check_trace(trace, metadata):\n    return __import__("os")\n'),
+                         ["PROHIBITED_BUILTIN|name=__import__"])
+
+    def test_regardless_of_call_context(self):
+        # Store, Load without call, and Del contexts all count.
+        self.assertEqual(self.names("def f():\n    g = eval\n    open = 1\n    del exec\n"),
+                         ["PROHIBITED_BUILTIN|name=eval", "PROHIBITED_BUILTIN|name=open", "PROHIBITED_BUILTIN|name=exec"])
+
+    def test_builtins_attribute_without_import(self):
+        self.assertEqual(self.names('def f():\n    builtins.open("x")\n'), ["PROHIBITED_BUILTIN|name=open"])
+
+    def test_re_compile_and_other_attributes_allowed(self):
+        self.assertEqual(self.names("import re\ndef f():\n    return re.compile('a'), obj.open, obj.eval\n"), [])
+
+    def test_builtins_other_attribute_allowed(self):
+        self.assertEqual(self.names("def f():\n    return builtins.len\n"), [])
+
+    def test_a016_not_matched(self):
+        # Planned reading (A-016): definitions/parameters and __builtins__ are not Name nodes.
+        self.assertEqual(self.names("def open():\n    pass\ndef f(eval):\n    return __builtins__.open\n"), [])
+
+    def test_source_order_with_keys(self):
+        found = find_prohibited_names(ast.parse("def f():\n    return eval(exec)\ndef g():\n    open\n"))
+        self.assertEqual(diagnostics(found),
+                         ["PROHIBITED_BUILTIN|name=eval", "PROHIBITED_BUILTIN|name=exec", "PROHIBITED_BUILTIN|name=open"])
+        self.assertEqual([f.key for f in found], [(2, 11, 2, 15), (2, 16, 2, 20), (4, 4, 4, 8)])
+
+    def test_name_inside_fstring_is_found(self):
+        # The AST walk sees names inside f-string replacement fields.
+        self.assertEqual(self.names('def f():\n    return f"{eval}"\n'), ["PROHIBITED_BUILTIN|name=eval"])
 
 
 if __name__ == "__main__":

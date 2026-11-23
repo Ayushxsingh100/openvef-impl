@@ -10,9 +10,14 @@ Implemented so far:
                    classification and its total precedence.
   File 30 §2 L18; Protocol §3.4 (file 02 L131) — per-node `ast.ImportFrom`
                    classification and its total precedence.
+  File 30 §2 L19; Protocol §3.4 (file 02 L133) — prohibited built-in names and
+                   `builtins.<name>` (PROHIBITED_BUILTIN|name=<NAME>).
 
 The order between categories inside one file (A-013, A-014) is not decided, so this
-module exposes one function per sub-rule and no combined stage yet.
+module exposes one function per sub-rule and no combined stage yet. The `find_*`
+functions return every violation as a `Finding` keyed by the node's
+`(lineno, col_offset, end_lineno, end_col_offset)` (File 30 §3 L27), sorted by that
+key, so any of the A-013/A-014 readings can be applied when the stage is assembled.
 
 Unsettled inputs raise `UnsettledSpec` (docs/ambiguities.md):
   A-019 a lone CR in the source (`ast.parse` and `tokenize` disagree on line numbers).
@@ -25,7 +30,7 @@ from __future__ import annotations
 import ast
 import io
 import tokenize
-from typing import Optional
+from typing import NamedTuple, Optional, Union
 
 from openvef.envelope import Failure
 from openvef.source_ast import UnsettledSpec
@@ -42,6 +47,22 @@ ALLOWED_ROOTS = frozenset({
 
 def _reject(diagnostic: str) -> Failure:
     return Failure(STAGE, ERROR_CLASS, diagnostic)
+
+
+SourceKey = tuple[int, int, int, int]
+
+
+class Finding(NamedTuple):
+    """One violation (or one unsettled case) at a source position."""
+
+    key: SourceKey
+    outcome: Union[Failure, UnsettledSpec]
+
+
+def node_key(node: ast.AST) -> SourceKey:
+    # File 30 §3 L27: "source nodes use ascending (lineno, col_offset, end_lineno,
+    # end_col_offset)".
+    return (node.lineno, node.col_offset, node.end_lineno, node.end_col_offset)
 
 
 # --- Non-ASCII identifier scan (File 30 §2 L21; Protocol §3.4 file 02 L133) ---------
@@ -167,3 +188,33 @@ def classify_import_from(file: str, node: ast.ImportFrom) -> Optional[Failure]:
     if root not in ALLOWED_ROOTS:
         return _not_allowed(root)
     return _form_reject(file, node, "FROM_IMPORT_FORBIDDEN")
+
+
+# --- Prohibited built-in names (File 30 §2 L19; Protocol §3.4 file 02 L133) -------------
+
+PROHIBITED_NAMES = frozenset({"__import__", "eval", "exec", "compile", "open"})
+
+
+def find_prohibited_names(tree: ast.Module) -> list[Finding]:
+    """Every prohibited-name violation in the file, in source order.
+
+    "AST `Name` nodes whose `id` is `__import__`, `eval`, `exec`, `compile` or `open`
+    are rejected, regardless of call context. A `builtins` attribute whose attribute is
+    one of those names is also rejected." (File 30 §2 L19.) `re.compile` is an
+    attribute of `re`, not a `Name`, so it is not matched.
+
+    A-016 (owner confirmation pending): only `ast.Name` nodes (any context) and
+    `Attribute(value=Name(id="builtins"))` are matched; a function or parameter named
+    e.g. `open`, and `__builtins__.<name>`, are not.
+    """
+    findings = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name) and node.id in PROHIBITED_NAMES:
+            name = node.id
+        elif (isinstance(node, ast.Attribute) and node.attr in PROHIBITED_NAMES
+              and isinstance(node.value, ast.Name) and node.value.id == "builtins"):
+            name = node.attr
+        else:
+            continue
+        findings.append(Finding(node_key(node), _reject(f"PROHIBITED_BUILTIN|name={name}")))
+    return sorted(findings, key=lambda f: f.key)
