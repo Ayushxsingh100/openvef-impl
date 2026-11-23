@@ -119,4 +119,10 @@ while IFS= read -r line <&"${RUNNER[0]}"; do
     *) printf '%s\n' "$line" ;;
   esac
 done
+set +e
 wait "$RPID"
+status=$?
+set -e
+# Evidence must not stay writable by other local users (files here have been created 646).
+chmod -R go-w "$OUT"
+exit "$status"
