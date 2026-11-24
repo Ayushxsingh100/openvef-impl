@@ -46,6 +46,7 @@
 | File 31 L11, L27–L30, §8: reserved heading lines, unresolved placeholders, clause-ID near-match and set equality | `src/openvef/assembler.py` | M18, M19, M20, M40 — PASS in run-20261123T182731Z | Implemented (A-030 Claude-decided, owner review pending) |
 | Protocol L175, L183–L185: halt signature, single recovery cycle, operational recovery | `src/openvef/ledger.py` | M41, M42, M47 — PASS in run-20261123T182731Z; change-class vectors: see the L175–L176 row | Implemented (A-031, A-032 Claude-decided, owner review pending; pack inconsistency noted in A-031) |
 | Protocol L175–L176, L181–L183: change-class lifecycle control expectations; `required_action` verbatim from L176; each field cited or marked unsupported | `src/openvef/ledger.py` `LIFECYCLE_CASES`, `lifecycle_expectation`; `tests/test_lifecycle.py` (5 tests) | M53 — PASS in run-20261123T195936Z; M48, M50, M54, M58 NOT_IMPLEMENTED (unsupported fields listed in A-033) | Implemented (A-033 revised per owner correction; field derivations Claude-decided, owner review pending) |
+| Owner freeze and audit readiness: one signing checklist with SHA-256 per item (whole files, or per-section for decision records); status, auditor needs and open items | `docs/OWNER-FREEZE-PACKAGE.md`, `docs/AUDIT-READINESS.md`; `tests/freeze_hashes.py`, `tests/test_freeze_package.py` | — | Ready for signature (nothing signed) |
 
 Latest run: `evidence/run-20261123T195936Z`. It was started by `runner/run_f18_container.sh` at commit bfc5393, on a
 clean tree:
@@ -76,9 +77,11 @@ pinned interpreter. Earlier runs used the host interpreter and are development r
 
 Related documents:
 - [pack-defects.md](pack-defects.md): pack inconsistencies and under-specifications
-  (PD-01 to PD-22) for a corrected release.
+  (PD-01 to PD-24) for a corrected release.
 - [fifo-owner-checklist.md](fifo-owner-checklist.md): FIFO items the owners must write or
   freeze (requirements only).
+- [OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md): hashed signing checklist for the owners and
+  the independent mask reviewer.
+- [AUDIT-READINESS.md](AUDIT-READINESS.md): status, auditor needs and open items.
 
 Every quote in both documents is checked verbatim by `tests/test_doc_quotes.py`.
-| Owner freeze and audit readiness: one signing checklist with SHA-256 per item (whole files, or per-section for decision records); status, auditor needs and open items | `docs/OWNER-FREEZE-PACKAGE.md`, `docs/AUDIT-READINESS.md`; `tests/freeze_hashes.py`, `tests/test_freeze_package.py` | — | Ready for signature (nothing signed) |
