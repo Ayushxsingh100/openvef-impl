@@ -19,57 +19,54 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T163535Z`**.
-- Run class `development`; commit `5116e9b`, clean tree; the first run after the owner
-  freeze ([FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md)). The run
-  re-verified all 20 frozen items against their signed hashes; none changed.
+Latest evidence run: **`evidence/run-20261124T193435Z`**.
+- Run class `development`; commit `c2db767`, clean tree; the first run after DEV-001
+  ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
+  The run re-verified all 20 frozen items, the DEV-001 mask files and the 40 D-009 items
+  against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Every fixture's outcome is identical to the previous run, `run-20261124T151744Z`
-  (commit `9a4b821`).
+- Every fixture's outcome is identical to the previous run, `run-20261124T163535Z`
+  (commit `5116e9b`). Only the provisional status and labels changed.
 
 | Status | Count | Fixtures |
 |---|---|---|
-| PASS | 139 | 129 not provisional; 10 provisional (below) |
+| PASS | 139 | 0 provisional; 129 unlabelled, 10 "cleared under DEV-001 (non-independent mask review)" (below) |
 | FAIL | 0 | — |
 | NOT_IMPLEMENTED | 5 | M27 (A-038, revisited 24 Nov 2026); M48, M50, M54, M58 (A-033: no supporting Protocol sentence) |
 | ERROR | 0 | — |
 | **Total** | **144** | the full mandatory set (File 21: 59 P + 13 R + 72 M) |
 
-**Provisional PASS (10):** P01, P14, P17, P21, P42, M07, M31, M32, M33, M57. They reach
-L166 (7)–(11) on the FIFO materials.
-- **Settled by the owner freeze (Krishika's signature `a955245`, governance rule D-008):**
-  the specification, frozen values, RTL, null-export script, `spec_version_sha256`, and
-  the readings they depend on (A-040–A-044).
-- **Still open, one reason:** the observation mask and File 24 table are unsigned. They
-  need the independent human mask reviewer (L271; package section G), and no owner
-  signature replaces that.
+**Passes cleared under DEV-001 (10):** P01, P14, P17, P21, P42, M07, M31, M32, M33, M57.
+They reach L166 (7)–(11) on the FIFO materials.
+- **Settled by the owner freeze (`a955245`, D-008):** the specification, frozen values,
+  RTL, null-export script, `spec_version_sha256`, and readings A-040–A-044.
+- **Mask and File 24 table:** accepted by the owner without an independent review. They
+  carry the label "cleared under DEV-001 (non-independent mask review)". **L271 and File 21
+  L32 remain unmet**; the auditor decides whether these 10 can count toward F18.
 
-They **do not count toward F18** until the mask is signed.
-
-See [OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md).
-
-Also not yet counting toward F18: any PASS that depends on a reading still awaiting owner
-review. [traceability.md](traceability.md) marks each one.
+**Readings:** every other Claude-decided reading is approved by Krishika as decided, without
+itemised owner review (D-009). Claude decided them, and Claude recommended the approval. The
+auditor should weigh them with that in mind.
 
 **F18 is therefore not passed.**
 - File 21: "F18 must fail if any fixture is missing, not materialized, hash-mismatched,
   ambiguous, assigned an outcome not in the normative contract, or produces a different
   stage, error class, diagnostic byte string or terminal disposition".
-- Five fixtures are not run to an outcome, ten are provisional, and many readings are
-  unreviewed.
+- Five fixtures are not run to an outcome, L271 is unmet (DEV-001), and the independent
+  implementation re-audit (L555 (5)) has not started.
 
 ## 2a. Feasibility controls F1–F15, F17 (Protocol §17)
 
 Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
 [design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
 
-Latest control run: **`evidence/controls-20261124T163709Z`**, pinned image, commit
-`5116e9b`. It carries the same identity records as an F18 run.
+Latest control run: **`evidence/controls-20261124T193604Z`**, pinned image, commit
+`c2db767`. It carries the same identity records as an F18 run.
 
 | Status | Controls |
 |---|---|
-| PASS, provisional | F14 (RTL and export script frozen; only A-052 awaits owner review), F15 (case table awaits owner review) |
+| PASS, not provisional | F14 (A-052) and F15 (case table): each rests on a D-009 approval "as decided, without itemised owner review" |
 | BLOCKED_OWNER_ARTIFACTS | F1–F13, F17: each record lists the owner files it is waiting for |
 
 **What is built:** the harness components H1–H10.
@@ -83,7 +80,7 @@ Latest control run: **`evidence/controls-20261124T163709Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T163535Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261124T193435Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -128,9 +125,10 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-008, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-009, DEV-001, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
-| Review of the readings decided by Claude: A-007–A-012, A-013 tie case, A-015–A-037, A-039, A-045–A-052 (A-038 and A-040–A-044 approved in the freeze) | an owner (D-008) | ambiguities.md; CLAUDE.md "Standing delegation" |
+| Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item. Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
+| Placeholders inside the mask files as frozen under DEV-001 (`TO_FREEZE`, `DRAFT_UNSIGNED`) | owners | [DEVIATIONS.md](DEVIATIONS.md) |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |
@@ -140,7 +138,7 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| Independent human mask reviewer: signs the mask and the File 24 table | owners to appoint; must not have authored the templates or the mask | L271; File 21 "Independent reviewer"; package §G |
+| Independent human mask reviewer: none available (DEV-001). Signing would end the deviation | owners to appoint if one becomes available; must not have authored the templates or the mask | L271; File 21 "Independent reviewer"; package §G |
 | Independent implementation auditor | owners to appoint | L555 (5) |
 
 **Human-written work (reserved by CLAUDE.md; Claude does not write it)**
@@ -158,4 +156,4 @@ this run is on the pinned one.
 |---|---|---|
 | Draft the remaining payload blocks (`[Execution envelope]`, `[Driver API]`, `[Trace schema]`, `[Checker contract]`) and the File 38 manifest (checklist items 2, 17), then run the assembler and clause-ID checks on them | Claude drafts; owners approve | D-005; File 31 L29–L30 |
 | Compose and run the F1–F13 and F17 procedures from H1–H10 as the owner files arrive (harness built; F14, F15 run) | Claude; owners supply the artifacts | L555 (4); plan step 8 |
-| After freeze and mask signature: a new pinned evidence run without provisional results | Claude | package "After signing" |
+| If a mask reviewer signs: end DEV-001 and make a new pinned evidence run without its label | Claude | DEVIATIONS.md |

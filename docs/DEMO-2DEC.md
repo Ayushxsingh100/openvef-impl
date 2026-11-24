@@ -30,17 +30,18 @@ artifacts**.
   - specification, RTL, null-netlist export (Yosys), frozen 24 Nov 2026
     (FREEZE-2026-11-24: Krishika's signature under governance rule D-008; Ayush's
     ratification pending);
-  - an observation mask, still a draft awaiting the independent reviewer;
+  - an observation mask, accepted by the owner under deviation DEV-001 because no
+    independent reviewer is available (not independently reviewed);
   - simultaneous read/write at full and a registered almost-full as its documented
     corner cases.
 - **Fixture runner and evidence records:** hashes of every input, the interpreter, the
   image and the source files. Each run re-checks the frozen files against their signed
   hashes.
 - **Feasibility-control harness (F1–F17):** built and unit-tested. F14 (export
-  repeatability) and F15 (ledger identities) pass, provisionally. The other controls wait
+  repeatability) and F15 (ledger identities) pass; each rests on a D-009 approval. The other controls wait
   for owner-written mutants, drivers and checkers.
 
-## Results (latest evidence run `run-20261124T163535Z`, pinned image)
+## Results (latest evidence run `run-20261124T193435Z`, pinned image)
 
 | PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
 |---|---|---|---|---|
@@ -48,20 +49,21 @@ artifacts**.
 
 **What to say about these numbers:**
 - **F18 is not passed.**
-- **10 of the 139 passes are provisional, for one reason only:** the independent human
-  reviewer hasn't signed the observation mask. The spec, RTL, frozen values and the
-  readings those fixtures use are now frozen and approved (FREEZE-2026-11-24).
-- **Several other passes rest on readings that still need owner review.** The pack was
-  ambiguous in places; those readings are logged and decided under a delegation. They
-  are listed for review in `docs/READINGS-REVIEW.md`. M36, R01–R13 and several M-fixtures
-  would change under a competing reading.
+- **No pass is marked provisional, but 10 of the 139 carry a label:** "cleared under
+  DEV-001 (non-independent mask review)". No independent mask reviewer is available, so
+  Krishika accepted the mask on the basis of Claude's review. Claude also drafted the
+  mask. The Protocol's independent signature (L271) is still missing.
+- **Many passes rest on readings of ambiguous pack text.** Claude decided them under a
+  delegation. Krishika approved them as decided, without itemised owner review (D-009).
+  They are listed in `docs/READINGS-REVIEW.md`; M36, R01–R13 and several M-fixtures would
+  change under a competing reading.
 - **The 5 NOT IMPLEMENTED are blocked by defects in the pack itself, not by missing
   code.** One fixture (M27) is unsatisfiable as written (PD-25), and four have no
   supporting Protocol sentence (A-033).
 - **The pack has 25 recorded defects** (pack-defects.md).
 - **AI-assisted, disclosed:** the FIFO specification, RTL and mask drafts were written
   by Claude via Claude Code. The specification and RTL were approved by Krishika in the
-  freeze; the mask is still a draft. If a Claude model is ever
+  freeze; the mask is accepted under DEV-001. If a Claude model is ever
   evaluated, that is reported as a potential familiarity confound.
 - **Benchmark overlap is disclosed.** The closest public match is GateTruth's
   synchronous FIFO; FIFO designs are not novel, and no novelty is claimed.
@@ -92,13 +94,12 @@ once to warm the image (about 15 s).
    .venv/bin/python -I tests/test_fifo_rtl.py -v FifoRtlTests.test_worked_example_on_rtl FifoRtlTests.test_check_e_rejects_write_while_full_without_read
    ```
 5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
-   provisional.
+   provisional or cleared under DEV-001.
    ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261124T163535Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261124T163535Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
+   python3 -c "import json;s=json.load(open('evidence/run-20261124T193435Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
+   grep '"fixture_id": "M27"' evidence/run-20261124T193435Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
-6. **What is open** (60 s): open `docs/OWNER-FREEZE-PACKAGE.md` (what the owners sign
-   next) and `docs/AUDIT-READINESS.md` (what the independent auditor will check).
+6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the independent auditor will check).
 
 *Optional, if there is time:* start a full containerized run at the beginning, writing
 outside the evidence tree, and show its counts at the end. It takes a few minutes, so
