@@ -64,6 +64,7 @@ they are listed in [fifo-owner-checklist.md](fifo-owner-checklist.md).
 | PD-23 | U | Trace-row fields named only in prose; trace numbering vs `reset_release_cycle`; run-status domain | none today (simulation not exercised by fixtures) | A-040 (Claude) |
 | PD-24 | I | TechRxiv preprint FIFO: Charter treats it as unverified, File 10 states it as fact | none (benchmark-overlap disclosure) | none (owners to settle) |
 | PD-25 | U, I | M27: no port set or widths; prose predicate stricter than the drafted FIFO predicate; needs a corrected fixture in a future pack release | M27 (NOT_IMPLEMENTED) | A-038 (Claude, revisited) |
+| PD-26 | U | Error classes of `DESIGN_HALT_REPEATED` and `FEEDBACK_SERIALIZER_REJECT` | M15, M42, M47 (NOT_IMPLEMENTED) | D-013 |
 
 "Fixtures affected now" means the fixture's result depends on the interim handling.
 "None" means no current fixture exercises the case, but a real artifact can.
@@ -176,7 +177,7 @@ descriptors.
   disposition either: M42 and M47 are `lifecycle_unit_vector` but expect
   `DESIGN_ABORTED_NO_SLOTS_SCORED`.
 
-**Interim (D-012).** M36 has no adapter and is NOT_IMPLEMENTED; the M36 part of A-012 is
+**Interim (D-012, D-013).** M36 has no adapter and is NOT_IMPLEMENTED; the M36 part of A-012 is
 superseded.
 
 **To settle.**
@@ -258,8 +259,8 @@ the L139 sentence quoted in PD-05 and the evaluation order.
 - A-025: event kinds map to stage-map rows, ranked by (step, row, file, line).
 - A-026: four run-record forms.
 - A-028: composite inputs run every available stage first.
-- D-012: a shape that only one fixture uses has no adapter. 15 fixtures are NOT_IMPLEMENTED
-  for this reason: M27, M36, M13, M14, M15, M17, M18, M19, M25, M26, M28, M37, M41, P17, R07.
+- D-013: an adapter needs a cited input contract. M13, M14, M15, M17, M27, M36, M37, M41,
+  M48, M50, M53, M54, M58, P17 and R07 have none.
 
 **To settle.** Give an input-shape table: shape, entry stage, field meanings and how
 the supplied outcomes stand in for later stages.
@@ -605,3 +606,19 @@ provenance log (File 22), and make the Charter and File 10 agree.
 - give the predicate in an executable form consistent with the frozen FIFO
   legal-input rules;
 - give a vector that violates that predicate.
+
+## PD-26 — Error classes not stated for two local outcomes (U)
+
+> [02 L185] "terminate with `DESIGN_HALT_REPEATED|reason=EVALUATOR_FAILURE_REPRODUCED`"
+
+> [02 L173] "`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`"
+
+> [02 L174] "`F18_REJECT` fixtures use error class `ASSEMBLY_OR_MANIFEST_FAILURE`"
+
+**Defect.** The pack gives these two diagnostics but no error class for them. M15, M42 and M47
+expect one equal to the diagnostic CODE, and "error class = CODE" is not a stated rule (A-033).
+Found while applying D-013.
+
+**Interim (D-013).** No outcome is produced for either.
+
+**To settle.** State both error classes.

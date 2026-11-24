@@ -73,7 +73,14 @@ which also covers the bundle-hash difference. Step (5) is not marked done.
 
 **Response (D-012):** A1-1 and A8-1 accepted and applied; limitations A2, A3, A5 and A9
 accepted and recorded, not treated as defects. The corrected code has **not** been re-audited.
-A later bundle (with evidence run-20261124T202333Z) replaces the zip in `dist/`; the audited
+
+**The rule applied to A1-1 was changed afterwards (D-013).** D-012 first removed every
+single-fixture adapter (123 PASS). D-013, on Claude (claude.ai) recommendation, replaced that
+rule with "cited input contract plus synthetic vectors" and restored five of the 15 (M18, M19,
+M25, M26, M28), while removing one more (`change_class`, M53): 127 PASS. The relaxation raises
+the pass count after an adverse finding, so **it requires re-audit** and must be disclosed
+wherever the count is quoted. Whether A1-1 is resolved is for the auditor.
+A later bundle (now with evidence run-20261124T203551Z) replaces the zip in `dist/`; the audited
 zip is in git at `9c89b1c`.
 
 | Audit input | Identity |

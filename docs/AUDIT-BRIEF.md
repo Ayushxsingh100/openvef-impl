@@ -23,7 +23,15 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
 
 - **This is a rebuilt bundle.** An earlier one (SHA-256 `e0ee23ff6e29ec78c5310405edd6dd50d7625a8893c75bffdb0d6d026464fa01`)
   went to an OpenAI GPT-6 audit, as Krishika states. D-012 changed the code after it. Audit
-  this bundle from scratch.
+  this bundle from scratch. (An intermediate bundle, `e6b2e2af86c2491b30d47fc28d36ca8e61b0519389bb97968a6e72fa0a1d28ab`, is also
+  superseded.)
+- **The adapter rule was changed after audit finding A1-1 and requires re-audit.** D-012
+  removed all 15 single-fixture adapters. D-013 replaced that rule: an adapter is allowed with
+  an input contract cited to the pack and at least three synthetic non-fixture vectors. Five
+  adapters came back (M18, M19, M25, M26, M28). Decide for yourself whether the new rule is
+  sound, whether each citation really defines the input, and whether A1-1 is resolved. The
+  author of the code also chose the reading of "defined" (A-053), and not-rejected outcomes
+  count as differing outcomes for M18, M19 and M28.
 
 ## 2. What the bundle contains
 
@@ -31,25 +39,25 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
 (`sha256sum -c MANIFEST.sha256`). `BUNDLE-INFO.json` records the source commit.
 - `src/`, `runner/`, `sandbox/`, `tests/`, `docs/`, `design/`: the implementation.
 - `requirements.in`, `requirements.lock`, `CLAUDE.md`: pins and the project rules.
-- `evidence/run-20261124T202333Z/`: the one F18 run under audit. Other runs named in the
+- `evidence/run-20261124T203551Z/`: the one F18 run under audit. Other runs named in the
   documents, including the feasibility-control runs, are **not** in the bundle.
 - `baseline/OpenVEF_Planning_v1_3_6/`: the relevant pack files and all 144 fixture
   descriptors. Pack files not needed here are omitted. `27_SHA256SUMS.txt` lists the
   whole pack, so use `sha256sum -c --ignore-missing`.
 
 The bundle has no git history, and commit IDs quoted in documents cannot be checked from
-it. The evidence run's commit is `3e92b7d`. Documents and tests may be newer than the run;
+it. The evidence run's commit is `0d50a7d`. Documents and tests may be newer than the run;
 the build refuses to run if any file the run hashed has changed.
 
 ## 3. Current claims to test
 
 | Claim | Where |
 |---|---|
-| 144 fixtures: 123 PASS, 0 FAIL, 21 NOT_IMPLEMENTED, 0 ERROR | `summary.json`, `results.jsonl` |
+| 144 fixtures: 127 PASS, 0 FAIL, 17 NOT_IMPLEMENTED, 0 ERROR | `summary.json`, `results.jsonl` |
 | **F18 is not passed** | docs/AUDIT-READINESS.md |
 | 0 results provisional; 9 labelled "cleared under DEV-001 (non-independent review saved)" | `summary.json` |
 | The run used the pinned CPython 3.11.18 in the pinned image | `summary.json` |
-| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012) | docs/READINGS-REVIEW.md |
+| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 unreviewed | docs/READINGS-REVIEW.md |
 
 ## 4. Audit areas
 
@@ -58,8 +66,9 @@ the build refuses to run if any file the run hashed has changed.
 - No path reports PASS without executing the fixture. No exception, skip or
   NOT_IMPLEMENTED becomes PASS.
 - **No fixture-specific code:** no branch on fixture IDs, file names or expected outputs,
-  directly or by input shapes that occur in only one fixture. Look hard at
-  `runner/run_f18.py` `ADAPTERS`, `src/openvef/ledger.py` `LIFECYCLE_CASES` and
+  directly or by input shapes that occur in only one fixture (the criterion the first audit
+  used; D-013 now allows such a shape under its two conditions, so report against both).
+  Look hard at `runner/run_f18.py` `ADAPTERS`, `runner/adapter_contracts.py` and
   `stage_map.py` `EVENT_ROWS`.
 
 **A2. Parser and static stages** (`envelope.py`, `schema.py`, `source_ast.py`,
@@ -76,7 +85,7 @@ L334; File 30 §4–§6)
 **A4. Serializer, assembler, lifecycle** (`serializer.py`, `assembler.py`, `ledger.py`;
 Protocol L168–L185, File 31)
 
-**A5. Evidence run** `run-20261124T202333Z`
+**A5. Evidence run** `run-20261124T203551Z`
 - `results_sha256` matches; counts recompute from `results.jsonl`; every `expected` equals
   its descriptor; every PASS has `actual == expected`.
 - Every `source_sha256` entry equals the bundled file. Interpreter and image identity are
@@ -97,7 +106,7 @@ Protocol L168–L185, File 31)
 - For each reading: is it supported by the quoted text, is the competing reading stated
   fairly, and is the Dependants column right? Start with rows marked **changes** (A-012,
   A-025 to A-033). Say where a reading appears chosen because it makes a fixture pass.
-- The 21 NOT_IMPLEMENTED reasons (D-012, A-033, PD-01): are they right?
+- The 17 NOT_IMPLEMENTED reasons (D-013, PD-01, PD-26): are they right?
 
 **A9. Sandbox** (docs/sandbox.md, `sandbox/`, `runner/*.args`)
 - Can artifact code read or influence the evaluator, expected outputs, the host or a

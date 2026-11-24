@@ -41,32 +41,32 @@ artifacts**.
   repeatability) and F15 (ledger identities) pass; each rests on a D-009 approval. The other controls wait
   for owner-written mutants, drivers and checkers.
 
-## Results (latest evidence run `run-20261124T202333Z`, pinned image)
+## Results (latest evidence run `run-20261124T203551Z`, pinned image)
 
 | PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
 |---|---|---|---|---|
-| 123 | 0 | 21 | 0 | 144 |
+| 127 | 0 | 17 | 0 | 144 |
 
 **What to say about these numbers:**
 - **F18 is not passed.**
-- **No pass is marked provisional, but 9 of the 123 carry a label:** "cleared under
+- **No pass is marked provisional, but 9 of the 127 carry a label:** "cleared under
   DEV-001 (non-independent review saved)". No independent mask reviewer is available, so
   Krishika accepted the mask with a saved Claude (claude.ai) review. Claude Code drafted the
   mask, so the review is not independent. The Protocol's independent signature (L271) is still missing.
 - **Many passes rest on readings of ambiguous pack text.** Claude decided them under a
-  delegation. Krishika approved them as decided, without itemised owner review (D-009).
+  delegation. Krishika approved them as decided, without itemised owner review (D-009); A-053 is still unreviewed.
   They are listed in `docs/READINGS-REVIEW.md`; R01–R13 and several M-fixtures would
   change under a competing reading.
-- **The count went down from 139 to 123 after an AI audit (D-012), on purpose.** Krishika accepted a finding
-  against runner branches that only one fixture could reach. All 15 were removed, and a
-  test now forbids them. 14 of those fixtures used to pass.
-- **The 21 NOT IMPLEMENTED:** 15 have an input shape that only one fixture uses, and the pack
-  doesn't define it. Two (M42, M47) supply halt signatures the Protocol doesn't allow (PD-01).
-  Four have no supporting Protocol sentence (A-033). The rules behind the 15 stay
-  unit-tested, but that is not F18 evidence.
+- **The count went 139, 123, 127 around an AI audit. Say so.** Krishika accepted a finding
+  against runner branches only one fixture could reach, and all 15 were removed (123). The rule
+  was then replaced (D-013): an adapter now needs pack text that defines its input, plus
+  synthetic tests. Five came back and one more went (127). Changing a rule after a finding
+  needs a re-audit, which hasn't happened.
+- **The 17 NOT IMPLEMENTED:** 15 have an input or outcome the pack doesn't define, and two
+  (M42, M47) supply halt signatures the Protocol doesn't allow (PD-01).
 - **The audit was by an AI model, not a human (DEV-002).** Its report isn't saved in the
   repository yet, and the corrected code has not been re-audited.
-- **The pack has 25 recorded defects** (pack-defects.md).
+- **The pack has 26 recorded defects** (pack-defects.md).
 - **AI-assisted, disclosed:** the FIFO specification, RTL and mask drafts were written
   by Claude via Claude Code. The specification and RTL were approved by Krishika in the
   freeze; the mask is accepted under DEV-001. If a Claude model is ever
@@ -102,8 +102,8 @@ once to warm the image (about 15 s).
 5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
    provisional or cleared under DEV-001.
    ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261124T202333Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261124T202333Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
+   python3 -c "import json;s=json.load(open('evidence/run-20261124T203551Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
+   grep '"fixture_id": "M27"' evidence/run-20261124T203551Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
 6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the auditor will check; DEV-002: an AI model, not a human independent auditor).
 

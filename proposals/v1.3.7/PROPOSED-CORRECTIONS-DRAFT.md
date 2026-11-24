@@ -5,7 +5,7 @@ any baseline. Drafted by Claude (Claude Opus 5.5, via Claude Code) at Krishika's
 instruction, 24 Nov 2026 (UTC). For the owners and the independent document auditor.
 
 - `baseline/` (v1.3.6) is not edited. Nothing here changes the implementation, the recorded
-  results, or F18: **M27, M36, M42, M47, M48, M50, M54 and M58 stay NOT_IMPLEMENTED.**
+  results, or F18: **M27, M36, M42, M47, M48, M50, M53, M54 and M58 stay NOT_IMPLEMENTED.**
 - "Unblocks" means the text would then support an outcome. It is not a predicted PASS:
   each change also needs an implementation change, a new baseline and a new evidence run.
 - **Conflict to weigh.** Claude wrote the implementation and drafted these corrections, so
@@ -23,11 +23,11 @@ instruction, 24 Nov 2026 (UTC). For the owners and the independent document audi
 | C3 | 02 L185 (halt-signature rule tokens) | PD-02 (3) | M54 |
 | C4 | 36 L176 (control-vector comparison) | PD-03 | none alone; states the comparison M48, M50, M54, M58 rely on |
 | C5 | 30 L83 (predicate form, order in check (a)) | PD-06, PD-25 | M27 (with C6) |
-| C6 | 41 M27 descriptor, 36 L133 | PD-06, PD-25 | M27 (with C5), subject to the D-012 runner rule |
+| C6 | 41 M27 descriptor, 36 L133 | PD-06, PD-25 | M27 (with C5), subject to the D-013 adapter rule |
 | C7 | 30 L7 (version label) | PD-22 | none |
 | C8 | 10, 11, 22 (TechRxiv preprint) | PD-24 | none |
-| C9 | 36 (parser-unit-vector contract) | PD-04 | M36, subject to the D-012 runner rule |
-| C10 | 41 M41, M42, M47; 02 L185 | PD-01 | M42, M47 |
+| C9 | 36 (parser-unit-vector contract) | PD-04 | M36, subject to the D-013 adapter rule |
+| C10 | 41 M41, M42, M47; 02 L185 | PD-01 | M42, M47 (also need PD-26) |
 
 ## C1 — Error classes of the revision vectors (PD-02)
 
@@ -238,9 +238,9 @@ Serializer, lifecycle and parser unit vectors are marked by `fixture_class` (`se
 **For the auditor:** this is a request that the pack define the contract. The contract matches
 the only existing vector, so the auditor should check that it follows from the column rule.
 A second vector of this class (for example `offset` absent, or `offset` = 0) would exercise
-the contract properly and is recommended; it also matters for the rule below.
+the contract properly and is recommended; it is not required by the rule below.
 
-**Unblocks:** M36, subject to "The D-012 runner rule" below.
+**Unblocks:** M36, subject to "The D-013 adapter rule" below.
 
 ## C10 — Halt signatures outside the L185 domains (PD-01; D-012 request)
 
@@ -279,16 +279,20 @@ A supplied halt signature with any component outside these domains is an evaluat
 Expected objects do not change. Under L185, M42's signatures stay identical and M47's stay
 different.
 
-**Unblocks:** M42 and M47. M41 has no adapter for a different reason (see below).
+**Unblocks:** removes the PD-01 reason for M42 and M47; they also need PD-26 (see below). M41
+has no adapter for other reasons.
 
-## The D-012 runner rule
+## The D-013 adapter rule
 
-Under D-012 this implementation has no adapter for an input shape that only one fixture uses,
-and a test enforces it. So **C5 and C6 (M27) and C9 (M36) do not by themselves let those
-fixtures run**: each shape would still belong to one fixture. Either the pack adds a second
-vector of the same shape, or it defines the input contracts (PD-07) and the owners then
-amend the runner rule. The same holds for M13, M14, M15, M17, M18, M19, M25, M26, M28, M37, M41, P17, R07: their rules are stated in the pack, but
-their input shapes are not. This proposal does not draft those contracts.
+Under D-013 this implementation allows an adapter only with an input contract cited to the pack
+and synthetic unit vectors. M27 and M36 are also kept out by owner decision until it is changed.
+So the corrections above are necessary, not sufficient:
+- **C1 to C3** state tokens and error classes, but the `change_class` adapter also needs the
+  output property names defined (C4 leaves that open), for M48, M50, M53, M54 and M58.
+- **C10** corrects the signatures, but **M42 and M47 also need an error class for
+  `DESIGN_HALT_REPEATED`** (PD-26). Not drafted here.
+- **M13, M14, M15, M17, M37, M41, P17 and R07** need input contracts or outcomes (PD-03, PD-07,
+  PD-26). Not drafted here.
 
 ## Consequences of adopting any of these
 

@@ -1478,3 +1478,62 @@ is validated too. "D-009's blanket approval of A-031 is withdrawn" is recorded i
 `design/fifo/freeze/readings-approval-D-009.json`, which now holds 39 items.
 
 **Limitations A2, A3, A5 and A9:** "accepted and recorded; not defects".
+
+## D-013 — Adapter rule replaced after audit A1-1 (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) recommendation, given in Claude Code:
+"replace the literal single-fixture-shape rule. New rule: an adapter is allowed only if (a) its
+input contract is defined by cited pack text (file + line), and (b) it is unit-tested with at
+least 3 synthetic non-fixture inputs, including at least one where the expected output differs
+from every fixture's. Adapters encoding knowledge of a specific fixture remain forbidden."
+
+Supersedes D-012's single-fixture-shape rule. A8-1, A-031 and the rest of D-012 stand. **The
+rule was changed after audit finding A1-1 and requires re-audit.**
+
+| Fixture | Decision | Citation (a), or reason |
+|---|---|---|
+| M18 | restored | File 31 L11, L27 (payload lines, reserved headings, LF normalization); outcome 02 L173, L174, File 36 L16 |
+| M19 | restored | File 31 L28 (placeholder pattern); outcome 02 L173, L174, File 36 L16 |
+| M25 | restored | File 30 L35, L37 (required parameters, now taken from that text); outcome 02 L148 |
+| M26 | restored | File 30 L83 (a), (b); outcome 02 L152 |
+| M28 | restored | 02 L166 (8); outcome 02 L156 |
+| M13 | out | `slots` and `evaluator_repair_attempt` have no meaning stated in the pack |
+| M14 | out | `test_scope` is not defined; the extra output properties appear only in the descriptor (PD-03) |
+| M15 | out | the pack states no error class for `FEEDBACK_SERIALIZER_REJECT` (PD-26) |
+| M17 | out | as M14; `grammar_exempt_for_primitive_test` is not defined |
+| M27 | out | owner; prose predicate, no port set (PD-25) |
+| M36 | out | owner; `parser_unit_vector` is not defined (PD-04) |
+| M37 | out | `driver_source_excerpt` is not defined; no text lets a supplied result replace the paired runs |
+| M41 | out | several properties not defined (for example `evaluator_repair_attempt`, its `required_action` literal); output properties only in the descriptor; its signature is outside L185 (PD-01) |
+| P17 | out | a names-only manifest is not the pack's port manifest (02 L60 names widths), and no text joins it to the FIFO materials (A-044) |
+| R07 | out | 02 L245 gives the condition but no error class or diagnostic, and the row at L157 is for the artifact's own stimulus. The only rejecting input is the fixture's own, so the adapter would encode it |
+
+**The rule is general, so the adapters that had stayed were checked too:**
+- **`change_class` is removed (M53 becomes NOT_IMPLEMENTED).** The change-class labels and the
+  output property names appear only in descriptors (PD-02, PD-03), and each label is used by
+  one fixture. M48, M50, M54 and M58 now stop at the same path.
+- **Halt recurrence keeps its input contract (L185) and gives no outcome.** The pack states no
+  error class for `DESIGN_HALT_REPEATED` (PD-26). M42 and M47 still stop earlier, on PD-01.
+- **Kept, weakest first:** `events` and the run-record forms (their labels are not in the pack;
+  each is cited to the row it names), `null_runs` with `response_object` (the composite order is
+  A-028), and the finish reason `length` (cited to 02 L144, which does not spell it; any value
+  other than `length` or `stop` is now refused).
+
+Mechanism: `runner/adapter_contracts.py` (citations), `tests/adapter_vectors.py` (synthetic
+vectors), `tests/test_dispatch_shapes.py` (both conditions; flags uncited selecting values).
+The scan checks that a citation is verbatim, not that it is the right text.
+
+## A-053 — What counts as a cited input contract (DECIDED BY CLAUDE — owner review pending)
+
+D-013 (a) asks for an input contract "defined by cited pack text". The pack spells no descriptor
+JSON keys apart from the response schema (PD-07). Readings: (i) keys must be spelled in the
+pack, which would remove nearly every adapter other than the response object, including all
+`events`, run-record and packet fixtures; (ii) the pack must state the meaning and domain of
+every property, the rule each selecting value names, and the whole outcome; spelling is a carrier.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (ii).** File 36
+L23 requires "a literal JSON input" and defines no key names, so a rule that needs spellings
+would contradict the fixture set the pack makes mandatory. Under (ii) a property without a
+stated meaning keeps an adapter out even if unused, and so does an outcome field that only a
+descriptor states. Not covered by D-009. The results that rest on it are the five restored
+fixtures, the `events`, `checker_runs` and `null_runs` fixtures, M16, M20, M29 and M40.

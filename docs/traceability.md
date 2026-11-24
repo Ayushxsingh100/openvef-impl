@@ -3,7 +3,7 @@
 **Reading status, 24 Nov 2026:** every Claude-decided reading below is approved by Krishika
 (D-008): A-038 and A-040–A-044 in FREEZE-2026-11-24; all others under D-009, as decided,
 without itemised owner review.
-Evidence runs since then: `run-20261124T202333Z`, `controls-20261124T195210Z`.
+Evidence runs since then: `run-20261124T203551Z`, `controls-20261124T195210Z`.
 
 | Requirement | Component | Fixtures | Status |
 |---|---|---|---|
@@ -34,7 +34,7 @@ Evidence runs since then: `run-20261124T202333Z`, `controls-20261124T195210Z`.
 | D-005; checklist items 1–5; Protocol L202, L217, L514, L519, L271, L415, L468; Charter L99; File 30 L83 (a), (e); File 31 L29–L30: FIFO specification v0.2 (v0.1 superseded), port manifest, reset and legal-input rules, executable predicate; benchmark-overlap disclosure note for owner signature | `docs/fifo-spec-v0.2.md`, `docs/fifo-benchmark-overlap-disclosure-DRAFT.md`; `tests/test_fifo_spec.py` (10 tests: clause-ID extraction with File 38 regexes, near-match scan, predicate truth table, driver keys, worked example against a model of the clauses) | — (not yet consumed by the harness; check (e) still accepts only `ALL_INPUTS_LEGAL`) | **DRAFT** (AI-drafted under D-005; frozen in FREEZE-2026-11-24, A1; A-041, A-042 Claude-decided, approved in FREEZE-2026-11-24) |
 | A-042; File 30 L83 (a); Protocol L208, L212, L217, L221, L260: harness-owned held inputs (reset) excluded from driver-vector keys, held after reset release, recorded as consumed inputs | `sandbox/sim_cocotb.py` (`held_inputs`), `src/openvef/simulation.py`; `tests/test_simulation.py` `test_held_inputs_are_not_driver_keys` | — | Implemented (Claude-decided, approved in FREEZE-2026-11-24); designs without `held_inputs` unchanged |
 | File 30 L83 (e), L87; Protocol L125, L284, L334; A-041, A-043, D-006: executable legal-input predicate at check (e) (`ILLEGAL_PROTOCOL_STATE`); L334 timeout per run and per step; checker-facing trace serialization and SHA-256 | `sandbox/sim_cocotb.py` (`load_predicate`, `vector_reason`), `src/openvef/simulation.py` (`l334_timeout`, `simulate_pair`), `src/openvef/trace.py`, `src/openvef/design_materials.py`; `tests/test_simulation.py` (predicate, error, not-determined, L334), `tests/test_trace.py` (4), `tests/test_fifo_rtl.py` (check (e) on the FIFO) | — | Implemented (A-041, A-043 Claude-decided, approved in FREEZE-2026-11-24; trace schema DRAFT) |
-| D-005; Protocol L166 (8), L270–L279, L540; File 24: DRAFT observation mask (primary and stricter variants) and File 24 traceability table; masked comparison with windows evaluated on the null trace; mask structure validation; null-trace X/Z check | `design/fifo/mask/ovf_fifo-mask-DRAFT.json`, `design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv`; `src/openvef/simulation.py` (`validate_mask`, `mask_comparator`, `compare_runs(mask=)`, `null_trace_xz`); `tests/test_fifo_mask.py` (8) | — | **Frozen under D-011 (DEV-001), not independently reviewed; L271 unmet.** Runner: `simulator_stages.open_reasons`, record `design/fifo/freeze/deviation-DEV-001.json`; `tests/test_freeze_package.py`. 9 fixtures labelled in run-20261124T202333Z |
+| D-005; Protocol L166 (8), L270–L279, L540; File 24: DRAFT observation mask (primary and stricter variants) and File 24 traceability table; masked comparison with windows evaluated on the null trace; mask structure validation; null-trace X/Z check | `design/fifo/mask/ovf_fifo-mask-DRAFT.json`, `design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv`; `src/openvef/simulation.py` (`validate_mask`, `mask_comparator`, `compare_runs(mask=)`, `null_trace_xz`); `tests/test_fifo_mask.py` (8) | — | **Frozen under D-011 (DEV-001), not independently reviewed; L271 unmet.** Runner: `simulator_stages.open_reasons`, record `design/fifo/freeze/deviation-DEV-001.json`; `tests/test_freeze_package.py`. 9 fixtures labelled in run-20261124T203551Z |
 | D-005; checklist item 13; Protocol L233: DRAFT FIFO RTL implementing spec v0.2; null netlist exported twice with the DRAFT export script, identical hashes, top module and public ports preserved; RTL and null paired runs with no divergence | `design/fifo/rtl/ovf_fifo.v`, `design/fifo/export_null.ys`; `tests/test_fifo_rtl.py` (6 tests in the pinned image: worked example on RTL and null netlist, export twice, ports, paired runs, seeded legal random driver against a model of the clauses) | — (no F18 fixture; the simulator fixtures stay NOT_IMPLEMENTED until the materials are approved and a mask exists) | **DRAFT** (AI-drafted under D-005; frozen in FREEZE-2026-11-24, C1, C2). Null netlist SHA-256 `56dabfec…4747` (Yosys v0.71). The export script is not the frozen L544 script |
 | D-005; checklist items 7–12; Protocol L221, L223, L227, L229, L334; File 30 L62, L87: proposed cycle cap, safe idle, watchdog, scheduler values, trace schema, checker metadata | `docs/fifo-frozen-values-proposal-DRAFT.md`, `design/fifo/design-materials-DRAFT.json` | — | **DRAFT** proposals (AI-drafted under D-005; frozen in FREEZE-2026-11-24, B1–B6). Not implemented: L334 timeout computation, canonical trace serialization and hashing |
 | File 30 §3 L27, L35–L39, §6; Protocol §3.4 L166 (7): restricted-runtime import, `create_driver(seed)` return type, runtime `inspect.signature` | `sandbox/harness.py` `task_factory`, `src/openvef/runtime.py` `factory_checks` | M06 — PASS in run-20261123T183649Z; all response fixtures that pass compilation now also pass this stage | Implemented (A-034, A-035, A-037 Claude-decided, approved under D-009) |
@@ -61,22 +61,24 @@ Evidence runs since then: `run-20261124T202333Z`, `controls-20261124T195210Z`.
 | Protocol L223, L216–L221 (F2/F10 ordering); L510 (F1 repeats) | `sandbox/sim_cocotb.py` ordering probe (H9); `src/openvef/alignment.py` (H9, H10) | F1, F2, F10 | Built; toy-design runs in the sandbox; A-051 Claude-decided, approved under D-009 |
 | Charter L74; L233; D-007 (2) (control mutants) | `src/openvef/mutants.py` (H1); `design/fifo/controls/` slots (owner-written content) | F4–F10, F12, F17 | Loader built; **no mutant exists yet** (owner item 15) |
 | Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261124T195210Z`: F14, F15 PASS (D-009); 14 controls BLOCKED_OWNER_ARTIFACTS |
-| CLAUDE.md rule 4; D-012 (A1-1): no adapter reachable by one fixture only | `runner/run_f18.py` `ADAPTERS`; `tests/test_dispatch_shapes.py` | all 144 | Implemented; evidence/run-20261124T202333Z |
+| CLAUDE.md rule 4; D-013 (A1-1): adapters need a cited contract and synthetic vectors | `runner/run_f18.py` `ADAPTERS`, `runner/adapter_contracts.py`; `tests/adapter_vectors.py`, `tests/test_dispatch_shapes.py` | all 144 | Implemented; evidence/run-20261124T203551Z; A-053 owner review pending; requires re-audit |
 | Protocol L185; D-012 (A8-1): supplied halt signatures validated | `src/openvef/ledger.py` `HaltSignature.given`; `tests/test_local_rules.py` | M42, M47 NOT_IMPLEMENTED (PD-01) | Implemented; A-031 reversed |
-| L555 (5): preparation for an external AI-assisted audit | `docs/AUDIT-BRIEF.md`, `tools/build_audit_bundle.py`, `dist/openvef-audit-bundle.zip` | all 144 (audited run: run-20261124T195537Z; bundle rebuilt with run-20261124T202333Z) | DEV-002 AI audit (OpenAI GPT-6) received, as stated by Krishika; report not saved yet; not a human independent audit. Not claimed to satisfy L555 (5) |
+| L555 (5): preparation for an external AI-assisted audit | `docs/AUDIT-BRIEF.md`, `tools/build_audit_bundle.py`, `dist/openvef-audit-bundle.zip` | all 144 (audited run: run-20261124T195537Z; bundle rebuilt with run-20261124T203551Z) | DEV-002 AI audit (OpenAI GPT-6) received, as stated by Krishika; report not saved yet; not a human independent audit. Not claimed to satisfy L555 (5) |
 
-Latest F18 run: `evidence/run-20261124T202333Z`. It was started by `runner/run_f18_container.sh development`
-at commit 3e92b7d, on a clean tree, after D-012:
+Latest F18 run: `evidence/run-20261124T203551Z`. It was started by `runner/run_f18_container.sh development`
+at commit 0d50a7d, on a clean tree, after D-013:
 - Interpreter status **PINNED** under D-002a: CPython 3.11.18, SHA-256 92d7e40e…6b79; the
   image ID is in `summary.json`.
 - The run re-verified the 20 frozen items, the DEV-001 mask files and the 39 D-009 items.
-- Counts: 123 PASS, 0 FAIL, 21 NOT_IMPLEMENTED, 0 ERROR. NOT_IMPLEMENTED:
-  M27, M36 and 13 more with no adapter for their input shape (D-012: M13, M14, M15, M17, M18, M19, M25, M26, M28, M37, M41, P17, R07); M42, M47 (PD-01, D-012); M48, M50, M54, M58 (A-033: no supporting Protocol sentence).
+- Counts: 127 PASS, 0 FAIL, 17 NOT_IMPLEMENTED, 0 ERROR. NOT_IMPLEMENTED:
+  M13, M14, M15, M17, M27, M36, M37, M41, M48, M50, M53, M54, M58, P17, R07 (no cited input contract or outcome, D-013); M42, M47 (PD-01).
 - **Rows above that record an earlier PASS for one of these fixtures are superseded** for the
   fixture's F18 status. The components stay implemented and unit-tested.
 - 9 PASS (P01, P14, P21, P42, M07, M31, M32, M33, M57) are "cleared under DEV-001
   (non-independent review saved)". The independent mask signature (L271) does not exist.
-- Earlier runs with other DEV-001 labels or before D-012 are superseded.
+- Earlier runs with other DEV-001 labels, or before D-013, are superseded.
+- Results that rest on A-053 (owner review pending) do not count toward F18 until reviewed:
+  M16, M18–M20, M25, M26, M28, M29, M40, R01–R06, R08–R13, M10–M12, P18, P19, P22.
 
 Latest control run: `evidence/controls-20261124T195210Z`, commit 875ca7e, same image:
 - F14 PASS (A-052 approved under D-009) and F15 PASS (case table approved under D-009);

@@ -22,11 +22,14 @@ correction) are not listed.
   record shows its result would change;
 - *none:* no current fixture reaches the case.
 
-**D-012 (after the DEV-002 audit):** D-009's approval of **A-031 is withdrawn**, and A-031 is
-reversed. The runner no longer has adapters for input shapes only one fixture uses, so these
-fixtures are NOT_IMPLEMENTED and the Dependants cells naming them describe the state before
-D-012: M36 (A-012), M13 (A-025), M26 (A-027), M37 (A-028), M15 (A-029), M18 and M19 (A-030),
-M14, M17 and M41 (A-032).
+**D-012, D-013 (after the DEV-002 audit):** D-009's approval of **A-031 is withdrawn**, and
+A-031 is reversed. These fixtures no longer have an adapter, and the Dependants cells naming
+them describe an earlier state: M36 (A-012), M13 (A-025), M37 (A-028), M15 (A-029), M14, M17
+and M41 (A-032), M53 (A-033).
+
+**A-053 is new and owner review is pending** (what counts as a cited input contract, D-013). It
+is **not** covered by D-009. It affects M16, M18–M20, M25, M26, M28, M29, M40, R01–R06, R08–R13,
+M10–M12, P18, P19 and P22.
 
 ## Readings
 
