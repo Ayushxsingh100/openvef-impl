@@ -67,5 +67,36 @@ class BrokerProtocolTests(unittest.TestCase):
         self.assertNotIn("{HARNESS_DIR}", " ".join(flags))
 
 
+class HostInvocationTests(unittest.TestCase):
+    """AUDIT-READINESS §3 item 4: host command and allow-listed environment."""
+
+    def test_round_trip(self):
+        b64 = lambda items: base64.b64encode("".join(i + "\0" for i in items).encode()).decode()
+        env = {"OPENVEF_HOST_ARGV_B64": b64(["runner/run_f18_container.sh", "development", "é x"]),
+               "OPENVEF_HOST_CWD": "/w", "OPENVEF_DOCKER_CLIENT": "/usr/bin/docker 27.0",
+               "OPENVEF_HOST_ENV_B64": b64(["OPENVEF_EVIDENCE_ROOT=/tmp/a=b", "LANG=C.UTF-8"])}
+        rec = sandbox.host_invocation(env)
+        self.assertEqual(rec["argv"], ["runner/run_f18_container.sh", "development", "é x"])
+        self.assertEqual(rec["environment"], {"OPENVEF_EVIDENCE_ROOT": "/tmp/a=b", "LANG": "C.UTF-8"})
+        self.assertEqual(rec["cwd"], "/w")
+        self.assertIn("credentials", rec["environment_policy"])
+
+    def test_empty_environment(self):
+        env = {"OPENVEF_HOST_ARGV_B64": base64.b64encode(b"x\0").decode(), "OPENVEF_HOST_CWD": "/",
+               "OPENVEF_DOCKER_CLIENT": "d", "OPENVEF_HOST_ENV_B64": ""}
+        self.assertEqual(sandbox.host_invocation(env)["environment"], {})
+
+    def test_policy_matches_broker_allow_list(self):
+        """The recorded policy names exactly the broker's allow-list; DOCKER_* is never wholesale."""
+        import re
+        script = (Path(sandbox.REPO) / "runner" / "run_f18_container.sh").read_text(encoding="utf-8")
+        names = re.search(r"HOST_ENV_NAMES=\(([^)]*)\)", script).group(1).split()
+        self.assertTrue(names)
+        for name in names:
+            self.assertIn(name, sandbox.HOST_ENV_POLICY)
+        self.assertNotIn("DOCKER_)", script)
+        self.assertNotIn("DOCKER_*", sandbox.HOST_ENV_POLICY)
+
+
 if __name__ == "__main__":
     unittest.main()

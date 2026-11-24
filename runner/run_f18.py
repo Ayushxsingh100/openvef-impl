@@ -445,6 +445,11 @@ def git_commit() -> str:
         return "NO_GIT_COMMIT"
 
 
+def utc_stamp() -> str:
+    """ISO 8601 UTC time with milliseconds, for each run.log fixture line (§3 item 6)."""
+    return dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
 def main() -> int:
     root, evidence_root, run_class = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
     if broker_mode():  # D-002a: the broker created and mounted the (empty) run directory
@@ -522,8 +527,10 @@ def main() -> int:
                                       "simulator": sim_details}
                 provisional_ids.append(entry["fixture_id"])
             res.write(json.dumps(rec, ensure_ascii=False, sort_keys=True) + "\n")
-            log.write(f"{entry['fixture_id']}: {status} {note}\n")
+            log.write(f"{utc_stamp()} {entry['fixture_id']}: {status} {note}\n")
+            log.flush()
 
+    meta["run_finished_utc"] = utc_stamp()
     summary = {**meta, "counts": counts, "total": sum(counts.values()),
                "provisional_fixtures": provisional_ids,
                "results_sha256": sha256_file(out_dir / "results.jsonl")}

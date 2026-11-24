@@ -115,6 +115,30 @@ def _sha256_path(path: str) -> Optional[str]:
         return None
 
 
+HOST_ENV_POLICY = ("Only host variables that can change the broker script or the docker CLI are "
+                   "recorded: every OPENVEF_* variable that was set, plus, if set, DOCKER_HOST, "
+                   "DOCKER_CONTEXT, DOCKER_CONFIG, DOCKER_TLS_VERIFY, DOCKER_CERT_PATH, "
+                   "DOCKER_API_VERSION, DOCKER_BUILDKIT, DOCKER_DEFAULT_PLATFORM, LANG, LC_ALL and TZ. "
+                   "Other host variables are not recorded (they can hold credentials) and are not "
+                   "passed to any container. An unset variable is absent from the record.")
+
+
+def _nul_list(b64: str) -> list:
+    raw = base64.b64decode(b64).decode("utf-8", "surrogateescape")
+    return raw.split("\0")[:-1] if raw else []
+
+
+def host_invocation(env) -> dict:
+    """Host-side command and environment as the broker captured them (§3 item 4)."""
+    host_env = {}
+    for item in _nul_list(env["OPENVEF_HOST_ENV_B64"]):
+        name, _, value = item.partition("=")
+        host_env[name] = value
+    return {"argv": _nul_list(env["OPENVEF_HOST_ARGV_B64"]), "cwd": env["OPENVEF_HOST_CWD"],
+            "docker_client": env["OPENVEF_DOCKER_CLIENT"], "environment": host_env,
+            "environment_policy": HOST_ENV_POLICY}
+
+
 def ensure_image() -> dict:
     """Identity of the pinned image for the evidence record.
 
@@ -133,6 +157,7 @@ def ensure_image() -> dict:
                 "runner_container_flags": base64.b64decode(env["OPENVEF_RUNNER_FLAGS_B64"]).decode().splitlines(),
                 "artifact_container_flags": base64.b64decode(env["OPENVEF_ARTIFACT_FLAGS_B64"]).decode().splitlines(),
                 "artifact_command": list(HARNESS_COMMAND), "harness_sha256": harness_sha,
+                "host_invocation": host_invocation(env),
                 "toolchain": toolchain_identity()}
     tag = image_tag()
     probe = subprocess.run(["docker", "image", "inspect", tag, "--format", "{{.Id}}"], capture_output=True, text=True)

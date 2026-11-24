@@ -17,6 +17,20 @@
 set -euo pipefail
 
 RUN_CLASS=${1:?usage: run_f18_container.sh <run_class>}
+# Host invocation, captured before anything changes it (AUDIT-READINESS §3 item 4).
+HOST_ARGV_B64=$(printf '%s\0' "$0" "$@" | base64 -w0)
+HOST_CWD=$(pwd)
+# Host environment: only variables that can change what this script or the docker CLI
+# does, by name (allow-list). The full host environment is not recorded because it can
+# hold credentials (DOCKER_* is not taken wholesale for that reason); the containers
+# receive only the --env values listed in ENV_ARGS below.
+HOST_ENV_NAMES=(DOCKER_HOST DOCKER_CONTEXT DOCKER_CONFIG DOCKER_TLS_VERIFY DOCKER_CERT_PATH
+                DOCKER_API_VERSION DOCKER_BUILDKIT DOCKER_DEFAULT_PLATFORM LANG LC_ALL TZ)
+HOST_ENV_B64=$(
+  for n in $(compgen -e | grep -E '^OPENVEF_' | sort) "${HOST_ENV_NAMES[@]}"; do
+    if [ -n "${!n+x}" ]; then printf '%s=%s\0' "$n" "${!n}"; fi
+  done | base64 -w0
+)
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 BASELINE="$REPO/baseline/OpenVEF_Planning_v1_3_6"
 HARNESS_DIR="$REPO/sandbox"
@@ -78,6 +92,10 @@ ENV_ARGS=(
   "--env=OPENVEF_RUNNER_FLAGS_B64=$(printf '%s\n' "${RUNNER_FLAGS[@]}" | b64)"
   "--env=OPENVEF_ARTIFACT_FLAGS_B64=$(artifact_flags '<name>' | b64)"
   "--env=OPENVEF_BROKER_SHA256=$(sha256sum "${BASH_SOURCE[0]}" | cut -c1-64)"
+  "--env=OPENVEF_HOST_ARGV_B64=$HOST_ARGV_B64"
+  "--env=OPENVEF_HOST_CWD=$HOST_CWD"
+  "--env=OPENVEF_HOST_ENV_B64=$HOST_ENV_B64"
+  "--env=OPENVEF_DOCKER_CLIENT=$(command -v docker) $(docker version --format '{{.Client.Version}}')"
 )
 
 # --- broker ------------------------------------------------------------------------
