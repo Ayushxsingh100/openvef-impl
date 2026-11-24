@@ -25,6 +25,8 @@
 --volume={REPO}/src:/opt/openvef-repo/src:ro
 --volume={REPO}/runner:/opt/openvef-repo/runner:ro
 --volume={REPO}/sandbox:/opt/openvef-repo/sandbox:ro
+--volume={REPO}/design:/opt/openvef-repo/design:ro
+--volume={REPO}/docs:/opt/openvef-repo/docs:ro
 --volume={OUT}:/evidence:rw
 --workdir=/tmp
 --name={NAME}

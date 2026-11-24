@@ -43,7 +43,7 @@ read_args() {  # read_args <file> -> one flag per line, comments and blanks remo
 }
 
 GIT_COMMIT=$(git -C "$REPO" rev-parse HEAD)
-if [ -n "$(git -C "$REPO" status --porcelain -- src runner sandbox requirements.lock)" ]; then
+if [ -n "$(git -C "$REPO" status --porcelain -- src runner sandbox requirements.lock design docs/fifo-spec-v0.2.md)" ]; then
   GIT_COMMIT="$GIT_COMMIT+UNCOMMITTED_CHANGES"
 fi
 

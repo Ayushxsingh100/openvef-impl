@@ -36,6 +36,8 @@ from openvef.assembler import (NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, c
                                check_unresolved_placeholders, check_visible_clause_ids)
 from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
 from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
+from openvef import simulator_stages  # noqa: E402
+from openvef.simulation import SimulationError  # noqa: E402
 from openvef.ledger import HaltSignature, halt_after_recovery, lifecycle_expectation, operational_recovery  # noqa: E402
 from openvef.serializer import check_diagnostic, serialize, truncate  # noqa: E402
 from openvef.stage_map import (RTL_NULL_CONTROL_FAILURE, EventError, NotDetermined, adjudicate_checker,  # noqa: E402
@@ -124,6 +126,12 @@ ACCEPT = {"disposition": "ACCEPT", "stage_id": None, "error_class": None, "diagn
 
 
 SANDBOX: dict | None = None  # set by main() once the pinned image is verified
+# D-005 DRAFT design materials for L166 (7)-(11); set by main(). Every result that uses
+# them is provisional (simulator_stages.prepare lists why).
+DESIGN_MATERIALS_FILE = "design/fifo/design-materials-DRAFT.json"
+SIM: dict | None = None
+SIM_UNAVAILABLE = "not prepared"
+PROVISIONAL: dict = {}  # fixture descriptor id -> simulator details, filled by sim_stages
 
 
 def source_stages(driver_source: str, checker_source: str) -> Failure | None:
@@ -144,6 +152,25 @@ def source_stages(driver_source: str, checker_source: str) -> Failure | None:
     if SANDBOX is None:
         raise Blocked("static stages and compilation passed; sandbox unavailable, runtime stage not run")
     return factory_checks(driver_source)
+
+
+def response_object(inp: dict) -> dict:
+    """The response object a response input carries (envelope already accepted)."""
+    if "response_object" in inp:
+        return inp["response_object"]
+    raw = (inp["raw_response_utf8"].encode("utf-8") if "raw_response_utf8" in inp
+           else base64.b64decode(inp["raw_response_base64"], validate=True))
+    return parse_envelope(raw, inp.get("provider_finish_reason")).obj
+
+
+def sim_stages(desc: dict, obj: dict, port_names: list | None = None) -> Failure | None:
+    """L166 (7)-(11) on the DRAFT design materials (D-005); results are provisional."""
+    if SIM is None:
+        raise Blocked(RUNTIME_NEXT + f" [D-005 materials: {SIM_UNAVAILABLE}]")
+    failure, details = simulator_stages.run_response(SIM, obj["driver"]["source"], obj["checker"]["source"],
+                                                     port_names)
+    PROVISIONAL[id(desc)] = details
+    return failure
 
 
 def response_stages(desc: dict, inp: dict, validator) -> Failure | None:
@@ -261,7 +288,7 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
     if keys in RESPONSE_KEYS:
         result = response_stages(desc, inp, validator)
         if result is None:
-            raise Blocked(RUNTIME_NEXT)
+            return sim_stages(desc, response_object(inp))
         return result
     if keys == {"driver_source", "checker_source"}:  # A-012 source pair
         result = source_stages(inp["driver_source"], inp["checker_source"])
@@ -291,8 +318,10 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
         result = response_stages(desc, {"response_object": inp["response_object"]}, validator)
         if result is not None:
             return result
-        raise Blocked("driver vector checks need Driver.step outputs from an RTL simulation; the port manifest "
-                      "gives names only and the simulator stage is blocked on: " + MISSING_DESIGN_MATERIALS)
+        manifest = inp["port_manifest"]
+        if set(manifest) != {"input_ports"} or not isinstance(manifest["input_ports"], list):
+            raise Blocked("port manifest outside the names-only shape A-044 covers")
+        return sim_stages(desc, inp["response_object"], manifest["input_ports"])
     if keys == {"events"}:  # A-025
         return first_event(inp["events"])
     if keys == {"lifecycle", "event", "slots", "evaluator_repair_attempt"} and inp["lifecycle"] == "MID_RUN":
@@ -407,7 +436,8 @@ def git_commit() -> str:
         return os.environ["OPENVEF_GIT_COMMIT"]
     try:
         out = subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True, check=True)
-        dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", "src", "runner", "sandbox"],
+        dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", "src", "runner", "sandbox",
+                                "design", "docs/fifo-spec-v0.2.md"],
                                capture_output=True, text=True, check=True).stdout.strip()
         return out.stdout.strip() + ("+UNCOMMITTED_CHANGES" if dirty else "")
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -427,7 +457,7 @@ def main() -> int:
         out_dir.mkdir(parents=True, exist_ok=False)
 
     source_files = sorted([*(REPO / "src").rglob("*.py"), *(REPO / "runner").rglob("*.py"),
-                           *(REPO / "sandbox").glob("*")])
+                           *(REPO / "sandbox").glob("*"), *(p for p in (REPO / "design").rglob("*") if p.is_file())])
     global SANDBOX
     try:
         SANDBOX = ensure_image()
@@ -457,6 +487,15 @@ def main() -> int:
         "sandbox": SANDBOX,
     }
 
+    global SIM, SIM_UNAVAILABLE
+    if SANDBOX is not None:
+        try:
+            SIM = simulator_stages.prepare(REPO, DESIGN_MATERIALS_FILE)
+            meta["design_materials"] = SIM["record"]
+        except (OSError, KeyError, ValueError, SimulationError) as exc:
+            SIM, SIM_UNAVAILABLE = None, f"{type(exc).__name__}: {exc}"
+            meta["design_materials"] = {"unavailable": SIM_UNAVAILABLE}
+    provisional_ids: list = []
     counts = {"PASS": 0, "FAIL": 0, "NOT_IMPLEMENTED": 0, "ERROR": 0}
     with open(out_dir / "results.jsonl", "w", encoding="utf-8") as res, open(out_dir / "run.log", "w", encoding="utf-8") as log:
         log.write(json.dumps(meta, indent=2) + "\n")
@@ -476,10 +515,16 @@ def main() -> int:
             counts[status] += 1
             rec = {"fixture_id": entry["fixture_id"], "descriptor_sha256": entry["sha256"], "status": status,
                    "expected": expected, "actual": actual, "note": note}
+            sim_details = PROVISIONAL.pop(id(desc), None)
+            if sim_details is not None:  # reached L166 (7)-(11) on DRAFT materials (D-005)
+                rec["provisional"] = {"reason": "depends on DRAFT/unfrozen/unsigned design materials",
+                                      "simulator": sim_details}
+                provisional_ids.append(entry["fixture_id"])
             res.write(json.dumps(rec, ensure_ascii=False, sort_keys=True) + "\n")
             log.write(f"{entry['fixture_id']}: {status} {note}\n")
 
     summary = {**meta, "counts": counts, "total": sum(counts.values()),
+               "provisional_fixtures": provisional_ids,
                "results_sha256": sha256_file(out_dir / "results.jsonl")}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"out_dir": str(out_dir), "run": f"run-{started}", "counts": counts}), file=sys.stderr)

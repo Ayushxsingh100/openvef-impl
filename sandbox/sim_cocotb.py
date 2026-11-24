@@ -64,18 +64,24 @@ def load_predicate(spec):
     return None
 
 
-def vector_reason(value, widths: dict, predicate, sampled: dict) -> str | None:
+def vector_reason(value, widths: dict, predicate, sampled: dict, key_names=None) -> str | None:
     """File 30 §4 (a)-(e) on a non-COMPLETE return; None if the vector may be driven.
-    Returns "NOT_DETERMINED" when (e) cannot be run (A-027)."""
+    Returns "NOT_DETERMINED" when (e) cannot be run (A-027).
+
+    `key_names` (A-044): a fixture-supplied port manifest with names only. It is the key
+    set for (a); a vector that passes (a) and (b) under names that are not the design's
+    ports cannot be width-checked or driven, so the result is NOT_DETERMINED."""
     if not isinstance(value, dict):
         return "RETURN_TYPE"
-    keys, ports = set(value), set(widths)
+    keys, ports = set(value), set(widths) if key_names is None else set(key_names)
     if ports - keys:
         return "MISSING_KEYS"
     if keys - ports:
         return "EXTRA_KEYS"
     if not all(isinstance(v, str) for v in value.values()):
         return "NON_STRING_VALUE"
+    if key_names is not None and set(key_names) != set(widths):
+        return "NOT_DETERMINED"
     if any(len(value[k]) != widths[k] for k in value):
         return "WRONG_WIDTH"
     if any(c not in "01" for v in value.values() for c in v):
@@ -195,12 +201,12 @@ async def openvef_driver_run(dut):
                 vector = applied(safe_idle)
             else:
                 try:
-                    reason = vector_reason(value, widths, predicate, snapshot)
+                    reason = vector_reason(value, widths, predicate, snapshot, design.get("driver_vector_keys"))
                 except PredicateError as exc:
                     finish({"error": f"design materials: {exc}", "cycle": n})
                     return
                 if reason == "NOT_DETERMINED":
-                    finish({"not_determined": "legal-input predicate not executable (A-027, A-038)",
+                    finish({"not_determined": "vector checks not determinable: legal-input predicate not executable (A-027, A-038) or fixture port manifest without the design's ports/widths (A-044)",
                             "cycle": n, "rows": rows, "target": target})
                     return
                 if reason is not None:  # an invalid vector is not driven (File 30 §4)

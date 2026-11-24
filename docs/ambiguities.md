@@ -1151,3 +1151,30 @@ Reasons:
 
 **What changes under (b):** T_timeout is smaller, and container start-up time no longer
 affects it.
+
+## A-044 — A fixture-supplied names-only port manifest (DECIDED BY CLAUDE — owner review pending)
+
+F18 descriptor P17 carries `input.port_manifest` = `{"input_ports": [...]}` with port
+names only. File 30 L83 check (a) uses "the frozen top-level input-port set". The catalog
+does not say how a fixture's own manifest relates to the design materials. Here the
+design materials are the D-005 DRAFT FIFO, whose ports differ from the fixture's.
+
+**Readings:**
+- (a) The fixture's names are the key set for checks (a)–(b) for that fixture, as with
+  `manifest_clause_ids` (A-005, owner decision). If (a) and (b) pass under names that
+  are not the design's ports, checks (c)–(e) cannot run (no widths) and the vector
+  cannot be driven, so the result is not determined.
+- (b) Ignore the fixture's manifest and use the design materials' ports.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (a).**
+- A-005, an owner decision, already treats descriptor-supplied manifest data as the
+  frozen manifest for that fixture.
+- Reading (b) would discard part of the fixture's input.
+- The rule is generic: it never depends on the fixture's ID or expected output.
+
+**Implemented:** design field `driver_vector_keys`, which `run_f18.py` passes for the
+`{port_manifest, response_object}` input shape. The simulation still runs on the design
+materials, because the driver's `step` receives the design's outputs.
+
+**What changes under (b):** for P17's vector `{"data": "0"}`, nothing does. It lacks
+keys under both readings, so the result is `MISSING_KEYS` either way.

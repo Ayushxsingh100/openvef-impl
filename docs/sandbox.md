@@ -180,6 +180,18 @@ Timeout (Protocol L334, A-043): `simulation.l334_timeout` makes three null-netli
 of the artifact (each capped at 120 s, a build default). T_timeout = max(5 × median wall
 time, 2 s) is then the per-run budget and the per-step watchdog.
 
+F18 wiring (D-005, provisional): when a response fixture passes the factory checks,
+`runner/run_f18.py` calls [src/openvef/simulator_stages.py](../src/openvef/simulator_stages.py)
+for L166 (7)–(11), on the DRAFT materials named by `design/fifo/design-materials-DRAFT.json`.
+- At the start of the run, the null netlist is exported twice through the harness's
+  `export` task (Yosys in an artifact container), and the two SHA-256 must agree.
+- For each response: the L334 timeout, the RTL and null runs, the comparison under the
+  primary mask, freezing of the null trace, then two checker invocations on the same
+  bytes.
+- The runner container mounts `design/` and `docs/` read-only.
+- Every such result carries a `provisional` block in `results.jsonl`, and the summary
+  lists them in `provisional_fixtures`.
+
 Trace for the checker (DRAFT schema, item 11): [src/openvef/trace.py](../src/openvef/trace.py)
 serializes the rows as UTF-8 JSON (sorted keys, no whitespace) and records the bytes'
 SHA-256. Each checker invocation gets a value freshly decoded from those bytes.

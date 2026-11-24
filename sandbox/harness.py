@@ -174,7 +174,26 @@ def task_simulate(request: dict) -> dict:
     return sim.run(request)
 
 
-TASKS = {"factory": task_factory, "checker": task_checker, "simulate": task_simulate}
+def task_export(request: dict) -> dict:
+    """Null-netlist export (Protocol L233) with the design pack's Yosys script.
+
+    The script reads /tmp/in.v and writes /tmp/net.v (design/fifo/export_null.ys). Evaluator
+    material only: no artifact code is involved. Returns the netlist text and its SHA-256."""
+    import hashlib
+    import subprocess
+    with open("/tmp/in.v", "w", encoding="utf-8") as f:
+        f.write(request["verilog"])
+    with open("/tmp/export.ys", "w", encoding="utf-8") as f:
+        f.write(request["script"])
+    p = subprocess.run(["yosys", "-q", "-s", "/tmp/export.ys"], capture_output=True, text=True)
+    if p.returncode != 0:
+        return {"error": f"yosys exit {p.returncode}: {(p.stderr or p.stdout)[-800:]}"}
+    data = open("/tmp/net.v", "rb").read()
+    version = subprocess.run(["yosys", "-V"], capture_output=True, text=True).stdout.strip()
+    return {"netlist": data.decode("utf-8"), "sha256": hashlib.sha256(data).hexdigest(), "yosys_version": version}
+
+
+TASKS = {"factory": task_factory, "checker": task_checker, "simulate": task_simulate, "export": task_export}
 
 
 def main() -> None:

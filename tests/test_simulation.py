@@ -94,6 +94,17 @@ class SimulationTests(unittest.TestCase):
         self.assertIsNone(out["failure"])
         self.assertEqual(len(out["null_rows"]), 8)
 
+    def test_fixture_port_names_override_key_set(self):
+        # A-044: a fixture-supplied names-only port manifest is the key set for (a); a
+        # vector that passes (a)-(b) under names that are not the design's ports is not
+        # determined (no widths, cannot be driven).
+        d = design(driver_vector_keys=["data", "valid"])
+        self.assertEqual(self.diag(returns("{'data': '0'}"), d=d), "DRIVER_VECTOR_INVALID|reason=MISSING_KEYS")
+        self.assertEqual(self.diag(returns("{'data': '0', 'valid': 1}"), d=d),
+                         "DRIVER_VECTOR_INVALID|reason=NON_STRING_VALUE")
+        with self.assertRaises(NotDetermined):
+            run_outcome(self.run1(returns("{'data': '0', 'valid': '1'}"), d))
+
     def test_held_inputs_are_not_driver_keys(self):
         # A-042: rst is harness-owned; driver vectors omit it, the harness holds it at 0
         # after reset and records it as a consumed top-level input (L217).
