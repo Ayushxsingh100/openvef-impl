@@ -886,6 +886,19 @@ authored, cycle-exact specs"; the pack does not define "independently authored".
 AI-drafted specification weakens that claim. The D-005 disclosure states it, and reports a
 potential familiarity confound if a Claude model is evaluated.
 
+## D-006 — Owner approvals of FIFO draft choices (DECIDED — Ayush's confirmation pending)
+
+**Owner approvals by Krishika, 24 Nov 2026 (Ayush's confirmation pending)**, following a
+review by Claude (claude.ai):
+- A-042 is accepted: `rst` is harness-owned and not a driver-vector key.
+- The almost-full threshold is 3 (FIFO-029).
+- The top module name is `ovf_fifo`.
+- The cycle cap is 64 (proposal item 7).
+- The watchdog applies per run (proposal item 9).
+
+**Not frozen.** Spec v0.2 and the item 7–12 proposals stay DRAFT until both owners freeze
+them. Every run that uses them is provisional.
+
 ## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
 
 File 30 §6 is headed "Import sandbox and deterministic execution". Paired runs compare
@@ -1067,7 +1080,7 @@ Reasons from the pack text:
   approve the specification.
 
 
-## A-042 — Harness-owned reset and the "frozen top-level input-port" key set (DECIDED BY CLAUDE — owner review pending)
+## A-042 — Harness-owned reset and the "frozen top-level input-port" key set (DECIDED BY CLAUDE — accepted by Krishika under D-006, Ayush's confirmation pending)
 
 File 30 L83 check (a): "its key set equals the frozen top-level input-port set exactly".
 Protocol L212: "Every non-`COMPLETE` return must be a dictionary with exactly the frozen

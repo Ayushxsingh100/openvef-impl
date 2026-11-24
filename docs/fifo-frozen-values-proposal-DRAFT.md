@@ -1,6 +1,8 @@
 # FIFO frozen-value proposals, checklist items 7–12 — DRAFT for owner review
 
-**Status: DRAFT. Proposals only: not approved, not frozen.** Drafted by Claude (Claude
+**Status: DRAFT. Not frozen.** Approved so far, by Krishika under D-006 (24 Nov 2026;
+Ayush's confirmation pending): cycle cap 64 and the per-run watchdog. Everything stays DRAFT
+until both owners freeze it. Drafted by Claude (Claude
 Opus 5.5, via Claude Code) under owner decision D-005 (Krishika, 24 Nov 2026; Ayush's
 confirmation pending). The pack freezes these values "after feasibility validation"
 (L229, L542, L543), and only the owners can freeze them.

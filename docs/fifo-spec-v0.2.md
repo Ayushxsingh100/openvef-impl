@@ -109,6 +109,10 @@ The frozen driver-vector key set is `wr_en`, `wr_data`, `rd_en` (FIFO-004). `clk
 | 4 Reset protocol | FIFO-010 … FIFO-013 | exact sequence; `reset_release_cycle` = 1 under the A-040 row convention |
 | 5 Legal-input rules | FIFO-040 … FIFO-043 | executable Python 3.11 predicate with explicit scope |
 
+**Owner approvals so far (D-006, Krishika, 24 Nov 2026; Ayush's confirmation pending):**
+A-042, the almost-full threshold 3 and the top module name `ovf_fifo` are approved.
+The specification stays DRAFT until both owners freeze it.
+
 **Open points for owner review:**
 1. Top module name `ovf_fifo` is a placeholder.
 2. A-042: `rst` is harness-owned and not a driver-vector key. The competing reading keeps
