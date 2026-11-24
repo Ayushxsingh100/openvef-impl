@@ -33,20 +33,31 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   author of the code also chose the reading of "defined" (A-053), and not-rejected outcomes
   count as differing outcomes for M18, M19 and M28.
 
+- **Two earlier audits.** The first report is in `docs/reviews/`. A re-audit of bundle
+  `34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0` followed, as Krishika
+  states; its report is in `docs/reviews/` only if it arrived before this bundle was built. All its
+  findings were accepted (D-015) and fixed **without re-audit**. Do not assume the fixes are right:
+  - A9: attack `sandbox/artifact_worker.py` and `artifact_proc.py`. Is the seccomp list tight, is
+    anything inherited, can a frame be confused with another, what can the artifact learn?
+    `tests/test_artifact_isolation.py` shows what was tried. Residuals are in docs/sandbox.md.
+  - A1/A8: is each `DOMAINS` citation the right text, and does each adapter enforce it?
+  - A4: is `STAGE_MAP` in `serializer.py` exactly the stage map? The auditor's own case was not in
+    hand when the tests were written.
+
 ## 2. What the bundle contains
 
 `MANIFEST.sha256` lists the SHA-256 of every other file; check it first
 (`sha256sum -c MANIFEST.sha256`). `BUNDLE-INFO.json` records the source commit.
 - `src/`, `runner/`, `sandbox/`, `tests/`, `docs/`, `design/`: the implementation.
 - `requirements.in`, `requirements.lock`, `CLAUDE.md`: pins and the project rules.
-- `evidence/run-20261124T203551Z/`: the one F18 run under audit. Other runs named in the
+- `evidence/run-20261124T211459Z/`: the one F18 run under audit. Other runs named in the
   documents, including the feasibility-control runs, are **not** in the bundle.
 - `baseline/OpenVEF_Planning_v1_3_6/`: the relevant pack files and all 144 fixture
   descriptors. Pack files not needed here are omitted. `27_SHA256SUMS.txt` lists the
   whole pack, so use `sha256sum -c --ignore-missing`.
 
 The bundle has no git history, and commit IDs quoted in documents cannot be checked from
-it. The evidence run's commit is `0d50a7d`. Documents and tests may be newer than the run;
+it. The evidence run's commit is `a1d2e9c`. Documents and tests may be newer than the run;
 the build refuses to run if any file the run hashed has changed.
 
 ## 3. Current claims to test
@@ -85,7 +96,7 @@ L334; File 30 §4–§6)
 **A4. Serializer, assembler, lifecycle** (`serializer.py`, `assembler.py`, `ledger.py`;
 Protocol L168–L185, File 31)
 
-**A5. Evidence run** `run-20261124T203551Z`
+**A5. Evidence run** `run-20261124T211459Z`
 - `results_sha256` matches; counts recompute from `results.jsonl`; every `expected` equals
   its descriptor; every PASS has `actual == expected`.
 - Every `source_sha256` entry equals the bundled file. Interpreter and image identity are
@@ -108,7 +119,7 @@ Protocol L168–L185, File 31)
   A-025 to A-033). Say where a reading appears chosen because it makes a fixture pass.
 - The 17 NOT_IMPLEMENTED reasons (D-013, PD-01, PD-26): are they right?
 
-**A9. Sandbox** (docs/sandbox.md, `sandbox/`, `runner/*.args`)
+**A9. Sandbox** (docs/sandbox.md, `sandbox/`, `runner/*.args`; `tests/test_artifact_isolation.py`)
 - Can artifact code read or influence the evaluator, expected outputs, the host or a
   later fixture?
 

@@ -71,7 +71,13 @@ human independent audit".
 `3dfa0865bf1d3c187930ecd63ffb2aac8f0716d2e66e69bd8f865e40e4820296`; [note](reviews/implementation-audit-gpt6-2026-11-25-NOTE.md).
 It found one BLOCKER (A1-1) and one MAJOR (A8-1); A2, A3, A5 and A9 are limitations (no Docker,
 no CPython 3.11.18). It states a 63-digit bundle hash; the note explains. Step (5) is not
-marked done, and a re-audit is pending.
+marked done.
+
+**Re-audit (as stated by Krishika):** received from GPT-6, operator Krishika, on bundle
+`34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0`. The report is to be uploaded as
+`reviews/implementation-reaudit-gpt6-2026-11-25.md` (SHA-256 `8ef52f96…1ec7`) and is **not saved
+yet**; Claude Code has not seen it. D-015 accepts all its findings. **The D-015 fixes are not
+re-audited**, and include a new isolation mechanism.
 
 **Response (D-012):** A1-1 and A8-1 accepted and applied; limitations A2, A3, A5 and A9
 accepted and recorded, not treated as defects. The corrected code has **not** been re-audited.
@@ -82,7 +88,7 @@ rule with "cited input contract plus synthetic vectors" and restored five of the
 M25, M26, M28), while removing one more (`change_class`, M53): 127 PASS. The relaxation raises
 the pass count after an adverse finding, so **it requires re-audit** and must be disclosed
 wherever the count is quoted. Whether A1-1 is resolved is for the auditor.
-A later bundle (now with evidence run-20261124T203551Z) replaces the zip in `dist/`; the audited
+A later bundle (now with evidence run-20261124T211459Z) replaces the zip in `dist/`; the audited
 zip is in git at `9c89b1c`.
 
 | Audit input | Identity |

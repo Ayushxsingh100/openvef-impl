@@ -36,6 +36,8 @@ with an input contract cited to the pack and at least 3 synthetic non-fixture ve
 outcome no fixture expects (tests/test_dispatch_shapes.py). Adapters encoding knowledge of a
 specific fixture are forbidden. The rule changed after audit A1-1 and requires re-audit. A-031 is
 reversed, and D-009's approval of it is withdrawn.
+Owner decision D-015: artifact code runs only in sandbox/artifact_worker.py (confined process); no
+evaluator module may share an interpreter with it. Not yet re-audited.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

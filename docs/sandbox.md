@@ -124,12 +124,25 @@ container and removes it afterwards (`--rm`).
 What the container does **not** do by itself: it does not stop artifact code from
 calling allowed standard-library functions. The import allow-list, prohibited names and
 module-global `random` are enforced statically at IMPORT_POLICY. At runtime, the
-harness enforces the same import allow-list for imports made by artifact code (File 30
+artifact process enforces the same import allow-list for imports made by artifact code (File 30
 §6 "Enforce the same import allow-list statically and at runtime"; see
-`sandbox/harness.py`). The container flags are what contain anything the static and
+`sandbox/artifact_worker.py`). The seccomp filter and the container flags are what contain anything the static and
 runtime checks miss.
 
 ## Harness and integrity guard
+
+**Process separation (D-015, audit A9-1).** No artifact code runs in an evaluator interpreter.
+- [sandbox/artifact_worker.py](../sandbox/artifact_worker.py) is the artifact process. Before
+  loading artifact code it keeps only its two pipes, limits its address space, and installs a
+  seccomp allow-list (pipe, memory and exit calls). Everything else fails with EPERM: file opens,
+  `/proc`, sockets, fork/exec, signals, ptrace. It checks that the filter works, and refuses to
+  continue otherwise.
+- [sandbox/artifact_proc.py](../sandbox/artifact_proc.py) is the evaluator side: plain JSON in,
+  schema-checked tagged plain data out. It and the harness compute every verdict.
+- A separate process without seccomp is not enough: a same-uid child can write to the
+  evaluator's stdout through `/proc` (observed). Tests: `tests/test_artifact_isolation.py`.
+- Residuals: the artifact's own signature facts are measured in its own interpreter; the wall
+  clock is readable (vDSO); CPU is shared, so the watchdog still matters.
 
 [sandbox/harness.py](../sandbox/harness.py) runs inside each container (standard library
 only). Each request runs one task:
@@ -137,8 +150,7 @@ only). Each request runs one task:
   signatures;
 - `checker`: one null invocation of `check_trace`.
 
-It writes one framed result line to the original stdout. Artifact stdout/stderr is
-captured and discarded, so an artifact cannot forge a result
+It writes one framed result line to stdout. The artifact process has no access to that stdout
 (`test_artifact_output_cannot_forge_result`). The harness directory is bind-mounted
 read-only. Before every run the launcher refuses to start if any file in it is group- or
 other-writable, or unreadable by the sandbox uid (`check_harness_permissions`). That guard
@@ -150,9 +162,9 @@ ACLs (the `+` in `ls -l`) were not inspected: `getfacl` is not installed here.
 Task `simulate` ([sandbox/sim.py](../sandbox/sim.py), [sandbox/sim_cocotb.py](../sandbox/sim_cocotb.py))
 runs one driver on one target (`rtl` or `null`) in its own artifact container:
 `iverilog -g2012` compiles the design sources, `vvp` runs them with cocotb's Icarus VPI
-library, and the cocotb test module runs the cycle loop. The artifact is imported with
-the same restricted import as the factory task, its output is discarded, and `step`
-receives only a dict of strings, never a simulator handle. `sim.py` watches a heartbeat
+library, and the cocotb test module runs the cycle loop. The artifact runs in its own
+confined process (D-015); `step` receives only a dict of strings, and the loop receives one
+schema-checked plain value. `sim.py` watches a heartbeat
 file and kills `vvp` when a `step` call exceeds the per-step watchdog (`WATCHDOG_TIMEOUT|phase=driver_step`).
 The runner side is [src/openvef/simulation.py](../src/openvef/simulation.py): RTL run, then
 null run, then the L166 (8) paired comparison.

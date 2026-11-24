@@ -1556,3 +1556,50 @@ subject to re-audit."
 - **Not changed:** F18 is not passed. Claude decided A-053 and Claude (claude.ai) recommended its
   approval. Takes effect under D-008; Ayush's ratification stays the single entry in
   AUDIT-READINESS.md.
+
+## D-015 — Response to the re-audit findings (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) triage of the GPT-6 re-audit (bundle
+`34bc8109…c0c0`): "accept all findings, fix in this order". The re-audit report had not reached
+this repository when the fixes were made, so they follow the decision's wording, not the report's.
+
+1. **A9-1, artifact isolation.** Before: `driver.step` ran inside the cocotb recorder's interpreter
+   and `check_trace` inside the harness's, so artifact code could patch evaluator modules.
+   - Now `driver.py` and `checker.py` run in `sandbox/artifact_worker.py`, a separate interpreter
+     with no evaluator module, request, RTL or trace file. `sandbox/artifact_proc.py` sends it
+     plain JSON and accepts only schema-checked, tagged plain data; it alone computes verdicts.
+   - **A separate process was not enough.** Under the same uid, a child wrote into its parent's
+     stdout through `/proc/<pid>/fd` in the pinned container (probe, 24 Nov 2026). So the worker
+     installs a seccomp allow-list before loading artifact code: pipe, memory and exit calls only.
+     File opens, `/proc`, sockets, fork/exec, signals and ptrace fail with EPERM. It also gets an
+     address-space limit (build default 160 MiB) and is the first OOM victim.
+   - Tests: `tests/test_artifact_isolation.py`, in the pinned container.
+   - **Residual:** the runtime return-type and signature facts are measured inside the artifact's
+     interpreter, so a hostile driver could misreport its own. That can only affect its own
+     disposition, and the static AST_SIGNATURE checks do not depend on it. The wall clock stays
+     readable (vDSO).
+2. **A1-1/A8-2.** The reserved headings are the sidecar's nine (File 31 L9; File 33 L10–L50).
+   Descriptor headings must be a subset and are never used; descriptor clause-ID patterns must
+   equal File 31 §8's and are never used. `DOMAINS` cites each property's domain, and a test
+   requires every adapter to refuse an out-of-domain value for each property.
+3. **A4-1.** `serialize` and `feedback_bytes` require the whole (stage, error class, diagnostic) to
+   be what one stage-map row emits (L143–L162). **The auditor's own case is not in hand**; the
+   tests cover wrong stage, class, file, unknown labels, null and trailing newlines.
+4. The 3.11-specific f-string test skips on other versions.
+
+**A-036 correction.** A-036 set `PYTHONHASHSEED=0`, but factory and checker runs used
+`python -I`, which ignores that variable (probe: two runs gave different hashes). It took effect
+only in simulations. The worker now starts without `-I` and with a fixed environment, so it takes
+effect everywhere. No fixture outcome changed.
+
+## A-054 — An artifact process that ends or breaks its message schema (DECIDED BY CLAUDE — owner review pending)
+
+The stage map has rows for a driver that raises and for a checker "process crash" (File 30 L97),
+but `<EXCEPTION_CLASS>` presumes an exception. With process isolation the artifact can also exit,
+crash, or send malformed data. Readings: (i) an evaluator error; (ii) the artifact's own failure.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (ii)**, with the
+L125 fallback class: "otherwise the fixed fallback `Exception`". File 30 L97 says a process crash is
+`CHECKER_RUNTIME_ERROR|class=<EXCEPTION_CLASS>`; the driver row covers factory and step. A process
+killed by SIGKILL (memory), or never confined, stays an evaluator error, because the artifact cannot
+send signals. No current fixture reaches it. Not covered by D-009 or D-014.
