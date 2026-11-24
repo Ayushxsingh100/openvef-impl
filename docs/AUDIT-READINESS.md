@@ -132,6 +132,7 @@ this run is on the pinned one.
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item. Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
+| Draft pack corrections for M27, M48, M50, M54, M58, PD-22 and PD-24: `proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md` (DRAFT; needs a new independent document audit) | owners | PD-02, PD-03, PD-06, PD-22, PD-24, PD-25 |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |
 | TechRxiv preprint: retrieve it, or record its access status; make the Charter and File 10 agree | owners | PD-24 |
 
@@ -140,7 +141,7 @@ this run is on the pinned one.
 | Item | Owner | Reference |
 |---|---|---|
 | Independent human mask reviewer: none available (DEV-001). Signing would end the deviation | owners to appoint if one becomes available; must not have authored the templates or the mask | L271; File 21 "Independent reviewer"; package §G |
-| Independent implementation auditor | owners to appoint | L555 (5) |
+| Independent implementation auditor | owners to appoint. An AI-assisted audit by a different model is prepared ([AUDIT-BRIEF.md](AUDIT-BRIEF.md), `tools/build_audit_bundle.py`) but not run; whether it can count toward L555 (5) is an owner decision, to be disclosed | L555 (5) |
 
 **Human-written work (reserved by CLAUDE.md; Claude does not write it)**
 
