@@ -23,7 +23,7 @@ The observation mask may be drafted by Claude, but it must be signed by an indep
 human mask reviewer (Protocol L271). Claude is never that reviewer.
 Deviation DEV-001 (Krishika, 24 Nov 2026; docs/DEVIATIONS.md): no such reviewer is
 available, so the owner accepted the FIFO mask and File 24 table at their frozen hashes
-(D-010) with a saved, non-independent Claude review
+(D-011) with a saved, non-independent Claude review
 (docs/reviews/claude-mask-review-2026-11-25.md). L271 stays unmet. Every affected result
 carries "cleared under DEV-001 (non-independent review saved)";
 never call the mask independently reviewed.

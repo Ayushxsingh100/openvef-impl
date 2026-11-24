@@ -23,13 +23,15 @@ it is saved, the 10 affected results carried a "review pending" label.
 **Review saved:** [claude-mask-review-2026-11-25.md](reviews/claude-mask-review-2026-11-25.md)
 (supplied by Krishika, saved verbatim). Outcome: PASS with placeholder fixes.
 
-**D-010 (Krishika):** the placeholder fixes are applied and the mask is re-frozen
+**D-010 and D-011 (Krishika):** the placeholder fixes are applied (D-010), the
+`independent_reviewer` column reads "none (DEV-001)" and the L270 reminder is restored
+(D-011). The mask is re-frozen
 (machine-readable: `design/fifo/freeze/deviation-DEV-001.json`):
 
-| File | SHA-256 (frozen under D-010) | SHA-256 (as reviewed) |
+| File | SHA-256 (frozen under D-011) | SHA-256 (as reviewed) |
 |---|---|---|
-| `design/fifo/mask/ovf_fifo-mask-DRAFT.json` | `ea877da0046541550a23cc2beb69c2b9960ede422727ee080e1e00827602acbe` | `78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f` |
-| `design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv` | `af2a846174bead3924d10212b36bf3c46cc41380811bf1d84f636e17caf6c97e` | `3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92` |
+| `design/fifo/mask/ovf_fifo-mask-DRAFT.json` | `64c7a9e6f25845521b9ad8164c3dff4d371f97fbd7c78c7c43c02e92540bbb59` | `78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f` |
+| `design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv` | `25e15c1e38ab8ff8a4a4a1172c144feabfdad24aa00992ed5d0876a87418dfd8` | `3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92` |
 
 Only `spec_version_sha256`, the status fields and the table's reviewer fields changed.
 `tests/test_freeze_package.py` checks that undoing those changes gives the reviewed bytes.
@@ -44,8 +46,8 @@ pending").
 - L271 and File 21 L32 remain **unmet**. Nobody signed section G.
 - The review is not independent: Claude drafted the mask and the table (D-005), and the
   reviewer is Claude (claude.ai). Claude Code performed no sign-off review.
-- The table's `independent_reviewer` column is filled as D-010 instructs. Its value says
-  "non-independent"; the column name must not be quoted as meaning an independent review.
+- The table's `independent_reviewer` column reads "none (DEV-001)". The `mask_reviewer`
+  entry is the non-independent Claude review.
 - It does not cover any other mask, or any changed bytes of this one. The runner re-checks
   the hashes and restores the provisional reason on a mismatch.
 

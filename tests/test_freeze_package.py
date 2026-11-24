@@ -97,7 +97,7 @@ class FreezeRecordTests(unittest.TestCase):
         self.assertEqual({r["ref"]: r["sha256_reviewed"] for r in refs},
                          {r["ref"]: r["sha256"] for r in dev["review"]["reviewed"]})
         self.assertEqual({r["ref"]: r["sha256"] for r in refs},
-                         {r["ref"]: r["sha256"] for r in self.record["amendments"][0]["refs"]})
+                         {r["ref"]: r["sha256"] for r in self.record["amendments"][-1]["refs"]})
         self.assertEqual(self.freeze.ref_sha256(dev["review"]["file"]), dev["review"]["sha256"])
 
     def test_d010_changed_only_placeholders(self):
@@ -109,10 +109,11 @@ class FreezeRecordTests(unittest.TestCase):
         for r in dev["items"][0]["refs"]:
             t = (REPO / r["ref"]).read_bytes().decode("utf-8").replace(spec, "TO_FREEZE")
             if r["ref"].endswith(".json"):
-                t = t.replace(status, "DRAFT under D-005 — requires independent human reviewer signature (Protocol L271). Evaluator-only: never part of an authoring packet (L270). "
+                t = t.replace(status + ". Evaluator-only: never part of an authoring packet (L270).",
+                              "DRAFT under D-005 — requires independent human reviewer signature (Protocol L271). Evaluator-only: never part of an authoring packet (L270). "
                               "Not frozen (L540).")
             else:
-                t = t.replace(f"{who},{who},{status}", "UNSIGNED (drafted by Claude under D-005; Claude is not the mask reviewer),"
+                t = t.replace(f"{who},none (DEV-001),{status}", "UNSIGNED (drafted by Claude under D-005; Claude is not the mask reviewer),"
                               "REQUIRED: independent human reviewer signature (Protocol L271),DRAFT_UNSIGNED")
             self.assertEqual(hashlib.sha256(t.encode("utf-8")).hexdigest(), r["sha256_reviewed"], r["ref"])
 

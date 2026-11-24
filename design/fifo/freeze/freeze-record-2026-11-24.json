@@ -275,6 +275,21 @@
           "sha256": "af2a846174bead3924d10212b36bf3c46cc41380811bf1d84f636e17caf6c97e"
         }
       ]
+    },
+    {
+      "id": "D-011",
+      "item": "Supersedes the D-010 hashes: independent_reviewer column set to 'none (DEV-001)'; L270 reminder restored to the JSON status. Not covered by signature a955245; L271 stays unmet.",
+      "record": "design/fifo/freeze/deviation-DEV-001.json",
+      "refs": [
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-DRAFT.json",
+          "sha256": "64c7a9e6f25845521b9ad8164c3dff4d371f97fbd7c78c7c43c02e92540bbb59"
+        },
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",
+          "sha256": "25e15c1e38ab8ff8a4a4a1172c144feabfdad24aa00992ed5d0876a87418dfd8"
+        }
+      ]
     }
   ]
 }

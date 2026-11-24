@@ -1,5 +1,5 @@
 {
-  "status": "FROZEN under D-010; reviewed non-independently (DEV-001)",
+  "status": "FROZEN under D-010; reviewed non-independently (DEV-001). Evaluator-only: never part of an authoring packet (L270).",
   "spec": "docs/fifo-spec-v0.2.md",
   "spec_version_sha256": "5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5",
   "traceability_table": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",

@@ -2,21 +2,21 @@
   "record_id": "DEV-001",
   "kind": "owner deviation from Protocol L271 (docs/DEVIATIONS.md)",
   "status": "Transcribed by Claude (Claude Opus 5.5, via Claude Code) at Krishika's instruction. Claude signed nothing and is not the independent reviewer.",
-  "basis": "Owner decisions by Krishika: DEV-001 (24 Nov 2026), corrected, and D-010. No independent human mask reviewer is available. The owner accepts the mask and File 24 table with a Claude (claude.ai) review dated 25 Nov 2026, saved at docs/reviews/claude-mask-review-2026-11-25.md. The review had not happened when DEV-001 was first recorded, covered the pre-D-010 bytes, and is NOT independent. The L271 signature does not exist.",
+  "basis": "Owner decisions by Krishika: DEV-001 (24 Nov 2026), corrected, D-010 and D-011. No independent human mask reviewer is available. The owner accepts the mask and File 24 table with a Claude (claude.ai) review dated 25 Nov 2026, saved at docs/reviews/claude-mask-review-2026-11-25.md. The review had not happened when DEV-001 was first recorded, covered the pre-D-010 bytes, and is NOT independent. The L271 signature does not exist.",
   "label": "cleared under DEV-001 (non-independent review saved)",
   "items": [
     {
       "id": "G",
-      "item": "Observation mask (primary and stricter variants) and File 24 traceability table, re-frozen under D-010 with the review's placeholder fixes",
+      "item": "Observation mask (primary and stricter variants) and File 24 traceability table, re-frozen under D-011 (D-010 placeholder fixes; independent_reviewer = none)",
       "refs": [
         {
           "ref": "design/fifo/mask/ovf_fifo-mask-DRAFT.json",
-          "sha256": "ea877da0046541550a23cc2beb69c2b9960ede422727ee080e1e00827602acbe",
+          "sha256": "64c7a9e6f25845521b9ad8164c3dff4d371f97fbd7c78c7c43c02e92540bbb59",
           "sha256_reviewed": "78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f"
         },
         {
           "ref": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",
-          "sha256": "af2a846174bead3924d10212b36bf3c46cc41380811bf1d84f636e17caf6c97e",
+          "sha256": "25e15c1e38ab8ff8a4a4a1172c144feabfdad24aa00992ed5d0876a87418dfd8",
           "sha256_reviewed": "3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92"
         }
       ]

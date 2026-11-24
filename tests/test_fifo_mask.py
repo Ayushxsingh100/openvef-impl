@@ -1,6 +1,6 @@
 """FIFO observation mask and File 24 traceability table (D-005).
 
-The mask is frozen under D-010 with a non-independent review (DEV-001); the independent
+The mask is frozen under D-010/D-011 with a non-independent review (DEV-001); the independent
 signature (Protocol L271) does not exist. These checks are mechanical only:
 - the table has exactly the File 24 template columns;
 - every row maps to a defined clause ID, with an exact excerpt of that clause's text;
@@ -72,10 +72,11 @@ class MaskTableTests(unittest.TestCase):
         status = "FROZEN under D-010; reviewed non-independently (DEV-001)"
         for r in rows():
             self.assertEqual(r["review_status"], status)
-            for col in ("mask_reviewer", "independent_reviewer"):
-                self.assertEqual(r[col], "Claude (claude.ai), non-independent, DEV-001; accepted by owner Krishika")
+            self.assertEqual(r["mask_reviewer"], "Claude (claude.ai), non-independent, DEV-001; accepted by owner Krishika")
+            self.assertEqual(r["independent_reviewer"], "none (DEV-001)")
             self.assertEqual(r["spec_version_sha256"], spec)
-        self.assertEqual(MASK["status"], status)
+        self.assertEqual(MASK["status"],
+                         status + ". Evaluator-only: never part of an authoring packet (L270).")
         self.assertEqual(MASK["spec_version_sha256"], spec)
 
     def test_json_and_table_agree(self):

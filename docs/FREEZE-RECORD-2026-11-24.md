@@ -66,9 +66,23 @@ The runner reads it from `design/fifo/freeze/deviation-DEV-001.json`.
 | `design/fifo/mask/ovf_fifo-mask-DRAFT.json` | `ea877da0046541550a23cc2beb69c2b9960ede422727ee080e1e00827602acbe` | `78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f` |
 | `design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv` | `af2a846174bead3924d10212b36bf3c46cc41380811bf1d84f636e17caf6c97e` | `3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92` |
 
+## Amendment D-011: observation mask, current hashes (Krishika, recorded 24 Nov 2026 UTC)
+
+Supersedes the D-010 frozen hashes above; the same limits apply. The table's
+`independent_reviewer` column now reads "none (DEV-001)", and the JSON status again states
+the L270 rule.
+
+| File | SHA-256 (frozen) |
+|---|---|
+| `design/fifo/mask/ovf_fifo-mask-DRAFT.json` | `64c7a9e6f25845521b9ad8164c3dff4d371f97fbd7c78c7c43c02e92540bbb59` |
+| `design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv` | `25e15c1e38ab8ff8a4a4a1172c144feabfdad24aa00992ed5d0876a87418dfd8` |
+
+File names and `author_packet_location` cells keep "DRAFT": see D-011 in
+[ambiguities.md](ambiguities.md).
+
 ## Not frozen by this record
 
-The first row below was written before D-010: the mask is now frozen by the amendment
+The first row below was written before D-010: the mask is now frozen by the amendments
 above, but the signature it names still does not exist.
 
 | Item | Why |

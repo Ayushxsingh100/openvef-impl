@@ -1412,3 +1412,21 @@ become "cleared under DEV-001 (non-independent review saved)".
 the JSON `status`. Mask content is unchanged. The JSON status no longer repeats
 "evaluator-only: never part of an authoring packet"; that Protocol rule (L270) still applies.
 L271 stays unmet ([DEVIATIONS.md](DEVIATIONS.md)).
+
+## D-011 — Independent-reviewer column and L270 reminder (DECIDED)
+
+**Owner decision by Krishika**, given in Claude Code: "set the independent_reviewer column to
+"none (DEV-001)" in every row; restore "Evaluator-only: never part of an authoring packet
+(L270)" to the JSON status text. Leave file names and author_packet_location cells as they
+are (record why)." This supersedes D-010 on those two points.
+
+**Why the file names and `author_packet_location` cells stay** (reasons recorded by Claude
+at the owner's instruction):
+- `design/fifo/design-materials-DRAFT.json`, frozen at its signed hash (B1–B6), names
+  the mask JSON by its current path. Renaming it would break a frozen item.
+- The mask JSON names the table by its path, and earlier evidence, records and reviews
+  cite both paths. Renaming would break that trail.
+- The cells name `docs/fifo-spec-v0.2.md (DRAFT)`. The frozen specification keeps its DRAFT
+  wording, because the package says signed files are not edited in place. Frozen status is
+  set by the freeze record and its hashes, not by the word "DRAFT".
+- The saved review covers those cells, and changing them has no effect on what is compared.
