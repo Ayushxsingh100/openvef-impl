@@ -13,10 +13,18 @@
 # The broker never interprets results. On timeout it kills and removes the container by
 # its unique name. The runner cannot choose the command, image or flags.
 #
-# Usage: runner/run_f18_container.sh <run_class>
+# Usage: runner/run_f18_container.sh <run_class> [f18|controls]
+#   f18 (default): runner/run_f18.py, evidence in evidence/run-<UTC>;
+#   controls: runner/run_controls.py (feasibility controls F1-F15, F17), evidence in
+#   evidence/controls-<UTC>. The runner script comes from this fixed list only.
 set -euo pipefail
 
-RUN_CLASS=${1:?usage: run_f18_container.sh <run_class>}
+RUN_CLASS=${1:?usage: run_f18_container.sh <run_class> [f18|controls]}
+case "${2:-f18}" in
+  f18) RUNNER_SCRIPT=run_f18.py; OUT_PREFIX=run ;;
+  controls) RUNNER_SCRIPT=run_controls.py; OUT_PREFIX=controls ;;
+  *) echo "unknown runner '${2}'; expected f18 or controls" >&2; exit 2 ;;
+esac
 # Host invocation, captured before anything changes it (AUDIT-READINESS §3 item 4).
 HOST_ARGV_B64=$(printf '%s\0' "$0" "$@" | base64 -w0)
 HOST_CWD=$(pwd)
@@ -63,7 +71,7 @@ fi
 
 STARTED=$(date -u +%Y%m%dT%H%M%SZ)
 # OPENVEF_EVIDENCE_ROOT is for smoke tests outside the append-only evidence/ tree.
-OUT="${OPENVEF_EVIDENCE_ROOT:-$REPO/evidence}/run-$STARTED"
+OUT="${OPENVEF_EVIDENCE_ROOT:-$REPO/evidence}/$OUT_PREFIX-$STARTED"
 mkdir "$OUT"   # fails if it exists: evidence is append-only
 
 RNAME="openvef-runner-$(od -An -N6 -tx1 /dev/urandom | tr -d ' \n')"
@@ -124,7 +132,7 @@ cleanup() { docker rm -f "$RNAME" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 coproc RUNNER { docker run "${RUNNER_FLAGS[@]}" "${ENV_ARGS[@]}" "$TAG" \
-  python -I /opt/openvef-repo/runner/run_f18.py /baseline /evidence "$RUN_CLASS"; }
+  python -I "/opt/openvef-repo/runner/$RUNNER_SCRIPT" /baseline /evidence "$RUN_CLASS"; }
 RUNNER_IN=${RUNNER[1]}
 RPID=$RUNNER_PID
 while IFS= read -r line <&"${RUNNER[0]}"; do

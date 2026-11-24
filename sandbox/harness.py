@@ -193,7 +193,58 @@ def task_export(request: dict) -> dict:
     return {"netlist": data.decode("utf-8"), "sha256": hashlib.sha256(data).hexdigest(), "yosys_version": version}
 
 
-TASKS = {"factory": task_factory, "checker": task_checker, "simulate": task_simulate, "export": task_export}
+def task_interface(request: dict) -> dict:
+    """Top module and public ports of a Verilog text, from Yosys `write_json` (F14; H1).
+
+    Evaluator material only. Returns {"modules", "top", "ports": [[name, direction, width],
+    ...] in declaration order}."""
+    import subprocess
+    with open("/tmp/iface.v", "w", encoding="utf-8") as f:
+        f.write(request["verilog"])
+    top = request["top"]
+    script = f"read_verilog -sv /tmp/iface.v\nhierarchy -check -top {top}\nproc\nwrite_json /tmp/iface.json\n"
+    p = subprocess.run(["yosys", "-q", "-p", script], capture_output=True, text=True)
+    if p.returncode != 0:
+        return {"error": f"yosys exit {p.returncode}: {(p.stderr or p.stdout)[-800:]}"}
+    data = json.load(open("/tmp/iface.json", encoding="utf-8"))
+    mod = data["modules"][top]
+    ports = [[name, spec["direction"], len(spec["bits"])] for name, spec in mod["ports"].items()]
+    return {"modules": sorted(data["modules"]), "top": top, "ports": ports}
+
+
+def task_yosys(request: dict) -> dict:
+    """Run evaluator-built Yosys scripts on evaluator-supplied files (H5 bounded check).
+
+    `files` maps plain names to text, written under /tmp/y; each of `scripts` runs as one
+    `yosys -s` invocation with its own wall-clock limit. Returns each log and exit code.
+    No artifact code is involved."""
+    import subprocess
+    os.makedirs("/tmp/y", exist_ok=True)
+    for name, text in request["files"].items():
+        if "/" in name or name.startswith("."):
+            return {"error": "file names must be plain"}
+        with open(f"/tmp/y/{name}", "w", encoding="utf-8") as f:
+            f.write(text)
+    runs = []
+    for i, script in enumerate(request["scripts"]):
+        path = f"/tmp/y/script{i}.ys"
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(script)
+        try:
+            p = subprocess.run(["yosys", "-q", "-l", f"/tmp/y/log{i}.txt", "-s", path], capture_output=True,
+                               text=True, timeout=float(request["timeout_s"]), cwd="/tmp/y")
+            log = open(f"/tmp/y/log{i}.txt", encoding="utf-8", errors="replace").read()
+            runs.append({"returncode": p.returncode, "log": log[-int(request.get("log_tail", 200000)):],
+                         "stderr": (p.stderr or "")[-800:]})
+        except subprocess.TimeoutExpired:
+            runs.append({"returncode": None, "timed_out": True, "log": ""})
+            break
+    version = subprocess.run(["yosys", "-V"], capture_output=True, text=True).stdout.strip()
+    return {"runs": runs, "yosys_version": version}
+
+
+TASKS = {"factory": task_factory, "checker": task_checker, "simulate": task_simulate, "export": task_export,
+         "interface": task_interface, "yosys": task_yosys}
 
 
 def main() -> None:

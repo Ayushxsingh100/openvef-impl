@@ -1,0 +1,343 @@
+{
+  "status": "Slot list written by Claude (harness side) under CLAUDE.md and owner decision D-007. Every file listed under `slots` is OWNER-WRITTEN; Claude never places content in a slot. The runner (runner/run_controls.py) reads this list to report which owner artifacts each control is still waiting for.",
+  "mutant_roles": {
+    "M-exposed": {
+      "behaviour": "a masked-observable divergence under legal inputs within the bound N (some always-observed output, or rd_data while the null rd_valid = 1)",
+      "feeds": [
+        "F4",
+        "F6",
+        "F17"
+      ]
+    },
+    "M-dontcare": {
+      "behaviour": "changes rd_data only in rows where the null trace has rd_valid = 0; must not change rd_valid or any other always-observed output",
+      "feeds": [
+        "F5",
+        "F7",
+        "F17"
+      ]
+    },
+    "M-full": {
+      "behaviour": "changes the full output",
+      "feeds": [
+        "F10"
+      ]
+    },
+    "M-x": {
+      "behaviour": "drives X on a public output (e.g. from an undriven net), so a driver converting that output with int(..., 2) raises",
+      "feeds": [
+        "F12"
+      ]
+    },
+    "M-silent": {
+      "behaviour": "structurally distinct from the original, but gives no raw output divergence under the F8 driver (the reference driver)",
+      "feeds": [
+        "F8"
+      ]
+    },
+    "M-any": {
+      "behaviour": "any distinct control mutant; may be the same file as another role",
+      "feeds": [
+        "F9"
+      ]
+    }
+  },
+  "slots": [
+    {
+      "path": "mutants/manifest.json",
+      "kind": "mutant manifest",
+      "item": 15,
+      "feeds": [
+        "F4",
+        "F5",
+        "F6",
+        "F7",
+        "F8",
+        "F9",
+        "F10",
+        "F12",
+        "F17"
+      ]
+    },
+    {
+      "path": "drivers/reference_driver.py",
+      "kind": "driver",
+      "item": 14,
+      "feeds": [
+        "F1",
+        "F3",
+        "F5",
+        "F7",
+        "F8",
+        "F13"
+      ]
+    },
+    {
+      "path": "drivers/directed/suite.json",
+      "kind": "directed suite index",
+      "item": 14,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "drivers/f2_echo_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F2"
+      ]
+    },
+    {
+      "path": "drivers/f2_echo.json",
+      "kind": "echo declaration",
+      "item": 16,
+      "feeds": [
+        "F2"
+      ]
+    },
+    {
+      "path": "drivers/f6_exposing_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F6"
+      ]
+    },
+    {
+      "path": "drivers/f6_nonexposing_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F6"
+      ]
+    },
+    {
+      "path": "drivers/f9_unseeded_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F9"
+      ]
+    },
+    {
+      "path": "drivers/f9_seeded_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F9"
+      ]
+    },
+    {
+      "path": "drivers/f10_full_reactive_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F10"
+      ]
+    },
+    {
+      "path": "drivers/f11_runs_to_cap_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F11"
+      ]
+    },
+    {
+      "path": "drivers/f11_infinite_loop_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F11"
+      ]
+    },
+    {
+      "path": "drivers/f12_x_convert_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F12"
+      ]
+    },
+    {
+      "path": "drivers/f17_reactive_random_driver.py",
+      "kind": "driver",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "checkers/f6_correct_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F1",
+        "F3",
+        "F6",
+        "F9",
+        "F10",
+        "F11",
+        "F12"
+      ]
+    },
+    {
+      "path": "checkers/f6_always_pass_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F6"
+      ]
+    },
+    {
+      "path": "checkers/f7_stricter_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F7"
+      ]
+    },
+    {
+      "path": "checkers/f8_nondeterministic_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F8"
+      ]
+    },
+    {
+      "path": "checkers/f13_adversarial_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F13"
+      ]
+    },
+    {
+      "path": "checkers/f17_reference_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "checkers/f17_always_pass_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "checkers/f17_always_fail_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "checkers/f17_stimulus_literal_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "checkers/f17_crashing_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "checkers/f17_stricter_than_mask_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    },
+    {
+      "path": "checkers/f17_nondeterministic_checker.py",
+      "kind": "checker",
+      "item": 16,
+      "feeds": [
+        "F17"
+      ]
+    }
+  ],
+  "controls": {
+    "F1": {
+      "mutant_roles": []
+    },
+    "F2": {
+      "mutant_roles": []
+    },
+    "F3": {
+      "mutant_roles": []
+    },
+    "F4": {
+      "mutant_roles": [
+        "M-exposed"
+      ]
+    },
+    "F5": {
+      "mutant_roles": [
+        "M-dontcare"
+      ]
+    },
+    "F6": {
+      "mutant_roles": [
+        "M-exposed"
+      ]
+    },
+    "F7": {
+      "mutant_roles": [
+        "M-dontcare"
+      ]
+    },
+    "F8": {
+      "mutant_roles": [
+        "M-silent"
+      ]
+    },
+    "F9": {
+      "mutant_roles": [
+        "M-any"
+      ]
+    },
+    "F10": {
+      "mutant_roles": [
+        "M-full"
+      ]
+    },
+    "F11": {
+      "mutant_roles": []
+    },
+    "F12": {
+      "mutant_roles": [
+        "M-x"
+      ]
+    },
+    "F13": {
+      "mutant_roles": []
+    },
+    "F14": {
+      "mutant_roles": []
+    },
+    "F15": {
+      "mutant_roles": []
+    },
+    "F17": {
+      "mutant_roles": [
+        "M-exposed",
+        "M-dontcare"
+      ]
+    }
+  }
+}

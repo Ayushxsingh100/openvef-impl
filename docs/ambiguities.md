@@ -899,6 +899,20 @@ review by Claude (claude.ai):
 **Not frozen.** Spec v0.2 and the item 7–12 proposals stay DRAFT until both owners freeze
 them. Every run that uses them is provisional.
 
+## D-007 — Feasibility-control authorship, mutant form, miter tool (DECIDED — Ayush's confirmation pending)
+
+**Owner decisions by Krishika, 24 Nov 2026 (Ayush's confirmation pending)**, on a
+recommendation by Claude (claude.ai), answering §8 of
+[F1-F17-plan.md](F1-F17-plan.md):
+1. The control drivers and checkers for F1–F5 and F7–F13 are owner-written, for
+   independence from the harness author. Claude does not draft them.
+2. Control mutants are RTL edits of `design/fifo/rtl/ovf_fifo.v`.
+3. The mask-aware miter uses Yosys's built-in `sat` (no new dependency).
+4. F1 reuses the reference driver (checklist item 14) with the F6 correct checker.
+
+CLAUDE.md's Scope section is updated to match. The owner-artifact slots, their interfaces
+and the controls each feeds are listed in `design/fifo/controls/README.md`.
+
 ## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
 
 File 30 §6 is headed "Import sandbox and deterministic execution". Paired runs compare
@@ -1208,3 +1222,128 @@ materials, because the driver's `step` receives the design's outputs.
 
 **What changes under (b):** for P17's vector `{"data": "0"}`, nothing does. It lacks
 keys under both readings, so the result is `MISSING_KEYS` either way.
+
+## A-045 — Construction of the mask-aware miter (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L291] "Build the miter with the same observation mask as the trace comparator and with the same reset sequence and legal-input assumptions from the design specification."
+
+The pack does not say:
+- on which side's outputs a legal-input predicate that reads outputs is evaluated;
+- how the comparator's executable Python predicate becomes a miter assumption;
+- what the initial register state is.
+
+FIFO-043 (DRAFT spec) says the FIFO-042 rules are the miter's assumptions.
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- **Legal-input predicate:** evaluated on the null (gold) side's outputs at that step,
+  i.e. the outputs the driver would have sampled. This is the same side as the mask
+  predicate (L273: "evaluated using the null-netlist trace for both members of a pair").
+- **Assumption generated from the spec's own predicate:** by exhaustive enumeration of
+  every input and output bit (`miter.compile_predicate`). Support bits are proven by
+  invariance over the whole domain, and the expression is the truth table on the
+  support. So the assumption equals the predicate by construction; there is no
+  hand translation. This answers plan Q5.
+- **Reset:** each reset vector forces every input at its step. Afterwards, held inputs
+  keep their held value.
+- **Initial state:** all registers start at zero (`sat -set-init-zero`), a stated
+  bounded-equivalence assumption (L544, TO FREEZE). The simulator starts memories at X
+  instead. A mutant that reads an unwritten FIFO slot could therefore disagree between the
+  miter and the simulator. F4's replay check would show it.
+- **Shortest counterexample (L293):** after a failure at the full bound, ascending bounds
+  are checked; the first failing bound is the shortest.
+- **Step mapping:** sat step t holds the state after t−1 edges, so trace row n is step n+2.
+
+**What changes under another reading:**
+- Evaluating the predicate on the mutant side would let a mutant that corrupts `full`
+  change which inputs are legal for the comparison.
+- Undefined initial state (`-set-init-undef`) would need X-aware triggers.
+
+## A-046 — Mapping harness events to §12 terminations in a pair run (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L306] "Driver/simulator error, split by whether a masked divergence was recorded before termination."
+
+**Decision (decided by Claude under standing delegation, owner review pending):** on the
+mutant run:
+
+| Harness event | §12 termination | Source |
+|---|---|---|
+| `driver_runtime`, `driver_vector` (an invalid or illegal vector, which the harness does not drive), `simulator_error` | DRIVER_SIM_ERROR | — |
+| `driver_watchdog` | TIMEOUT | L333 |
+| `trace_integrity` (row alignment) | integrity failure → INVALID_PAIR | L311 |
+
+An evaluator-side failure of the harness itself (no adjudicable result) is raised, not
+classified.
+
+Reason: §12 has no separate class for an invalid vector after an artifact is valid.
+The vector ends the run as the driver's fault, which is the "driver" half of rule 2.
+
+The rows recorded before a watchdog kill are now kept (sandbox/sim.py `_truncated`), so
+"masked divergence recorded before termination" is measured on them.
+
+## A-047 — A null run that fails inside a pair (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L336] "A null run must complete within its watchdog for a mutant-run timeout to be interpreted."
+
+**Decision (decided by Claude under standing delegation, owner review pending):** if the
+null member of a pair does not complete, the pair is `INVALID_PAIR` as an integrity
+failure.
+
+Reason: the artifact's null runs passed during validation, so a failing null in the pair
+can't be explained from predeclared evidence. L311: "If the cause cannot be determined
+from predeclared integrity evidence, classify conservatively as INVALID_PAIR."
+
+## A-048 — Checker invocations per pair (DECIDED BY CLAUDE — owner review pending)
+
+§12 classifies a pair by what "checker returns" on the complete mutant trace. The repeat
+rule (two invocations) is stated for null traces (L247) and for the panel (L435), not for
+pair classification.
+
+**Decision (decided by Claude under standing delegation, owner review pending):** one
+invocation, in its own process, on the frozen mutant trace bytes. The bytes are
+re-hashed afterwards. The pair record also says whether the mutant trace is
+byte-identical to the null trace (needed for F8, L311).
+
+## A-049 — Panel false-alarm event per benign trace (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L429] "Define the false-alarm event rate as the number of `FAIL` outcomes on the `B_ds` benign original-RTL/null-netlist reference traces divided by `|G_cd| × B_ds`"
+
+Each benign trace is evaluated twice (L417).
+
+**Decision (decided by Claude under standing delegation, owner review pending):** a
+benign trace carries one false-alarm event if either evaluation returned FAIL. This keeps
+the rate within [0, 1], and an inconsistent pair still counts the FAIL it contains, as
+L423 asks ("so an error does not hide a simultaneous false alarm").
+
+## A-050 — Which mutant traces the panel evaluates (DECIDED BY CLAUDE — owner review pending)
+
+**Decision (decided by Claude under standing delegation, owner review pending):** each
+checker is evaluated twice on every exposed case in `Q_ds` (L427, L435), and twice on
+every raw-only unmasked case (for `PANEL_STRICTER_THAN_MASK_EVENT`, L427).
+
+Mutant traces with no raw divergence are not evaluated: they are byte-identical to the
+null trace of the same scenario, which is already in the benign set.
+
+Plan Q6 is settled the same way: the "valid" of F5 (L514) is `rd_valid`, the predicate of
+the DRAFT mask (MK05); this stays open until the mask is signed.
+
+## A-051 — Non-deterministic run-record fields for F1 (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L510] "Traces match excluding explicitly non-deterministic metadata"
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- The checker-facing trace rows are compared byte for byte, with no exclusions.
+- In a simulation run record, only `waveform` is excluded, by an explicit list
+  (`alignment.NONDETERMINISTIC_RESULT_FIELDS`).
+- Observed on the pinned image: two otherwise identical runs give FST files that differ
+  in the header date string ("… 15:16:49 2026") and in a later block. All other fields,
+  including the per-row simulator times, are identical.
+
+## A-052 — F14 "ports" comparison (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L523] "Stable null hash, top module and ports"
+
+**Decision (decided by Claude under standing delegation, owner review pending):**
+- Ports match when the set of (name, direction, width) is the same in the RTL and in both
+  exported netlists.
+- Declaration order is recorded and compared separately (`port_order_same_as_rtl`), but
+  it is not a pass condition. Connections are by name in the harness and the miter.

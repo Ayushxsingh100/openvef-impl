@@ -23,6 +23,7 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import FallingEdge, ReadOnly, RisingEdge
 from cocotb.types import LogicArray
+from cocotb.utils import get_sim_time
 
 import harness
 
@@ -36,6 +37,18 @@ NEXT = "next_inputs_scheduled_for_edge_n_plus_1"
 def beat(phase: str) -> None:
     with open(os.environ["OPENVEF_SIM_HEARTBEAT"], "w", encoding="ascii") as f:
         f.write(f"{phase} {time.time()}\n")
+
+
+def record_row(rows: list, row: dict) -> None:
+    """Keep the row, and append it to the rows file at once, so the rows recorded before a
+    watchdog kill survive it (Protocol L306-L307: masked divergence before termination)."""
+    rows.append(row)
+    with open(os.environ["OPENVEF_SIM_ROWS"], "a", encoding="utf-8") as f:
+        f.write(json.dumps(row) + "\n")
+
+
+def now_ns() -> float:
+    return get_sim_time(unit="ns")
 
 
 def finish(result: dict) -> None:
@@ -156,20 +169,27 @@ async def openvef_driver_run(dut):
     # edge, whose post-edge snapshot is the first `step` input (B5).
     release = len(reset) - 1
     rows, completed, events = [], False, []
+    # Ordering probe (F2/F10, Protocol L223 "F2/F10 must prove the actual ordering"):
+    # simulator time of each active edge, the ReadOnly sample, the driver call and the
+    # drive phase, per row. Kept outside the trace rows (the trace schema is unchanged).
+    ordering = []
     scheduled = dict(reset[0])
     n = 0
     drive(dut, scheduled)
     while True:
         await RisingEdge(clk)
+        timing = {"row": n, "edge_ns": now_ns()}
         consumed = sample(dut, all_inputs)  # passive capture at the edge (L262)
         await ReadOnly()
         snapshot = sample(dut, outputs)
+        timing.update(sample_ns=now_ns(), sample_phase="ReadOnly")
+        ordering.append(timing)
         row = {"cycle_index": n, "reset": n < release, INPUTS: consumed, OUTPUTS: snapshot}
         if consumed != {k: scheduled[k] for k in all_inputs}:
             # L221: "The consumed-input field ... must agree with the prior row's scheduled
             # input"; a mismatch is a harness fault (stage map L155, reason ROW_ALIGNMENT).
             row.update({NEXT: None, "driver_completed": completed})
-            rows.append(row)
+            record_row(rows, row)
             events.append({"kind": "trace_integrity", "reason": "ROW_ALIGNMENT", "cycle": n})
             break
         if n < release:
@@ -177,13 +197,14 @@ async def openvef_driver_run(dut):
         elif n - release >= cap:
             # Cap reached (L227): this edge's outputs are recorded; no further decision.
             row.update({NEXT: None, "driver_completed": completed})
-            rows.append(row)
+            record_row(rows, row)
             break
         elif completed:
             vector = applied(safe_idle)
         else:
             cycle_index = n - release
             beat("step")
+            timing["driver_call_ns"] = now_ns()
             try:
                 value = guarded(driver.step, cycle_index, dict(snapshot))
             except BaseException as exc:  # includes SystemExit
@@ -194,7 +215,7 @@ async def openvef_driver_run(dut):
                 beat("sim")
             if events:
                 row.update({NEXT: None, "driver_completed": completed})
-                rows.append(row)
+                record_row(rows, row)
                 break
             if value == "COMPLETE":
                 completed = True
@@ -212,14 +233,16 @@ async def openvef_driver_run(dut):
                 if reason is not None:  # an invalid vector is not driven (File 30 §4)
                     events.append({"kind": "driver_vector", "reason": reason, "cycle": n})
                     row.update({NEXT: None, "driver_completed": completed})
-                    rows.append(row)
+                    record_row(rows, row)
                     break
                 vector = applied({k: value[k] for k in sorted(widths)})
         row.update({NEXT: vector, "driver_completed": completed})
-        rows.append(row)
+        record_row(rows, row)
         scheduled = vector
         await FallingEdge(clk)  # designated drive phase: build default (L219; TO FREEZE, L542)
         drive(dut, vector)
+        timing["drive_ns"] = now_ns()
         n += 1
     finish({"events": events, "rows": rows, "reset_release_cycle": release, "driver_completed": completed,
-            "run_status": "TRUNCATED_TRACE" if events else "COMPLETE_TRACE", "target": target})
+            "run_status": "TRUNCATED_TRACE" if events else "COMPLETE_TRACE", "target": target,
+            "ordering": ordering})

@@ -97,6 +97,7 @@ def run(request: dict) -> dict:
     (work / "request.json").write_text(json.dumps(request), encoding="utf-8")
     heartbeat = work / "heartbeat"
     result_file = work / "result.json"
+    rows_file = work / "rows.jsonl"  # rows as recorded, kept if the run is killed
     from cocotb_tools import config as cocotb_config  # harness-side only; same env as cocotb's Icarus runner
     import find_libpython
     libdir = str(cocotb_config.libs_dir)
@@ -119,6 +120,7 @@ def run(request: dict) -> dict:
         "OPENVEF_SIM_REQUEST": str(work / "request.json"),
         "OPENVEF_SIM_HEARTBEAT": str(heartbeat),
         "OPENVEF_SIM_RESULT": str(result_file),
+        "OPENVEF_SIM_ROWS": str(rows_file),
     }
     log = open(work / "vvp.log", "wb")
     proc = subprocess.Popen(["vvp", "-m", vpi_entry, str(vvp_file), "-fst"], cwd=str(work), env=env,
@@ -131,14 +133,15 @@ def run(request: dict) -> dict:
         if phase == "step" and since is not None and time.time() - since > step_timeout:
             proc.kill()
             proc.wait()
-            return _events({"kind": "driver_watchdog"})
+            return _truncated(rows_file, {"kind": "driver_watchdog"}, target)
         if now - started > budget_s:
             proc.kill()
             proc.wait()
             if phase in ("import", "factory"):
                 # A-037: no stage-map row for a driver import/factory that never returns.
                 return {"error": "A-037: driver import/factory exceeded the wall-clock limit", "scheduler": SCHEDULER}
-            return _events({"kind": "simulator_error", "target": target, "exception_class": "TimeoutExpired"})
+            return _truncated(rows_file, {"kind": "simulator_error", "target": target,
+                                          "exception_class": "TimeoutExpired"}, target)
     if not result_file.exists():
         # vvp ended without the loop's result: the simulator process failed.
         return _events({"kind": "simulator_error", "target": target, "exception_class": "CalledProcessError",
@@ -147,6 +150,22 @@ def run(request: dict) -> dict:
     result = json.loads(result_file.read_text(encoding="utf-8"))
     result["scheduler"] = SCHEDULER
     result["waveform"] = _waveform(wave_file)
+    return result
+
+
+def _truncated(rows_file: Path, event: dict, target: str) -> dict:
+    """A run killed from outside: the event plus every row recorded before the kill
+    (Protocol L306-L307 need to know whether a masked divergence was recorded before
+    termination). A partly written last line is discarded."""
+    rows = []
+    if rows_file.exists():
+        for line in rows_file.read_text(encoding="utf-8").splitlines():
+            try:
+                rows.append(json.loads(line))
+            except ValueError:
+                break
+    result = _events(event)
+    result.update(rows=rows, run_status="TRUNCATED_TRACE", target=target)
     return result
 
 
