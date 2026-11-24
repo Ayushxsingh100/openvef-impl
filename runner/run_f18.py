@@ -31,14 +31,15 @@ from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
 from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
 from openvef.import_policy import check_import_policy  # noqa: E402
 from openvef.ast_signature import check_ast_signature, check_compile  # noqa: E402
-from openvef.assembler import NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, check_visible_clause_ids  # noqa: E402
+from openvef.assembler import (NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, check_reserved_heading_lines,  # noqa: E402
+                               check_unresolved_placeholders, check_visible_clause_ids)
 from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
 from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
 from openvef import simulator_stages  # noqa: E402
 from openvef.simulation import SimulationError  # noqa: E402
-from openvef.ledger import HaltSignature, SignatureDomainError, halt_after_recovery, lifecycle_expectation  # noqa: E402
+from openvef.ledger import HaltSignature, SignatureDomainError  # noqa: E402
 from openvef.stage_map import (EventError, NotDetermined, adjudicate_checker, first_event,  # noqa: E402
-                               outcome_from_record)
+                               outcome_from_record, paired_run_failure, runtime_signature_failure, validate_vector)
 from openvef.source_ast import UnsettledSpec, check_sources  # noqa: E402
 
 INDEX_REL = "41_F18_Fixture_Inputs/fixture-index.json"
@@ -209,6 +210,8 @@ def two_runs(runs) -> tuple:
 
 
 def adapt_response(desc: dict, validator) -> Failure | dict | None:
+    if desc["input"].get("provider_finish_reason", "stop") not in ("length", "stop"):
+        raise Blocked("provider finish reason outside the cited values")
     result = response_stages(desc, desc["input"], validator)
     return sim_stages(desc, response_object(desc["input"])) if result is None else result
 
@@ -243,19 +246,8 @@ def adapt_halt_recurrence(desc: dict, validator) -> Failure | dict | None:
         first, second = (HaltSignature.given(inp[k]) for k in ("first_halt_signature", "second_halt_signature"))
     except SignatureDomainError as exc:
         raise Blocked(f"PD-01 fixture defect: supplied halt signature outside the Protocol L185 domains: {exc}") from exc
-    return halt_after_recovery(first, second, inp["recovery_cycles_used"])
-
-
-def adapt_change_class(desc: dict, validator) -> Failure | dict | None:
-    """Ledger, Protocol L175-L176, L181-L185 (A-033 revised)."""
-    try:
-        record, missing = lifecycle_expectation(desc["input"]["change_class"])
-    except ValueError as exc:
-        raise Blocked(str(exc)) from exc
-    if missing:
-        raise Blocked("A-033: no supporting Protocol sentence for " +
-                      "; ".join(f"{name}: {reason}" for name, reason in missing.items()))
-    return record
+    raise Blocked(f"PD-26: signatures valid (identical: {first == second}), but the pack states no error class for "
+                  "DESIGN_HALT_REPEATED")
 
 
 def adapt_clause_ids(desc: dict, validator) -> Failure | dict | None:
@@ -264,14 +256,57 @@ def adapt_clause_ids(desc: dict, validator) -> Failure | dict | None:
         inp["visible_payload"], inp["manifest_clause_ids"], inp["clause_id_regex"],
         inp.get("clause_id_search_regex", SEARCH_REGEX_DEFAULT),
         inp.get("clause_id_near_match_regex", NEAR_MATCH_REGEX_DEFAULT))
+    return rejected(result)
+
+
+def rejected(result: Failure | None) -> Failure:
+    """A packet or local check's rejection; the pack defines no record for "not rejected"."""
     if result is None:
-        raise Blocked("packet check passed; nothing further to compare")
+        raise Blocked("check passed; nothing further to compare")
     return result
 
 
+def adapt_reserved_headings(desc: dict, validator) -> Failure | dict | None:
+    return rejected(check_reserved_heading_lines(desc["input"]["payload"], desc["input"]["reserved_headings"]))
+
+
+def adapt_rendered(desc: dict, validator) -> Failure | dict | None:
+    return rejected(check_unresolved_placeholders(desc["input"]["rendered"]))
+
+
+# File 30 L35, L37: the parameter names the runtime signature must confirm.
+REQUIRED_PARAMETERS = {("driver.py", "create_driver"): ["seed"],
+                       ("driver.py", "Driver.step"): ["self", "cycle_index", "outputs_after_edge"],
+                       ("checker.py", "check_trace"): ["trace", "metadata"]}
+
+
+def adapt_runtime_signature(desc: dict, validator) -> Failure | dict | None:
+    sig = desc["input"]["runtime_signature"]
+    if set(sig) != {"file", "symbol", "actual", "expected"}:
+        raise Blocked("runtime signature outside the contract's fields")
+    required = REQUIRED_PARAMETERS.get((sig["file"], sig["symbol"]))
+    if required is None or sig["expected"] != required:
+        raise Blocked("runtime signature: not a File 30 L35/L37 entry point, or its required parameters differ")
+    return rejected(runtime_signature_failure(sig["file"], sig["symbol"], sig["actual"], required))
+
+
+def adapt_vector_keys(desc: dict, validator) -> Failure | dict | None:
+    """File 30 L83 (a)-(b); a vector passing them is not determined without widths (A-027)."""
+    return rejected(validate_vector(desc["input"]["driver_return"], desc["input"]["expected_keys"]))
+
+
+def adapt_paired_runs(desc: dict, validator) -> Failure | dict | None:
+    runs = desc["input"]["paired_runs"]
+    fields = ("first_raw_output_divergence_cycle", "first_next_input_divergence_cycle")
+    if set(runs) != set(fields) or not all(runs[f] is None or (type(runs[f]) is int and runs[f] >= 0) for f in fields):
+        raise Blocked("paired runs outside the contract's fields")
+    return rejected(paired_run_failure(*(runs[f] for f in fields)))
+
+
 # (required keys, optional keys, adapter). This table is the ONLY place an input shape
-# selects code. D-012 (A1-1): an adapter that only one mandatory fixture can reach is not
-# allowed; tests/test_dispatch_shapes.py enforces it.
+# selects code. D-013: each adapter needs an input contract cited to the pack
+# (runner/adapter_contracts.py) and at least three synthetic non-fixture vectors
+# (tests/adapter_vectors.py); tests/test_dispatch_shapes.py enforces both.
 ADAPTERS = (
     ({"raw_response_utf8"}, {"provider_finish_reason"}, adapt_response),
     ({"raw_response_base64"}, set(), adapt_response),
@@ -282,9 +317,13 @@ ADAPTERS = (
     ({"checker_runs"}, set(), adapt_checker_runs),
     ({"design_id", "recovery_cycles_used", "first_halt_signature", "second_halt_signature", "scheduled_slots"}, set(),
      adapt_halt_recurrence),
-    ({"change_class"}, set(), adapt_change_class),
     ({"visible_payload", "manifest_clause_ids", "clause_id_regex"},
      {"clause_id_search_regex", "clause_id_near_match_regex"}, adapt_clause_ids),
+    ({"payload", "reserved_headings"}, set(), adapt_reserved_headings),
+    ({"rendered"}, set(), adapt_rendered),
+    ({"runtime_signature"}, set(), adapt_runtime_signature),
+    ({"driver_return", "expected_keys"}, set(), adapt_vector_keys),
+    ({"paired_runs"}, set(), adapt_paired_runs),
 )
 
 
