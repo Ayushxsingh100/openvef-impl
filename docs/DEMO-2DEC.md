@@ -64,8 +64,9 @@ artifacts**.
   needs a re-audit, which hasn't happened.
 - **The 17 NOT IMPLEMENTED:** 15 have an input or outcome the pack doesn't define, and two
   (M42, M47) supply halt signatures the Protocol doesn't allow (PD-01).
-- **The audit was by an AI model, not a human (DEV-002).** Its report isn't saved in the
-  repository yet, and the corrected code has not been re-audited.
+- **The audit was by an AI model, not a human (DEV-002).** It found one
+  blocker and one major issue, and could not run Docker or the pinned Python. The corrected
+  code has not been re-audited. The report is in `docs/reviews/`.
 - **The pack has 26 recorded defects** (pack-defects.md).
 - **AI-assisted, disclosed:** the FIFO specification, RTL and mask drafts were written
   by Claude via Claude Code. The specification and RTL were approved by Krishika in the

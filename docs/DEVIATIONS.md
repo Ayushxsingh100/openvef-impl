@@ -66,10 +66,12 @@ will be performed by a different AI model (ChatGPT, OpenAI), not the implementat
 using dist/openvef-audit-bundle.zip (e0ee23ff…fa01) and docs/AUDIT-BRIEF.md. This is NOT a
 human independent audit".
 
-**Status: report received, as stated by Krishika (OpenAI GPT-6, 25 Nov 2026), but not yet
-saved.** Its text was not supplied to Claude Code, so it is not under `docs/reviews/` and
-Claude has not seen it; see the [note](reviews/implementation-audit-gpt6-2026-11-25-NOTE.md),
-which also covers the bundle-hash difference. Step (5) is not marked done.
+**Status: first report received and saved verbatim** (OpenAI GPT-6, 25 Nov 2026):
+[report](reviews/implementation-audit-gpt6-2026-11-25.md), SHA-256
+`3dfa0865bf1d3c187930ecd63ffb2aac8f0716d2e66e69bd8f865e40e4820296`; [note](reviews/implementation-audit-gpt6-2026-11-25-NOTE.md).
+It found one BLOCKER (A1-1) and one MAJOR (A8-1); A2, A3, A5 and A9 are limitations (no Docker,
+no CPython 3.11.18). It states a 63-digit bundle hash; the note explains. Step (5) is not
+marked done, and a re-audit is pending.
 
 **Response (D-012):** A1-1 and A8-1 accepted and applied; limitations A2, A3, A5 and A9
 accepted and recorded, not treated as defects. The corrected code has **not** been re-audited.
