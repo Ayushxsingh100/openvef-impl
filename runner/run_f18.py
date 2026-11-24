@@ -353,9 +353,10 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
             raise Blocked("vector valid")
         return result
     if keys == {"driver_return", "legal_input_predicate"}:
-        raise Blocked("A-038: executing a prose legal-input predicate would require inventing a predicate "
-                      "language (File 30 L83 (e) defines none); the predicate belongs to the owner-written "
-                      "FIFO reset/legal-input specification; no port set is supplied for checks (a)-(d)")
+        raise Blocked("A-038 (revisited): the descriptor's prose predicate is not the design's executable "
+                      "FIFO-042 (they disagree when rd_en = 1 at full), executing the prose would need a "
+                      "predicate language File 30 L83 (e) does not define, and no port set is supplied for "
+                      "checks (a)-(d), which precede (e)")
 
     if keys == HALT_RECOVERY_KEYS:  # ledger, Protocol L185
         return halt_after_recovery(HaltSignature.given(inp["first_halt_signature"]),

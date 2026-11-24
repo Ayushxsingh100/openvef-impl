@@ -44,7 +44,7 @@ they are listed in [fifo-owner-checklist.md](fifo-owner-checklist.md).
 | PD-03 | I | Exact comparison of four fields vs control-vector expectations with extra keys | M14, M17, M41, M48–M58 | A-032 (Claude) |
 | PD-04 | U | `parser_unit_vector` and the disposition of unit vectors | M36 | A-012 (Claude) |
 | PD-05 | I | OUTPUT_TRUNCATED: stage-map row order vs evaluation order | P11a | A-001 (owner, Ayush pending) |
-| PD-06 | U, I | Driver-vector parameters: prose predicate, missing widths, output port in a driven vector | M26, M27 (NOT_IMPLEMENTED) | A-027, A-038 (Claude) |
+| PD-06 | U, I | Driver-vector parameters: prose predicate, missing widths, output port in a driven vector | M26 (PASS), M27 (NOT_IMPLEMENTED) | A-027, A-038 (Claude; revisited 24 Nov 2026, still blocked) |
 | PD-07 | U | Fixture input shapes and the call under test | most non-response fixtures | A-002, A-012, A-025, A-026, A-028 |
 | PD-08 | U | `UNSPECIFIED` text requirement has no mechanical rule | P21 | A-004 (owner, Ayush pending) |
 | PD-09 | U | Source of the manifest `clause_ids` for fixtures | all response fixtures | A-005 (owner, Ayush pending) |

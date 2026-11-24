@@ -980,6 +980,36 @@ stays NOT_IMPLEMENTED, because executing it would require inventing behaviour:
 What would unblock it: an executable predicate in the FIFO specification's legal-input
 rules (owner-written), plus the port manifest. The vector check then calls it as step (e).
 
+**Revisited, 24 Nov 2026 (decided by Claude under standing delegation, owner review
+pending), now that FIFO-042 exists as an executable predicate (D-005) and check (e) runs
+it (A-041): M27 still stays NOT_IMPLEMENTED.** Reason 2 above no longer applies, because
+the FIFO specification exists as a D-005 draft. Reasons 1 and 3 still hold, in narrower
+form:
+1. **FIFO-042 is not M27's predicate.**
+   - M27 supplies its own predicate, "wr_en must be 0 when full is 1". FIFO-041 states a
+     different rule: a write is illegal at full only "with `rd_en` = 0", because
+     FIFO-030 makes a write together with a read at full legal.
+   - The two disagree on the vector `wr_en` = 1, `rd_en` = 1 at full.
+   - Substituting FIFO-042 would evaluate a predicate the fixture does not supply. That
+     would also contradict the treatment of descriptor-supplied data in A-005 (owner
+     decision) and A-044, where fixture-supplied data controls.
+   - Executing M27's own string still needs a prose-to-code translation that has a
+     single instance, which is fixture-shaped (hard rule 4). No predicate language exists
+     (File 30 L83 (e); PD-06).
+2. **No port set.** M27 gives no input-port set or widths, so checks (a)–(d), which
+   precede (e) (File 30 L83), cannot be established.
+   - The vector's own keys cannot be the port set, because check (a) would then pass by
+     construction.
+   - Under the FIFO port manifest (FIFO-004), the vector `{"wr_en", "full"}` fails (a)
+     first, with `MISSING_KEYS` (`wr_data`, `rd_en`), and `full` is an output.
+   - So evaluating M27 against the FIFO materials would not reach (e) at all.
+
+**What would unblock it** (an owner or pack action, not an interpretation):
+- either a revised M27 descriptor that supplies a port manifest with widths and an
+  executable predicate;
+- or an owner decision that M27 is evaluated against the frozen FIFO materials, in which
+  case its expected outcome must be revisited, because (a) fires before (e).
+
 ## A-039 — Simulator failures: the `class` token and an overrun outside `step` (DECIDED BY CLAUDE — owner review pending)
 
 The stage-map row is `SIMULATOR_ERROR|target=<RTL_OR_NULL>|class=<EXCEPTION_CLASS>`
