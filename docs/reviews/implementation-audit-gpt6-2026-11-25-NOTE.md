@@ -33,8 +33,14 @@ which was written before the report was available (in git at `2ddd67c`).
 - *PASS areas:* A4, A6, A7 and A10.
 
 **Facts about the report a reader should know**
-- **The operator is not identified**, and the version given is "OpenAI GPT-6" only. DEV-002
-  requires the exact model and version. The prompt is not recorded.
+- **The report does not identify the operator** or the prompt, and gives the version as
+  "OpenAI GPT-6" only. Supplied afterwards, **as stated by Krishika** (24 Nov 2026 UTC; not
+  verifiable from the report):
+  - Operator: Krishika.
+  - Model as displayed by ChatGPT: "GPT-6" (no finer version shown). DEV-002 asks for the
+    exact model and version; this is all that was available.
+  - Prompt used: "You are the implementation auditor. Unzip this bundle and follow
+    docs/AUDIT-BRIEF.md exactly. Produce the report in the format it requires."
 - **A1-1 cites two shapes.** It says singleton shapes were identified and discusses M27 and
   M36. The audited bundle had 17 shapes used by one fixture, which D-012 acted on more
   widely. D-013 then replaced that rule.
