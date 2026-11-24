@@ -27,11 +27,18 @@ artifacts**.
   traces, paired original/null-netlist runs with a masked comparison, and checker runs
   in separate processes.
 - **A 4-entry × 8-bit FIFO design:**
-  - specification, RTL, null-netlist export (Yosys) and an observation-mask draft;
+  - specification, RTL, null-netlist export (Yosys), frozen 24 Nov 2026
+    (FREEZE-2026-11-24: Krishika's signature under governance rule D-008; Ayush's
+    ratification pending);
+  - an observation mask, still a draft awaiting the independent reviewer;
   - simultaneous read/write at full and a registered almost-full as its documented
     corner cases.
 - **Fixture runner and evidence records:** hashes of every input, the interpreter, the
-  image and the source files.
+  image and the source files. Each run re-checks the frozen files against their signed
+  hashes.
+- **Feasibility-control harness (F1–F17):** built and unit-tested. F14 (export
+  repeatability) and F15 (ledger identities) pass, provisionally. The other controls wait
+  for owner-written mutants, drivers and checkers.
 
 ## Results (latest evidence run `run-20261124T163535Z`, pinned image)
 
@@ -41,16 +48,20 @@ artifacts**.
 
 **What to say about these numbers:**
 - **F18 is not passed.**
-- **10 of the 139 passes are provisional.** The FIFO materials are now frozen
-  (FREEZE-2026-11-24), but the independent human reviewer hasn't signed the mask yet.
+- **10 of the 139 passes are provisional, for one reason only:** the independent human
+  reviewer hasn't signed the observation mask. The spec, RTL, frozen values and the
+  readings those fixtures use are now frozen and approved (FREEZE-2026-11-24).
 - **Several other passes rest on readings that still need owner review.** The pack was
-  ambiguous in places; those readings are logged and decided under a delegation.
+  ambiguous in places; those readings are logged and decided under a delegation. They
+  are listed for review in `docs/READINGS-REVIEW.md`. M36, R01–R13 and several M-fixtures
+  would change under a competing reading.
 - **The 5 NOT IMPLEMENTED are blocked by defects in the pack itself, not by missing
   code.** One fixture (M27) is unsatisfiable as written (PD-25), and four have no
   supporting Protocol sentence (A-033).
 - **The pack has 25 recorded defects** (pack-defects.md).
 - **AI-assisted, disclosed:** the FIFO specification, RTL and mask drafts were written
-  by Claude via Claude Code and are reviewed by the owners. If a Claude model is ever
+  by Claude via Claude Code. The specification and RTL were approved by Krishika in the
+  freeze; the mask is still a draft. If a Claude model is ever
   evaluated, that is reported as a potential familiarity confound.
 - **Benchmark overlap is disclosed.** The closest public match is GateTruth's
   synchronous FIFO; FIFO designs are not novel, and no novelty is claimed.
