@@ -19,13 +19,14 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T151744Z`**.
-- Run class `development`; commit `9a4b821`, clean tree.
+Latest evidence run: **`evidence/run-20261124T163535Z`**.
+- Run class `development`; commit `5116e9b`, clean tree; the first run after the owner
+  freeze ([FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md)). The run
+  re-verified all 20 frozen items against their signed hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Rerun after the sandbox simulation changed (H9 ordering probe; rows kept on a watchdog
-  kill). Every fixture's outcome is identical to the previous run,
-  `run-20261124T144337Z` (commit `3f3e355`).
+- Every fixture's outcome is identical to the previous run, `run-20261124T151744Z`
+  (commit `9a4b821`).
 
 | Status | Count | Fixtures |
 |---|---|---|
@@ -36,12 +37,15 @@ Latest evidence run: **`evidence/run-20261124T151744Z`**.
 | **Total** | **144** | the full mandatory set (File 21: 59 P + 13 R + 72 M) |
 
 **Provisional PASS (10):** P01, P14, P17, P21, P42, M07, M31, M32, M33, M57. They reach
-L166 (7)–(11) on the DRAFT FIFO materials (D-005). They **do not count toward F18**
-until all of these hold:
-- the owners freeze the materials;
-- an independent human signs the mask;
-- the owners review the readings they depend on (A-040, A-041, A-043, A-044; A-042
-  needs Ayush's confirmation).
+L166 (7)–(11) on the FIFO materials.
+- **Settled by the owner freeze (Krishika's signature `a955245`, governance rule D-008):**
+  the specification, frozen values, RTL, null-export script, `spec_version_sha256`, and
+  the readings they depend on (A-040–A-044).
+- **Still open, one reason:** the observation mask and File 24 table are unsigned. They
+  need the independent human mask reviewer (L271; package section G), and no owner
+  signature replaces that.
+
+They **do not count toward F18** until the mask is signed.
 
 See [OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md).
 
@@ -60,12 +64,12 @@ review. [traceability.md](traceability.md) marks each one.
 Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
 [design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
 
-Latest control run: **`evidence/controls-20261124T151740Z`**, pinned image, commit
-`9a4b821`. It carries the same identity records as an F18 run.
+Latest control run: **`evidence/controls-20261124T163709Z`**, pinned image, commit
+`5116e9b`. It carries the same identity records as an F18 run.
 
 | Status | Controls |
 |---|---|
-| PASS, provisional | F14 (DRAFT RTL and export script; A-052), F15 (case table awaits owner review) |
+| PASS, provisional | F14 (RTL and export script frozen; only A-052 awaits owner review), F15 (case table awaits owner review) |
 | BLOCKED_OWNER_ARTIFACTS | F1–F13, F17: each record lists the owner files it is waiting for |
 
 **What is built:** the harness components H1–H10.
@@ -79,7 +83,7 @@ Latest control run: **`evidence/controls-20261124T151740Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T151744Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261124T163535Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -124,10 +128,9 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| Sign the freeze package: spec v0.2, items 7–12, RTL, export script, D-004…D-006, A-040…A-044 (and A-038), overlap disclosure | both owners | [OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md) |
-| Ayush's confirmation of every owner decision recorded from Krishika alone: A-001–A-006, A-013, A-014, A-015 case 2, D-002, D-002a, D-003, D-004, D-004a, D-005, D-006, D-007 | Ayush | [ambiguities.md](ambiguities.md) |
-| D-001 (Draft 2020-12 validator pin): one owner confirmation outstanding | owners | ambiguities.md D-001 |
-| Review of the readings decided by Claude: A-007–A-012, A-013 tie case, A-015–A-041, A-043, A-044, A-045–A-052 (A-042 accepted by Krishika) | both owners (the delegation came from Krishika alone) | ambiguities.md; CLAUDE.md "Standing delegation" |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-008, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
+| Review of the readings decided by Claude: A-007–A-012, A-013 tie case, A-015–A-037, A-039, A-045–A-052 (A-038 and A-040–A-044 approved in the freeze) | an owner (D-008) | ambiguities.md; CLAUDE.md "Standing delegation" |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |

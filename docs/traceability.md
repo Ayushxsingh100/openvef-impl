@@ -48,30 +48,30 @@
 | Protocol L175–L176, L181–L183: change-class lifecycle control expectations; `required_action` verbatim from L176; each field cited or marked unsupported | `src/openvef/ledger.py` `LIFECYCLE_CASES`, `lifecycle_expectation`; `tests/test_lifecycle.py` (5 tests) | M53 — PASS in run-20261123T195936Z; M48, M50, M54, M58 NOT_IMPLEMENTED (unsupported fields listed in A-033) | Implemented (A-033 revised per owner correction; field derivations Claude-decided, owner review pending) |
 | Owner freeze and audit readiness: one signing checklist with SHA-256 per item (whole files, or per-section for decision records); status, auditor needs and open items | `docs/OWNER-FREEZE-PACKAGE.md`, `docs/AUDIT-READINESS.md`; `tests/freeze_hashes.py`, `tests/test_freeze_package.py` | — | Ready for signature (nothing signed) |
 | L555 (4); File 50: Python 3.11 Unicode identifier tokenizer check on the pinned interpreter | `runner/probe_file50.py`, `src/openvef/import_policy.py` (`scan_identifiers`) | M55, M56, M57 (PASS in the evidence runs) | **Recorded**: `evidence/probe-file50-20261124T112645Z`; matches File 54 audit-time 3.11.18 results |
-| Protocol §17 L524, L529, L405–L411; §12 L303–L328; §13.1–§13.3; inclusion table L370–L384 (F15) | `src/openvef/pairs.py` (H3), `src/openvef/metrics.py` (H4), `src/openvef/f15.py`; `tests/test_pairs_metrics.py` | F15 control (not an F18 fixture) | **PASS, provisional**: `evidence/controls-20261124T151740Z`. The case table was built by Claude; owner review pending. No Claude-decided reading is used. Does not count until reviewed |
-| Protocol §17 L523, L233 (F14) | `src/openvef/f14.py`; harness task `interface` | F14 control | **PASS, provisional**: `evidence/controls-20261124T151740Z`. DRAFT RTL and export script (D-005); A-052 Claude-decided, owner review pending |
+| Protocol §17 L524, L529, L405–L411; §12 L303–L328; §13.1–§13.3; inclusion table L370–L384 (F15) | `src/openvef/pairs.py` (H3), `src/openvef/metrics.py` (H4), `src/openvef/f15.py`; `tests/test_pairs_metrics.py` | F15 control (not an F18 fixture) | **PASS, provisional**: `evidence/controls-20261124T163709Z`. The case table was built by Claude; owner review pending. No Claude-decided reading is used. Does not count until reviewed |
+| Protocol §17 L523, L233 (F14) | `src/openvef/f14.py`; harness task `interface` | F14 control | **PASS, provisional**: `evidence/controls-20261124T163709Z`. RTL and export script frozen (C1, C2); A-052 Claude-decided, owner review pending |
 | Protocol §8 L257–L265, §12 L306–L311, L336 (pair runs) | `src/openvef/pair_runner.py` (H2); sandbox rows kept on a watchdog kill | F3–F12, F17 (when owner artifacts exist) | Built and unit-tested on synthetic rows; A-046, A-047, A-048 Claude-decided, owner review pending |
 | Protocol §11 L291–L297, L278; F4 L513, F5 L514; D-007 (3) | `src/openvef/miter.py` (H5, H6); harness task `yosys` | F4, F5 | Built; tested on TEST-ONLY toy designs (shortest counterexample, replay agreement, bounded equivalence under the mask); A-045 Claude-decided, owner review pending |
 | Protocol §13.4 L415–L437 (panel); L529 (5) | `src/openvef/panel.py` (H7) | F17, F15 (5) | Built; synthetic tests; A-049, A-050 Claude-decided, owner review pending |
 | Protocol L223, L216–L221 (F2/F10 ordering); L510 (F1 repeats) | `sandbox/sim_cocotb.py` ordering probe (H9); `src/openvef/alignment.py` (H9, H10) | F1, F2, F10 | Built; toy-design runs in the sandbox; A-051 Claude-decided, owner review pending |
 | Charter L74; L233; D-007 (2) (control mutants) | `src/openvef/mutants.py` (H1); `design/fifo/controls/` slots (owner-written content) | F4–F10, F12, F17 | Loader built; **no mutant exists yet** (owner item 15) |
-| Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261124T151740Z`: F14, F15 PASS (provisional); 14 controls BLOCKED_OWNER_ARTIFACTS |
+| Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261124T163709Z`: F14, F15 PASS (provisional); 14 controls BLOCKED_OWNER_ARTIFACTS |
 
-Latest F18 run: `evidence/run-20261124T151744Z`. It was started by `runner/run_f18_container.sh development`
-at commit 9a4b821, on a clean tree:
-- Interpreter status **PINNED** under D-002a: the runner and every artifact ran in the
-  image `python@sha256:07d48240…b535`, image ID `sha256:565e5547…1c3f`, CPython 3.11.18,
+Latest F18 run: `evidence/run-20261124T163535Z`. It was started by `runner/run_f18_container.sh development`
+at commit 5116e9b, on a clean tree, after the owner freeze (FREEZE-2026-11-24; Krishika's
+signature a955245 under D-008):
+- Interpreter status **PINNED** under D-002a: image ID `sha256:565e5547…1c3f`, CPython 3.11.18,
   SHA-256 92d7e40e…6b79.
-- The host-side command and environment are in `summary.json` `sandbox.host_invocation`;
-  every `run.log` fixture line carries a UTC timestamp.
-- Counts: 139 PASS (10 provisional: P01, P14, P17, P21, P42, M07, M31, M32, M33, M57),
-  0 FAIL, 5 NOT_IMPLEMENTED (M27, A-038; M48, M50, M54, M58, A-033), 0 ERROR.
-- Rerun after the sandbox gained the H9 ordering probe and kept rows: every fixture's
-  status, actual and expected values are identical to run-20261124T144337Z (commit 3f3e355).
+- The run re-verified all 20 frozen items against their signed hashes.
+- Counts: 139 PASS, 0 FAIL, 5 NOT_IMPLEMENTED (M27, A-038; M48, M50, M54, M58, A-033),
+  0 ERROR. Outcomes are identical to run-20261124T151744Z.
+- 10 PASS are still provisional (P01, P14, P17, P21, P42, M07, M31, M32, M33, M57). The
+  only remaining reason is the unsigned observation mask (L271, package section G).
 
-Latest control run: `evidence/controls-20261124T151740Z`, at the same commit and in the same image.
-- F14 and F15 are PASS, provisional.
-- The other 14 controls are BLOCKED_OWNER_ARTIFACTS, each with its missing files listed.
+Latest control run: `evidence/controls-20261124T163709Z`, same commit and image:
+- F14 PASS, provisional on A-052 only;
+- F15 PASS, provisional on owner review of the case table;
+- 14 controls BLOCKED_OWNER_ARTIFACTS.
 
 Caveats:
 - D-002a and D-003 still await Ayush's confirmation.

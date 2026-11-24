@@ -33,7 +33,7 @@ artifacts**.
 - **Fixture runner and evidence records:** hashes of every input, the interpreter, the
   image and the source files.
 
-## Results (latest evidence run `run-20261124T151744Z`, pinned image)
+## Results (latest evidence run `run-20261124T163535Z`, pinned image)
 
 | PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
 |---|---|---|---|---|
@@ -41,9 +41,8 @@ artifacts**.
 
 **What to say about these numbers:**
 - **F18 is not passed.**
-- **10 of the 139 passes are provisional.** They run on FIFO materials that are still
-  DRAFT: the owners haven't frozen them, and the independent human reviewer hasn't
-  signed the mask.
+- **10 of the 139 passes are provisional.** The FIFO materials are now frozen
+  (FREEZE-2026-11-24), but the independent human reviewer hasn't signed the mask yet.
 - **Several other passes rest on readings that still need owner review.** The pack was
   ambiguous in places; those readings are logged and decided under a delegation.
 - **The 5 NOT IMPLEMENTED are blocked by defects in the pack itself, not by missing
@@ -84,8 +83,8 @@ once to warm the image (about 15 s).
 5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
    provisional.
    ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261124T151744Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261124T151744Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
+   python3 -c "import json;s=json.load(open('evidence/run-20261124T163535Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures'])"
+   grep '"fixture_id": "M27"' evidence/run-20261124T163535Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
 6. **What is open** (60 s): open `docs/OWNER-FREEZE-PACKAGE.md` (what the owners sign
    next) and `docs/AUDIT-READINESS.md` (what the independent auditor will check).
