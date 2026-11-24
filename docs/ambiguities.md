@@ -802,6 +802,59 @@ Debian `iverilog` `12.0-2+b1`, `.deb` SHA-256
 snapshot.debian.org (owner instruction, 23 Nov 2026). Details in
 [docs/sandbox.md](sandbox.md).
 
+## D-004 — Yosys and MCY for the null-netlist export (DECIDED — Ayush's confirmation pending)
+
+**Owner decision by Krishika, 23 Nov 2026 (Ayush's confirmation pending):** pin Yosys and
+MCY for the null-netlist export (Protocol L233, L235, L544) at their latest stable
+releases that build in the pinned image, from snapshot.debian.org or a pinned source
+commit, with exact versions and hashes recorded in docs and in every run.
+
+Pinned:
+- **Yosys v0.71**, latest release, 12 Nov 2026. Debian trixie ships only 0.52, and that
+  package would also bring a second, system Python (`python3`, `python3-click`) into
+  the image.
+  - Built from the release tarball `yosys.tar.gz`, SHA-256
+    `2ec7c2ee63bb9b4065d6d5fff2786a1455e834f90ede8eb1d47791153ebef2a5`, the digest
+    GitHub publishes.
+  - Tag commit `b4c586fd37d0ec61bb38fc1a85fd6a2fde48fcd1`. The tarball's `.gitcommit`
+    is CI merge commit `5628c13240f670b97aaaca3d47940c4afb8ff572`, which GitHub's
+    compare shows has no file differences from it; the build asserts that value.
+- **MCY v0.71**: commit `5a2cad0cbefceb7f23051c08348bd23128fd1046` (tag object
+  `b062a44a…`). It is pinned by commit because MCY publishes no release asset.
+  - Only the command-line tool and its scripts are installed. `mcy-dash` (Flask) and the
+    GUI (Qt) are not needed for export.
+- **`click`** was left out at first. Hard rule 3 requires owner approval for it, D-004
+  does not mention Python packages, and the standing delegation excludes dependency
+  pins. D-004a (below) approved it on 24 Nov 2026, and it is now in `requirements.lock`.
+  The null-netlist export uses Yosys only.
+- **Build tools** (gcc, cmake, bison, flex, …) come from snapshot.debian.org at
+  `20261104T212339Z`, the snapshot recorded in the base image's own apt sources.
+  - They are used in a separate build stage and are not in the final image.
+
+Build configuration: CMake `release` preset (`-O3`), with these changes:
+- Tcl off, editline off, Python off and unit tests off;
+- `BUILD_SHARED_LIBS=OFF`, so no new shared libraries are needed at run time;
+- everything else at release defaults, including ABC and the slang frontend.
+
+Details and binary hashes: [docs/sandbox.md](sandbox.md). Not decided here: the frozen
+export script, mutation modes and the mutant population (L544), which stay owner items.
+
+## D-004a — `click` for the MCY command-line tool (DECIDED — Ayush's confirmation pending)
+
+**Owner decision by Krishika, 24 Nov 2026 (Ayush's confirmation pending):** "approve
+adding click (the version mcy requires) to requirements.lock with --require-hashes."
+Recorded with D-004.
+
+- MCY v0.71 (commit `5a2cad0c`) states no version bound for `click`. Its README says only
+  `pip install click flask`, and `mcy.py` has `import click`.
+- The pin is therefore the version pip-tools 7.7.0 resolves in the pinned base image:
+  `click==8.5.1` (wheel and sdist hashes `8bb5376d…7e37`, `9bbfada7…72b4`). The lock is regenerated with the same `pip-compile --generate-hashes`
+  command, starting from the existing lock, so the existing pins are unchanged.
+- On Linux, `click` has no dependencies (`colorama` applies on Windows only).
+- `flask` is not added: it serves only `mcy-dash`, which is not installed.
+- After this decision, `mcy --help` runs in the image, and `tests/test_netlist_export.py`
+  checks that.
+
 ## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
 
 File 30 §6 is headed "Import sandbox and deterministic execution". Paired runs compare
@@ -946,4 +999,3 @@ schema itself is TO FREEZE (L543).
 - `compare_runs` compares every row, including reset rows. Reset windows belong to the
   mask (L276), which is owner material.
 - Until the mask exists, a raw divergence during reset is compared like any other row.
-

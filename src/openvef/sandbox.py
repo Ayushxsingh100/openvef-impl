@@ -82,7 +82,30 @@ def toolchain_identity() -> dict:
             "vvp_version_line": (vvp.stdout or vvp.stderr).splitlines()[0] if (vvp.stdout or vvp.stderr) else None,
             "iverilog_deb_version": dpkg.stdout.strip() or None,
             "iverilog_sha256": _sha256_path("/usr/bin/iverilog"),
-            "vvp_sha256": _sha256_path("/usr/bin/vvp")}
+            "vvp_sha256": _sha256_path("/usr/bin/vvp"),
+            # D-004: Yosys and MCY.
+            "yosys_version_line": _first_line(["yosys", "-V"]),
+            "yosys_sha256": _sha256_path("/usr/local/bin/yosys"),
+            "yosys_abc_sha256": _sha256_path("/usr/local/bin/yosys-abc"),
+            "mcy_commit": _read_text("/usr/local/share/mcy/COMMIT"),
+            "mcy_sha256": _sha256_path("/usr/local/bin/mcy"),
+            "eda_pins": _read_text("/usr/local/share/EDA_PINS")}
+
+
+def _first_line(argv: list) -> Optional[str]:
+    try:
+        p = subprocess.run(argv, capture_output=True, text=True)
+    except OSError:
+        return None
+    text = p.stdout or p.stderr
+    return text.splitlines()[0] if text else None
+
+
+def _read_text(path: str) -> Optional[str]:
+    try:
+        return Path(path).read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
 
 
 def _sha256_path(path: str) -> Optional[str]:

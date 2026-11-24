@@ -36,7 +36,11 @@ configuration is adequate as the security boundary for F16 is for the owners to 
 | Pinned interpreter (D-002a) | `3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]`, `/usr/local/bin/python3.11`, SHA-256 `92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79` |
 | Icarus Verilog (D-003) | Debian package `iverilog` `12.0-2+b1` from snapshot.debian.org (`iverilog -V`: "Icarus Verilog version 12.0 (stable)"); `.deb` SHA-256 `febe027d2d3f5a7e570844d55758339ab5490acc09f404f214a8719d89d07056`, checked with `sha256sum -c` before `dpkg -i`; `/usr/bin/iverilog` SHA-256 `99633b21…8462`, `/usr/bin/vvp` SHA-256 `dc287630…c1df` |
 | cocotb (D-003) | `cocotb==2.1.0` (cp311 manylinux wheel) and its dependencies `find-libpython==0.5.1`, `iniconfig==2.3.1`, `packaging==26.3`, `pluggy==1.7.0`, `pygments==2.21.0`, `pytest==9.2.0`, all with hashes in `requirements.lock` (pip-tools 7.7.0 `pip-compile --generate-hashes`, run in the pinned base image). Earlier pins are unchanged. |
-| Build | [sandbox/Dockerfile](../sandbox/Dockerfile): base by digest; iverilog `.deb` from snapshot.debian.org by URL, version and SHA-256; `pip install --require-hashes --no-deps -r requirements.lock`; user `sandbox` uid/gid 10001 |
+| Yosys (D-004) | v0.71 (latest release, 12 Nov 2026), built from the release tarball `yosys.tar.gz`, SHA-256 `2ec7c2ee63bb9b4065d6d5fff2786a1455e834f90ede8eb1d47791153ebef2a5` (GitHub-published digest), checked with `sha256sum -c`; tag `v0.71` → commit `b4c586fd37d0ec61bb38fc1a85fd6a2fde48fcd1`; tarball `.gitcommit` `5628c13240f670b97aaaca3d47940c4afb8ff572` (asserted; GitHub compare: 0 files differ from the tag commit). CMake `release` preset, Tcl/editline/Python/unit tests off, static libs. Installed in `/usr/local/bin`: `yosys` SHA-256 `0bf886591a8e2b0f45fea92b2022f61d5a2213c370904ff87bbdeadbbee4e6af`, `yosys-abc` SHA-256 `2bc88ba4923042e96ce0da15b993b892a70ed14d9f0c625c394aa6cad48bcf7b`; `yosys -V` reports "Yosys 0.71+post (git sha1 5628c132…)": the `+post` comes from the tarball being built from the CI merge commit, which has no file differences from the tag |
+| MCY (D-004) | v0.71, tag object `b062a44a1978ed41c5dcb87a5dad41d8112497d2` → commit `5a2cad0cbefceb7f23051c08348bd23128fd1046` (no release asset; pinned by commit, asserted after checkout). `/usr/local/bin/mcy` (= `mcy.py`) SHA-256 `e56df004f5960d811cf8f468b21fce77922ce5cb541c4faf400fdab8af944a01`, scripts in `/usr/local/share/mcy/scripts`. Its `click` dependency is `click==8.5.1` in `requirements.lock` (D-004a); `mcy --help` runs |
+| EDA build stage | Separate stage `eda-build`, same base digest; build tools (gcc, cmake, bison, flex, …) from snapshot.debian.org `20261104T212339Z`, the snapshot in the base image's own apt sources. Only `/opt/eda` is copied into the final image. `/usr/local/share/EDA_PINS` records the pins; `toolchain_identity` records versions and binary hashes in every run |
+| Build | [sandbox/Dockerfile](../sandbox/Dockerfile): base by digest; iverilog `.deb` from snapshot.debian.org by URL, version and SHA-256; `pip install --require-hashes --no-deps -r requirements.lock`; user `sandbox` uid/gid 10001. The pip step alone sets `OPENSSL_CONF` to a temporary file limiting TLS groups to X25519/P-256: the base image's OpenSSL 3.5.7 offers a post-quantum key share, and its large ClientHello is dropped on this Codespace's path to PyPI (handshake timeout; the same container reaches PyPI with the classical groups). Every installed file is still hash-checked, so the installed bytes do not depend on it |
+| click (D-004a) | `click==8.5.1` with both hashes in `requirements.lock`. MCY states no version bound, so this is what pip-tools 7.7.0 resolved in the pinned base image (same command and TLS setting as above); the other pins are unchanged |
 | Build context | `.dockerignore` admits only `requirements.lock` |
 | Local tag | `openvef-sandbox:<first 16 hex of SHA-256 of the sha256sum listing of sandbox/Dockerfile and requirements.lock>`, rebuilt automatically when either changes |
 
@@ -53,6 +57,16 @@ snapshot `mr/binary/iverilog/12.0-2+b1/binfiles` API. The same SHA-256 check run
 switch, `/usr/bin/iverilog` and `/usr/bin/vvp` have the same SHA-256 as before, and a
 containerized smoke run gave results identical to run-20261123T195936Z. The image ID
 changes, because the Dockerfile changed, and each run records it.
+
+D-004 "latest stable" was checked on 24 Nov 2026 with the GitHub API: Yosys
+`releases/latest` is `v0.71` (published 2026-11-12), and MCY's newest `v*` tag is `v0.71`
+(tagged 2026-11-10; MCY publishes no releases). Debian trixie carries only Yosys 0.52,
+so Yosys is built from source. The null-netlist export uses Yosys only; the frozen
+export script, mutation modes and mutant population stay owner items (Protocol L544).
+Repeatability is tested by `tests/test_netlist_export.py` on a test-only toy design.
+After D-004a, `mcy --help` runs in the image, and the test checks it. The containerized
+smoke run on the new image (24 Nov 2026, outside `evidence/`) gave 129/0/15/0, with
+per-fixture results identical to run-20261123T195936Z.
 
 ## Where things run (D-002a)
 
