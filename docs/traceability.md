@@ -49,28 +49,26 @@
 | Owner freeze and audit readiness: one signing checklist with SHA-256 per item (whole files, or per-section for decision records); status, auditor needs and open items | `docs/OWNER-FREEZE-PACKAGE.md`, `docs/AUDIT-READINESS.md`; `tests/freeze_hashes.py`, `tests/test_freeze_package.py` | — | Ready for signature (nothing signed) |
 | L555 (4); File 50: Python 3.11 Unicode identifier tokenizer check on the pinned interpreter | `runner/probe_file50.py`, `src/openvef/import_policy.py` (`scan_identifiers`) | M55, M56, M57 (PASS in the evidence runs) | **Recorded**: `evidence/probe-file50-20261124T112645Z`; matches File 54 audit-time 3.11.18 results |
 
-Latest run: `evidence/run-20261123T195936Z`. It was started by `runner/run_f18_container.sh` at commit bfc5393, on a
-clean tree:
+Latest run: `evidence/run-20261124T144337Z`. It was started by `runner/run_f18_container.sh development`
+at commit 3f3e355, on a clean tree:
 - Interpreter status **PINNED** under D-002a: the runner and every artifact ran in the
-  image `python@sha256:07d48240…b535`, image ID `sha256:87219fac…4141`, CPython 3.11.18,
+  image `python@sha256:07d48240…b535`, image ID `sha256:565e5547…1c3f`, CPython 3.11.18,
   SHA-256 92d7e40e…6b79.
-- Toolchain recorded: cocotb 2.1.0; iverilog 12.0-2+b1, "Icarus Verilog version 12.0
-  (stable)".
-- Counts: 129 PASS, 0 FAIL, 15 NOT_IMPLEMENTED, 0 ERROR. M53 is new versus
-  run-20261123T183649Z, and no other result changed.
-- NOT_IMPLEMENTED:
-  - 10 are blocked on design materials absent from the pack (P01, P14, P17, P21, P42, M07,
-    M31, M32, M33, M57; see the L166 (7)–(8) row);
-  - M27 (A-038);
-  - M48, M50, M54, M58 (A-033: unsupported fields).
-- run-20261123T195911Z (commit 81aea65) has identical results. Its files were written
-  with mode 646 and later set to 644; the broker now does this itself.
+- The host-side command, working directory, docker client and allow-listed host
+  environment are in `summary.json` `sandbox.host_invocation`. Every fixture line in
+  `run.log` carries an ISO 8601 UTC timestamp, and `summary.json` has `run_finished_utc`.
+- Counts: 139 PASS (10 provisional: P01, P14, P17, P21, P42, M07, M31, M32, M33, M57),
+  0 FAIL, 5 NOT_IMPLEMENTED (M27, A-038; M48, M50, M54, M58, A-033), 0 ERROR.
+- Every fixture's status, actual and expected values are identical to
+  run-20261124T112030Z (commit 12abd1f). Only the L334 timing medians inside the
+  provisional records differ; they are wall-clock measurements.
 
 Caveats:
 - D-002a and D-003 still await Ayush's confirmation.
 - This was a development host (Codespaces, Docker 29.9.2).
-- Results that depend on Claude-decided readings (A-007, A-012, A-013 tie, A-015–A-039)
-  do not count toward F18 until both owners review them.
+- Results that depend on Claude-decided readings (A-007–A-012, A-013 tie, A-015–A-041,
+  A-043, A-044) do not count toward F18 until both owners review them. The 10 provisional
+  passes also wait for the freeze and the mask signature.
 
 Evidence: see `evidence/run-*/summary.json`. Since D-002a, only runs whose
 `interpreter_status` is `PINNED` (started with `runner/run_f18_container.sh`) are on the

@@ -19,10 +19,12 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T112030Z`**.
-- Run class `development`; commit `12abd1f`.
+Latest evidence run: **`evidence/run-20261124T144337Z`**.
+- Run class `development`; commit `3f3e355`, clean tree.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
+- Outcomes are identical to the previous run, `run-20261124T112030Z` (commit `12abd1f`),
+  fixture by fixture. Only the L334 wall-clock medians in the provisional records differ.
 
 | Status | Count | Fixtures |
 |---|---|---|
@@ -57,18 +59,19 @@ review. [traceability.md](traceability.md) marks each one.
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T112030Z`:
+Status is checked against the latest evidence run, `evidence/run-20261124T144337Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
-- **Partly met:** some of it is recorded; the gap is named.
+- **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
+  and 6 were partly met up to `run-20261124T112030Z`.)
 
 | # | §5.3 item | Where it is in each run | Status |
 |---|---|---|---|
 | 1 | Fixture-index SHA-256 verified at run time | `runner/run_f18.py` `load_index` aborts the run on a mismatch with the pinned `INDEX_SHA256`; `summary.json` `fixture_index_sha256` (`f37808c7…de54`) | **Met** |
 | 2 | Interpreter version and binary/image hash | `summary.json` `python_version` (3.11.18), `python_executable_sha256` (`92d7e40e…6b79`), `interpreter_status` PINNED, `sandbox.image_id`, `base_image_digest`, `dockerfile_sha256`, `requirements_lock_sha256`, `toolchain` | **Met** |
 | 3 | Parser/assembler/runner source commit and per-file SHA-256 | `summary.json` `git_commit` (with `+UNCOMMITTED_CHANGES` if the tree was dirty) and `source_sha256` for every file under `src/`, `runner/`, `sandbox/` and `design/`; `sandbox.harness_sha256`; `design_materials.file_sha256` (includes the spec) | **Met** |
-| 4 | Exact run commands and environment variables | `summary.json` `command` (the in-container command) and `sandbox.runner_container_flags` / `artifact_container_flags` (every `--env` passed to the containers) | **Partly met.** The host-side command (`runner/run_f18_container.sh development`) and the host environment (e.g. whether `OPENVEF_EVIDENCE_ROOT` was set) are not written into the run record |
+| 4 | Exact run commands and environment variables | `summary.json` `command` (the in-container command); `sandbox.runner_container_flags` / `artifact_container_flags` (every `--env` passed to the containers); `sandbox.host_invocation`: host `argv` (`runner/run_f18_container.sh development`), `cwd`, `docker_client`, and the host `environment` under the recorded allow-list `environment_policy` (every `OPENVEF_*` variable plus named docker CLI and locale variables, if set) | **Met.** The full host environment is deliberately not recorded: it can hold credentials. The allow-list names every variable that can change the broker script or the docker CLI |
 | 5 | Per-fixture record: ID, descriptor SHA-256, actual disposition/stage/error class/diagnostic, expected, match | `results.jsonl`: `fixture_id`, `descriptor_sha256`, `actual` (four fields), `expected`, `status` (PASS = match, FAIL = mismatch), `note`; provisional block where applicable | **Met** |
-| 6 | Raw run logs with timestamps | `run.log`: run metadata (with `run_started_utc`), then one line per fixture | **Partly met.** Only the run start is timestamped; the per-fixture lines carry no timestamps |
+| 6 | Raw run logs with timestamps | `run.log`: run metadata (with `run_started_utc`), then one line per fixture, each prefixed with an ISO 8601 UTC timestamp in milliseconds (written and flushed as the fixture finishes); `summary.json` `run_finished_utc` | **Met** |
 | 7 | Results files and SHA-256 | `results.jsonl`, with its SHA-256 in `summary.json` `results_sha256`; `summary.json` itself is not hashed inside the run | **Met** for results; the summary's own hash is computable but not recorded |
 | 8 | Every failed/errored/skipped fixture, with reason | `results.jsonl` `note` for every non-PASS; this run has 0 FAIL, 0 ERROR and 5 NOT_IMPLEMENTED (M27, M48, M50, M54, M58), each with its blocking reason | **Met** |
 | 9 | Isolation arrangement for LLM-generated code | artifact containers: no network, read-only root, all capabilities dropped, non-root, noexec tmpfs, limits, wall-clock kill; flags in each run's `artifact_container_flags`; [sandbox.md](sandbox.md); `tests/test_sandbox.py`, `tests/test_broker.py` (D-002, D-002a) | **Met** as built. Whether it is adequate as the security boundary for F16 is for the owners to decide (sandbox.md) |
@@ -130,7 +133,6 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| Close §3 gaps 4 and 6: write the host-side command and environment into the run record, and timestamp each fixture line in `run.log` (runner change, then a new evidence run) | Claude (on request) | §3 items 4, 6 |
 | Draft the remaining payload blocks (`[Execution envelope]`, `[Driver API]`, `[Trace schema]`, `[Checker contract]`) and the File 38 manifest (checklist items 2, 17), then run the assembler and clause-ID checks on them | Claude drafts; owners approve | D-005; File 31 L29–L30 |
 | F1–F15 feasibility harness runs, once the control mutants exist | Claude builds the harness; owners supply the mutants | L555 (4) |
 | After freeze and mask signature: a new pinned evidence run without provisional results | Claude | package "After signing" |
