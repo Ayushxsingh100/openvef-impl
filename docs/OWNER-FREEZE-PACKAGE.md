@@ -29,7 +29,7 @@ Mark boxes as `[x]`. Write notes in the Notes column.
 
 | # | Item | File | SHA-256 | Krishika | Ayush | Notes |
 |---|---|---|---|---|---|---|
-| A1 | FIFO specification v0.2: FIFO-001…FIFO-043, port manifest, reset and legal-input rules, FIFO-042 executable predicate | `docs/fifo-spec-v0.2.md` | `5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
+| A1 | FIFO specification v0.2: FIFO-001…FIFO-043, port manifest, reset and legal-input rules, FIFO-042 executable predicate | `docs/fifo-spec-v0.2.md` | `5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
 
 On freeze, `spec_version_sha256` (File 30 L62; File 38) is computed over the frozen
 specification bytes. Until then, runs use the SHA-256 of this draft file and are
@@ -39,12 +39,12 @@ provisional.
 
 | # | Item | Proposed value | Source | Krishika | Ayush | Notes |
 |---|---|---|---|---|---|---|
-| B1 | Cycle cap (item 7) | 64 driver cycles after reset release | approved by Krishika under D-006 | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| B2 | Safe-idle vector (item 8) | `{"wr_en": "0", "wr_data": "00000000", "rd_en": "0"}` (`rst` held at 0) | proposal | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| B3 | Watchdog (item 9) | L334 formula, per run and per step; wall time per A-043; calibration ceiling 120 s (build default) | per run approved by Krishika under D-006 | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| B4 | Scheduler (item 10) | timescale 1ns/1ps; 10 ns clock, starts low; drive at the falling edge; sample in `ReadOnly` (L218); output-first (L221); reset per FIFO-011, A-040, A-042 | proposal (current build values) | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| B5 | Trace schema (item 11) | `openvef-trace-0.1-draft`: six row keys; `0`/`1`/`X`/`Z` strings; canonical UTF-8 JSON plus SHA-256 | proposal | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| B6 | Checker metadata (item 12) | `design_id` `ovf_fifo`; `spec_version_sha256` computed at freeze; `trace_schema_version` as B5; `cycle_cap` 64; `reset_release_cycle` 1; `trace_integrity_status` `VALID` | proposal | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
+| B1 | Cycle cap (item 7) | 64 driver cycles after reset release | approved by Krishika under D-006 | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| B2 | Safe-idle vector (item 8) | `{"wr_en": "0", "wr_data": "00000000", "rd_en": "0"}` (`rst` held at 0) | proposal | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| B3 | Watchdog (item 9) | L334 formula, per run and per step; wall time per A-043; calibration ceiling 120 s (build default) | per run approved by Krishika under D-006 | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| B4 | Scheduler (item 10) | timescale 1ns/1ps; 10 ns clock, starts low; drive at the falling edge; sample in `ReadOnly` (L218); output-first (L221); reset per FIFO-011, A-040, A-042 | proposal (current build values) | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| B5 | Trace schema (item 11) | `openvef-trace-0.1-draft`: six row keys; `0`/`1`/`X`/`Z` strings; canonical UTF-8 JSON plus SHA-256 | proposal | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| B6 | Checker metadata (item 12) | `design_id` `ovf_fifo`; `spec_version_sha256` computed at freeze; `trace_schema_version` as B5; `cycle_cap` 64; `reset_release_cycle` 1; `trace_integrity_status` `VALID` | proposal | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
 
 | File | SHA-256 |
 |---|---|
@@ -55,8 +55,8 @@ provisional.
 
 | # | Item | File | SHA-256 | Krishika | Ayush | Notes |
 |---|---|---|---|---|---|---|
-| C1 | FIFO RTL `ovf_fifo` (Verilog, Icarus 12 `-g2012`) | `design/fifo/rtl/ovf_fifo.v` | `ca06abf55e6a82e6617dab9cd5d7e4ef0118d082b7789fce169016307fe2042b` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| C2 | Null-netlist export script (Yosys v0.71). The frozen L544 export script, mutation modes and mutant population are separate owner items, **not** frozen by this line | `design/fifo/export_null.ys` | `85dfdddda430adc22ea3df9c961397d596264b195e56cba8c49da84b4bc474b1` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
+| C1 | FIFO RTL `ovf_fifo` (Verilog, Icarus 12 `-g2012`) | `design/fifo/rtl/ovf_fifo.v` | `ca06abf55e6a82e6617dab9cd5d7e4ef0118d082b7789fce169016307fe2042b` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| C2 | Null-netlist export script (Yosys v0.71). The frozen L544 export script, mutation modes and mutant population are separate owner items, **not** frozen by this line | `design/fifo/export_null.ys` | `85dfdddda430adc22ea3df9c961397d596264b195e56cba8c49da84b4bc474b1` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
 
 For reference, not signed here: the null netlist exported from C1 with C2 has SHA-256
 `56dabfecc3768078bd96f7a026034ee9e2a795e266db89282b4ad4434ea64747`. It was identical on
@@ -66,27 +66,27 @@ two exports in each evidence run (run-20261124T111335Z, run-20261124T112030Z).
 
 | # | Record | Section | SHA-256 | Krishika | Ayush | Notes |
 |---|---|---|---|---|---|---|
-| D1 | D-004: Yosys v0.71 and MCY v0.71 pins | `docs/ambiguities.md#D-004` | `cd34f9a4b75010db7a95b918dc8251881eae85870465b4414ace1f10d67af80a` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| D2 | D-004a: `click==8.5.1` for MCY's command-line tool | `docs/ambiguities.md#D-004a` | `4f51302297ae8dc264669bc3766fdbc31b32ab1030f6a1bfe8308bfa3956b060` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| D3 | D-005: FIFO design materials AI-assisted, with disclosure | `docs/ambiguities.md#D-005` | `d3dd7667dfc1661242f013ca32b7ee7e8110e5bb791933584a86c66dbdc2d9b8` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| D4 | D-006: approvals (A-042, threshold 3, `ovf_fifo`, cap 64, watchdog per run) | `docs/ambiguities.md#D-006` | `41d68cc0a6f39cc6ddae0522400f6049a23a5c2a2d256b331a9106f0c4fccfce` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
+| D1 | D-004: Yosys v0.71 and MCY v0.71 pins | `docs/ambiguities.md#D-004` | `cd34f9a4b75010db7a95b918dc8251881eae85870465b4414ace1f10d67af80a` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| D2 | D-004a: `click==8.5.1` for MCY's command-line tool | `docs/ambiguities.md#D-004a` | `4f51302297ae8dc264669bc3766fdbc31b32ab1030f6a1bfe8308bfa3956b060` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| D3 | D-005: FIFO design materials AI-assisted, with disclosure | `docs/ambiguities.md#D-005` | `d3dd7667dfc1661242f013ca32b7ee7e8110e5bb791933584a86c66dbdc2d9b8` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| D4 | D-006: approvals (A-042, threshold 3, `ovf_fifo`, cap 64, watchdog per run) | `docs/ambiguities.md#D-006` | `41d68cc0a6f39cc6ddae0522400f6049a23a5c2a2d256b331a9106f0c4fccfce` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
 
 ## E. Readings decided by Claude under the standing delegation (owner review)
 
 | # | Reading | Section | SHA-256 | Krishika | Ayush | Notes |
 |---|---|---|---|---|---|---|
-| E1 | A-040: trace-row fields and row numbering | `docs/ambiguities.md#A-040` | `2329ab5b9ee388e29ef14ff266749ce6db8b205a613b02d285f41e4027a2de9a` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| E2 | A-041: predicate scope (vector plus same-row sampled outputs) | `docs/ambiguities.md#A-041` | `6c215691edd86c33481bfc05e36e655e5a3a095941aea2deaa161c09edb67cae` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| E3 | A-042: harness-owned reset, not a driver key (accepted by Krishika, D-006) | `docs/ambiguities.md#A-042` | `423211c6484c3cb04cbce32fa9fb344050b29302608a87f9db12c5236b3d3064` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| E4 | A-043: L334 wall time = the whole null-run container | `docs/ambiguities.md#A-043` | `3e16a6d1fe840456dc7342c92ff0d32a2e4ce30b96d09c6ebe975f7c1095c0be` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| E5 | A-044: a fixture's names-only port manifest (P17) | `docs/ambiguities.md#A-044` | `395848f1bb6b6630610ab026e1025a17ca003a2bae5fce47857ea5ace19f0d3b` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
-| E6 | *(additional, not in the requested list)* A-038 revisited: M27 stays NOT_IMPLEMENTED | `docs/ambiguities.md#A-038` | `483c8539baa37494807333cffa1ba33db4cef578fe29286503604326d0800dad` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
+| E1 | A-040: trace-row fields and row numbering | `docs/ambiguities.md#A-040` | `2329ab5b9ee388e29ef14ff266749ce6db8b205a613b02d285f41e4027a2de9a` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| E2 | A-041: predicate scope (vector plus same-row sampled outputs) | `docs/ambiguities.md#A-041` | `6c215691edd86c33481bfc05e36e655e5a3a095941aea2deaa161c09edb67cae` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| E3 | A-042: harness-owned reset, not a driver key (accepted by Krishika, D-006) | `docs/ambiguities.md#A-042` | `423211c6484c3cb04cbce32fa9fb344050b29302608a87f9db12c5236b3d3064` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| E4 | A-043: L334 wall time = the whole null-run container | `docs/ambiguities.md#A-043` | `3e16a6d1fe840456dc7342c92ff0d32a2e4ce30b96d09c6ebe975f7c1095c0be` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| E5 | A-044: a fixture's names-only port manifest (P17) | `docs/ambiguities.md#A-044` | `395848f1bb6b6630610ab026e1025a17ca003a2bae5fce47857ea5ace19f0d3b` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
+| E6 | *(additional, not in the requested list)* A-038 revisited: M27 stays NOT_IMPLEMENTED | `docs/ambiguities.md#A-038` | `483c8539baa37494807333cffa1ba33db4cef578fe29286503604326d0800dad` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
 
 ## F. Benchmark-overlap disclosure (Protocol L468)
 
 | # | Item | File | SHA-256 | Krishika | Ayush | Notes |
 |---|---|---|---|---|---|---|
-| F1 | Disclosure note with the GateTruth/DVBench comparison. **Decision: disclose; do not rename ports.** Re-check the relayed source extracts before signing | `docs/fifo-benchmark-overlap-disclosure-DRAFT.md` | `ae37c774e98a6a0db0b9af0642dd5de399c281becc58115c74ae609f433bf417` | [ ] Approve [ ] Change | [ ] Approve [ ] Change | |
+| F1 | Disclosure note with the GateTruth/DVBench comparison. **Decision: disclose; do not rename ports.** Re-check the relayed source extracts before signing | `docs/fifo-benchmark-overlap-disclosure-DRAFT.md` | `ae37c774e98a6a0db0b9af0642dd5de399c281becc58115c74ae609f433bf417` | [x] Approve [ ] Change | [ ] Approve [ ] Change | |
 
 The note has its own owner-signature table, which can be completed in the same sitting.
 
@@ -121,8 +121,15 @@ author the prompt templates or the mask. Claude cannot be this reviewer.
 
 | Owner | Signature | Date |
 |---|---|---|
-| Krishika | | |
+| Krishika | signed by typed statement in Claude Code session, commit by KRISHIKA | 24 Nov 2026 |
 | Ayush Kumar Singh | | |
+
+Krishika's signing statement, typed by her in a Claude Code session on 24 Nov 2026 and
+transcribed here verbatim by Claude (Claude Opus 5.5) at her instruction:
+
+> "I, Krishika, co-owner of OpenVEF, approve every line A1 through the last numbered line
+> of docs/OWNER-FREEZE-PACKAGE.md as it stands at this commit, and sign the owner freeze
+> package."
 
 ## After signing
 
