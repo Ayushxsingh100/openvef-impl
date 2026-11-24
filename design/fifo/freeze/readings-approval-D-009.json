@@ -259,17 +259,6 @@
       ]
     },
     {
-      "id": "A-031",
-      "item": "A-031",
-      "refs": [
-        {
-          "ref": "docs/ambiguities.md#A-031",
-          "sha256": "f4f6ea07bb83da3118533aba380c4d178972f7be97e64f6fe53e4e76a2aabc40",
-          "sha256_as_approved": "2a6bf475eaca32a8ded5d227d1d839004c566540e25466e67d56a97fe7dc37db"
-        }
-      ]
-    },
-    {
       "id": "A-032",
       "item": "A-032",
       "refs": [
@@ -442,6 +431,20 @@
           "ref": "src/openvef/f15.py",
           "sha256": "055dc60e3584bbd8ff1a11611c6b3b49b89ce089fcb1eaecaf3015d6404bdff1",
           "sha256_as_approved": "3d1ee7714cada226d7b054f49bf8691a682ecb5e0f733794f5028081fc55ccc3"
+        }
+      ]
+    }
+  ],
+  "withdrawn": [
+    {
+      "id": "A-031",
+      "by": "D-012 (Krishika)",
+      "reason": "D-009's blanket approval of A-031 is withdrawn; A-031 is reversed (audit finding A8-1).",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-031",
+          "sha256": "f4f6ea07bb83da3118533aba380c4d178972f7be97e64f6fe53e4e76a2aabc40",
+          "sha256_as_approved": "2a6bf475eaca32a8ded5d227d1d839004c566540e25466e67d56a97fe7dc37db"
         }
       ]
     }

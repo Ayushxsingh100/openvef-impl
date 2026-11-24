@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from openvef.assembler import (check_reserved_heading_lines, check_unresolved_placeholders,  # noqa: E402
                                check_visible_clause_ids)
-from openvef.ledger import HaltSignature, halt_after_recovery, operational_recovery  # noqa: E402
+from openvef.ledger import HaltSignature, SignatureDomainError, halt_after_recovery, operational_recovery  # noqa: E402
 from openvef.serializer import MARKER, check_diagnostic, feedback_bytes, in_grammar, serialize, truncate  # noqa: E402
 from openvef.stage_map import (CHECKER_TIMEOUT, CheckerOutcome, EventError, NotDetermined,  # noqa: E402
                                adjudicate_checker, checker_runtime_error, classify_return, exception_class,
@@ -193,6 +193,23 @@ class LedgerTests(unittest.TestCase):
         for args in (("SPI", "SIMULATOR_ERROR"), ("FIFO", "SIMULATOR_ERROR")):
             with self.subTest(args=args), self.assertRaises(ValueError):
                 HaltSignature.build(*args)
+
+    def test_given_enforces_every_domain(self):  # D-012
+        sim = HaltSignature.build("FIFO", "SIMULATOR_ERROR", exception_class="OSError")._asdict()
+        trace = HaltSignature.build("UART", "TRACE_INTEGRITY_FAILURE", trace_reason="ROW_ALIGNMENT")._asdict()
+        rtl = HaltSignature.build("UART", "RTL_NULL_CONTROL_FAILURE")._asdict()
+        for good in (sim, trace, rtl):
+            self.assertEqual(HaltSignature.given(good)._asdict(), good)
+        for base, change in ((sim, {"design_id": "SPI"}), (sim, {"halt_code": "OTHER"}),
+                             (sim, {"evaluator_component": "simulator"}), (sim, {"evaluator_component": "RECORDER"}),
+                             (sim, {"stable_error_class": "a b"}), (sim, {"stable_error_class": None}),
+                             (sim, {"stable_diagnostic_code": "X"}), (trace, {"stable_error_class": "Fault"}),
+                             (trace, {"evaluator_component": "SIMULATOR"}), (rtl, {"stable_error_class": "OSError"}),
+                             (rtl, {"evaluator_component": "RECORDER"})):
+            with self.subTest(change=change), self.assertRaises(SignatureDomainError):
+                HaltSignature.given({**base, **change})
+        with self.assertRaises(SignatureDomainError):
+            HaltSignature.given({k: v for k, v in sim.items() if k != "design_id"})
 
     def test_recurrence(self):
         a = HaltSignature.build("FIFO", "SIMULATOR_ERROR", exception_class="RuntimeError")

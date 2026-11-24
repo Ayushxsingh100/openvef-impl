@@ -13,10 +13,8 @@ Implements:
                    FROZEN_ARTIFACTS` (error class `MID_RUN_REEVALUATION`) for a successful
                    operational recovery.
 
-A-031 (decided by Claude, approved under D-009): `HaltSignature.build` enforces the
-L185 domains for signatures the ledger constructs from halt events. Signatures supplied
-ready-made (as in a descriptor) are compared for identity as given, because recurrence
-detection needs only tuple equality.
+A-031 was reversed by owner decision D-012: every signature, constructed or supplied, must
+lie in the L185 domains; a supplied signature outside them is rejected (PD-01).
 """
 from __future__ import annotations
 
@@ -39,6 +37,10 @@ _EXC = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 SIGNATURE_FIELDS = ("design_id", "halt_code", "evaluator_component", "stable_error_class", "stable_diagnostic_code")
 
 ABORTED = "DESIGN_ABORTED_NO_SLOTS_SCORED"
+
+
+class SignatureDomainError(ValueError):
+    """A supplied halt signature has a component outside its Protocol L185 domain."""
 
 
 class HaltSignature(NamedTuple):
@@ -64,9 +66,24 @@ class HaltSignature(NamedTuple):
 
     @classmethod
     def given(cls, record: Mapping[str, Any]) -> "HaltSignature":
-        """A ready-made signature: exactly the five components, compared as given."""
+        """A ready-made signature: exactly the five components, each in its L185 domain (D-012)."""
         if set(record) != set(SIGNATURE_FIELDS):
-            raise ValueError(f"halt signature must have exactly {SIGNATURE_FIELDS}")
+            raise SignatureDomainError(f"halt signature must have exactly {SIGNATURE_FIELDS}")
+        code = record["halt_code"]
+        component = {"SIMULATOR_ERROR": ("SIMULATOR",), "RTL_NULL_CONTROL_FAILURE": ("RTL_NULL_COMPARATOR",),
+                     "TRACE_INTEGRITY_FAILURE": tuple(TRACE_REASON_COMPONENT.values())}
+        cls_ = record["stable_error_class"]
+        ok = {
+            "design_id": record["design_id"] in DESIGN_IDS,
+            "halt_code": code in HALT_CODES,
+            "evaluator_component": record["evaluator_component"] in component.get(code, EVALUATOR_COMPONENTS),
+            "stable_error_class": (isinstance(cls_, str) and _EXC.fullmatch(cls_) is not None
+                                   if code == "SIMULATOR_ERROR" else cls_ == "NONE"),
+            "stable_diagnostic_code": record["stable_diagnostic_code"] == code,
+        }
+        bad = [f"{f}={record[f]!r}" for f in SIGNATURE_FIELDS if not ok[f]]
+        if bad:
+            raise SignatureDomainError(", ".join(bad))
         return cls(*(record[f] for f in SIGNATURE_FIELDS))
 
 

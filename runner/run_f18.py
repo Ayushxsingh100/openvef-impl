@@ -22,7 +22,6 @@ import os
 import platform
 import subprocess
 import sys
-from dataclasses import replace
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -32,18 +31,15 @@ from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
 from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
 from openvef.import_policy import check_import_policy  # noqa: E402
 from openvef.ast_signature import check_ast_signature, check_compile  # noqa: E402
-from openvef.assembler import (NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, check_reserved_heading_lines,  # noqa: E402
-                               check_unresolved_placeholders, check_visible_clause_ids)
+from openvef.assembler import NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, check_visible_clause_ids  # noqa: E402
 from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
 from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
 from openvef import simulator_stages  # noqa: E402
 from openvef.simulation import SimulationError  # noqa: E402
-from openvef.ledger import HaltSignature, halt_after_recovery, lifecycle_expectation, operational_recovery  # noqa: E402
-from openvef.serializer import check_diagnostic, serialize, truncate  # noqa: E402
-from openvef.stage_map import (RTL_NULL_CONTROL_FAILURE, EventError, NotDetermined, adjudicate_checker,  # noqa: E402
-                               first_event, outcome_from_record, paired_run_failure, runtime_signature_failure,
-                               validate_vector)
-from openvef.source_ast import FILE_ORDER, UnsettledSpec, check_sources, syntax_reject  # noqa: E402
+from openvef.ledger import HaltSignature, SignatureDomainError, halt_after_recovery, lifecycle_expectation  # noqa: E402
+from openvef.stage_map import (EventError, NotDetermined, adjudicate_checker, first_event,  # noqa: E402
+                               outcome_from_record)
+from openvef.source_ast import UnsettledSpec, check_sources  # noqa: E402
 
 INDEX_REL = "41_F18_Fixture_Inputs/fixture-index.json"
 INDEX_SHA256 = "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54"
@@ -163,12 +159,11 @@ def response_object(inp: dict) -> dict:
     return parse_envelope(raw, inp.get("provider_finish_reason")).obj
 
 
-def sim_stages(desc: dict, obj: dict, port_names: list | None = None) -> Failure | None:
+def sim_stages(desc: dict, obj: dict) -> Failure | None:
     """L166 (7)-(11) on the design materials (D-005); see SIM provisional/cleared."""
     if SIM is None:
         raise Blocked(RUNTIME_NEXT + f" [D-005 materials: {SIM_UNAVAILABLE}]")
-    failure, details = simulator_stages.run_response(SIM, obj["driver"]["source"], obj["checker"]["source"],
-                                                     port_names)
+    failure, details = simulator_stages.run_response(SIM, obj["driver"]["source"], obj["checker"]["source"])
     PROVISIONAL[id(desc)] = details
     return failure
 
@@ -207,74 +202,96 @@ RUNTIME_NEXT = ("runtime import, factory and signature checks passed in the sand
                 "stages are built but blocked on design materials absent from the pack: " + MISSING_DESIGN_MATERIALS)
 
 
-def run_syntax_error_vector(source_file: str, syntax_error: dict) -> Failure:
-    """Apply the column rule to a given SyntaxError position (A-012, Protocol L177)."""
-    lineno = syntax_error.get("lineno")
-    if (source_file not in FILE_ORDER or set(syntax_error) - {"lineno", "offset"}
-            or not isinstance(lineno, int) or isinstance(lineno, bool) or lineno < 1):
-        raise Blocked("syntax_error vector outside the shape the column rule covers")
-    offset = syntax_error.get("offset")
-    if offset is not None and (not isinstance(offset, int) or isinstance(offset, bool)):
-        raise Blocked("syntax_error offset is neither an integer nor null")
-    return replace(syntax_reject(source_file, lineno, offset), disposition="CONTROL_EXPECTATION")
-
-
 def two_runs(runs) -> tuple:
     if not isinstance(runs, list) or len(runs) != 2:
         raise Blocked("checker adjudication needs exactly two run records (L166 steps (9)-(10))")
     return outcome_from_record(runs[0]), outcome_from_record(runs[1])
 
 
-def control_record(failure: Failure, **properties) -> dict:
-    """A control-vector record: the stage-map fields plus named computed properties (A-032)."""
-    record = {"disposition": failure.disposition, "stage_id": failure.stage_id, "error_class": failure.error_class}
-    if failure.diagnostic is not None:
-        record["diagnostic"] = failure.diagnostic
-    record.update(properties)
+def adapt_response(desc: dict, validator) -> Failure | dict | None:
+    result = response_stages(desc, desc["input"], validator)
+    return sim_stages(desc, response_object(desc["input"])) if result is None else result
+
+
+def adapt_source_pair(desc: dict, validator) -> Failure | dict | None:
+    """A-012 source pair."""
+    result = source_stages(desc["input"]["driver_source"], desc["input"]["checker_source"])
+    if result is None:
+        raise Blocked(RUNTIME_NEXT)
+    return result
+
+
+def adapt_null_runs(desc: dict, validator) -> Failure | dict | None:
+    """A-028: run every implemented response stage first; the supplied outcomes stand in."""
+    inp = desc["input"]
+    result = response_stages(desc, {"response_object": inp["response_object"]}, validator)
+    return adjudicate_checker(*two_runs(inp["null_runs"])) if result is None else result
+
+
+def adapt_events(desc: dict, validator) -> Failure | dict | None:
+    return first_event(desc["input"]["events"])  # A-025
+
+
+def adapt_checker_runs(desc: dict, validator) -> Failure | dict | None:
+    return adjudicate_checker(*two_runs(desc["input"]["checker_runs"]))  # A-026
+
+
+def adapt_halt_recurrence(desc: dict, validator) -> Failure | dict | None:
+    """Ledger, Protocol L185. An out-of-domain supplied signature is a fixture defect (D-012)."""
+    inp = desc["input"]
+    try:
+        first, second = (HaltSignature.given(inp[k]) for k in ("first_halt_signature", "second_halt_signature"))
+    except SignatureDomainError as exc:
+        raise Blocked(f"PD-01 fixture defect: supplied halt signature outside the Protocol L185 domains: {exc}") from exc
+    return halt_after_recovery(first, second, inp["recovery_cycles_used"])
+
+
+def adapt_change_class(desc: dict, validator) -> Failure | dict | None:
+    """Ledger, Protocol L175-L176, L181-L185 (A-033 revised)."""
+    try:
+        record, missing = lifecycle_expectation(desc["input"]["change_class"])
+    except ValueError as exc:
+        raise Blocked(str(exc)) from exc
+    if missing:
+        raise Blocked("A-033: no supporting Protocol sentence for " +
+                      "; ".join(f"{name}: {reason}" for name, reason in missing.items()))
     return record
 
 
-def run_truncation_primitive(inp: dict) -> dict:
-    """Feedback serialization step (2) alone (Protocol L168); grammar bypassed by scope."""
-    raw = inp["raw_diagnostic"]
-    if not (inp.get("truncate_before_json_escape") is True and inp.get("truncate_on_utf8_boundary") is True):
-        raise Blocked("truncation options differ from the Protocol L168 rule")
-    if inp.get("raw_diagnostic_utf8_bytes") != len(raw.encode("utf-8")):
-        raise Blocked("raw_diagnostic_utf8_bytes does not match the raw diagnostic")
-    out = truncate(raw, inp["byte_cap"], inp["marker"])
-    data = out.encode("utf-8")
-    try:
-        data.decode("utf-8", errors="strict")
-        valid = True
-    except UnicodeDecodeError:
-        valid = False
-    failure = Failure("FEEDBACK_SERIALIZER", "TRUNCATION", None, "CONTROL_EXPECTATION")
-    return control_record(failure, contains_marker=out.endswith(inp["marker"]), valid_utf8=valid,
-                          output_diagnostic_bytes=len(data), marker_utf8_bytes=len(inp["marker"].encode("utf-8")))
+def adapt_clause_ids(desc: dict, validator) -> Failure | dict | None:
+    inp = desc["input"]
+    result = check_visible_clause_ids(
+        inp["visible_payload"], inp["manifest_clause_ids"], inp["clause_id_regex"],
+        inp.get("clause_id_search_regex", SEARCH_REGEX_DEFAULT),
+        inp.get("clause_id_near_match_regex", NEAR_MATCH_REGEX_DEFAULT))
+    if result is None:
+        raise Blocked("packet check passed; nothing further to compare")
+    return result
 
 
-def run_json_primitive(inp: dict) -> dict:
-    """Feedback serialization step (3) alone (Protocol L168); grammar bypassed by scope."""
-    spec = {"encoding": "UTF-8", "ensure_ascii": False, "indent": 2, "line_endings": "LF", "terminal_newline": True}
-    if any(inp.get(k) != v for k, v in spec.items()):
-        raise Blocked("serialization options differ from the Protocol L168 rule")
-    obj = inp["feedback_object"]
-    if list(obj) != ["stage_id", "error_class", "diagnostic"]:
-        raise Blocked("feedback object keys differ from the L168 three-key order")
-    data = serialize(obj["stage_id"], obj["error_class"], obj["diagnostic"])
-    failure = Failure("FEEDBACK_SERIALIZER", "JSON_SERIALIZATION", None, "CONTROL_EXPECTATION")
-    return control_record(failure, diagnostic_utf8=data.decode("utf-8"),
-                          diagnostic_sha256=hashlib.sha256(data).hexdigest(), diagnostic_bytes=len(data))
+# (required keys, optional keys, adapter). This table is the ONLY place an input shape
+# selects code. D-012 (A1-1): an adapter that only one mandatory fixture can reach is not
+# allowed; tests/test_dispatch_shapes.py enforces it.
+ADAPTERS = (
+    ({"raw_response_utf8"}, {"provider_finish_reason"}, adapt_response),
+    ({"raw_response_base64"}, set(), adapt_response),
+    ({"response_object"}, set(), adapt_response),
+    ({"driver_source", "checker_source"}, set(), adapt_source_pair),
+    ({"null_runs", "response_object"}, set(), adapt_null_runs),
+    ({"events"}, set(), adapt_events),
+    ({"checker_runs"}, set(), adapt_checker_runs),
+    ({"design_id", "recovery_cycles_used", "first_halt_signature", "second_halt_signature", "scheduled_slots"}, set(),
+     adapt_halt_recurrence),
+    ({"change_class"}, set(), adapt_change_class),
+    ({"visible_payload", "manifest_clause_ids", "clause_id_regex"},
+     {"clause_id_search_regex", "clause_id_near_match_regex"}, adapt_clause_ids),
+)
 
 
-RESPONSE_KEYS = ({"raw_response_utf8"}, {"raw_response_utf8", "provider_finish_reason"}, {"raw_response_base64"},
-                 {"response_object"})
-HALT_RECOVERY_KEYS = {"design_id", "recovery_cycles_used", "first_halt_signature", "second_halt_signature",
-                      "scheduled_slots"}
-OPERATIONAL_RECOVERY_KEYS = {"design_id", "slots", "evaluator_repair_attempt", "same_artifacts_for_all_slots",
-                             "new_generation_calls", "required_action", "recovery_mode", "frozen_evaluator_hashes_unchanged",
-                             "same_artifact_bytes", "same_slot_seeds", "f16_required", "author_visible_materials_changed",
-                             "pre_halt_scored_slots", "scheduled_slots", "halt_signature"}
+def find_adapters(inp: dict) -> list:
+    """Every ADAPTERS row whose key sets fit the input (at most one)."""
+    keys = set(inp)
+    return [row for row in ADAPTERS if row[0] <= keys <= row[0] | row[1]]
 
 
 def dispatch(desc: dict, validator) -> Failure | dict | None:
@@ -282,132 +299,10 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
 
     The code path is chosen from the input's key set only (CLAUDE.md rule 4).
     """
-    inp = desc["input"]
-    keys = set(inp)
-
-    if keys in RESPONSE_KEYS:
-        result = response_stages(desc, inp, validator)
-        if result is None:
-            return sim_stages(desc, response_object(inp))
-        return result
-    if keys == {"driver_source", "checker_source"}:  # A-012 source pair
-        result = source_stages(inp["driver_source"], inp["checker_source"])
-        if result is None:
-            raise Blocked(RUNTIME_NEXT)
-        return result
-    if keys == {"source_file", "syntax_error"}:  # A-012 column-rule vector
-        return run_syntax_error_vector(inp["source_file"], inp["syntax_error"])
-
-    # Composite inputs (A-028): run every implemented response stage first; the supplied
-    # later-stage outcome stands in for stages that need the simulator.
-    if keys == {"null_runs", "response_object"}:
-        result = response_stages(desc, {"response_object": inp["response_object"]}, validator)
-        if result is not None:
-            return result
-        return adjudicate_checker(*two_runs(inp["null_runs"]))
-    if keys == {"runtime_pair", "response_object"}:
-        result = response_stages(desc, {"response_object": inp["response_object"]}, validator)
-        if result is not None:
-            return result
-        pair = inp["runtime_pair"]
-        if pair.get("before_first_raw_output_divergence") is True and pair.get("next_input_schedules_equal") is False:
-            return paired_run_failure(None, 0)
-        raise Blocked("paired runs agree; later stages need a null trace: " + MISSING_DESIGN_MATERIALS)
-
-    if keys == {"port_manifest", "response_object"}:
-        result = response_stages(desc, {"response_object": inp["response_object"]}, validator)
-        if result is not None:
-            return result
-        manifest = inp["port_manifest"]
-        if set(manifest) != {"input_ports"} or not isinstance(manifest["input_ports"], list):
-            raise Blocked("port manifest outside the names-only shape A-044 covers")
-        return sim_stages(desc, inp["response_object"], manifest["input_ports"])
-    if keys == {"events"}:  # A-025
-        return first_event(inp["events"])
-    if keys == {"lifecycle", "event", "slots", "evaluator_repair_attempt"} and inp["lifecycle"] == "MID_RUN":
-        return first_event([inp["event"]])
-    if keys == {"checker_runs"}:  # A-026
-        return adjudicate_checker(*two_runs(inp["checker_runs"]))
-    if keys == {"paired_runs"}:
-        runs = inp["paired_runs"]
-        result = paired_run_failure(runs["first_raw_output_divergence_cycle"], runs["first_next_input_divergence_cycle"])
-        if result is None:
-            raise Blocked("no paired-run failure; later stages need the simulator")
-        return result
-    if keys == {"design_preflight"}:
-        if inp["design_preflight"].get("rtl_null_masked_divergence") is True:
-            return RTL_NULL_CONTROL_FAILURE
-        raise Blocked("design preflight passed; slot stages need the simulator")
-    if keys == {"runtime_signature"}:
-        sig = inp["runtime_signature"]
-        result = runtime_signature_failure(sig["file"], sig["symbol"], sig["actual"], sig["expected"])
-        if result is None:
-            raise Blocked("runtime signature matches; later stages need the sandbox")
-        return result
-    if keys == {"driver_return", "expected_keys"}:
-        try:
-            result = validate_vector(inp["driver_return"], inp["expected_keys"])
-        except NotDetermined as exc:
-            raise Blocked(f"A-027: {exc}") from exc
-        if result is None:
-            raise Blocked("vector valid")
-        return result
-    if keys == {"driver_return", "legal_input_predicate"}:
-        raise Blocked("A-038 (revisited): the descriptor's prose predicate is not the design's executable "
-                      "FIFO-042 (they disagree when rd_en = 1 at full), executing the prose would need a "
-                      "predicate language File 30 L83 (e) does not define, and no port set is supplied for "
-                      "checks (a)-(d), which precede (e)")
-
-    if keys == HALT_RECOVERY_KEYS:  # ledger, Protocol L185
-        return halt_after_recovery(HaltSignature.given(inp["first_halt_signature"]),
-                                   HaltSignature.given(inp["second_halt_signature"]), inp["recovery_cycles_used"])
-    if keys == OPERATIONAL_RECOVERY_KEYS and inp["recovery_mode"] == "OPERATIONAL_RECOVERY":  # ledger, L183-L185
-        rec = operational_recovery(
-            scheduled_slots=inp["scheduled_slots"], frozen_evaluator_hashes_unchanged=inp["frozen_evaluator_hashes_unchanged"],
-            same_artifact_bytes=inp["same_artifact_bytes"], same_slot_seeds=inp["same_slot_seeds"],
-            author_visible_materials_changed=inp["author_visible_materials_changed"],
-            new_generation_calls=inp["new_generation_calls"], f16_required=inp["f16_required"])
-        if rec is None:
-            raise Blocked("operational-recovery conditions not met; evaluator-revision path not implemented")
-        return control_record(rec.failure, discard_pre_halt_scores=rec.discard_pre_halt_scores,
-                              rerun_slots=rec.rerun_slots, reuse_same_artifact_bytes=rec.reuse_same_artifact_bytes,
-                              new_confirmatory_generation_calls=rec.new_confirmatory_generation_calls)
-    if keys == {"change_class"}:  # ledger, Protocol L175-L176, L181-L185 (A-033 revised)
-        try:
-            record, missing = lifecycle_expectation(inp["change_class"])
-        except ValueError as exc:
-            raise Blocked(str(exc)) from exc
-        if missing:
-            raise Blocked("A-033: no supporting Protocol sentence for " +
-                          "; ".join(f"{name}: {reason}" for name, reason in missing.items()))
-        return record
-
-    if keys == {"diagnostic", "allowed_diagnostics"}:  # serializer step (1), A-029
-        result = check_diagnostic(inp["diagnostic"], inp["allowed_diagnostics"])
-        if result is None:
-            raise Blocked("diagnostic accepted; nothing further to compare")
-        return result
-    if inp.get("test_scope") == "TRUNCATION_PRIMITIVE_ONLY_GRAMMAR_BYPASSED":
-        return run_truncation_primitive(inp)
-    if inp.get("test_scope") == "JSON_ESCAPING_PRIMITIVE_ONLY_GRAMMAR_BYPASSED":
-        return run_json_primitive(inp)
-
-    if keys == {"payload", "reserved_headings"}:
-        result = check_reserved_heading_lines(inp["payload"], inp["reserved_headings"])
-    elif keys == {"rendered"}:
-        result = check_unresolved_placeholders(inp["rendered"])
-    elif {"visible_payload", "manifest_clause_ids", "clause_id_regex"} <= keys <= {
-            "visible_payload", "manifest_clause_ids", "clause_id_regex", "clause_id_search_regex",
-            "clause_id_near_match_regex"}:
-        result = check_visible_clause_ids(
-            inp["visible_payload"], inp["manifest_clause_ids"], inp["clause_id_regex"],
-            inp.get("clause_id_search_regex", SEARCH_REGEX_DEFAULT),
-            inp.get("clause_id_near_match_regex", NEAR_MATCH_REGEX_DEFAULT))
-    else:
-        raise Blocked(f"input shape {sorted(keys)} has no implemented adapter")
-    if result is None:
-        raise Blocked("packet check passed; nothing further to compare")
-    return result
+    rows = find_adapters(desc["input"])
+    if not rows:
+        raise Blocked(f"no adapter for this input shape: {sorted(desc['input'])}")
+    return rows[0][2](desc, validator)
 
 
 def execute(desc: dict, validator) -> tuple[str, dict | None, str]:

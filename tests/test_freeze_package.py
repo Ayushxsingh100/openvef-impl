@@ -128,7 +128,8 @@ class FreezeRecordTests(unittest.TestCase):
     def test_d009_readings_match(self):
         v = self.freeze.verify(REPO, self.freeze.load(REPO, self.stages.READINGS_RECORD))
         self.assertEqual(v["changed"], [])
-        self.assertEqual(len(v["frozen"]), 40)  # 7 + 23 + 1 + 8 readings and the F15 case table
+        self.assertEqual(len(v["frozen"]), 39)  # 40 under D-009, less A-031 (withdrawn, D-012)
+        self.assertNotIn("A-031", v["frozen"])
 
     def test_d009_cleanup_was_wording_only(self):
         import hashlib
