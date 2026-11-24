@@ -1,0 +1,328 @@
+{
+  "run_started_utc": "20261124T112030Z",
+  "run_class": "development",
+  "interpreter_status": "PINNED (D-002a: runner and artifacts in the pinned image)",
+  "python_version": "3.11.18 (main, Nov  5 2026, 07:57:53) [GCC 14.2.0]",
+  "python_executable": "/usr/local/bin/python",
+  "python_executable_sha256": "92d7e40ec50be176cb1b790c7568b7e08cd862137b5aa69f1413ba1967886b79",
+  "platform": "Linux-6.8.0-1070-azure-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "fixture_index_sha256": "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54",
+  "response_schema_sha256": "6fb5d282b09540949f21ee134b522841c3345031cb3e118a83bdffc18b4e7c34",
+  "distributions": {
+    "jsonschema": "4.26.0",
+    "attrs": "26.1.0",
+    "jsonschema-specifications": "2025.9.1",
+    "referencing": "0.37.0",
+    "rpds-py": "2026.9.1",
+    "typing_extensions": "4.16.0",
+    "cocotb": "2.1.0",
+    "find-libpython": "0.5.1",
+    "iniconfig": "2.3.1",
+    "packaging": "26.3",
+    "pluggy": "1.7.0",
+    "pygments": "2.21.0",
+    "pytest": "9.2.0"
+  },
+  "git_commit": "12abd1fc92515f9839e17e02fcbb926fe58b9e75",
+  "source_sha256": {
+    "design/fifo/design-materials-DRAFT.json": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393",
+    "design/fifo/export_null.ys": "85dfdddda430adc22ea3df9c961397d596264b195e56cba8c49da84b4bc474b1",
+    "design/fifo/mask/ovf_fifo-mask-DRAFT.json": "78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f",
+    "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv": "3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92",
+    "design/fifo/rtl/ovf_fifo.v": "ca06abf55e6a82e6617dab9cd5d7e4ef0118d082b7789fce169016307fe2042b",
+    "runner/run_f18.py": "5ce552311b17f7e1ac74cce7f8c9a36a595fc0f72e0e2a94fb07b0b2b4325a73",
+    "sandbox/Dockerfile": "f40c5f4337d4e3bee5dced3033f79789287aa93ed798ecbc71d6a533482cfe48",
+    "sandbox/harness.py": "c05e8acff5423d42514361ddbc7f07c0b2f9ddc74cf08e9e59765cd7fcd095d6",
+    "sandbox/sim.py": "a84171d868da9938cde9608c1b5174412c774023f601c8d493131a9e8ddc26cf",
+    "sandbox/sim_cocotb.py": "b2578236549eb35f7e18db7d724d8bd757db0718434652a4d01c6834e53eb77f",
+    "src/openvef/__init__.py": "6071fa9f7b1f81b634bd32bd0c5c6b1aeb1969c747b8b45ebf7b783c6c73567a",
+    "src/openvef/assembler.py": "b0c04b93c69035aa4e3eeba9f475d2794dac4894f798463813e9356cb6d2a7fd",
+    "src/openvef/ast_signature.py": "5910f63e57ed3714747a545376feb60a9f5b9e1190b99d048e66812c154bd256",
+    "src/openvef/design_materials.py": "1919b2390a5fc5ca654744b3072f83eaebdcd04eea9674f3dfb0477084933ce7",
+    "src/openvef/envelope.py": "af74dc9c80097d9e6f526a54acabcf26041396bee446438bbf915b1a3dd119df",
+    "src/openvef/import_policy.py": "a27f6197ede05db172d4e8e76e928873dbbb3c20fc8e522a5a9e14ee741b72f6",
+    "src/openvef/ledger.py": "3c397c38da3f21f425e5eaa89e81bf4be7f751a5c90d121ed8bc80a5db9db30f",
+    "src/openvef/runtime.py": "4758ff4de83146444aaa9449ebee30aba6089fb197f0f1b64e17435e1699f076",
+    "src/openvef/sandbox.py": "9034b4bf6632e0e7bb26bc82841b19599ab38842bff733a16d15828d1a9b9de4",
+    "src/openvef/schema.py": "18a9cebaf5c912b5eaa4edff431d9752dae95b2412d387f26b4084392a06807d",
+    "src/openvef/serializer.py": "9452adae7dbbf56eed2a93752740b8c52f12ca148439e5bf929d9de259ca6b75",
+    "src/openvef/simulation.py": "452fb36cc92be0d9bff1388efeda160c493fbca69ec28a66ecac133f93108452",
+    "src/openvef/simulator_stages.py": "0fb33f6e448872f94d7be625c4fd322decc08cf1c5cdc8ba05dc77b9f0eec78c",
+    "src/openvef/source_ast.py": "b58a6914a4ca3ee80c9bc095fc75767cd0235dd085aa2744e30839bbdbecbbaa",
+    "src/openvef/stage_map.py": "ba548253ea222918b774b9e3960616263a307f1f8df7beadca9c79108c209ec1",
+    "src/openvef/trace.py": "f2363956ac24da4df77dd666083715293c21ecf3b8071781e9602f4ac316a5d1"
+  },
+  "command": [
+    "/usr/local/bin/python",
+    "/opt/openvef-repo/runner/run_f18.py",
+    "/baseline",
+    "/evidence",
+    "development"
+  ],
+  "sandbox": {
+    "mode": "D-002a runner container + host broker",
+    "base_image_digest": "python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535",
+    "image_tag": "openvef-sandbox:693f422c7a112dcd",
+    "image_id": "sha256:565e55470476be93f0b6b6ea6ec88776b0332598c77a9a3fba0aa305c2971c3f",
+    "docker_server_version": "29.9.2-2",
+    "host_kernel": "Linux 6.8.0-1070-azure",
+    "dockerfile_sha256": "f40c5f4337d4e3bee5dced3033f79789287aa93ed798ecbc71d6a533482cfe48",
+    "requirements_lock_sha256": "e12f3a4c4cddb0694c33fd2ec2dd7b9f84bffc76a16fd8e47f22d7663cf9d7d1",
+    "broker_sha256": "53d2af90649f9de6742aa4b020c28a28accf2de78356d06c13930c1169025740",
+    "runner_container_flags": [
+      "--rm",
+      "-i",
+      "--network=none",
+      "--read-only",
+      "--cap-drop=ALL",
+      "--security-opt=no-new-privileges",
+      "--user=1000:1000",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777",
+      "--pids-limit=128",
+      "--memory=1g",
+      "--memory-swap=1g",
+      "--cpus=2",
+      "--ipc=none",
+      "--hostname=runner",
+      "--env=PYTHONHASHSEED=0",
+      "--env=PYTHONDONTWRITEBYTECODE=1",
+      "--env=PYTHONUNBUFFERED=1",
+      "--env=OPENVEF_BROKER=1",
+      "--volume=/workspaces/openvef-impl/baseline/OpenVEF_Planning_v1_3_6:/baseline:ro",
+      "--volume=/workspaces/openvef-impl/src:/opt/openvef-repo/src:ro",
+      "--volume=/workspaces/openvef-impl/runner:/opt/openvef-repo/runner:ro",
+      "--volume=/workspaces/openvef-impl/sandbox:/opt/openvef-repo/sandbox:ro",
+      "--volume=/workspaces/openvef-impl/design:/opt/openvef-repo/design:ro",
+      "--volume=/workspaces/openvef-impl/docs:/opt/openvef-repo/docs:ro",
+      "--volume=/workspaces/openvef-impl/evidence/run-20261124T112030Z:/evidence:rw",
+      "--workdir=/tmp",
+      "--name=openvef-runner-f777bb0b2173"
+    ],
+    "artifact_container_flags": [
+      "--rm",
+      "-i",
+      "--network=none",
+      "--read-only",
+      "--cap-drop=ALL",
+      "--security-opt=no-new-privileges",
+      "--user=10001:10001",
+      "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777",
+      "--pids-limit=64",
+      "--memory=256m",
+      "--memory-swap=256m",
+      "--cpus=1",
+      "--ulimit=nofile=64:64",
+      "--ipc=none",
+      "--hostname=sandbox",
+      "--env=PYTHONHASHSEED=0",
+      "--env=PYTHONDONTWRITEBYTECODE=1",
+      "--env=PYTHONUNBUFFERED=1",
+      "--volume=/workspaces/openvef-impl/sandbox:/opt/openvef:ro",
+      "--workdir=/tmp",
+      "--name=<name>"
+    ],
+    "artifact_command": [
+      "python",
+      "-I",
+      "/opt/openvef/harness.py"
+    ],
+    "harness_sha256": {
+      "harness.py": "c05e8acff5423d42514361ddbc7f07c0b2f9ddc74cf08e9e59765cd7fcd095d6",
+      "sim.py": "a84171d868da9938cde9608c1b5174412c774023f601c8d493131a9e8ddc26cf",
+      "sim_cocotb.py": "b2578236549eb35f7e18db7d724d8bd757db0718434652a4d01c6834e53eb77f"
+    },
+    "toolchain": {
+      "cocotb": "2.1.0",
+      "iverilog_version_line": "Icarus Verilog version 12.0 (stable) ()",
+      "vvp_version_line": "Icarus Verilog runtime version 12.0 (stable) ()",
+      "iverilog_deb_version": "12.0-2+b1",
+      "iverilog_sha256": "99633b21371b5fc6ddc3156c9402c10e2915a94feb99ddc5eb01ba8f02758462",
+      "vvp_sha256": "dc287630d71c187dcf258a9d3c7d4aa77d2c3c2c4c7515debe91d000ea40c1df",
+      "yosys_version_line": "Yosys 0.71+post (git sha1 5628c13240f670b97aaaca3d47940c4afb8ff572, Release, GNU /usr/bin/c++ 14.2.0)",
+      "yosys_sha256": "0bf886591a8e2b0f45fea92b2022f61d5a2213c370904ff87bbdeadbbee4e6af",
+      "yosys_abc_sha256": "2bc88ba4923042e96ce0da15b993b892a70ed14d9f0c625c394aa6cad48bcf7b",
+      "mcy_commit": "5a2cad0cbefceb7f23051c08348bd23128fd1046",
+      "mcy_sha256": "e56df004f5960d811cf8f468b21fce77922ce5cb541c4faf400fdab8af944a01",
+      "eda_pins": "yosys 0.71 2ec7c2ee63bb9b4065d6d5fff2786a1455e834f90ede8eb1d47791153ebef2a5\nmcy 5a2cad0cbefceb7f23051c08348bd23128fd1046\ndebian_snapshot 20261104T212339Z"
+    }
+  },
+  "design_materials": {
+    "materials_file": "design/fifo/design-materials-DRAFT.json",
+    "status": "DRAFT under D-005: proposed values for checklist items 3, 4 and 7-12; not approved, not frozen. See docs/fifo-frozen-values-proposal-DRAFT.md.",
+    "file_sha256": {
+      "design/fifo/design-materials-DRAFT.json": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393",
+      "docs/fifo-spec-v0.2.md": "5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5",
+      "design/fifo/rtl/ovf_fifo.v": "ca06abf55e6a82e6617dab9cd5d7e4ef0118d082b7789fce169016307fe2042b",
+      "design/fifo/export_null.ys": "85dfdddda430adc22ea3df9c961397d596264b195e56cba8c49da84b4bc474b1",
+      "design/fifo/mask/ovf_fifo-mask-DRAFT.json": "78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f",
+      "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv": "3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92"
+    },
+    "null_netlist_sha256": [
+      "56dabfecc3768078bd96f7a026034ee9e2a795e266db89282b4ad4434ea64747",
+      "56dabfecc3768078bd96f7a026034ee9e2a795e266db89282b4ad4434ea64747"
+    ],
+    "yosys_version": "Yosys 0.71+post (git sha1 5628c13240f670b97aaaca3d47940c4afb8ff572, Release, GNU /usr/bin/c++ 14.2.0)",
+    "checker_metadata": {
+      "design_id": "ovf_fifo",
+      "spec_version_sha256": "5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5",
+      "trace_schema_version": "openvef-trace-0.1-draft",
+      "cycle_cap": 64,
+      "reset_release_cycle": 1,
+      "trace_integrity_status": "VALID"
+    },
+    "mask_variant": "primary",
+    "provisional": [
+      "FIFO specification, port manifest, reset/legal-input rules: DRAFT, not frozen (D-005, D-006)",
+      "cycle cap, safe idle, watchdog, scheduler, trace schema, metadata: DRAFT proposals, not frozen (items 7-12)",
+      "FIFO RTL and export script: DRAFT; export script is not the frozen L544 script",
+      "observation mask and File 24 table: DRAFT, unsigned; require an independent human reviewer (L271)",
+      "spec_version_sha256 in checker metadata is the SHA-256 of the DRAFT spec file, not a frozen value",
+      "Claude-decided readings, owner review pending: A-040, A-041, A-043, A-044"
+    ]
+  }
+}
+M01: PASS 
+M02: PASS 
+M03: PASS 
+M04a: PASS 
+M04b: PASS 
+M05: PASS 
+M06: PASS 
+M07: PASS 
+M08a: PASS 
+M08b: PASS 
+M09: PASS 
+M10: PASS 
+M11: PASS 
+M12: PASS 
+M13: PASS 
+M14: PASS 
+M15: PASS 
+M16: PASS 
+M17: PASS 
+M18: PASS 
+M19: PASS 
+M20: PASS 
+M21: PASS 
+M22: PASS 
+M23: PASS 
+M24: PASS 
+M25: PASS 
+M26: PASS 
+M27: NOT_IMPLEMENTED A-038 (revisited): the descriptor's prose predicate is not the design's executable FIFO-042 (they disagree when rd_en = 1 at full), executing the prose would need a predicate language File 30 L83 (e) does not define, and no port set is supplied for checks (a)-(d), which precede (e)
+M28: PASS 
+M29: PASS 
+M30: PASS 
+M31: PASS 
+M32: PASS 
+M33: PASS 
+M34: PASS 
+M35: PASS 
+M36: PASS 
+M37: PASS 
+M38: PASS 
+M39: PASS 
+M40: PASS 
+M41: PASS 
+M42: PASS 
+M43: PASS 
+M44: PASS 
+M45: PASS 
+M46: PASS 
+M47: PASS 
+M48: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for error_class: error class not stated: L175 states error classes only for the M41 (MID_RUN_REEVALUATION), M53 and M54 vectors, and the stage map shows the error class need not equal the diagnostic CODE (L154: SIMULATOR_ERROR under EVALUATOR_INFRASTRUCTURE_FAILURE); rerun_scope_rule: meaning supported (L183 'If the revised evaluator component is shared across FIFO and UART, the affected scope is both designs and every arm x design slot; if it is design-specific, the affected scope is that design in both arms') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M49: PASS 
+M50: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for error_class: error class not stated: L175 states error classes only for the M41 (MID_RUN_REEVALUATION), M53 and M54 vectors, and the stage map shows the error class need not equal the diagnostic CODE (L154: SIMULATOR_ERROR under EVALUATOR_INFRASTRUCTURE_FAILURE); affected_slots: meaning supported (L181 'invalidate every scheduled slot across both designs and both arms') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M51: PASS 
+M52: PASS 
+M53: PASS 
+M54: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for stable_error_class_rule: meaning supported (L185 'a simple exception class name ... for SIMULATOR_ERROR and the literal NONE for the other two halt codes') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4); stable_diagnostic_code_rule: meaning supported (L185 'stable_diagnostic_code is exactly the corresponding halt_code token') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M55: PASS 
+M56: PASS 
+M57: PASS 
+M58: NOT_IMPLEMENTED A-033: no supporting Protocol sentence for error_class: error class not stated: L175 states error classes only for the M41 (MID_RUN_REEVALUATION), M53 and M54 vectors, and the stage map shows the error class need not equal the diagnostic CODE (L154: SIMULATOR_ERROR under EVALUATOR_INFRASTRUCTURE_FAILURE); affected_scope: meaning supported (L181 'halt and invalidate every slot for that design in both arms') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4); unaffected_design_scope: meaning supported (L176 'M58 invalidates both arms for the affected design only when membership, estimand and weights remain unchanged') but the exact token appears nowhere in the Protocol; writing it would copy the expected output (hard rule 4)
+M59: PASS 
+M60: PASS 
+M61: PASS 
+M62: PASS 
+M63: PASS 
+M64: PASS 
+M65: PASS 
+M66: PASS 
+M67: PASS 
+M68: PASS 
+M69: PASS 
+M70: PASS 
+P01: PASS 
+P02: PASS 
+P03: PASS 
+P04: PASS 
+P05: PASS 
+P06a: PASS 
+P06b: PASS 
+P07: PASS 
+P08a: PASS 
+P08b: PASS 
+P08c: PASS 
+P08d: PASS 
+P09: PASS 
+P10: PASS 
+P11a: PASS 
+P11b: PASS 
+P12a: PASS 
+P12b: PASS 
+P13: PASS 
+P14: PASS 
+P15: PASS 
+P16: PASS 
+P17: PASS 
+P18: PASS 
+P19: PASS 
+P20: PASS 
+P21: PASS 
+P22: PASS 
+P23: PASS 
+P24a: PASS 
+P24b: PASS 
+P24c: PASS 
+P24d: PASS 
+P25a: PASS 
+P25b: PASS 
+P26: PASS 
+P27: PASS 
+P28: PASS 
+P29a: PASS 
+P29b: PASS 
+P30: PASS 
+P31: PASS 
+P32: PASS 
+P33: PASS 
+P34: PASS 
+P35: PASS 
+P36: PASS 
+P37: PASS 
+P38: PASS 
+P39: PASS 
+P40: PASS 
+P41: PASS 
+P42: PASS 
+P43: PASS 
+P44: PASS 
+P45: PASS 
+P46: PASS 
+P47: PASS 
+P48: PASS 
+R01: PASS 
+R02: PASS 
+R03: PASS 
+R04: PASS 
+R05: PASS 
+R06: PASS 
+R07: PASS 
+R08: PASS 
+R09: PASS 
+R10: PASS 
+R11: PASS 
+R12: PASS 
+R13: PASS 
