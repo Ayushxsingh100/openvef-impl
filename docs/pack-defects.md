@@ -62,6 +62,8 @@ they are listed in [fifo-owner-checklist.md](fifo-owner-checklist.md).
 | PD-21 | U | Non-JSON number tokens | none | A-003 (owner, Ayush pending) |
 | PD-22 | I | Stale planning-pack version label in File 30 | none | none needed (found while preparing this document; not in ambiguities.md) |
 | PD-23 | U | Trace-row fields named only in prose; trace numbering vs `reset_release_cycle`; run-status domain | none today (simulation not exercised by fixtures) | A-040 (Claude) |
+| PD-24 | I | TechRxiv preprint FIFO: Charter treats it as unverified, File 10 states it as fact | none (benchmark-overlap disclosure) | none (owners to settle) |
+| PD-25 | U, I | M27: no port set or widths; prose predicate stricter than the drafted FIFO predicate; needs a corrected fixture in a future pack release | M27 (NOT_IMPLEMENTED) | A-038 (Claude, revisited) |
 
 "Fixtures affected now" means the fixture's result depends on the interim handling.
 "None" means no current fixture exercises the case, but a real artifact can.
@@ -575,3 +577,28 @@ not relied on. The literature review states it as fact, with section-level detai
 
 **To settle.** The owners retrieve the preprint, or record the access status in the
 provenance log (File 22), and make the Charter and File 10 agree.
+
+## PD-25 — M27 is an unsatisfiable fixture as written (U, I)
+
+> [41/M27.json L14] "\"legal_input_predicate\": \"wr_en must be 0 when full is 1\""
+
+> [30 L83] "(a) its key set equals the frozen top-level input-port set exactly"
+
+**Defect.** M27 expects `DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE` from check
+(e), but:
+- **It supplies no port set or widths.** Checks (a)–(d), which precede (e) (File 30 L83),
+  cannot be established. Under the drafted FIFO port manifest (FIFO-004), its vector
+  `{"wr_en": "1", "full": "1"}` fails (a) first: keys are missing, and `full` is an
+  output.
+- **Its predicate is a prose sentence with no executable form** (no predicate language;
+  PD-06). It is also **stricter than the drafted FIFO predicate** (FIFO-041/042, DRAFT,
+  not yet frozen): it forbids `wr_en` = 1 at full even together with `rd_en` = 1, which
+  FIFO-030 makes legal.
+
+**Interim.** M27 stays NOT_IMPLEMENTED (A-038, revisited 24 Nov 2026).
+
+**To settle.** A corrected M27 in a future pack release. It should:
+- supply a port manifest with widths and a driven vector that passes (a)–(d) under it;
+- give the predicate in an executable form consistent with the frozen FIFO
+  legal-input rules;
+- give a vector that violates that predicate.

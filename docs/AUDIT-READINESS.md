@@ -52,26 +52,48 @@ review. [traceability.md](traceability.md) marks each one.
 - Five fixtures are not run to an outcome, ten are provisional, and many readings are
   unreviewed.
 
-## 3. What the independent implementation auditor needs
+## 3. Evidence bundle for the independent implementation auditor
 
-The v1.3.6 pack has no document named an "evidence bundle". The Owner Sign-off Pack is
-not in this repository. The list below is derived from L555 step (5), the File 21 F18
-checklist and CLAUDE.md. **The owners should confirm it, or supply the list they mean.**
+**Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
+document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-| # | Needed for (L555 (5) / File 21) | Where it is | Status |
+Status is checked against the latest evidence run, `evidence/run-20261124T112030Z`:
+- **Met:** the run records it as stated.
+- **Partly met:** some of it is recorded; the gap is named.
+
+| # | §5.3 item | Where it is in each run | Status |
 |---|---|---|---|
-| 1 | Baseline identity | `baseline/` verified against `27_SHA256SUMS.txt`; ZIP SHA-256 in CLAUDE.md | Ready |
-| 2 | Implementation and parser/assembler source at an exact commit | `src/`, `runner/`, `sandbox/`; commit `12abd1f`, plus later doc-only commits | Ready |
-| 3 | Pinned Python 3.11 behaviour | `sandbox/Dockerfile` (base by digest), `requirements.lock` (hashes), [sandbox.md](sandbox.md); every run records `sys.version`, the interpreter SHA-256, the image ID and the toolchain | Ready |
-| 4 | Python 3.11 Unicode tokenizer probe (File 50; L555 (4) "otherwise it must be recorded during this implementation-validation stage") | not recorded | **Open**: run File 50's probe on the pinned interpreter and record it |
-| 5 | All mandatory fixture results | `evidence/run-20261124T112030Z/` (`results.jsonl`, `summary.json` with `results_sha256`, `run.log`); fixture index SHA-256 in `summary.json` | Ready as evidence of current state; F18 not passed (§2) |
-| 6 | Requirement → module → fixture → evidence map | [traceability.md](traceability.md) | Ready |
-| 7 | Every interpretation, with readings and reasons | [ambiguities.md](ambiguities.md) (A-001…A-044, D-001…D-006) and [pack-defects.md](pack-defects.md) (PD-01…PD-24) | Ready; many reviews outstanding (§4) |
-| 8 | Sandbox and isolation behaviour (File 21 "Runtime sandbox") | `tests/test_sandbox.py`, `tests/test_broker.py`, [sandbox.md](sandbox.md) | Ready |
-| 9 | Unit tests outside F18 | `tests/` (16 files; run with `.venv/bin/python -I tests/<file>`, Docker required for the sandbox tests) | Ready |
-| 10 | AI-assistance disclosure | [assistance-log.md](assistance-log.md) (D-005 wording at the top) | Ready |
-| 11 | Design materials, mask and freeze record (File 21 "Mask traceability", "Payload/manifest binding", "Independent reviewer") | [OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md) | **Open**: unsigned |
-| 12 | Prompt-pair, assembly and clause-ID checks on the real FIFO payloads (File 21 "Payload/manifest binding", "Prompt template-stage hashes", "Clause IDs") | the assembler checks exist (`src/openvef/assembler.py`); the seven FIFO payload blocks and the File 38 manifest are not drafted | **Open** |
+| 1 | Fixture-index SHA-256 verified at run time | `runner/run_f18.py` `load_index` aborts the run on a mismatch with the pinned `INDEX_SHA256`; `summary.json` `fixture_index_sha256` (`f37808c7…de54`) | **Met** |
+| 2 | Interpreter version and binary/image hash | `summary.json` `python_version` (3.11.18), `python_executable_sha256` (`92d7e40e…6b79`), `interpreter_status` PINNED, `sandbox.image_id`, `base_image_digest`, `dockerfile_sha256`, `requirements_lock_sha256`, `toolchain` | **Met** |
+| 3 | Parser/assembler/runner source commit and per-file SHA-256 | `summary.json` `git_commit` (with `+UNCOMMITTED_CHANGES` if the tree was dirty) and `source_sha256` for every file under `src/`, `runner/`, `sandbox/` and `design/`; `sandbox.harness_sha256`; `design_materials.file_sha256` (includes the spec) | **Met** |
+| 4 | Exact run commands and environment variables | `summary.json` `command` (the in-container command) and `sandbox.runner_container_flags` / `artifact_container_flags` (every `--env` passed to the containers) | **Partly met.** The host-side command (`runner/run_f18_container.sh development`) and the host environment (e.g. whether `OPENVEF_EVIDENCE_ROOT` was set) are not written into the run record |
+| 5 | Per-fixture record: ID, descriptor SHA-256, actual disposition/stage/error class/diagnostic, expected, match | `results.jsonl`: `fixture_id`, `descriptor_sha256`, `actual` (four fields), `expected`, `status` (PASS = match, FAIL = mismatch), `note`; provisional block where applicable | **Met** |
+| 6 | Raw run logs with timestamps | `run.log`: run metadata (with `run_started_utc`), then one line per fixture | **Partly met.** Only the run start is timestamped; the per-fixture lines carry no timestamps |
+| 7 | Results files and SHA-256 | `results.jsonl`, with its SHA-256 in `summary.json` `results_sha256`; `summary.json` itself is not hashed inside the run | **Met** for results; the summary's own hash is computable but not recorded |
+| 8 | Every failed/errored/skipped fixture, with reason | `results.jsonl` `note` for every non-PASS; this run has 0 FAIL, 0 ERROR and 5 NOT_IMPLEMENTED (M27, M48, M50, M54, M58), each with its blocking reason | **Met** |
+| 9 | Isolation arrangement for LLM-generated code | artifact containers: no network, read-only root, all capabilities dropped, non-root, noexec tmpfs, limits, wall-clock kill; flags in each run's `artifact_container_flags`; [sandbox.md](sandbox.md); `tests/test_sandbox.py`, `tests/test_broker.py` (D-002, D-002a) | **Met** as built. Whether it is adequate as the security boundary for F16 is for the owners to decide (sandbox.md) |
+
+**Also available to the auditor:**
+- [traceability.md](traceability.md), [ambiguities.md](ambiguities.md),
+  [pack-defects.md](pack-defects.md), [assistance-log.md](assistance-log.md);
+- the unit tests in `tests/`, 16 files, run with `.venv/bin/python -I tests/<file>`.
+
+**File 50 Python 3.11 Unicode tokenizer check (L555 (4)): recorded.** Run
+`evidence/probe-file50-20261124T112645Z/` on the pinned image (CPython 3.11.18,
+interpreter SHA-256 `92d7e40e…6b79`, image `sha256:565e5547…`). Results:
+- the File 50 code block ran byte-for-byte;
+- `℘ = 1` gives `ERRORTOKEN '℘' (1, 0)`;
+- `a℘ = 1` gives `NAME 'a' (1, 0)`, then `ERRORTOKEN '℘' (1, 1)`;
+- `ast.parse` accepts both;
+- the scanner rejects both as `NON_ASCII_IDENTIFIER|…|column=1`, at the start of the
+  complete identifier lexeme;
+- Unicode in a STRING and in a COMMENT is not rejected.
+
+This **matches the audit-time CPython 3.11.18 results** in File 54 (M55: "ERRORTOKEN `℘`
+at (1,0)"; M56: "NAME `a` + ERRORTOKEN `℘`"), and it differs from the 3.13.5 exploratory
+result in File 50, which emitted NAME. No difference from the audit-time results was
+found. The audit used a different 3.11.18 binary (`/usr/bin/python3.11`, File 54 L35);
+this run is on the pinned one.
 
 ## 4. Open items and owners
 
@@ -84,7 +106,7 @@ checklist and CLAUDE.md. **The owners should confirm it, or supply the list they
 | D-001 (Draft 2020-12 validator pin): one owner confirmation outstanding | owners | ambiguities.md D-001 |
 | Review of the readings decided by Claude: A-007–A-012, A-013 tie case, A-015–A-041, A-043, A-044 (A-042 accepted by Krishika) | both owners (the delegation came from Krishika alone) | ambiguities.md; CLAUDE.md "Standing delegation" |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
-| M27: a revised descriptor (port manifest with widths and an executable predicate), or a decision to run it against the frozen FIFO materials with a revisited expectation | owners | A-038 (revisited) |
+| M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |
 | TechRxiv preprint: retrieve it, or record its access status; make the Charter and File 10 agree | owners | PD-24 |
 
@@ -108,7 +130,7 @@ checklist and CLAUDE.md. **The owners should confirm it, or supply the list they
 
 | Item | Owner | Reference |
 |---|---|---|
-| File 50 tokenizer probe on the pinned interpreter, recorded as evidence | Claude (on request) | L555 (4) |
+| Close §3 gaps 4 and 6: write the host-side command and environment into the run record, and timestamp each fixture line in `run.log` (runner change, then a new evidence run) | Claude (on request) | §3 items 4, 6 |
 | Draft the remaining payload blocks (`[Execution envelope]`, `[Driver API]`, `[Trace schema]`, `[Checker contract]`) and the File 38 manifest (checklist items 2, 17), then run the assembler and clause-ID checks on them | Claude drafts; owners approve | D-005; File 31 L29–L30 |
 | F1–F15 feasibility harness runs, once the control mutants exist | Claude builds the harness; owners supply the mutants | L555 (4) |
 | After freeze and mask signature: a new pinned evidence run without provisional results | Claude | package "After signing" |

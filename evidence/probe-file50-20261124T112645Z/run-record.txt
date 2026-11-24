@@ -1,0 +1,15 @@
+File 50 Python 3.11 Unicode identifier tokenizer check — pinned-image run record
+
+Started (UTC): 20261124T112645Z
+Image: openvef-sandbox:693f422c7a112dcd
+Image ID: sha256:565e55470476be93f0b6b6ea6ec88776b0332598c77a9a3fba0aa305c2971c3f
+  (same image as evidence/run-20261124T112030Z; base python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535)
+Command (host, repo root; OUT = this directory):
+  docker run --rm --network=none --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+    --user=<host uid>:<host gid> --tmpfs=/tmp:rw,noexec,nosuid,nodev,size=16m \
+    --env=PYTHONHASHSEED=0 --env=PYTHONDONTWRITEBYTECODE=1 \
+    -v "$PWD/baseline/OpenVEF_Planning_v1_3_6:/baseline:ro" -v "$PWD/src:/opt/openvef-repo/src:ro" \
+    -v "$PWD/runner:/opt/openvef-repo/runner:ro" -v "$PWD/$OUT:/out:rw" --workdir=/tmp \
+    openvef-sandbox:693f422c7a112dcd python -I /opt/openvef-repo/runner/probe_file50.py /baseline /out
+Exit status: 0
+Outputs: part1_stdout.txt (File 50 code block output, verbatim), probe.json (versions, hashes, scanner results)

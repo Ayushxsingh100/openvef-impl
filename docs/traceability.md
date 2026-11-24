@@ -47,6 +47,7 @@
 | Protocol L175, L183–L185: halt signature, single recovery cycle, operational recovery | `src/openvef/ledger.py` | M41, M42, M47 — PASS in run-20261123T182731Z; change-class vectors: see the L175–L176 row | Implemented (A-031, A-032 Claude-decided, owner review pending; pack inconsistency noted in A-031) |
 | Protocol L175–L176, L181–L183: change-class lifecycle control expectations; `required_action` verbatim from L176; each field cited or marked unsupported | `src/openvef/ledger.py` `LIFECYCLE_CASES`, `lifecycle_expectation`; `tests/test_lifecycle.py` (5 tests) | M53 — PASS in run-20261123T195936Z; M48, M50, M54, M58 NOT_IMPLEMENTED (unsupported fields listed in A-033) | Implemented (A-033 revised per owner correction; field derivations Claude-decided, owner review pending) |
 | Owner freeze and audit readiness: one signing checklist with SHA-256 per item (whole files, or per-section for decision records); status, auditor needs and open items | `docs/OWNER-FREEZE-PACKAGE.md`, `docs/AUDIT-READINESS.md`; `tests/freeze_hashes.py`, `tests/test_freeze_package.py` | — | Ready for signature (nothing signed) |
+| L555 (4); File 50: Python 3.11 Unicode identifier tokenizer check on the pinned interpreter | `runner/probe_file50.py`, `src/openvef/import_policy.py` (`scan_identifiers`) | M55, M56, M57 (PASS in the evidence runs) | **Recorded**: `evidence/probe-file50-20261124T112645Z`; matches File 54 audit-time 3.11.18 results |
 
 Latest run: `evidence/run-20261123T195936Z`. It was started by `runner/run_f18_container.sh` at commit bfc5393, on a
 clean tree:
