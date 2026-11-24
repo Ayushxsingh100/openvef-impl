@@ -79,5 +79,6 @@ adopted, modified or rejected.
 - `src/openvef/` — implementation
 - `tests/` — unit tests that are not F18 fixtures
 - `runner/` — F18 fixture runner
+- `design/fifo/` — DRAFT FIFO design materials under D-005 (RTL, export script, proposed values)
 - `evidence/` — run outputs, logs, hashes (append-only)
 - `docs/` — traceability, ambiguities, assistance log

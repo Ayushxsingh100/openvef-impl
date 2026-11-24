@@ -1,0 +1,9 @@
+# DRAFT null-netlist export script for ovf_fifo (D-005; checklist item 13). NOT the
+# frozen L544 export script: freezing it, the mutation modes and the mutant population
+# are owner items. Yosys v0.71 (D-004). Reads /tmp/in.v, writes /tmp/net.v.
+# Protocol L233: "Export must preserve top module name and public ports."
+read_verilog -sv /tmp/in.v
+hierarchy -check -top ovf_fifo
+synth -flatten -top ovf_fifo
+opt_clean -purge
+write_verilog -noattr /tmp/net.v
