@@ -41,7 +41,7 @@ artifacts**.
   repeatability) and F15 (ledger identities) pass; each rests on a D-009 approval. The other controls wait
   for owner-written mutants, drivers and checkers.
 
-## Results (latest evidence run `run-20261124T194216Z`, pinned image)
+## Results (latest evidence run `run-20261124T195043Z`, pinned image)
 
 | PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
 |---|---|---|---|---|
@@ -50,9 +50,9 @@ artifacts**.
 **What to say about these numbers:**
 - **F18 is not passed.**
 - **No pass is marked provisional, but 10 of the 139 carry a label:** "cleared under
-  DEV-001 — review pending". No independent mask reviewer is available, so Krishika
-  accepted the mask. Claude drafted it, and the Claude (claude.ai) review that was meant to
-  support the acceptance had not been done at the time; it is still pending. The Protocol's independent signature (L271) is still missing.
+  DEV-001 (non-independent review saved)". No independent mask reviewer is available, so
+  Krishika accepted the mask with a saved Claude (claude.ai) review. Claude Code drafted the
+  mask, so the review is not independent. The Protocol's independent signature (L271) is still missing.
 - **Many passes rest on readings of ambiguous pack text.** Claude decided them under a
   delegation. Krishika approved them as decided, without itemised owner review (D-009).
   They are listed in `docs/READINGS-REVIEW.md`; M36, R01–R13 and several M-fixtures would
@@ -96,8 +96,8 @@ once to warm the image (about 15 s).
 5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
    provisional or cleared under DEV-001.
    ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261124T194216Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261124T194216Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
+   python3 -c "import json;s=json.load(open('evidence/run-20261124T195043Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
+   grep '"fixture_id": "M27"' evidence/run-20261124T195043Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
 6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the independent auditor will check).
 
