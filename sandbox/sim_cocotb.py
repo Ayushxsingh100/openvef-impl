@@ -1,9 +1,8 @@
 """cocotb test module hosted by vvp: the per-cycle driver loop (see sim.py).
 
-Runs inside the D-002 sandbox only. The artifact is imported with the same restricted
-runtime import as the factory task (harness.guarded_import), its stdout/stderr are
-discarded, and it never receives a simulator handle: `step` gets a plain dict of
-strings.
+Runs inside the D-002 sandbox only. The artifact runs in its own confined process
+(artifact_worker.py, D-015): this process, which owns the simulator, the recorder and the
+trace, sends it the sampled outputs and receives one schema-checked plain value.
 
 Per cycle (Protocol L166 (7); File 30 §4 (a)-(e)): call `step`; an exception is recorded
 first; otherwise the vector is validated in order (a) key set (missing before extra),
@@ -12,11 +11,8 @@ is not driven and ends the run. The watchdog is enforced from outside via the he
 """
 from __future__ import annotations
 
-import builtins
-import io
 import json
 import os
-import sys
 import time
 
 import cocotb
@@ -26,6 +22,7 @@ from cocotb.types import LogicArray
 from cocotb.utils import get_sim_time
 
 import harness
+from artifact_proc import ArtifactFailed, ArtifactHostError, ArtifactProcess
 
 ALL_INPUTS_LEGAL = "ALL_INPUTS_LEGAL"
 # Field names given by Protocol §5.2 L217-L219, used verbatim (A-040).
@@ -139,21 +136,15 @@ async def openvef_driver_run(dut):
     def applied(vector: dict) -> dict:
         return {**vector, **held}
 
-    sink = io.StringIO()
-    real_out, real_err = sys.stdout, sys.stderr
-
-    def guarded(fn, *args):
-        sys.stdout, sys.stderr = sink, sink
-        builtins.__import__ = harness.guarded_import
-        try:
-            return fn(*args)
-        finally:
-            builtins.__import__ = harness._real_import
-            sys.stdout, sys.stderr = real_out, real_err
-
     beat("import")
-    failure, driver = guarded(harness.construct, req["driver_source"], req["seed"])
+    try:
+        artifact = ArtifactProcess()
+        failure = harness.construct(artifact, req["driver_source"], req["seed"])
+    except ArtifactHostError as exc:
+        finish({"error": f"artifact host error: {exc}"})
+        return
     if failure is not None:
+        artifact.close()
         finish(failure)
         return
     beat("sim")
@@ -206,18 +197,21 @@ async def openvef_driver_run(dut):
             beat("step")
             timing["driver_call_ns"] = now_ns()
             try:
-                value = guarded(driver.step, cycle_index, dict(snapshot))
-            except BaseException as exc:  # includes SystemExit
-                events.append({"kind": "driver_runtime", "phase": "step", "exception_class": harness.exc_class(exc),
+                value = artifact.step(cycle_index, dict(snapshot))
+            except ArtifactFailed as exc:
+                events.append({"kind": "driver_runtime", "phase": "step", "exception_class": exc.exception_class,
                                "cycle": n})
                 value = None
+            except ArtifactHostError as exc:
+                finish({"error": f"artifact host error: {exc}", "cycle": n})
+                return
             finally:
                 beat("sim")
             if events:
                 row.update({NEXT: None, "driver_completed": completed})
                 record_row(rows, row)
                 break
-            if value == "COMPLETE":
+            if isinstance(value, str) and value == "COMPLETE":
                 completed = True
                 vector = applied(safe_idle)
             else:
@@ -243,6 +237,7 @@ async def openvef_driver_run(dut):
         drive(dut, vector)
         timing["drive_ns"] = now_ns()
         n += 1
+    artifact.close()
     finish({"events": events, "rows": rows, "reset_release_cycle": release, "driver_completed": completed,
             "run_status": "TRUNCATED_TRACE" if events else "COMPLETE_TRACE", "target": target,
             "ordering": ordering})

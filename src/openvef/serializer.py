@@ -81,6 +81,41 @@ GRAMMAR = [re.compile(p) for p in (
 )]
 
 
+# Authoritative stage map, file 02 L143-L162: (stage, error class, diagnostic codes). The
+# fixed sentence and the bare token count as their own code.
+STAGE_MAP: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+    ("PARSE_SCHEMA", "SCHEMA_REJECT", ("SCHEMA_REJECT",)),                                              # L143
+    ("PARSE_SCHEMA", "OUTPUT_TRUNCATED", ("OUTPUT_TRUNCATED",)),                                        # L144
+    ("SOURCE_AST", "SOURCE_SYNTAX_REJECT", ("SOURCE_SYNTAX_REJECT",)),                                  # L145
+    ("SOURCE_AST", "SOURCE_EMPTY", ("SOURCE_EMPTY",)),                                                  # L146
+    ("IMPORT_POLICY", "IMPORT_POLICY_REJECT", ("IMPORT_NOT_ALLOWED", "IMPORT_FORM_REJECT", "NON_ASCII_IDENTIFIER",
+                                               "PROHIBITED_BUILTIN", "GLOBAL_RANDOM_USE",
+                                               "MODULE_STATEMENT_REJECT")),                             # L147
+    ("AST_SIGNATURE", "ENTRY_POINT_REJECT", ("ENTRY_POINT_REJECT", "DECORATOR_REJECT")),                # L148
+    ("COMPILE_DRIVER", "COMPILE_ERROR", ("COMPILE_ERROR|file=driver.py",)),                             # L149
+    ("COMPILE_CHECKER", "COMPILE_ERROR", ("COMPILE_ERROR|file=checker.py",)),                           # L150
+    ("DRIVER_RUNTIME", "RUNTIME_EXCEPTION", ("RUNTIME_EXCEPTION",)),                                    # L151
+    ("DRIVER_VECTOR", "DRIVER_VECTOR_INVALID", ("DRIVER_VECTOR_INVALID",)),                             # L152
+    ("DRIVER_WATCHDOG", "WATCHDOG_TIMEOUT", ("WATCHDOG_TIMEOUT",)),                                     # L153
+    ("DESIGN_HALT", "EVALUATOR_INFRASTRUCTURE_FAILURE", ("SIMULATOR_ERROR",)),                          # L154
+    ("DESIGN_HALT", "TRACE_INTEGRITY_FAILURE", ("TRACE_INTEGRITY_FAILURE",)),                           # L155
+    ("TERMINAL", "DRIVER_NONDETERMINISM", ("DRIVER_NONDETERMINISM",)),                                  # L156
+    ("DESIGN_HALT", "RTL_NULL_CONTROL_FAILURE", ("RTL_NULL_CONTROL_FAILURE",)),                         # L157
+    ("CHECKER_NULL", "CHECKER_RUNTIME_ERROR", ("CHECKER_RUNTIME_ERROR",)),                              # L158
+    ("CHECKER_NULL", "CHECKER_RETURN_INVALID", ("CHECKER_RETURN_INVALID",)),                            # L158
+    ("CHECKER_NULL", "CHECKER_TIMEOUT", ("CHECKER_TIMEOUT",)),                                          # L158
+    ("CHECKER_NULL_REJECT", "CHECKER_NULL_REJECT", (CHECKER_NULL_REJECT_SENTENCE,)),                    # L159
+    ("TERMINAL", "CHECKER_NONDETERMINISM", ("CHECKER_NONDETERMINISM",)),                                # L161
+)
+
+
+def in_stage_map(stage_id: object, error_class: object, diagnostic: object) -> bool:
+    """True only if one stage-map row emits exactly this (stage, error class, diagnostic)."""
+    return in_grammar(diagnostic) and any(
+        (stage_id, error_class) == (stage, cls) and any(diagnostic == c or diagnostic.startswith(c + "|") for c in codes)
+        for stage, cls, codes in STAGE_MAP)
+
+
 def in_grammar(diagnostic: str) -> bool:
     return isinstance(diagnostic, str) and any(p.fullmatch(diagnostic) for p in GRAMMAR)
 
@@ -114,15 +149,21 @@ def truncate(diagnostic: str, cap: int = BYTE_CAP, marker: str = MARKER) -> str:
     return "".join(out) + marker
 
 
-def serialize(stage_id: str, error_class: str, diagnostic: str) -> bytes:
-    """Step (3): the three-key object, UTF-8, ensure_ascii=false, indent 2, LF, one final LF."""
+def _serialize_object(stage_id: str, error_class: str, diagnostic: str) -> bytes:
+    """Step (3) alone, for the primitive's own unit test: the three-key object, UTF-8, ensure_ascii=false, indent 2, LF, one final LF."""
     text = json.dumps({"stage_id": stage_id, "error_class": error_class, "diagnostic": diagnostic},
                       ensure_ascii=False, indent=2)
     return (text + "\n").encode("utf-8")
 
 
 def feedback_bytes(failure: Failure) -> Optional[bytes]:
-    """Steps (1)-(3) for one stage-map failure; None if the grammar check rejects it."""
-    if check_diagnostic(failure.diagnostic) is not None:
+    """Steps (1)-(3) for one stage-map failure; None unless the authoritative stage map emits
+    exactly this (stage, error class, diagnostic) (L168; D-015, audit A4-1)."""
+    return serialize(failure.stage_id, failure.error_class, failure.diagnostic)
+
+
+def serialize(stage_id: str, error_class: str, diagnostic: str) -> Optional[bytes]:
+    """The only way to feedback bytes: validate the full tuple, truncate, serialize."""
+    if not in_stage_map(stage_id, error_class, diagnostic):
         return None
-    return serialize(failure.stage_id, failure.error_class, truncate(failure.diagnostic))
+    return _serialize_object(stage_id, error_class, truncate(diagnostic))

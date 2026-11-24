@@ -8,10 +8,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from openvef.envelope import Failure  # noqa: E402
 from openvef.assembler import (check_reserved_heading_lines, check_unresolved_placeholders,  # noqa: E402
                                check_visible_clause_ids)
 from openvef.ledger import HaltSignature, SignatureDomainError, halt_after_recovery, operational_recovery  # noqa: E402
-from openvef.serializer import MARKER, check_diagnostic, feedback_bytes, in_grammar, serialize, truncate  # noqa: E402
+from openvef.serializer import (MARKER, _serialize_object, check_diagnostic, feedback_bytes, in_grammar, in_stage_map,  # noqa: E402
+                                 serialize, truncate)
 from openvef.stage_map import (CHECKER_TIMEOUT, CheckerOutcome, EventError, NotDetermined,  # noqa: E402
                                adjudicate_checker, checker_runtime_error, classify_return, exception_class,
                                first_event, outcome_from_record, paired_run_failure, validate_vector)
@@ -149,7 +151,7 @@ class SerializerTests(unittest.TestCase):
         self.assertEqual(len(out.encode("utf-8")), 2047)
 
     def test_serialize_format(self):
-        data = serialize("S", "E", 'a"é\n')
+        data = _serialize_object("S", "E", 'a"é\n')
         self.assertEqual(data, b'{\n  "stage_id": "S",\n  "error_class": "E",\n  "diagnostic": "a\\"\xc3\xa9\\n"\n}\n')
         self.assertEqual(list(json.loads(data)), ["stage_id", "error_class", "diagnostic"])
 
@@ -158,11 +160,34 @@ class SerializerTests(unittest.TestCase):
         self.assertIsNone(feedback_bytes(Failure("COMPILE_DRIVER", "COMPILE_ERROR", "COMPILE_ERROR|path=x")))
         self.assertIsNotNone(feedback_bytes(Failure("COMPILE_DRIVER", "COMPILE_ERROR", "COMPILE_ERROR|file=driver.py|line=2")))
 
+    def test_full_tuple_against_the_stage_map(self):  # D-015, audit A4-1
+        good = ("COMPILE_DRIVER", "COMPILE_ERROR", "COMPILE_ERROR|file=driver.py|line=2")
+        self.assertIsNotNone(serialize(*good))
+        for bad in (("COMPILE_CHECKER", good[1], good[2]), ("PARSE_SCHEMA", good[1], good[2]),
+                    (good[0], "SCHEMA_REJECT", good[2]), (good[0], good[1], "COMPILE_ERROR|file=checker.py|line=2"),
+                    ("ATTACKER_STAGE", "ATTACKER_CLASS", good[2]), ("", "", good[2]), (None, None, good[2]),
+                    ("COMPILE_DRIVER\n", good[1], good[2]), (good[0], good[1], good[2] + "\n"),
+                    ("CHECKER_NULL", "CHECKER_TIMEOUT", "CHECKER_RUNTIME_ERROR|class=KeyError"),
+                    ("DESIGN_HALT", "TRACE_INTEGRITY_FAILURE", "SIMULATOR_ERROR|target=rtl|class=OSError")):
+            with self.subTest(bad=bad):
+                self.assertIsNone(serialize(*bad))
+                self.assertIsNone(feedback_bytes(Failure(*bad)))
+
+    def test_every_repair_expectation_is_in_the_stage_map(self):
+        root = Path(__file__).resolve().parent.parent / "baseline/OpenVEF_Planning_v1_3_6/41_F18_Fixture_Inputs"
+        n = 0
+        for p in root.glob("*.json"):
+            e = json.loads(p.read_text("utf-8")).get("expected")
+            if e and e.get("disposition") == "REPAIR":
+                n += 1
+                self.assertTrue(in_stage_map(e["stage_id"], e["error_class"], e["diagnostic"]), p.name)
+        self.assertGreater(n, 50)
+
 
 class AssemblerTests(unittest.TestCase):
     def test_reserved_heading(self):
-        self.assertIsNotNone(check_reserved_heading_lines("a\r\n[H]\r\nb", ["[H]"]))
-        self.assertIsNone(check_reserved_heading_lines("a [H]\n[H] b", ["[H]"]))
+        self.assertIsNotNone(check_reserved_heading_lines("a\r\n[Driver API]\r\nb"))
+        self.assertIsNone(check_reserved_heading_lines("a [Driver API]\n[Driver API] b\n[Other]"))
 
     def test_placeholder(self):
         self.assertIsNotNone(check_unresolved_placeholders("x {{A_1}} y"))

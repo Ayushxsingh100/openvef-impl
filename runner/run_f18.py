@@ -20,6 +20,7 @@ import importlib.metadata
 import json
 import os
 import platform
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -31,7 +32,8 @@ from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
 from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
 from openvef.import_policy import check_import_policy  # noqa: E402
 from openvef.ast_signature import check_ast_signature, check_compile  # noqa: E402
-from openvef.assembler import (NEAR_MATCH_REGEX_DEFAULT, SEARCH_REGEX_DEFAULT, check_reserved_heading_lines,  # noqa: E402
+from openvef.assembler import (CLAUSE_ID_REGEX_DEFAULT, NEAR_MATCH_REGEX_DEFAULT, RESERVED_HEADINGS,  # noqa: E402
+                               SEARCH_REGEX_DEFAULT, check_reserved_heading_lines,  # noqa: E402
                                check_unresolved_placeholders, check_visible_clause_ids)
 from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
 from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
@@ -204,12 +206,24 @@ RUNTIME_NEXT = ("runtime import, factory and signature checks passed in the sand
 
 
 def two_runs(runs) -> tuple:
-    if not isinstance(runs, list) or len(runs) != 2:
+    if not isinstance(runs, list) or len(runs) != 2 or not all(isinstance(r, dict) for r in runs):
         raise Blocked("checker adjudication needs exactly two run records (L166 steps (9)-(10))")
     return outcome_from_record(runs[0]), outcome_from_record(runs[1])
 
 
+def in_domain(ok: bool, name: str) -> None:
+    """Every input property is checked against its cited domain (D-015, A8-2)."""
+    if not ok:
+        raise Blocked(f"{name} outside its cited domain")
+
+
+def strings(value) -> bool:
+    return isinstance(value, list) and all(isinstance(v, str) for v in value)
+
+
 def adapt_response(desc: dict, validator) -> Failure | dict | None:
+    in_domain(all(isinstance(desc["input"].get(k, ""), str) for k in ("raw_response_utf8", "raw_response_base64")),
+              "raw response")
     if desc["input"].get("provider_finish_reason", "stop") not in ("length", "stop"):
         raise Blocked("provider finish reason outside the cited values")
     result = response_stages(desc, desc["input"], validator)
@@ -218,6 +232,7 @@ def adapt_response(desc: dict, validator) -> Failure | dict | None:
 
 def adapt_source_pair(desc: dict, validator) -> Failure | dict | None:
     """A-012 source pair."""
+    in_domain(strings(list(desc["input"].values())), "source pair")
     result = source_stages(desc["input"]["driver_source"], desc["input"]["checker_source"])
     if result is None:
         raise Blocked(RUNTIME_NEXT)
@@ -232,7 +247,9 @@ def adapt_null_runs(desc: dict, validator) -> Failure | dict | None:
 
 
 def adapt_events(desc: dict, validator) -> Failure | dict | None:
-    return first_event(desc["input"]["events"])  # A-025
+    events = desc["input"]["events"]
+    in_domain(isinstance(events, list) and all(isinstance(e, dict) for e in events), "events")
+    return first_event(events)  # A-025
 
 
 def adapt_checker_runs(desc: dict, validator) -> Failure | dict | None:
@@ -242,6 +259,10 @@ def adapt_checker_runs(desc: dict, validator) -> Failure | dict | None:
 def adapt_halt_recurrence(desc: dict, validator) -> Failure | dict | None:
     """Ledger, Protocol L185. An out-of-domain supplied signature is a fixture defect (D-012)."""
     inp = desc["input"]
+    in_domain(inp["design_id"] in ("FIFO", "UART"), "design_id")
+    in_domain(type(inp["recovery_cycles_used"]) is int and inp["recovery_cycles_used"] == 1, "recovery_cycles_used")
+    in_domain(type(inp["scheduled_slots"]) is int and inp["scheduled_slots"] >= 1, "scheduled_slots")
+    in_domain(all(isinstance(inp[k], dict) for k in ("first_halt_signature", "second_halt_signature")), "halt signature")
     try:
         first, second = (HaltSignature.given(inp[k]) for k in ("first_halt_signature", "second_halt_signature"))
     except SignatureDomainError as exc:
@@ -251,11 +272,16 @@ def adapt_halt_recurrence(desc: dict, validator) -> Failure | dict | None:
 
 
 def adapt_clause_ids(desc: dict, validator) -> Failure | dict | None:
+    """The patterns are File 31 §8's; a supplied pattern must equal it and is never used (D-015)."""
     inp = desc["input"]
-    result = check_visible_clause_ids(
-        inp["visible_payload"], inp["manifest_clause_ids"], inp["clause_id_regex"],
-        inp.get("clause_id_search_regex", SEARCH_REGEX_DEFAULT),
-        inp.get("clause_id_near_match_regex", NEAR_MATCH_REGEX_DEFAULT))
+    ids = inp["manifest_clause_ids"]
+    in_domain(isinstance(inp["visible_payload"], str), "visible_payload")
+    in_domain(strings(ids) and ids == sorted(set(ids)) and all(re.fullmatch(CLAUSE_ID_REGEX_DEFAULT, i) for i in ids),
+              "manifest_clause_ids")
+    for name, fixed in (("clause_id_regex", CLAUSE_ID_REGEX_DEFAULT), ("clause_id_search_regex", SEARCH_REGEX_DEFAULT),
+                        ("clause_id_near_match_regex", NEAR_MATCH_REGEX_DEFAULT)):
+        in_domain(inp.get(name, fixed) == fixed, name)
+    result = check_visible_clause_ids(inp["visible_payload"], ids)
     return rejected(result)
 
 
@@ -267,10 +293,15 @@ def rejected(result: Failure | None) -> Failure:
 
 
 def adapt_reserved_headings(desc: dict, validator) -> Failure | dict | None:
-    return rejected(check_reserved_heading_lines(desc["input"]["payload"], desc["input"]["reserved_headings"]))
+    """The headings are the sidecar's; supplied ones must be a subset and are never used (D-015)."""
+    supplied = desc["input"]["reserved_headings"]
+    in_domain(strings(supplied) and set(supplied) <= set(RESERVED_HEADINGS), "reserved_headings")
+    in_domain(isinstance(desc["input"]["payload"], str), "payload")
+    return rejected(check_reserved_heading_lines(desc["input"]["payload"]))
 
 
 def adapt_rendered(desc: dict, validator) -> Failure | dict | None:
+    in_domain(isinstance(desc["input"]["rendered"], str), "rendered")
     return rejected(check_unresolved_placeholders(desc["input"]["rendered"]))
 
 
@@ -282,8 +313,9 @@ REQUIRED_PARAMETERS = {("driver.py", "create_driver"): ["seed"],
 
 def adapt_runtime_signature(desc: dict, validator) -> Failure | dict | None:
     sig = desc["input"]["runtime_signature"]
-    if set(sig) != {"file", "symbol", "actual", "expected"}:
+    if not isinstance(sig, dict) or set(sig) != {"file", "symbol", "actual", "expected"} or not strings(sig["actual"]):
         raise Blocked("runtime signature outside the contract's fields")
+    in_domain(isinstance(sig["file"], str) and isinstance(sig["symbol"], str), "runtime_signature")
     required = REQUIRED_PARAMETERS.get((sig["file"], sig["symbol"]))
     if required is None or sig["expected"] != required:
         raise Blocked("runtime signature: not a File 30 L35/L37 entry point, or its required parameters differ")
@@ -292,13 +324,15 @@ def adapt_runtime_signature(desc: dict, validator) -> Failure | dict | None:
 
 def adapt_vector_keys(desc: dict, validator) -> Failure | dict | None:
     """File 30 L83 (a)-(b); a vector passing them is not determined without widths (A-027)."""
-    return rejected(validate_vector(desc["input"]["driver_return"], desc["input"]["expected_keys"]))
+    ports = desc["input"]["expected_keys"]
+    in_domain(strings(ports) and len(ports) == len(set(ports)) > 0, "expected_keys")
+    return rejected(validate_vector(desc["input"]["driver_return"], ports))
 
 
 def adapt_paired_runs(desc: dict, validator) -> Failure | dict | None:
     runs = desc["input"]["paired_runs"]
     fields = ("first_raw_output_divergence_cycle", "first_next_input_divergence_cycle")
-    if set(runs) != set(fields) or not all(runs[f] is None or (type(runs[f]) is int and runs[f] >= 0) for f in fields):
+    if not isinstance(runs, dict) or set(runs) != set(fields) or not all(runs[f] is None or (type(runs[f]) is int and runs[f] >= 0) for f in fields):
         raise Blocked("paired runs outside the contract's fields")
     return rejected(paired_run_failure(*(runs[f] for f in fields)))
 

@@ -2,7 +2,9 @@
 
 Data only: nothing here selects code. tests/test_dispatch_shapes.py checks that every
 adapter has a contract, that `inputs` names every property of its shape, that every quoted
-text is verbatim at that line, and that every value that selects code is cited in `values`.
+text is verbatim at that line, that every value that selects code is cited in `values`, and
+that `DOMAINS` gives, for every property, the cited lines and the domain terms they state
+(D-015, A8-2), with an out-of-domain vector per property that the adapter must refuse.
 
 Reading A-053 (docs/ambiguities.md): the pack does not spell descriptor JSON keys, so a key
 or label spelling is only a carrier. What the pack must state is each property's meaning and
@@ -67,7 +69,8 @@ CONTRACTS = {
                    "first_halt_signature": ("02", 185, "Define the **halt signature** as"),
                    "second_halt_signature": ("02", 185, "If the identical halt signature recurs after recovery"),
                    "scheduled_slots": ("02", 185, "re-evaluate every scheduled slot in the affected scope")},
-        "values": {}, "outcome": []},
+        "values": {"FIFO": ("02", 185, "`design_id` is `FIFO` or `UART`"),
+                   "UART": ("02", 185, "`design_id` is `FIFO` or `UART`")}, "outcome": []},
     "adapt_clause_ids": {
         "inputs": {"visible_payload": ("31", 30, "Search those payload bytes using"),
                    "manifest_clause_ids": ("31", 30, "requires equality with manifest `clause_ids`"),
@@ -78,7 +81,7 @@ CONTRACTS = {
                                   ("02", 173, "`F18_REJECT|reason=MALFORMED_CLAUSE_ID_TOKEN`"), *_F18]},
     "adapt_reserved_headings": {
         "inputs": {"payload": ("31", 27, "If any payload line equals one of the reserved headings after LF normalization"),
-                   "reserved_headings": ("31", 11, "any reserved heading after LF normalization")},
+                   "reserved_headings": ("31", 9, "one of the nine reserved headings in the sidecar")},
         "values": {}, "outcome": [("02", 173, "`PACKET_FREEZE_REJECT|reason=RESERVED_HEADING_LINE`"), *_F18]},
     "adapt_rendered": {
         "inputs": {"rendered": ("31", 28, "Missing, duplicate or unresolved matches of `\\{\\{[A-Z0-9_]+\\}\\}` are hard errors")},
@@ -99,4 +102,63 @@ CONTRACTS = {
                                               "mismatch before first raw-output divergence is terminal driver "
                                               "nondeterminism")},
         "values": {}, "outcome": [("02", 156, "Before first raw output divergence, paired next-input schedules differ")]},
+}
+
+_HEADINGS = {10: "[Task instruction]", 15: "[Design specification]", 20: "[Port manifest]",
+             25: "[Reset and legal-input rules]", 30: "[Execution envelope]", 35: "[Driver API]",
+             40: "[Trace schema]", 45: "[Checker contract]", 50: "[Response schema]"}
+_RUN_DOMAIN = {"lines": [("02", 166), ("30", 97)],
+               "terms": ["checker null invocation 1", "checker null invocation 2", "`PASS` or `FAIL`", "NON_DICTIONARY",
+                         "MISSING_DIAGNOSTICS", "TOP_LEVEL_KEYS", "INVALID_VERDICT", "DIAGNOSTICS_NOT_LIST",
+                         "CHECKER_RUNTIME_ERROR|class=", "CHECKER_TIMEOUT|phase=null_check"]}
+_RESP_DOMAIN = {"lines": [("30", 7)], "terms": ["one UTF-8 JSON object", "34_OpenVEF_Response_Schema_v1.0.json"]}
+
+# property -> cited lines, and the terms of its domain that those lines must state verbatim.
+DOMAINS = {
+    "adapt_response": {
+        "raw_response_utf8": _RESP_DOMAIN, "raw_response_base64": _RESP_DOMAIN, "response_object": _RESP_DOMAIN,
+        "provider_finish_reason": {"lines": [("02", 144)], "terms": ["explicitly reports max-token truncation"]}},
+    "adapt_source_pair": {
+        "driver_source": {"lines": [("30", 27)], "terms": ["strict UTF-8 decode", "`driver.py`"]},
+        "checker_source": {"lines": [("30", 27)], "terms": ["strict UTF-8 decode", "`checker.py`"]}},
+    "adapt_null_runs": {"response_object": _RESP_DOMAIN, "null_runs": _RUN_DOMAIN},
+    "adapt_checker_runs": {"checker_runs": _RUN_DOMAIN},
+    "adapt_events": {"events": {
+        "lines": [("02", n) for n in (125, 139, 143, 144, 147, 149, 150, 151, 152, 153, 154, 155)],
+        "terms": ["SCHEMA_REJECT", "OUTPUT_TRUNCATED", "IMPORT_NOT_ALLOWED", "COMPILE_ERROR", "RUNTIME_EXCEPTION",
+                  "DRIVER_VECTOR_INVALID", "WATCHDOG_TIMEOUT", "SIMULATOR_ERROR", "TRACE_INTEGRITY_FAILURE",
+                  "`FILE` is `driver.py` or `checker.py`", "`PHASE` is `factory` or `step`",
+                  "`RTL_OR_NULL` is `rtl` or `null`", "`LINE` and `COLUMN` are positive decimal integers"]}},
+    "adapt_halt_recurrence": {
+        "design_id": {"lines": [("02", 185)], "terms": ["`design_id` is `FIFO` or `UART`"]},
+        "recovery_cycles_used": {"lines": [("02", 185)], "terms": ["one permitted recovery cycle"]},
+        "scheduled_slots": {"lines": [("02", 181), ("02", 185)],
+                            "terms": ["a *slot* is exactly one arm × design combination", "every scheduled slot"]},
+        "first_halt_signature": {"lines": [("02", 185)], "terms": [
+            "`halt_code` is `SIMULATOR_ERROR`, `TRACE_INTEGRITY_FAILURE` or `RTL_NULL_CONTROL_FAILURE`",
+            "`evaluator_component` is `SIMULATOR`", "`stable_error_class` is", "`stable_diagnostic_code` is exactly"]},
+        "second_halt_signature": {"lines": [("02", 185)], "terms": ["Its components have these exact domains"]}},
+    "adapt_clause_ids": {
+        "visible_payload": {"lines": [("31", 30)], "terms": ["those payload bytes"]},
+        "manifest_clause_ids": {"lines": [("31", 29)], "terms": ["duplicate-free, lexicographically sorted array of strings",
+                                                                 "fully matches that pattern"]},
+        "clause_id_regex": {"lines": [("31", 91)], "terms": ["^[A-Z]{2,6}-[0-9]{3}$"]},
+        "clause_id_search_regex": {"lines": [("31", 92)], "terms": ["(?<![A-Za-z0-9_-])[A-Z]{2,6}-[0-9]{3}(?![A-Za-z0-9_-])"]},
+        "clause_id_near_match_regex": {"lines": [("31", 93)],
+                                       "terms": ["(?<![A-Za-z0-9_-])[A-Za-z]{2,6}-[0-9]{1,3}(?![A-Za-z0-9_-])"]}},
+    "adapt_reserved_headings": {
+        "payload": {"lines": [("31", 27)], "terms": ["any payload line", "after LF normalization"]},
+        "reserved_headings": {"lines": [("31", 9), *(("33", n) for n in _HEADINGS)],
+                              "terms": ["one of the nine reserved headings in the sidecar", *_HEADINGS.values()]}},
+    "adapt_rendered": {"rendered": {"lines": [("31", 28)], "terms": ["\\{\\{[A-Z0-9_]+\\}\\}"]}},
+    "adapt_runtime_signature": {"runtime_signature": {
+        "lines": [("30", 35), ("30", 37)],
+        "terms": ["named `seed`", "`self`, `cycle_index`, `outputs_after_edge`", "`trace` and `metadata`",
+                  "`driver.py`", "`checker.py`", "`create_driver`", "`Driver.step`", "`check_trace`"]}},
+    "adapt_vector_keys": {
+        "driver_return": {"lines": [("30", 83)], "terms": ["exact string `COMPLETE` or a dictionary", "each value is a string"]},
+        "expected_keys": {"lines": [("30", 83)], "terms": ["frozen top-level input-port set"]}},
+    "adapt_paired_runs": {"paired_runs": {
+        "lines": [("02", 156), ("02", 166)],
+        "terms": ["first raw output divergence", "next-input schedules", "first raw-output divergence"]}},
 }

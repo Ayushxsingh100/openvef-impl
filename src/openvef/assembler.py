@@ -29,6 +29,11 @@ SEARCH_REGEX_DEFAULT = r"(?<![A-Za-z0-9_-])[A-Z]{2,6}-[0-9]{3}(?![A-Za-z0-9_-])"
 NEAR_MATCH_REGEX_DEFAULT = r"(?<![A-Za-z0-9_-])[A-Za-z]{2,6}-[0-9]{1,3}(?![A-Za-z0-9_-])"
 PLACEHOLDER = re.compile(r"\{\{[A-Z0-9_]+\}\}")
 
+# The nine reserved headings: File 31 §1 L9, File 33 (sidecar) `block_inventory`, L10-L50.
+RESERVED_HEADINGS = ("[Task instruction]", "[Design specification]", "[Port manifest]",
+                     "[Reset and legal-input rules]", "[Execution envelope]", "[Driver API]", "[Trace schema]",
+                     "[Checker contract]", "[Response schema]")
+
 
 def _reject(diagnostic: str) -> Failure:
     return Failure("F18", "ASSEMBLY_OR_MANIFEST_FAILURE", diagnostic, "F18_REJECT")
@@ -38,8 +43,8 @@ def _lf(text: str) -> str:
     return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
-def check_reserved_heading_lines(payload: str, reserved_headings: Iterable[str]) -> Optional[Failure]:
-    headings = set(reserved_headings)
+def check_reserved_heading_lines(payload: str) -> Optional[Failure]:
+    headings = set(RESERVED_HEADINGS)  # never a caller-supplied list (D-015)
     if any(line in headings for line in _lf(payload).split("\n")):
         return _reject("PACKET_FREEZE_REJECT|reason=RESERVED_HEADING_LINE")
     return None

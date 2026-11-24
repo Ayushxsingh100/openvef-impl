@@ -147,6 +147,9 @@ VECTORS = {
         ({"payload": "x [Port manifest]", "reserved_headings": ["[Port manifest]"]}, BLOCKED + "check passed"),
         ({"payload": "[Port manifest] ", "reserved_headings": ["[Port manifest]"]}, BLOCKED + "check passed"),
         ({"payload": "", "reserved_headings": []}, BLOCKED + "check passed"),
+        # the canonical list decides, not the supplied one
+        ({"payload": "[Driver API]", "reserved_headings": []}, F18("PACKET_FREEZE_REJECT|reason=RESERVED_HEADING_LINE")),
+        ({"payload": "[My heading]", "reserved_headings": ["[My heading]"]}, BLOCKED + "outside its cited domain"),
     ],
     "adapt_rendered": [
         ({"rendered": "x {{A_1}} y"}, F18("ASSEMBLY_REJECT|reason=UNRESOLVED_PLACEHOLDER")),
@@ -185,3 +188,39 @@ VECTORS = {
          BLOCKED + "outside the contract"),
     ],
 }
+
+
+# One out-of-domain input per property (D-015): the adapter must refuse it (BLOCKED), or reject it
+# by a cited rule where the property's domain is "anything, judged by the rule".
+OUT_OF_DOMAIN = {
+    "adapt_response": {"raw_response_utf8": {"raw_response_utf8": 7}, "raw_response_base64": {"raw_response_base64": 7},
+                       "response_object": {"response_object": 7},
+                       "provider_finish_reason": {"raw_response_utf8": "{}", "provider_finish_reason": "max_tokens"}},
+    "adapt_source_pair": {"driver_source": {"driver_source": 7, "checker_source": CHECKER},
+                          "checker_source": {"driver_source": DRIVER, "checker_source": None}},
+    "adapt_null_runs": {"response_object": {"response_object": [], "null_runs": [{"timeout": True}] * 2},
+                        "null_runs": {"response_object": response(), "null_runs": ["PASS", "PASS"]}},
+    "adapt_checker_runs": {"checker_runs": {"checker_runs": [{"verdict": "MAYBE"}] * 2}},
+    "adapt_events": {"events": {"events": "driver_watchdog"}},
+    "adapt_halt_recurrence": {"design_id": dict(halt(sig(), sig()), design_id="SPI"),
+                              "recovery_cycles_used": dict(halt(sig(), sig()), recovery_cycles_used=2),
+                              "scheduled_slots": dict(halt(sig(), sig()), scheduled_slots="6"),
+                              "first_halt_signature": halt(sig(comp="rtl_null_comparator"), sig()),
+                              "second_halt_signature": halt(sig(), [])},
+    "adapt_clause_ids": {
+        p: dict({"visible_payload": "UART-001", "manifest_clause_ids": ["UART-001"], "clause_id_regex": CLAUSE}, **{p: v})
+        for p, v in (("visible_payload", 7), ("manifest_clause_ids", ["UART-002", "UART-001"]), ("clause_id_regex", ".*"),
+                     ("clause_id_search_regex", ".*"), ("clause_id_near_match_regex", "x^"))},
+    "adapt_reserved_headings": {"payload": {"payload": 7, "reserved_headings": []},
+                                "reserved_headings": {"payload": "a\n[X]", "reserved_headings": ["[X]"]}},
+    "adapt_rendered": {"rendered": {"rendered": ["{{A}}"]}},
+    "adapt_runtime_signature": {"runtime_signature": {"runtime_signature": {
+        "file": "driver.py", "symbol": "create_driver", "actual": ["x"], "expected": ["x", "y"]}}},
+    "adapt_vector_keys": {"driver_return": {"driver_return": [], "expected_keys": ["a"]},
+                          "expected_keys": {"driver_return": {"a": "0"}, "expected_keys": ["a", "a"]}},
+    "adapt_paired_runs": {"paired_runs": {"paired_runs": {"first_raw_output_divergence_cycle": -1,
+                                                          "first_next_input_divergence_cycle": 1}}},
+}
+# Properties whose out-of-domain value is rejected by a rule rather than refused.
+JUDGED_BY_RULE = {("adapt_response", "response_object"), ("adapt_null_runs", "response_object"),
+                  ("adapt_vector_keys", "driver_return")}

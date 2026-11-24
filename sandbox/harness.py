@@ -1,14 +1,14 @@
-"""In-container harness: restricted import, factory and signature checks, checker calls.
+"""In-container harness: factory and signature checks, checker calls, EDA tasks.
 
 Runs inside the D-002 sandbox only (`python -I /opt/openvef/harness.py`), standard
 library only. Reads one JSON request on stdin and writes one result line
-`OPENVEF_SANDBOX_RESULT <json>` to the original stdout. Artifact output is captured and
-discarded, so artifact code cannot forge a result line.
+`OPENVEF_SANDBOX_RESULT <json>`. **No artifact code runs in this interpreter** (D-015, audit
+A9-1): driver.py and checker.py run in artifact_worker.py, a confined process reached only
+through artifact_proc.py.
 
 Implements:
   File 30 §3 L27 — "compilation; restricted-runtime import; runtime `inspect.signature`
                    and factory-return checks".
-  File 30 §6 — "Enforce the same import allow-list statically and at runtime."
   File 30 §3 L35/L37 — `create_driver(seed)` must return an instance of the module's
                    `Driver` class; runtime `inspect.signature` must confirm the same
                    parameter names/kinds/counts for create_driver, Driver.step and
@@ -25,38 +25,19 @@ post-construction checks and when check_trace's signature is checked.
 """
 from __future__ import annotations
 
-import builtins
-import inspect
-import io
 import json
 import os
-import re
 import sys
-import types
 
-ALLOWED_ROOTS = frozenset({"__future__", "collections", "copy", "functools", "itertools", "json", "math",
-                           "operator", "random", "re", "statistics", "typing"})
-ARTIFACT_MODULES = frozenset({"driver", "checker"})
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # `-I` leaves it off
+from artifact_proc import ArtifactFailed, ArtifactHostError, ArtifactProcess, signature_ok  # noqa: E402
+
 RESULT_MARKER = "OPENVEF_SANDBOX_RESULT "
-_EXC = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
-P = inspect.Parameter
-REQUIRED_SIGNATURES = {
-    "create_driver": ("seed",),
-    "Driver.step": ("self", "cycle_index", "outputs_after_edge"),
-    "check_trace": ("trace", "metadata"),
-}
-
-_real_stdout_fd = os.dup(1)
-_real_import = builtins.__import__
 
 
 def emit(result: dict) -> None:
-    os.write(_real_stdout_fd, (RESULT_MARKER + json.dumps(result, sort_keys=True) + "\n").encode("utf-8"))
-
-
-def exc_class(exc: BaseException) -> str:
-    name = type(exc).__name__
-    return name if _EXC.fullmatch(name) else "Exception"
+    sys.stdout.write(RESULT_MARKER + json.dumps(result, sort_keys=True) + "\n")
+    sys.stdout.flush()
 
 
 def failure(stage: str, error_class: str, diagnostic: str, disposition: str = "REPAIR") -> dict:
@@ -64,65 +45,32 @@ def failure(stage: str, error_class: str, diagnostic: str, disposition: str = "R
                         "disposition": disposition}}
 
 
-def guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
-    """The static allow-list, applied again to imports made by artifact code."""
-    importer = (globals or {}).get("__name__")
-    if importer in ARTIFACT_MODULES:
-        if level != 0 or name.split(".", 1)[0] not in ALLOWED_ROOTS:
-            raise ImportError(f"import of {name!r} is not allowed")
-    return _real_import(name, globals, locals, fromlist, level)
-
-
-def load(name: str, filename: str, source: str) -> types.ModuleType:
-    """Restricted-runtime import of one artifact file as module `name`."""
-    module = types.ModuleType(name)
-    module.__file__ = filename
-    sys.modules[name] = module
-    exec(compile(source, filename, "exec", dont_inherit=True), module.__dict__)
-    return module
-
-
-def signature_ok(func, expected: tuple[str, ...]) -> bool:
-    try:
-        params = list(inspect.signature(func).parameters.values())
-    except (TypeError, ValueError):
-        return False
-    return ([p.name for p in params] == list(expected)
-            and all(p.kind is P.POSITIONAL_OR_KEYWORD and p.default is P.empty for p in params))
-
-
 def entry_reject(file: str, symbol: str, reason: str) -> dict:
     return failure("AST_SIGNATURE", "ENTRY_POINT_REJECT", f"ENTRY_POINT_REJECT|file={file}|symbol={symbol}|reason={reason}")
 
 
-def construct(driver_source: str, seed: int):
-    """Import driver.py, call create_driver(seed) once, then the return-type and signature
-    checks. Returns (failure_record_or_None, instance_or_None)."""
+def construct(artifact: ArtifactProcess, driver_source: str, seed: int):
+    """Import driver.py and call create_driver(seed) once in the artifact process, then the
+    return-type and signature checks here. Returns a failure record or None."""
     try:
-        driver = load("driver", "driver.py", driver_source)
-    except BaseException as exc:  # A-034: import is the first execution of driver code; includes SystemExit
+        type_ok, create_params, step_params = artifact.construct(driver_source, seed)
+    except ArtifactFailed as exc:  # A-034: import is the first execution of driver code
         return failure("DRIVER_RUNTIME", "RUNTIME_EXCEPTION",
-                       f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc_class(exc)}"), None
-    try:
-        instance = driver.create_driver(seed)
-    except BaseException as exc:  # includes SystemExit from exit()
-        return failure("DRIVER_RUNTIME", "RUNTIME_EXCEPTION",
-                       f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc_class(exc)}"), None
+                       f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc.exception_class}")
     # A-035: return type, then create_driver's signature, then Driver.step's.
-    driver_class = getattr(driver, "Driver", None)
-    if not (isinstance(driver_class, type) and isinstance(instance, driver_class)):
-        return entry_reject("driver.py", "create_driver", "RETURN_TYPE"), None
-    if not signature_ok(driver.create_driver, REQUIRED_SIGNATURES["create_driver"]):
-        return entry_reject("driver.py", "create_driver", "RUNTIME_SIGNATURE"), None
-    if not signature_ok(driver_class.__dict__.get("step"), REQUIRED_SIGNATURES["Driver.step"]):
-        return entry_reject("driver.py", "Driver.step", "RUNTIME_SIGNATURE"), None
-    return None, instance
+    if not type_ok:
+        return entry_reject("driver.py", "create_driver", "RETURN_TYPE")
+    if not signature_ok(create_params, "create_driver"):
+        return entry_reject("driver.py", "create_driver", "RUNTIME_SIGNATURE")
+    if not signature_ok(step_params, "Driver.step"):
+        return entry_reject("driver.py", "Driver.step", "RUNTIME_SIGNATURE")
+    return None
 
 
 def task_factory(request: dict) -> dict:
     """Import driver.py, construct the driver, then return-type and signature checks."""
-    fail, _ = construct(request["driver_source"], request["seed"])
-    return fail or {"failure": None}
+    with ArtifactProcess() as artifact:
+        return construct(artifact, request["driver_source"], request["seed"]) or {"failure": None}
 
 
 def classify_return(value) -> dict:
@@ -149,27 +97,21 @@ def classify_return(value) -> dict:
 
 
 def task_checker(request: dict) -> dict:
-    """One checker null invocation on an immutable trace (its own container = process)."""
-    try:
-        checker = load("checker", "checker.py", request["checker_source"])
-    except BaseException as exc:  # A-034; includes SystemExit
-        return {"error": ["CHECKER_RUNTIME_ERROR", f"CHECKER_RUNTIME_ERROR|class={exc_class(exc)}"]}
-    # A-035: check_trace's runtime signature is checked in the checker process, before
-    # the first call.
-    if not signature_ok(getattr(checker, "check_trace", None), REQUIRED_SIGNATURES["check_trace"]):
-        return entry_reject("checker.py", "check_trace", "RUNTIME_SIGNATURE")
-    try:
-        value = checker.check_trace(request["trace"], request["metadata"])
-    except BaseException as exc:  # includes SystemExit from exit()
-        return {"error": ["CHECKER_RUNTIME_ERROR", f"CHECKER_RUNTIME_ERROR|class={exc_class(exc)}"]}
+    """One checker null invocation on an immutable trace (its own container and process)."""
+    with ArtifactProcess() as artifact:
+        try:
+            params = artifact.load_checker(request["checker_source"])
+            # A-035: check_trace's runtime signature is checked before the first call.
+            if not signature_ok(params, "check_trace"):
+                return entry_reject("checker.py", "check_trace", "RUNTIME_SIGNATURE")
+            value = artifact.check(request["trace"], request["metadata"])
+        except ArtifactFailed as exc:  # A-034
+            return {"error": ["CHECKER_RUNTIME_ERROR", f"CHECKER_RUNTIME_ERROR|class={exc.exception_class}"]}
     return classify_return(value)
 
 
 def task_simulate(request: dict) -> dict:
     """One driver run on one target (rtl or null) through Icarus + cocotb (sim.py)."""
-    # `python -I` leaves the script directory off sys.path; sim.py sits next to this file.
-    # Artifacts still cannot import it: guarded_import admits only the allow-list roots.
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import sim
     return sim.run(request)
 
@@ -249,17 +191,10 @@ TASKS = {"factory": task_factory, "checker": task_checker, "simulate": task_simu
 
 def main() -> None:
     request = json.loads(sys.stdin.read())
-    task = TASKS[request["task"]]
-    for root in sorted(ALLOWED_ROOTS):  # initialize allowed modules before artifact code runs
-        _real_import(root)
-    sink = io.StringIO()
-    sys.stdout, sys.stderr = sink, sink
-    builtins.__import__ = guarded_import
     try:
-        result = task(request)
-    finally:
-        builtins.__import__ = _real_import
-        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
+        result = TASKS[request["task"]](request)
+    except ArtifactHostError as exc:
+        sys.exit(f"artifact host error: {exc}")  # no result line: an evaluator-side error
     emit(result)
 
 

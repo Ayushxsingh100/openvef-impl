@@ -97,6 +97,7 @@ class IdentifierScanTests(unittest.TestCase):
         self.assertEqual(scan("x = 1\ry = 2\r  # é\rz = 1; ab℘ = 3\n"),
                          "NON_ASCII_IDENTIFIER|file=checker.py|line=4|column=8")
 
+    @unittest.skipUnless(sys.version_info[:2] == (3, 11), "A-018 is specific to CPython 3.11 f-string tokens")
     def test_fstring_identifier_not_scanned_on_311(self):
         # A-018 (decided by Claude, approved under D-009): the rule as written; the AST does
         # contain the non-ASCII Name.

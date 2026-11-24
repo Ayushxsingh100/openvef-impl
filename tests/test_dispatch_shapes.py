@@ -27,8 +27,8 @@ for p in (HERE, REPO / "src", REPO / "runner"):
     sys.path.insert(0, str(p))
 
 import run_f18  # noqa: E402
-from adapter_contracts import CONTRACTS  # noqa: E402
-from adapter_vectors import BLOCKED, VECTORS  # noqa: E402
+from adapter_contracts import CONTRACTS, DOMAINS  # noqa: E402
+from adapter_vectors import BLOCKED, JUDGED_BY_RULE, OUT_OF_DOMAIN, VECTORS  # noqa: E402
 from openvef import envelope, stage_map  # noqa: E402
 
 PACK = REPO / "baseline/OpenVEF_Planning_v1_3_6"
@@ -146,6 +146,37 @@ class DispatchShapeTests(unittest.TestCase):
         self.assertTrue(contract_problems(rows, {}))
         c = {"added": {"inputs": {"x": ("02", 139, "not in the pack")}, "values": {}, "outcome": []}}
         self.assertEqual(len(contract_problems(rows, c)), 2)
+
+    # --- domains (D-015, audit A8-2)
+    def test_cited_text_covers_every_property_domain(self):
+        self.assertEqual({a: set(c["inputs"]) for a, c in CONTRACTS.items()}, {a: set(d) for a, d in DOMAINS.items()})
+        for adapter, props in DOMAINS.items():
+            for prop, d in props.items():
+                text = "\n".join(line(t, n) for t, n in d["lines"])
+                self.assertTrue(d["terms"])
+                for term in d["terms"]:
+                    with self.subTest(adapter=adapter, prop=prop, term=term):
+                        self.assertIn(term, text)
+
+    def test_every_property_is_checked_against_its_domain(self):
+        self.assertEqual({a: set(d) for a, d in OUT_OF_DOMAIN.items()}, {a: set(d) for a, d in DOMAINS.items()})
+        validator = run_f18.load_schema_validator(PACK)
+        with unittest.mock.patch.object(run_f18, "SANDBOX", {}), \
+                unittest.mock.patch.object(run_f18, "factory_checks", lambda source: None):
+            for adapter, props in OUT_OF_DOMAIN.items():
+                for prop, inp in props.items():
+                    with self.subTest(adapter=adapter, prop=prop):
+                        self.assertEqual([r[2].__name__ for r in run_f18.find_adapters(inp)], [adapter])
+                        status, actual, note = run_f18.execute({"input": inp, "manifest_clause_ids": ["UART-001"]}, validator)
+                        if (adapter, prop) in JUDGED_BY_RULE:
+                            self.assertEqual((status, actual["disposition"]), ("EXECUTED", "REPAIR"))
+                        else:
+                            self.assertEqual(status, "NOT_IMPLEMENTED", (actual, note))
+
+    def test_canonical_values_equal_the_pack(self):
+        from openvef import assembler
+        sidecar = json.loads(next(PACK.glob("33_*")).read_text("utf-8"))
+        self.assertEqual(list(assembler.RESERVED_HEADINGS), [b["heading"] for b in sidecar["block_inventory"]])
 
     # --- (b)
     def test_every_adapter_has_synthetic_vectors(self):
