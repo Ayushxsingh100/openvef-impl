@@ -72,6 +72,10 @@ sources before signing.
    training (File 12 L87), or keep them and disclose. This is an owner decision; v0.2 is
    unchanged.
 
+**Owner decision on finding 4 (Krishika, 24 Nov 2026; Ayush's confirmation pending):**
+**disclose; do not rename the ports.** Both owners sign it in
+[OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md).
+
 ## Overlap statement (draft wording)
 
 > The OpenVEF FIFO is a single-clock, synchronous-reset, 4-entry by 8-bit queue with a

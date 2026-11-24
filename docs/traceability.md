@@ -81,4 +81,4 @@ Related documents:
   freeze (requirements only).
 
 Every quote in both documents is checked verbatim by `tests/test_doc_quotes.py`.
-
+| Owner freeze and audit readiness: one signing checklist with SHA-256 per item (whole files, or per-section for decision records); status, auditor needs and open items | `docs/OWNER-FREEZE-PACKAGE.md`, `docs/AUDIT-READINESS.md`; `tests/freeze_hashes.py`, `tests/test_freeze_package.py` | — | Ready for signature (nothing signed) |

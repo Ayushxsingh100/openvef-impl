@@ -13,7 +13,8 @@ REPO = Path(__file__).resolve().parent.parent
 BASE = REPO / "baseline/OpenVEF_Planning_v1_3_6"
 DOCS = ("docs/pack-defects.md", "docs/fifo-owner-checklist.md", "docs/fifo-spec-v0.1.md",
         "docs/fifo-spec-v0.2.md", "docs/fifo-benchmark-overlap-disclosure-DRAFT.md",
-        "docs/fifo-frozen-values-proposal-DRAFT.md")
+        "docs/fifo-frozen-values-proposal-DRAFT.md",
+        "docs/OWNER-FREEZE-PACKAGE.md", "docs/AUDIT-READINESS.md")
 QUOTE = re.compile(r'^> \[(?P<file>[0-9]{2}|41/[A-Za-z0-9]+\.json) L(?P<line>[0-9]+)\] "(?P<text>.*)"$')
 
 
