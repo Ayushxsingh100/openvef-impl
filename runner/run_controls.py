@@ -37,7 +37,7 @@ sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "runner"))
 
 import run_f18 as F18  # noqa: E402  (identity helpers and pinned-interpreter constants)
-from openvef import eda, f14, f15, simulator_stages  # noqa: E402
+from openvef import eda, f14, f15, freeze, simulator_stages  # noqa: E402
 from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
 
 MATERIALS = "design/fifo/design-materials-DRAFT.json"
@@ -74,7 +74,14 @@ def missing_artifacts(slots: dict, control: str, root: Path | None = None) -> li
 
 def run_f14() -> dict:
     rec = f14.run(REPO, MATERIALS, simulator_stages.export_null, eda.interface)
-    return {"status": rec.pop("status"), "provisional": [DRAFT_PROVISIONAL, *rec.pop("provisional")], "details": rec}
+    rec.pop("provisional")
+    record = freeze.load(REPO, simulator_stages.FREEZE_RECORD)
+    fr = freeze.verify(REPO, record)
+    rec["freeze"] = fr
+    provisional = ["A-052 (port comparison) decided by Claude, owner review pending"]
+    if not {"C1", "C2"} <= set(fr["frozen"]):
+        provisional.insert(0, "RTL or null-netlist export script not frozen, or changed since the freeze (C1, C2)")
+    return {"status": rec.pop("status"), "provisional": provisional, "details": rec}
 
 
 def run_f15(baseline: Path) -> dict:

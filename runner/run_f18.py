@@ -522,8 +522,9 @@ def main() -> int:
             rec = {"fixture_id": entry["fixture_id"], "descriptor_sha256": entry["sha256"], "status": status,
                    "expected": expected, "actual": actual, "note": note}
             sim_details = PROVISIONAL.pop(id(desc), None)
-            if sim_details is not None:  # reached L166 (7)-(11) on DRAFT materials (D-005)
-                rec["provisional"] = {"reason": "depends on DRAFT/unfrozen/unsigned design materials",
+            if sim_details is not None and SIM["provisional"]:  # reached L166 (7)-(11); items still open
+                rec["provisional"] = {"reason": "depends on design items not yet frozen or signed: "
+                                                + "; ".join(SIM["provisional"]),
                                       "simulator": sim_details}
                 provisional_ids.append(entry["fixture_id"])
             res.write(json.dumps(rec, ensure_ascii=False, sort_keys=True) + "\n")

@@ -1,0 +1,263 @@
+{
+  "record_id": "FREEZE-2026-11-24",
+  "status": "Owner freeze record, transcribed by Claude (Claude Opus 5.5, via Claude Code) at Krishika's instruction. Claude did not approve or sign anything.",
+  "package": "docs/OWNER-FREEZE-PACKAGE.md",
+  "signature_commit": "a955245",
+  "basis": "Signed by Krishika (owner), commit a955245, typed statement quoted in the package. Under governance rule D-008 (Krishika, 24 Nov 2026), decisions and approvals signed by Krishika alone take effect; Ayush Kumar Singh's ratification is pending and recorded once, in docs/AUDIT-READINESS.md. This supersedes the package's own step 3 ('A line is frozen only when both owners approve it').",
+  "frozen_values": {
+    "spec_version_sha256": "5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5"
+  },
+  "items": [
+    {
+      "id": "A1",
+      "item": "FIFO specification v0.2: FIFO-001…FIFO-043, port manifest, reset and legal-input rules, FIFO-042 executable predicate",
+      "refs": [
+        {
+          "ref": "docs/fifo-spec-v0.2.md",
+          "sha256": "5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5"
+        }
+      ]
+    },
+    {
+      "id": "B1",
+      "item": "Cycle cap (item 7)",
+      "refs": [
+        {
+          "ref": "docs/fifo-frozen-values-proposal-DRAFT.md",
+          "sha256": "b8d5ec793bd9aef0be41f684f009afbabe819912c618da4e2da39a7244305952"
+        },
+        {
+          "ref": "design/fifo/design-materials-DRAFT.json",
+          "sha256": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393"
+        }
+      ]
+    },
+    {
+      "id": "B2",
+      "item": "Safe-idle vector (item 8)",
+      "refs": [
+        {
+          "ref": "docs/fifo-frozen-values-proposal-DRAFT.md",
+          "sha256": "b8d5ec793bd9aef0be41f684f009afbabe819912c618da4e2da39a7244305952"
+        },
+        {
+          "ref": "design/fifo/design-materials-DRAFT.json",
+          "sha256": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393"
+        }
+      ]
+    },
+    {
+      "id": "B3",
+      "item": "Watchdog (item 9)",
+      "refs": [
+        {
+          "ref": "docs/fifo-frozen-values-proposal-DRAFT.md",
+          "sha256": "b8d5ec793bd9aef0be41f684f009afbabe819912c618da4e2da39a7244305952"
+        },
+        {
+          "ref": "design/fifo/design-materials-DRAFT.json",
+          "sha256": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393"
+        }
+      ]
+    },
+    {
+      "id": "B4",
+      "item": "Scheduler (item 10)",
+      "refs": [
+        {
+          "ref": "docs/fifo-frozen-values-proposal-DRAFT.md",
+          "sha256": "b8d5ec793bd9aef0be41f684f009afbabe819912c618da4e2da39a7244305952"
+        },
+        {
+          "ref": "design/fifo/design-materials-DRAFT.json",
+          "sha256": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393"
+        }
+      ]
+    },
+    {
+      "id": "B5",
+      "item": "Trace schema (item 11)",
+      "refs": [
+        {
+          "ref": "docs/fifo-frozen-values-proposal-DRAFT.md",
+          "sha256": "b8d5ec793bd9aef0be41f684f009afbabe819912c618da4e2da39a7244305952"
+        },
+        {
+          "ref": "design/fifo/design-materials-DRAFT.json",
+          "sha256": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393"
+        }
+      ]
+    },
+    {
+      "id": "B6",
+      "item": "Checker metadata (item 12)",
+      "refs": [
+        {
+          "ref": "docs/fifo-frozen-values-proposal-DRAFT.md",
+          "sha256": "b8d5ec793bd9aef0be41f684f009afbabe819912c618da4e2da39a7244305952"
+        },
+        {
+          "ref": "design/fifo/design-materials-DRAFT.json",
+          "sha256": "30758c86ad88a5dc34bbe7802c5272935e8cdca810f6eec5f8cd1ff8895ba393"
+        }
+      ]
+    },
+    {
+      "id": "C1",
+      "item": "FIFO RTL `ovf_fifo` (Verilog, Icarus 12 `-g2012`)",
+      "refs": [
+        {
+          "ref": "design/fifo/rtl/ovf_fifo.v",
+          "sha256": "ca06abf55e6a82e6617dab9cd5d7e4ef0118d082b7789fce169016307fe2042b"
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "item": "Null-netlist export script (Yosys v0.71). The frozen L544 export script, mutation modes and mutant population are separate owner items, **not** frozen by this line",
+      "refs": [
+        {
+          "ref": "design/fifo/export_null.ys",
+          "sha256": "85dfdddda430adc22ea3df9c961397d596264b195e56cba8c49da84b4bc474b1"
+        }
+      ]
+    },
+    {
+      "id": "D1",
+      "item": "D-004: Yosys v0.71 and MCY v0.71 pins",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#D-004",
+          "sha256": "cd34f9a4b75010db7a95b918dc8251881eae85870465b4414ace1f10d67af80a"
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "item": "D-004a: `click==8.5.1` for MCY's command-line tool",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#D-004a",
+          "sha256": "4f51302297ae8dc264669bc3766fdbc31b32ab1030f6a1bfe8308bfa3956b060"
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "item": "D-005: FIFO design materials AI-assisted, with disclosure",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#D-005",
+          "sha256": "d3dd7667dfc1661242f013ca32b7ee7e8110e5bb791933584a86c66dbdc2d9b8"
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "item": "D-006: approvals (A-042, threshold 3, `ovf_fifo`, cap 64, watchdog per run)",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#D-006",
+          "sha256": "41d68cc0a6f39cc6ddae0522400f6049a23a5c2a2d256b331a9106f0c4fccfce"
+        }
+      ]
+    },
+    {
+      "id": "E1",
+      "item": "A-040: trace-row fields and row numbering",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-040",
+          "sha256": "2329ab5b9ee388e29ef14ff266749ce6db8b205a613b02d285f41e4027a2de9a"
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "item": "A-041: predicate scope (vector plus same-row sampled outputs)",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-041",
+          "sha256": "6c215691edd86c33481bfc05e36e655e5a3a095941aea2deaa161c09edb67cae"
+        }
+      ]
+    },
+    {
+      "id": "E3",
+      "item": "A-042: harness-owned reset, not a driver key (accepted by Krishika, D-006)",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-042",
+          "sha256": "423211c6484c3cb04cbce32fa9fb344050b29302608a87f9db12c5236b3d3064"
+        }
+      ]
+    },
+    {
+      "id": "E4",
+      "item": "A-043: L334 wall time = the whole null-run container",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-043",
+          "sha256": "3e16a6d1fe840456dc7342c92ff0d32a2e4ce30b96d09c6ebe975f7c1095c0be"
+        }
+      ]
+    },
+    {
+      "id": "E5",
+      "item": "A-044: a fixture's names-only port manifest (P17)",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-044",
+          "sha256": "395848f1bb6b6630610ab026e1025a17ca003a2bae5fce47857ea5ace19f0d3b"
+        }
+      ]
+    },
+    {
+      "id": "E6",
+      "item": "*(additional, not in the requested list)* A-038 revisited: M27 stays NOT_IMPLEMENTED",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-038",
+          "sha256": "483c8539baa37494807333cffa1ba33db4cef578fe29286503604326d0800dad"
+        }
+      ]
+    },
+    {
+      "id": "F1",
+      "item": "Disclosure note with the GateTruth/DVBench comparison. **Decision: disclose; do not rename ports.** Re-check the relayed source extracts before signing",
+      "refs": [
+        {
+          "ref": "docs/fifo-benchmark-overlap-disclosure-DRAFT.md",
+          "sha256": "ae37c774e98a6a0db0b9af0642dd5de399c281becc58115c74ae609f433bf417"
+        }
+      ]
+    }
+  ],
+  "not_frozen": [
+    {
+      "id": "G",
+      "item": "Observation mask, stricter variant and File 24 traceability table",
+      "reason": "needs the independent human mask reviewer's signature (Protocol L271; package section G); no owner signature replaces it",
+      "refs": [
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-DRAFT.json",
+          "sha256": "78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f"
+        },
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",
+          "sha256": "3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92"
+        }
+      ]
+    },
+    {
+      "id": "F1-note-table",
+      "item": "The overlap disclosure note's own owner-signature table",
+      "reason": "not signed; F1 in the package is approved"
+    },
+    {
+      "id": "L544",
+      "item": "Frozen L544 mutant export script, mutation modes, mutant population, bounded-equivalence assumptions",
+      "reason": "separate owner items; C2 freezes only the null-netlist export script"
+    }
+  ]
+}

@@ -19,7 +19,7 @@ import re
 from pathlib import Path
 from typing import Any, Optional
 
-from openvef import design_materials, trace
+from openvef import design_materials, freeze, trace
 from openvef.envelope import Failure
 from openvef.runtime import checker_invocation
 from openvef.sandbox import run_harness
@@ -28,6 +28,19 @@ from openvef.simulation import (SimulationError, compare_runs, l334_timeout, nul
 from openvef.stage_map import adjudicate_checker
 
 SEED = 0  # A-037: no F18 fixture supplies a slot seed
+# Owner freeze record (Krishika's signature a955245 under D-008). Each provisional reason
+# below is dropped only if every item it names is frozen AND its bytes still match.
+FREEZE_RECORD = "design/fifo/freeze/freeze-record-2026-11-24.json"
+# (reason, freeze-package items that settle it); an empty tuple is never settled by owners.
+PROVISIONAL_REASONS = (
+    ("FIFO specification, port manifest, reset/legal-input rules: not frozen", ("A1",)),
+    ("cycle cap, safe idle, watchdog, scheduler, trace schema, metadata: not frozen (items 7-12)",
+     ("B1", "B2", "B3", "B4", "B5", "B6")),
+    ("FIFO RTL and null-netlist export script: not frozen", ("C1", "C2")),
+    ("spec_version_sha256 in checker metadata: not a frozen value", ("A1", "B6")),
+    ("readings A-040, A-041, A-043, A-044: owner approval pending", ("E1", "E2", "E4", "E5")),
+    ("observation mask and File 24 table: unsigned; require an independent human reviewer (L271)", ()),
+)
 EXPORT_TIMEOUT_S = 300.0  # build default
 
 
@@ -59,14 +72,9 @@ def prepare(repo: Path, materials_file: str) -> dict[str, Any]:
     files = [materials_file, m["spec"], m["rtl"], m["export_script"], m["mask"],
              loaded["mask"]["traceability_table"]]
     spec_sha = _sha((repo / m["spec"]).read_bytes())
-    provisional = [
-        "FIFO specification, port manifest, reset/legal-input rules: DRAFT, not frozen (D-005, D-006)",
-        "cycle cap, safe idle, watchdog, scheduler, trace schema, metadata: DRAFT proposals, not frozen (items 7-12)",
-        "FIFO RTL and export script: DRAFT; export script is not the frozen L544 script",
-        "observation mask and File 24 table: DRAFT, unsigned; require an independent human reviewer (L271)",
-        "spec_version_sha256 in checker metadata is the SHA-256 of the DRAFT spec file, not a frozen value",
-        "Claude-decided readings, owner review pending: A-040, A-041, A-043, A-044",
-    ]
+    frozen = freeze.verify(repo, freeze.load(repo, FREEZE_RECORD)) if (repo / FREEZE_RECORD).exists() else None
+    done = set(frozen["frozen"]) if frozen else set()
+    provisional = [reason for reason, items in PROVISIONAL_REASONS if not items or not set(items) <= done]
     metadata = {"design_id": m["design_id"], "spec_version_sha256": spec_sha,
                 "trace_schema_version": m["trace_schema_version"], "cycle_cap": m["cycle_cap"],
                 "reset_release_cycle": m["reset_release_cycle"], "trace_integrity_status": "VALID"}
@@ -75,7 +83,7 @@ def prepare(repo: Path, materials_file: str) -> dict[str, Any]:
                        "file_sha256": {f: _sha((repo / f).read_bytes()) for f in files},
                        "null_netlist_sha256": [first["sha256"], second["sha256"]],
                        "yosys_version": first["yosys_version"], "checker_metadata": metadata,
-                       "mask_variant": "primary", "provisional": provisional}}
+                       "mask_variant": "primary", "provisional": provisional, "freeze": frozen}}
 
 
 def run_response(ctx: dict[str, Any], driver_source: str, checker_source: str,

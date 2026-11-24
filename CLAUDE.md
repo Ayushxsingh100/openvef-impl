@@ -65,7 +65,12 @@ covers A-007 to A-019, the tie case, and all future cases."
 - Covers spec interpretation only. It does not relax the Scope section or hard rules
   1–5, 7 and 8, and it does not cover dependency pins (D-001 stays with the owners).
 - Given by Krishika alone; Ayush Kumar Singh's agreement is not recorded. Every such
-  decision stays "owner review pending" until both owners review it.
+  decision stays "owner review pending" until an owner reviews it.
+- Governance rule D-008 (Krishika, 24 Nov 2026): decisions and approvals signed by Krishika
+  alone take effect. Ayush's agreement is recorded once, as the single "Ayush ratification
+  pending" entry in docs/AUDIT-READINESS.md, not on individual items. Claude never signs or
+  approves for either owner. The independent mask reviewer's signature (L271) is still
+  required and no owner signature replaces it.
 - Evidence runs that depend on a Claude-decided reading say so in `docs/traceability.md`,
   and do not count toward F18 until the owners have reviewed that reading.
 7. Every commit message names the clause it implements, e.g. `File 30 §1: reject BOM`.

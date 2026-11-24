@@ -1347,3 +1347,25 @@ the DRAFT mask (MK05); this stays open until the mask is signed.
   exported netlists.
 - Declaration order is recorded and compared separately (`port_order_same_as_rtl`), but
   it is not a pass condition. Connections are by name in the harness and the miter.
+
+## D-008 — Governance: approvals signed by Krishika alone take effect (DECIDED)
+
+**Owner governance rule by Krishika (co-owner), 24 Nov 2026**, given in Claude Code:
+"decisions and approvals signed by Krishika alone take effect now. Ayush Kumar Singh's
+agreement is recorded ONCE, in a single 'Ayush ratification pending' entry in
+docs/AUDIT-READINESS.md, and is not repeated on individual items."
+
+**Applied to:** the owner freeze package. Krishika's signature (commit `a955245`) freezes
+A1–F1. The record is
+[FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) /
+`design/fifo/freeze/freeze-record-2026-11-24.json`.
+
+**Supersedes:** step 3 of the package ("A line is frozen only when both owners approve
+it"), and the CLAUDE.md line that kept Claude-decided readings "owner review pending until
+both owners review it".
+
+**Does not change:**
+- the independent human mask reviewer's signature (Protocol L271), which no owner signature
+  replaces;
+- the standing-delegation readings that no owner has reviewed yet;
+- earlier records, which keep their wording as written.
