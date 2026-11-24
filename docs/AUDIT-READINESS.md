@@ -19,12 +19,13 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T144337Z`**.
-- Run class `development`; commit `3f3e355`, clean tree.
+Latest evidence run: **`evidence/run-20261124T151744Z`**.
+- Run class `development`; commit `9a4b821`, clean tree.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Outcomes are identical to the previous run, `run-20261124T112030Z` (commit `12abd1f`),
-  fixture by fixture. Only the L334 wall-clock medians in the provisional records differ.
+- Rerun after the sandbox simulation changed (H9 ordering probe; rows kept on a watchdog
+  kill). Every fixture's outcome is identical to the previous run,
+  `run-20261124T144337Z` (commit `3f3e355`).
 
 | Status | Count | Fixtures |
 |---|---|---|
@@ -54,12 +55,31 @@ review. [traceability.md](traceability.md) marks each one.
 - Five fixtures are not run to an outcome, ten are provisional, and many readings are
   unreviewed.
 
+## 2a. Feasibility controls F1–F15, F17 (Protocol §17)
+
+Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
+[design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
+
+Latest control run: **`evidence/controls-20261124T151740Z`**, pinned image, commit
+`9a4b821`. It carries the same identity records as an F18 run.
+
+| Status | Controls |
+|---|---|
+| PASS, provisional | F14 (DRAFT RTL and export script; A-052), F15 (case table awaits owner review) |
+| BLOCKED_OWNER_ARTIFACTS | F1–F13, F17: each record lists the owner files it is waiting for |
+
+**What is built:** the harness components H1–H10.
+- They are unit-tested on synthetic inputs and TEST-ONLY toy designs.
+- The per-control procedures for F1–F13 and F17 are composed and run as the owner files
+  arrive (plan step 8).
+- **No control besides F14 and F15 has run.**
+
 ## 3. Evidence bundle for the independent implementation auditor
 
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T144337Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261124T151744Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -105,9 +125,9 @@ this run is on the pinned one.
 | Item | Owner | Reference |
 |---|---|---|
 | Sign the freeze package: spec v0.2, items 7–12, RTL, export script, D-004…D-006, A-040…A-044 (and A-038), overlap disclosure | both owners | [OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md) |
-| Ayush's confirmation of every owner decision recorded from Krishika alone: A-001–A-006, A-013, A-014, A-015 case 2, D-002, D-002a, D-003, D-004, D-004a, D-005, D-006 | Ayush | [ambiguities.md](ambiguities.md) |
+| Ayush's confirmation of every owner decision recorded from Krishika alone: A-001–A-006, A-013, A-014, A-015 case 2, D-002, D-002a, D-003, D-004, D-004a, D-005, D-006, D-007 | Ayush | [ambiguities.md](ambiguities.md) |
 | D-001 (Draft 2020-12 validator pin): one owner confirmation outstanding | owners | ambiguities.md D-001 |
-| Review of the readings decided by Claude: A-007–A-012, A-013 tie case, A-015–A-041, A-043, A-044 (A-042 accepted by Krishika) | both owners (the delegation came from Krishika alone) | ambiguities.md; CLAUDE.md "Standing delegation" |
+| Review of the readings decided by Claude: A-007–A-012, A-013 tie case, A-015–A-041, A-043, A-044, A-045–A-052 (A-042 accepted by Krishika) | both owners (the delegation came from Krishika alone) | ambiguities.md; CLAUDE.md "Standing delegation" |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |
@@ -126,7 +146,7 @@ this run is on the pinned one.
 |---|---|---|
 | Directed legal-input suite and reference driver (checklist item 14) | owners | L245, L415 |
 | Hand-built FIFO control mutants (item 15), sufficient for F1–F15, including F5 and F10 | owners | Charter L74; L506, L514, L519 |
-| F6/F17 control checkers and drivers (item 16) | owners | L489, L515 |
+| F6/F17 control checkers and drivers (item 16); under D-007 also the F1–F5 and F7–F13 control drivers and checkers | owners | L489, L515; D-007; design/fifo/controls/README.md |
 | Frozen L544 export script, mutation modes, mutant population, bounded-equivalence assumptions | owners | L544 |
 
 **Work Claude can do on request (under D-005 or the build scope)**
@@ -134,5 +154,5 @@ this run is on the pinned one.
 | Item | Owner | Reference |
 |---|---|---|
 | Draft the remaining payload blocks (`[Execution envelope]`, `[Driver API]`, `[Trace schema]`, `[Checker contract]`) and the File 38 manifest (checklist items 2, 17), then run the assembler and clause-ID checks on them | Claude drafts; owners approve | D-005; File 31 L29–L30 |
-| F1–F15 feasibility harness runs, once the control mutants exist | Claude builds the harness; owners supply the mutants | L555 (4) |
+| Compose and run the F1–F13 and F17 procedures from H1–H10 as the owner files arrive (harness built; F14, F15 run) | Claude; owners supply the artifacts | L555 (4); plan step 8 |
 | After freeze and mask signature: a new pinned evidence run without provisional results | Claude | package "After signing" |

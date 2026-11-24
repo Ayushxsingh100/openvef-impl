@@ -33,7 +33,7 @@ artifacts**.
 - **Fixture runner and evidence records:** hashes of every input, the interpreter, the
   image and the source files.
 
-## Results (latest evidence run `run-20261124T144337Z`, pinned image)
+## Results (latest evidence run `run-20261124T151744Z`, pinned image)
 
 | PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
 |---|---|---|---|---|
@@ -84,8 +84,8 @@ once to warm the image (about 15 s).
 5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
    provisional.
    ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261124T144337Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261124T144337Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
+   python3 -c "import json;s=json.load(open('evidence/run-20261124T151744Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures'])"
+   grep '"fixture_id": "M27"' evidence/run-20261124T151744Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
 6. **What is open** (60 s): open `docs/OWNER-FREEZE-PACKAGE.md` (what the owners sign
    next) and `docs/AUDIT-READINESS.md` (what the independent auditor will check).

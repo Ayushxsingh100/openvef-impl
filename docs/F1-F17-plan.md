@@ -539,3 +539,37 @@ A result that depends on a Claude-decided reading is marked as such in
    an external solver (Dockerfile change; owner approval).
 4. **Who writes F1's artifact:** the reference driver (item 14) with the F6 correct
    checker, or a separate (c) artifact?
+
+## 9. Build status (24 Nov 2026, after D-007)
+
+**Owner decisions:** D-007 (Krishika, 24 Nov 2026; Ayush's confirmation pending) answers
+§8:
+1. The (c) controls are owner-written.
+2. Control mutants are RTL edits of `ovf_fifo.v`.
+3. The miter uses Yosys's built-in `sat`.
+4. F1 reuses the reference driver with the F6 correct checker.
+
+The owner-written files are listed in
+[design/fifo/controls/README.md](../design/fifo/controls/README.md). None exists yet.
+
+| Item | Status |
+|---|---|
+| Step 1 — H3, H4, F15 | Built; F15 **PASS, provisional** in `evidence/controls-20261124T151740Z`. Contents: 16 pair cases, 84 known answers, 88 scenario identities, 34,159 identities over 300 random ledgers, and the inclusion table matched against L372–L384. The case table awaits owner review |
+| Step 2 — H8 control runner | Built (`runner/run_controls.py`; `runner/run_f18_container.sh <class> controls`) |
+| Step 3 — F14 record | Built; **PASS, provisional** (DRAFT export script and RTL; A-052) |
+| H1 mutants | Loader and export path built; waiting for the owners' mutants |
+| H2 pair runner | Built; the sandbox now keeps rows recorded before a watchdog kill (A-046–A-048) |
+| H5/H6 miter and replay | Built; on TEST-ONLY toy designs it finds the shortest counterexample, the replay agrees in the simulator, and a don't-care variant is `BOUNDED_EQUIVALENT_N` (A-045) |
+| H7 panel | Built; synthetic tests (A-049, A-050) |
+| H9/H10 ordering probe, alignment, determinism | Built; checked on real toy-design runs in the sandbox (A-051) |
+| Step 8 — compose and run F1–F13, F17 | Not started: needs the owner files. The runner reports these controls `BLOCKED_OWNER_ARTIFACTS`; once a control's files exist and its procedure is not yet composed, it reports `NOT_WIRED`, never a pass |
+
+**§6 questions:**
+- Q1: settled by D-007.
+- Q2: unchanged (F8 plan).
+- Q3: A-051.
+- Q4: the miter's `BOUNDED_EQUIVALENT_N` label.
+- Q5: A-045. The assumption is generated from the spec's own predicate, so there is no
+  hand translation.
+- Q6: A-050.
+- Q7: still open, to be confirmed when M-x exists.
