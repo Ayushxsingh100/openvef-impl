@@ -11,7 +11,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 BASE = REPO / "baseline/OpenVEF_Planning_v1_3_6"
-DOCS = ("docs/pack-defects.md", "docs/fifo-owner-checklist.md")
+DOCS = ("docs/pack-defects.md", "docs/fifo-owner-checklist.md", "docs/fifo-spec-v0.1.md")
 QUOTE = re.compile(r'^> \[(?P<file>[0-9]{2}|41/[A-Za-z0-9]+\.json) L(?P<line>[0-9]+)\] "(?P<text>.*)"$')
 
 

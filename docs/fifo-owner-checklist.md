@@ -11,8 +11,14 @@ simulator-backed F18 stages and the remaining fixtures can run.
 
 This document proposes no content, values or code for any item. Where the pack itself
 proposes a value, it is quoted as the pack's proposal. Where the pack does not state the
-form, the item says so. Under CLAUDE.md's Scope section, Claude does not write these
-items.
+form, the item says so.
+
+**Update, 24 Nov 2026 (owner decision D-005, Ayush's confirmation pending):**
+- Claude drafts items 1–5, 7–13 and 17. The owners review and approve them.
+- Item 6, the mask, may be drafted, but it needs an independent human mask reviewer
+  (L271).
+- Items 14–16 stay human-written.
+- Drafts so far: [fifo-spec-v0.1.md](fifo-spec-v0.1.md) (items 1–5, DRAFT).
 
 **Quotation format**, as in [pack-defects.md](pack-defects.md):
 `> [<file> L<line>] "<exact text>"`. `tests/test_doc_quotes.py` checks every quote
@@ -324,8 +330,8 @@ The serialization format and the field definitions are not given.
 The RTL language and its simulator compatibility are not stated. The pinned simulator
 here is Icarus Verilog 12.0 (D-003).
 
-**Waiting here:** every simulator-backed stage. The Yosys/MCY versions are not pinned
-in this implementation; that is a separate owner decision.
+**Waiting here:** every simulator-backed stage. Yosys v0.71 and MCY v0.71 are pinned
+under D-004/D-004a; the frozen export script is still open.
 
 ## 14. Reference driver and directed legal-input baseline (directed suite)
 

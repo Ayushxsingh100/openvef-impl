@@ -855,6 +855,37 @@ Recorded with D-004.
 - After this decision, `mcy --help` runs in the image, and `tests/test_netlist_export.py`
   checks that.
 
+## D-005 — FIFO design materials become AI-assisted (DECIDED — Ayush's confirmation pending)
+
+**Owner decision by Krishika, 24 Nov 2026 (Ayush's confirmation pending)**, recorded in
+the Owner Sign-off Pack, Amendment D-005: Part 2 row 4 changed. The Sign-off Pack is not
+in this repository; this record follows the instruction as given in Claude Code.
+
+**Now AI-assisted (Claude drafts; owners review and approve):**
+- the FIFO design specification, port manifest and reset/legal-input rules;
+- the other payload blocks (checklist item 17);
+- the FIFO RTL;
+- proposed frozen values and the trace schema (items 7–12).
+
+**Unchanged (human-written):** F6/F17 control checkers and drivers, the directed suite and
+the control mutants.
+
+**Observation mask:** may be drafted, but it must be signed by an independent human mask
+reviewer (Protocol L271).
+
+CLAUDE.md's Scope section is updated to match. The disclosure wording is carried in
+docs/assistance-log.md.
+
+**Values:** depth 4 and width 8 were recommended by Claude in the claude.ai session and
+adopted by Krishika. This attribution is as stated by Krishika on 24 Nov 2026; that
+session is not in this repository. Claude Code did not recommend values in its own
+session.
+
+**Research consequence, for the owners to weigh:** Protocol L468 requires "Independently
+authored, cycle-exact specs"; the pack does not define "independently authored". An
+AI-drafted specification weakens that claim. The D-005 disclosure states it, and reports a
+potential familiarity confound if a Claude model is evaluated.
+
 ## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
 
 File 30 §6 is headed "Import sandbox and deterministic execution". Paired runs compare
@@ -999,3 +1030,39 @@ schema itself is TO FREEZE (L543).
 - `compare_runs` compares every row, including reset rows. Reset windows belong to the
   mask (L276), which is owner material.
 - Until the mask exists, a raw divergence during reset is compared like any other row.
+
+## A-041 — Scope of the legal-input predicate in check (e) (DECIDED BY CLAUDE — owner review pending)
+
+File 30 L83 lists check (e) among the checks the harness makes on a returned vector
+"before driving": "(e) the full vector satisfies the design-specific legal-input
+predicate from the author-visible reset/legal-input specification". The same line says
+"illegal protocol combinations are distinct reason codes". The pack gives no predicate
+language (PD-06).
+
+**Readings:**
+- (a) The predicate sees only the vector's own values. It can then reject only
+  combinations within one vector.
+- (b) The predicate sees the vector together with the outputs that were sampled in the
+  same row and given to the driver (`outputs_after_edge_n`, L218). Legality can then
+  depend on protocol state.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (b).**
+This scope is also part of the AI-drafted FIFO specification under D-005 (FIFO-040 to
+FIFO-042). It therefore needs owner review twice: as a pack interpretation under the
+standing delegation, and as drafted specification text under D-005.
+Reasons from the pack text:
+- Protocol L415 gives "undefined writes while full" as its example of an input sequence
+  that violates "protocol legality". Whether a write happens while full depends on state,
+  and a single vector cannot express it under reading (a).
+- The reason-code wording is "illegal protocol combinations", and the stage-map token is
+  `ILLEGAL_PROTOCOL_STATE` (L125). Both name protocol state, not only the vector.
+- The sampled outputs are exactly what the driver was given in that `step` (L208, L221),
+  so the predicate uses no information hidden from the author.
+
+**What changes:**
+- The DRAFT FIFO specification states this scope (FIFO-040) and gives the predicate as a
+  Python 3.11 function of `(vector, sampled)` (FIFO-042).
+- The harness's check (e) does not consume that predicate yet. It still accepts only the
+  test-only literal `ALL_INPUTS_LEGAL` (A-038), and that stays so until the owners
+  approve the specification.
+

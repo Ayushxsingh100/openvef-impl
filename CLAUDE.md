@@ -7,9 +7,29 @@ Owners: Krishika and Ayush Kumar Singh. Governing records: Owner Sign-off Pack
 
 ## Scope
 Only the limited hand-built FIFO scope of Protocol §18(4) is open. Build the parser,
-assembler, harness, ledger and runner. Do NOT write: F6/F17 control checkers or drivers,
-the directed suite, the FIFO specification, authoring-packet text, observation mask or
-control mutants. Owners write those by hand; Claude may comment on them in prose only.
+assembler, harness, ledger and runner.
+
+Owner decision D-005 (Krishika, 24 Nov 2026; Ayush's confirmation pending; Owner
+Sign-off Pack Amendment D-005, Part 2 row 4 changed) makes these items AI-assisted.
+Claude drafts them; the owners review and approve them:
+- the FIFO design specification, port manifest and reset/legal-input rules;
+- the other payload blocks (docs/fifo-owner-checklist.md item 17);
+- the FIFO RTL;
+- proposed frozen values and the trace schema (checklist items 7–12).
+Everything Claude drafts under D-005 is marked DRAFT. Claude never marks it approved or
+frozen; only the owners do that.
+
+The observation mask may be drafted by Claude, but it must be signed by an independent
+human mask reviewer (Protocol L271). Claude is never that reviewer.
+
+Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
+suite, control mutants. Owners write those by hand; Claude may comment on them in prose
+only.
+
+Disclosure (D-005), carried in docs/assistance-log.md: "The FIFO specification, RTL and
+authoring-packet payloads were drafted by Claude (Anthropic) via Claude Code and reviewed
+and approved by the owners. If any Claude model is among the models evaluated, this is
+reported as a potential familiarity confound."
 
 ## Hard rules
 1. The v1.3.6 pack under `baseline/` is read-only. Never edit, reformat or regenerate it.
