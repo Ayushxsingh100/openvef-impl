@@ -160,7 +160,9 @@ null run, then the L166 (8) paired comparison.
 Request fields (design materials; **all supplied by the caller, no defaults**):
 `toplevel`, `verilog_sources`, `clock_port`, `input_ports` (name → width), `output_ports`,
 `reset_sequence`, `cycle_cap`, `safe_idle`, `legal_input_predicate`, plus `seed`,
-`step_timeout_s`, `budget_s`. The only executable predicate is the literal
+`step_timeout_s`, `budget_s`. Optional: `held_inputs` (name → bits), harness-owned inputs
+such as a reset port. They are not driver-vector keys, are held after reset release, and
+are recorded as consumed inputs (A-042). The only executable predicate is the literal
 `ALL_INPUTS_LEGAL` (used by the toy tests). Any other value makes the result not
 determined (A-027, A-038), never a pass.
 

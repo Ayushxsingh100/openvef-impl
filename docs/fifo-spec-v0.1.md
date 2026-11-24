@@ -1,5 +1,8 @@
 # FIFO specification v0.1 — DRAFT for owner review
 
+**Superseded by [fifo-spec-v0.2.md](fifo-spec-v0.2.md)** (24 Nov 2026). Kept unchanged below
+for the record.
+
 **Status: DRAFT. Not approved, not frozen.** Drafted by Claude (Claude Opus 5.5, via Claude
 Code) under owner decision D-005 (Krishika, 24 Nov 2026; Ayush's confirmation pending).
 Only the owners can approve it or freeze it.

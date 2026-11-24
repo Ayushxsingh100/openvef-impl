@@ -1,11 +1,12 @@
-"""Mechanical checks on the DRAFT FIFO specification v0.1 (D-005; docs/fifo-spec-v0.1.md).
+"""Mechanical checks on the DRAFT FIFO specification v0.2 (D-005; docs/fifo-spec-v0.2.md).
 
 These checks do not approve the draft; only the owners can. They check that:
 - the File 31 clause-ID extraction, using the regexes from the File 38 template, finds
   exactly the clause IDs the payload text defines, with no near-match tokens (File 31
   L29-L30, L91-L95);
 - the FIFO-042 executable predicate runs under Python 3.11 and agrees with FIFO-041;
-- the worked example agrees with a model of the read/write clauses (FIFO-020 to FIFO-030).
+- the worked example agrees with a model of the read/write and status clauses
+  (FIFO-020 to FIFO-035).
 """
 from __future__ import annotations
 
@@ -16,7 +17,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-SPEC = (REPO / "docs" / "fifo-spec-v0.1.md").read_text(encoding="utf-8")
+SPEC = (REPO / "docs" / "fifo-spec-v0.2.md").read_text(encoding="utf-8")
 TEMPLATE = json.loads((REPO / "baseline/OpenVEF_Planning_v1_3_6/38_Authoring_Packet_Manifest_Template_v1.3.6.json")
                       .read_text(encoding="utf-8"))
 MARKER = "<!-- PAYLOAD TEXT BELOW -->"
@@ -67,18 +68,22 @@ class ClauseIdTests(unittest.TestCase):
 class PredicateTests(unittest.TestCase):
     def test_matches_fifo_041(self):
         legal = predicate()
-        for rst, wr, rd, full, empty in itertools.product("01", repeat=5):
+        for wr, rd, full, af, empty, valid in itertools.product("01", repeat=6):
             for data in ("00000000", "10100101", "11111111"):
-                vector = {"rst": rst, "wr_en": wr, "wr_data": data, "rd_en": rd}
-                sampled = {"rd_valid": "0", "rd_data": "00000000", "full": full, "empty": empty}
-                expected = rst == "0" and not (full == "1" and wr == "1" and rd == "0")
+                vector = {"wr_en": wr, "wr_data": data, "rd_en": rd}
+                sampled = {"rd_valid": valid, "rd_data": data, "full": full, "almost_full": af, "empty": empty}
+                expected = not (full == "1" and wr == "1" and rd == "0")
                 self.assertEqual(legal(vector, sampled), expected, (vector, sampled))
 
     def test_all_zero_vector_is_legal_in_every_state(self):
         legal = predicate()
-        zero = {"rst": "0", "wr_en": "0", "wr_data": "00000000", "rd_en": "0"}
-        for full, empty in itertools.product("01", repeat=2):
-            self.assertTrue(legal(zero, {"rd_valid": "0", "rd_data": "00000000", "full": full, "empty": empty}))
+        zero = {"wr_en": "0", "wr_data": "00000000", "rd_en": "0"}
+        for full, af, empty in itertools.product("01", repeat=3):
+            self.assertTrue(legal(zero, {"rd_valid": "0", "rd_data": "00000000", "full": full, "almost_full": af,
+                                         "empty": empty}))
+
+    def test_driver_vector_keys(self):
+        self.assertIn("Every driver vector has exactly the keys `wr_en`, `wr_data` and `rd_en`.", BODY)
 
 
 class WorkedExampleTests(unittest.TestCase):
@@ -88,7 +93,7 @@ class WorkedExampleTests(unittest.TestCase):
                 for line in table.splitlines() if re.match(r"^\| [0-9]+ \|", line)]
         self.assertGreater(len(rows), 10)
         words: list[str] = []  # after reset: c = 0 (FIFO-010)
-        for edge, wr, data, rd, c, valid, rdata, full, empty in rows:
+        for edge, wr, data, rd, c, valid, rdata, full, af, empty in rows:
             read = rd == "1" and len(words) > 0                    # FIFO-020, FIFO-023
             write = wr == "1" and (len(words) < 4 or read)        # FIFO-024, FIFO-030
             self.assertFalse(wr == "1" and rd == "0" and len(words) == 4, f"edge {edge}: illegal (FIFO-031)")
@@ -100,6 +105,7 @@ class WorkedExampleTests(unittest.TestCase):
             self.assertEqual(rdata, popped if read else "-", f"edge {edge}: rd_data")  # FIFO-021/022
             self.assertEqual(full, "1" if len(words) == 4 else "0", f"edge {edge}: full")   # FIFO-028
             self.assertEqual(empty, "1" if not words else "0", f"edge {edge}: empty")       # FIFO-028
+            self.assertEqual(af, "1" if len(words) >= 3 else "0", f"edge {edge}: almost_full")  # FIFO-029
 
 
 if __name__ == "__main__":

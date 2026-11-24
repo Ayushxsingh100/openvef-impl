@@ -62,6 +62,24 @@ class SimulationTests(unittest.TestCase):
         f = run_outcome(self.run1(src, **kw))
         return None if f is None else f.diagnostic
 
+    def test_held_inputs_are_not_driver_keys(self):
+        # A-042: rst is harness-owned; driver vectors omit it, the harness holds it at 0
+        # after reset and records it as a consumed top-level input (L217).
+        held = design(input_ports={"a": 2, "b": 1}, held_inputs={"rst": "0"},
+                      safe_idle={"a": "00", "b": "0"})
+        no_rst = driver("        if cycle_index == 3:\n            return 'COMPLETE'\n"
+                        "        return {'a': format(cycle_index % 4, '02b'), 'b': '1'}\n")
+        r = self.run1(no_rst, held)
+        self.assertEqual(r["events"], [])
+        rows = r["rows"]
+        self.assertEqual(rows[0][INP], {"rst": "1", "a": "00", "b": "0"})
+        self.assertEqual(rows[2][INP], {"rst": "0", "a": "00", "b": "1"})
+        self.assertEqual(rows[1][NXT], {"rst": "0", "a": "00", "b": "1"})
+        self.assertEqual(rows[3][OUT], {"flag": "1", "q": "01"})
+        self.assertEqual(rows[-2][NXT], {"rst": "0", "a": "00", "b": "0"})  # safe idle, rst held
+        # A driver that still returns rst gets EXTRA_KEYS: rst is not a driver key.
+        self.assertEqual(self.diag(COUNTER, d=held), "DRIVER_VECTOR_INVALID|reason=EXTRA_KEYS")
+
     def test_reset_sampling_complete_and_safe_idle(self):
         r = self.run1(COUNTER)
         rows = r["rows"]

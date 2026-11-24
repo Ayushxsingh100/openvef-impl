@@ -18,7 +18,7 @@ form, the item says so.
 - Item 6, the mask, may be drafted, but it needs an independent human mask reviewer
   (L271).
 - Items 14–16 stay human-written.
-- Drafts so far: [fifo-spec-v0.1.md](fifo-spec-v0.1.md) (items 1–5, DRAFT).
+- Drafts so far: [fifo-spec-v0.2.md](fifo-spec-v0.2.md) (items 1–5, DRAFT; v0.1 superseded).
 
 **Quotation format**, as in [pack-defects.md](pack-defects.md):
 `> [<file> L<line>] "<exact text>"`. `tests/test_doc_quotes.py` checks every quote

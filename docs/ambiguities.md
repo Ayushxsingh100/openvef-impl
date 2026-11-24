@@ -1066,3 +1066,45 @@ Reasons from the pack text:
   test-only literal `ALL_INPUTS_LEGAL` (A-038), and that stays so until the owners
   approve the specification.
 
+
+## A-042 — Harness-owned reset and the "frozen top-level input-port" key set (DECIDED BY CLAUDE — owner review pending)
+
+File 30 L83 check (a): "its key set equals the frozen top-level input-port set exactly".
+Protocol L212: "Every non-`COMPLETE` return must be a dictionary with exactly the frozen
+top-level input-port keys".
+
+**Readings:**
+- (a) The key set is every top-level input port except the clock. A reset port is then
+  a driver key, and the driver must always drive it inactive (FIFO spec v0.1).
+- (b) The key set is the set the design pack freezes for driver vectors. It may leave out
+  harness-owned control inputs, the clock and the reset, which the harness drives itself.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (b).**
+This follows a spec review by Claude (claude.ai), adopted by Krishika. Reasons from the
+pack text:
+- Both sentences say "frozen", which points to the set the design pack freezes, not a
+  mechanical list of all ports.
+- The clock is already left out, even though it is a top-level input: drivers must not
+  "own the clock" (L212), and "The harness owns the clock and scheduler" (L208). So the
+  set is not literally every top-level input under either reading.
+- Reset belongs to the harness and the design pack, not the driver:
+  - L208: the first `step` call "is after reset release";
+  - L221: "the initial reset inputs are defined in the design pack";
+  - L260: paired runs "use identical seed, reset, simulator, cycle cap, safe-idle, driver
+    API and watchdog". Reset is listed among the fixed run conditions, not among the
+    driver's decisions.
+- L217 still records every top-level input: "`inputs_consumed_at_edge_n`: top-level
+  inputs stable immediately before active rising edge `n`". The harness therefore
+  records held inputs in the consumed-input field.
+
+**Implemented:**
+- New optional design field `held_inputs` (`{port: bits}`). Reset-sequence vectors give
+  these ports, and from the reset-release drive phase onward the harness holds them at
+  the given values.
+- They are not driver-vector keys: checks (a)–(d) use `input_ports` only.
+- They are recorded in `inputs_consumed_at_edge_n` and in the scheduled vector, and
+  they are part of the ROW_ALIGNMENT check.
+- Designs without `held_inputs` behave exactly as before.
+
+**Competing consequence:** under reading (a), the FIFO's `rst` returns to the driver key
+set (v0.1), and `held_inputs` is unused.

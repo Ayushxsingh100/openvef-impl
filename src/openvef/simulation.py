@@ -36,6 +36,8 @@ NEXT = "next_inputs_scheduled_for_edge_n_plus_1"
 
 DESIGN_FIELDS = ("toplevel", "verilog_sources", "clock_port", "input_ports", "output_ports", "reset_sequence",
                  "cycle_cap", "safe_idle", "legal_input_predicate")
+# Optional: "held_inputs" {port: bits} — harness-owned inputs that are not driver-vector
+# keys (A-042). Reset-sequence vectors must give them; they are held after reset release.
 
 
 class SimulationError(RuntimeError):

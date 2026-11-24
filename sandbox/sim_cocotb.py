@@ -82,6 +82,14 @@ async def openvef_driver_run(dut):
     cap = design["cycle_cap"]
     safe_idle = design["safe_idle"]
     predicate = design.get("legal_input_predicate")
+    # A-042: harness-owned inputs (e.g. a reset port) that are not driver-vector keys. Each
+    # reset-sequence vector gives them; from the reset-release drive phase onward they are
+    # held at these values. They are still recorded as consumed top-level inputs (L217).
+    held = dict(design.get("held_inputs") or {})
+    all_inputs = sorted(set(widths) | set(held))
+
+    def applied(vector: dict) -> dict:
+        return {**vector, **held}
 
     sink = io.StringIO()
     real_out, real_err = sys.stdout, sys.stderr
@@ -118,11 +126,11 @@ async def openvef_driver_run(dut):
     drive(dut, scheduled)
     while True:
         await RisingEdge(clk)
-        consumed = sample(dut, sorted(widths))  # passive capture at the edge (L262)
+        consumed = sample(dut, all_inputs)  # passive capture at the edge (L262)
         await ReadOnly()
         snapshot = sample(dut, outputs)
         row = {"cycle_index": n, "reset": n < release, INPUTS: consumed, OUTPUTS: snapshot}
-        if consumed != {k: scheduled[k] for k in sorted(widths)}:
+        if consumed != {k: scheduled[k] for k in all_inputs}:
             # L221: "The consumed-input field ... must agree with the prior row's scheduled
             # input"; a mismatch is a harness fault (stage map L155, reason ROW_ALIGNMENT).
             row.update({NEXT: None, "driver_completed": completed})
@@ -137,7 +145,7 @@ async def openvef_driver_run(dut):
             rows.append(row)
             break
         elif completed:
-            vector = dict(safe_idle)
+            vector = applied(safe_idle)
         else:
             cycle_index = n - release
             beat("step")
@@ -155,7 +163,7 @@ async def openvef_driver_run(dut):
                 break
             if value == "COMPLETE":
                 completed = True
-                vector = dict(safe_idle)
+                vector = applied(safe_idle)
             else:
                 reason = vector_reason(value, widths, predicate)
                 if reason == "NOT_DETERMINED":
@@ -167,7 +175,7 @@ async def openvef_driver_run(dut):
                     row.update({NEXT: None, "driver_completed": completed})
                     rows.append(row)
                     break
-                vector = {k: value[k] for k in sorted(widths)}
+                vector = applied({k: value[k] for k in sorted(widths)})
         row.update({NEXT: vector, "driver_completed": completed})
         rows.append(row)
         scheduled = vector
