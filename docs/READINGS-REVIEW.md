@@ -22,6 +22,12 @@ correction) are not listed.
   record shows its result would change;
 - *none:* no current fixture reaches the case.
 
+**D-012 (after the DEV-002 audit):** D-009's approval of **A-031 is withdrawn**, and A-031 is
+reversed. The runner no longer has adapters for input shapes only one fixture uses, so these
+fixtures are NOT_IMPLEMENTED and the Dependants cells naming them describe the state before
+D-012: M36 (A-012), M13 (A-025), M26 (A-027), M37 (A-028), M15 (A-029), M18 and M19 (A-030),
+M14, M17 and M41 (A-032).
+
 ## Readings
 
 A-045–A-052 and the F15 case table affect only the feasibility controls, not F18.
@@ -51,7 +57,7 @@ A-045–A-052 and the F15 case table affect only the feasibility controls, not F
 | A-028 | A response plus a supplied later-stage outcome | Run every stage available; a failure stands; otherwise the supplied outcome stands in for L166 (7)–(10) | 02 L166 evaluation order | **changes: M10–M12, P18, P19, P22, M37** (on path: M28, R07) |
 | A-029 | Serializer: what makes a diagnostic "normative"? | Must match the closed grammar and, when supplied, the emitted set; else `NON_NORMATIVE_DIAGNOSTIC` | 02 L168; L94–L125 templates and domains; Catalog L18 | **changes: M15** (on path: M14, M17) |
 | A-030 | Clause-ID packet checks: order, missing regexes, line endings | Near-match before set equality; File 31 §8 defaults when a regex is omitted; LF normalization | File 31 L11, L27, L28, L30, §8 | **changes: M20** (default regex); on path: M18, M19, M40 |
-| A-031 | Descriptor halt signatures outside the L185 domains (lower-case components, `RecorderFault`) | Constructed signatures enforce L185; supplied signatures compared as given. **Pack inconsistency flagged** | 02 L185 domains and recurrence rule | **changes: M42, M47** (PASS only under this reading) |
+| A-031 **(reversed, D-012)** | Descriptor halt signatures outside the L185 domains (lower-case components, `RecorderFault`) | Constructed signatures enforce L185; supplied signatures compared as given. **Pack inconsistency flagged** | 02 L185 domains and recurrence rule | M42, M47: now NOT_IMPLEMENTED (PD-01) |
 | A-032 | Control-vector expectations with extra keys | Compared as a whole object; each extra key computed from a cited rule; property names taken from the descriptors (disclosed) | Catalog requirement 2; 02 L168 (2), (3); L176; L183–L185 | **changes: M14, M17, M41** |
 | A-033 (field derivations) | Which lifecycle-vector fields have a supporting Protocol sentence? | Change class matched to its Protocol case; only fields with a supporting sentence produced (table `LIFECYCLE_CASES`) | 02 L175, L176, L181, L183, L185 | **changes: M53** (PASS); M48, M50, M54, M58 stay NOT_IMPLEMENTED |
 | A-034 | An exception while importing an artifact module | `driver.py`: `RUNTIME_EXCEPTION\|…\|phase=factory\|class=C`; `checker.py`: `CHECKER_RUNTIME_ERROR\|class=C` | Stage map phases (`factory` earliest); File 30 L97 | none (no fixture raises on import; on path: every fixture reaching the runtime stage) |

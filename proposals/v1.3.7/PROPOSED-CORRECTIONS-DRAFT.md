@@ -5,11 +5,11 @@ any baseline. Drafted by Claude (Claude Opus 5.5, via Claude Code) at Krishika's
 instruction, 24 Nov 2026 (UTC). For the owners and the independent document auditor.
 
 - `baseline/` (v1.3.6) is not edited. Nothing here changes the implementation, the recorded
-  results, or F18: **M27, M48, M50, M54 and M58 stay NOT_IMPLEMENTED.**
+  results, or F18: **M27, M36, M42, M47, M48, M50, M54 and M58 stay NOT_IMPLEMENTED.**
 - "Unblocks" means the text would then support an outcome. It is not a predicted PASS:
   each change also needs an implementation change, a new baseline and a new evidence run.
 - **Conflict to weigh.** Claude wrote the implementation and drafted these corrections, so
-  adopting them would let five fixtures it could not execute become executable. The scope
+  adopting them would make executable some fixtures it does not execute now. The scope
   and rule tokens in C2 to C4 are taken from the fixture descriptors, because the Protocol
   contains none. The auditor must decide from L181, L183 and L185 whether each token is
   the right rule, not merely whether it equals the descriptor.
@@ -23,9 +23,11 @@ instruction, 24 Nov 2026 (UTC). For the owners and the independent document audi
 | C3 | 02 L185 (halt-signature rule tokens) | PD-02 (3) | M54 |
 | C4 | 36 L176 (control-vector comparison) | PD-03 | none alone; states the comparison M48, M50, M54, M58 rely on |
 | C5 | 30 L83 (predicate form, order in check (a)) | PD-06, PD-25 | M27 (with C6) |
-| C6 | 41 M27 descriptor, 36 L133 | PD-06, PD-25 | M27 (with C5) |
+| C6 | 41 M27 descriptor, 36 L133 | PD-06, PD-25 | M27 (with C5), subject to the D-012 runner rule |
 | C7 | 30 L7 (version label) | PD-22 | none |
 | C8 | 10, 11, 22 (TechRxiv preprint) | PD-24 | none |
+| C9 | 36 (parser-unit-vector contract) | PD-04 | M36, subject to the D-012 runner rule |
+| C10 | 41 M41, M42, M47; 02 L185 | PD-01 | M42, M47 |
 
 ## C1 — Error classes of the revision vectors (PD-02)
 
@@ -93,7 +95,7 @@ weights remain unchanged" with L181's contrast between shared and design-specifi
 ```
 
 **Unblocks:** M54. Its other fields already have supporting text (A-033). This does not settle
-PD-01 (M42 and M47 use values outside these domains), which still needs its own correction.
+PD-01; see C10.
 
 ## C4 — Which comparison applies to control vectors (PD-03)
 
@@ -208,10 +210,90 @@ re-read in the audit. The 403 was observed in a Claude Code session and is logge
 
 **Unblocks:** none. The overlap disclosure note should be re-checked if C8 is adopted.
 
+## C9 — Parser-unit-vector input contract (PD-04; D-012 request)
+
+**Current text**
+
+> [36 L27] "Serializer unit vectors and lifecycle unit vectors are marked by `fixture_class` and are deliberately grammar-exempt; they test local utilities/policies, not model feedback."
+
+> [36 L15] "`CONTROL_EXPECTATION`: a serializer, lifecycle or policy test vector; it does not represent an artifact feedback event."
+
+> [02 L177] "A `CONTROL_EXPECTATION` fixture exercises a serializer, protocol or lifecycle rule; its stage and expected diagnostic are test labels, not an artifact feedback event."
+
+> [41/M36.json L6] "\"fixture_class\": \"parser_unit_vector\","
+
+**Proposed replacement** of the File 36 unit-vector sentence (the rest of requirement 6 is
+unchanged):
+
+```text
+Serializer, lifecycle and parser unit vectors are marked by `fixture_class` (`serializer_primitive_unit_vector_grammar_exempt`, `lifecycle_unit_vector`, `parser_unit_vector`) and are deliberately grammar-exempt; they test local utilities/policies, not model feedback. A `parser_unit_vector` input has exactly the keys `source_file` and `syntax_error`. `source_file` is `driver.py` or `checker.py`. `syntax_error` has the key `lineno`, a positive integer, and may have the key `offset`, an integer or null. The vector applies the Protocol §3.4 `SOURCE_SYNTAX_REJECT` column rule to that position. Its result has stage `SOURCE_AST`, error class `SOURCE_SYNTAX_REJECT`, the diagnostic given by the rule, and disposition `CONTROL_EXPECTATION`.
+```
+
+**Proposed replacement** of the File 36 disposition text, aligned with Protocol L177:
+
+```text
+`CONTROL_EXPECTATION`: a serializer, parser, protocol or lifecycle test vector; it does not represent an artifact feedback event.
+```
+
+**For the auditor:** this is a request that the pack define the contract. The contract matches
+the only existing vector, so the auditor should check that it follows from the column rule.
+A second vector of this class (for example `offset` absent, or `offset` = 0) would exercise
+the contract properly and is recommended; it also matters for the rule below.
+
+**Unblocks:** M36, subject to "The D-012 runner rule" below.
+
+## C10 — Halt signatures outside the L185 domains (PD-01; D-012 request)
+
+**Current text**
+
+> [02 L185] "`evaluator_component` is `SIMULATOR`, `REPLAY_VERIFIER`, `RECORDER`, `TRACE_ALIGNMENT_CHECKER`, `TRACE_SERIALIZER` or `RTL_NULL_COMPARATOR`"
+
+> [41/M41.json L33] "\"evaluator_component\": \"simulator\","
+
+> [41/M42.json L16] "\"evaluator_component\": \"simulator\","
+
+> [41/M42.json L23] "\"evaluator_component\": \"simulator\","
+
+> [41/M47.json L16] "\"evaluator_component\": \"simulator\","
+
+> [41/M47.json L23] "\"evaluator_component\": \"recorder\","
+
+> [41/M47.json L24] "\"stable_error_class\": \"RecorderFault\","
+
+**Proposed replacement:** in the descriptors, the L185 values. L185 is unchanged.
+
+| Descriptor | Field | Current | Proposed |
+|---|---|---|---|
+| M41 `halt_signature` | `evaluator_component` | `simulator` | `SIMULATOR` |
+| M42 `first_` and `second_halt_signature` | `evaluator_component` | `simulator` | `SIMULATOR` |
+| M47 `first_halt_signature` | `evaluator_component` | `simulator` | `SIMULATOR` |
+| M47 `second_halt_signature` | `evaluator_component` | `recorder` | `RECORDER` |
+| M47 `second_halt_signature` | `stable_error_class` | `RecorderFault` | `NONE` |
+
+And one sentence added at the end of the L185 domain list:
+
+```text
+A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence.
+```
+
+Expected objects do not change. Under L185, M42's signatures stay identical and M47's stay
+different.
+
+**Unblocks:** M42 and M47. M41 has no adapter for a different reason (see below).
+
+## The D-012 runner rule
+
+Under D-012 this implementation has no adapter for an input shape that only one fixture uses,
+and a test enforces it. So **C5 and C6 (M27) and C9 (M36) do not by themselves let those
+fixtures run**: each shape would still belong to one fixture. Either the pack adds a second
+vector of the same shape, or it defines the input contracts (PD-07) and the owners then
+amend the runner rule. The same holds for M13, M14, M15, M17, M18, M19, M25, M26, M28, M37, M41, P17, R07: their rules are stated in the pack, but
+their input shapes are not. This proposal does not draft those contracts.
+
 ## Consequences of adopting any of these
 
 1. A new pack release with its own ZIP hash, change log, `27_SHA256SUMS.txt` and status files.
-   C6 also changes the M27 descriptor hash and length, `fixture-index.json`, and its hash.
+   C6 and C10 also change descriptor hashes and lengths, `fixture-index.json`, and its hash.
 2. **A new independent document audit**, then owner approval (Ayush's ratification included
    in the D-008 entry).
 3. A new baseline directory and pinned index hash in this repository, at owner instruction.

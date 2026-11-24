@@ -17,6 +17,11 @@ itemised owner review; those items now read "approved under D-009". A-038 and A-
 keep the wording "owner review pending": the signed freeze covers their exact bytes, so
 they are not edited. They are approved.
 
+**Update, D-012:** D-009's approval of A-031 is withdrawn, and A-031 is reversed. The M36 part
+of A-012 and the fixture adapters tied to a single input shape are removed; see D-012 at the
+end of this file. Entries that still say such a fixture passes are superseded on that point
+(their text is bound to approval hashes).
+
 ## A-001 — OUTPUT_TRUNCATED versus envelope rejection (DECIDED — Ayush's confirmation pending)
 
 - Protocol §3.4 stage map lists "Envelope, schema or clause manifest rejection" first and
@@ -672,7 +677,11 @@ closed grammar (L94–L123 templates with L125 domains, `src/openvef/serializer.
 - Reserved-heading lines are compared after LF normalization (CRLF and lone CR → LF,
   File 31 L11, L27). Unresolved placeholders match `\{\{[A-Z0-9_]+\}\}` (File 31 L28).
 
-## A-031 — Halt-signature domains versus supplied signatures (DECIDED BY CLAUDE — approved under D-009; pack inconsistency found)
+## A-031 — Halt-signature domains versus supplied signatures (REVERSED BY OWNER, D-012; D-009 approval withdrawn)
+
+**Reversed by D-012 (Krishika).** Every supplied signature must lie in the L185 domains; one
+that does not is a fixture defect (PD-01). M42 and M47 are NOT_IMPLEMENTED. The text below is
+the superseded reading, kept for the record.
 
 Protocol L185 gives exact domains: `evaluator_component` is one of `SIMULATOR`, …,
 `RTL_NULL_COMPARATOR`, and `stable_error_class` is the literal `NONE` for
@@ -1436,3 +1445,36 @@ at the owner's instruction):
 The L555 (5) implementation audit will be performed by a different AI model (ChatGPT,
 OpenAI); not yet performed, and not a human independent audit. Full record:
 [DEVIATIONS.md](DEVIATIONS.md).
+
+## D-012 — Response to audit findings A1-1 and A8-1 (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) triage of the DEV-002 audit report; given
+in Claude Code. The report itself was not supplied
+([note](reviews/implementation-audit-gpt6-2026-11-25-NOTE.md)).
+
+**A1-1 accepted:** "remove every runner branch reachable only by a single fixture's input
+shape. M27 and M36 fall to the generic "no adapter for this input shape" path,
+NOT_IMPLEMENTED."
+- **Scope confirmed by Krishika.** The decision names M27 and M36. Claude reported that 13
+  more fixtures (M13, M14, M15, M17, M18, M19, M25, M26, M28, M37, M41, P17, R07) sit on single-fixture branches and all passed, and asked. Krishika
+  chose "Literal: remove all".
+- **Applied:** 15 branches removed. The rules behind them stay implemented and unit-tested
+  (column rule, serializer, packet checks, runtime signature, vector checks, paired runs,
+  operational recovery), but no fixture reaches them through the runner.
+- **M20 and M40 stay.** They use one adapter (one required key set with two optional keys).
+- **Enforced by** `tests/test_dispatch_shapes.py`: an adapter must be reached by at least two
+  mandatory fixtures, and only the `ADAPTERS` table may select code by shape.
+- **Limit:** the scan is per input shape. Branches on values inside a shape (one event kind,
+  one change class) can still be reached by a single fixture; D-012 does not cover them.
+- **Supersedes:** the M36 part of A-012, and the adapters of A-027 (M26), A-028 (M37), A-029
+  (M15), A-030 (M18, M19), A-032 (M14, M17, M41) and A-044 (P17). The readings stay approved;
+  they no longer produce an F18 result for those fixtures. A-025, A-026 and the rest of
+  A-028 and A-030 are unaffected.
+
+**A8-1 accepted:** "reverse A-031. HaltSignature.given validates every component against
+Protocol L185 domains; out-of-domain supplied signatures are a fixture defect (PD-01), so M42
+and M47 become NOT_IMPLEMENTED with that reason." The L185 mapping from halt code to component
+is validated too. "D-009's blanket approval of A-031 is withdrawn" is recorded in
+`design/fifo/freeze/readings-approval-D-009.json`, which now holds 39 items.
+
+**Limitations A2, A3, A5 and A9:** "accepted and recorded; not defects".

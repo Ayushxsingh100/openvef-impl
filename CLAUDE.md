@@ -31,6 +31,9 @@ Deviation DEV-002 (Krishika; docs/DEVIATIONS.md): the L555 (5) implementation au
 performed by a different AI model (ChatGPT, OpenAI), not a human. Never call it a human
 independent audit, and never report it done before its report is saved verbatim under
 docs/reviews/.
+Owner decision D-012 (Krishika; docs/ambiguities.md): no runner adapter may be reachable by
+only one fixture's input shape (tests/test_dispatch_shapes.py); A-031 is reversed, and D-009's
+approval of it is withdrawn.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

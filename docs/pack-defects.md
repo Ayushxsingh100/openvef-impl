@@ -39,10 +39,10 @@ they are listed in [fifo-owner-checklist.md](fifo-owner-checklist.md).
 
 | ID | Class | Topic | Fixtures affected now | Interim handling |
 |---|---|---|---|---|
-| PD-01 | I | Halt-signature domains vs M42/M47 signatures | M42, M47 | A-031 (Claude) |
+| PD-01 | I | Halt-signature domains vs M42/M47 signatures | M42, M47 (NOT_IMPLEMENTED), M41 | D-012 (owner; A-031 reversed) |
 | PD-02 | U, R | Change-class vectors: error classes and scope/rule tokens | M48, M50, M54, M58 (NOT_IMPLEMENTED) | A-033 (owner correction + Claude) |
 | PD-03 | I | Exact comparison of four fields vs control-vector expectations with extra keys | M14, M17, M41, M48–M58 | A-032 (Claude) |
-| PD-04 | U | `parser_unit_vector` and the disposition of unit vectors | M36 | A-012 (Claude) |
+| PD-04 | U | `parser_unit_vector` and the disposition of unit vectors | M36 (NOT_IMPLEMENTED) | D-012 (owner) |
 | PD-05 | I | OUTPUT_TRUNCATED: stage-map row order vs evaluation order | P11a | A-001 (owner, Ayush pending) |
 | PD-06 | U, I | Driver-vector parameters: prose predicate, missing widths, output port in a driven vector | M26 (PASS), M27 (NOT_IMPLEMENTED) | A-027, A-038 (Claude; revisited 24 Nov 2026, still blocked) |
 | PD-07 | U | Fixture input shapes and the call under test | most non-response fixtures | A-002, A-012, A-025, A-026, A-028 |
@@ -87,9 +87,10 @@ domains: lower-case component names, and a non-`NONE` error class on a
 trace-integrity signature. The pack does not say whether an out-of-domain signature is
 invalid input, and gives no outcome for one.
 
-**Interim (A-031).** Signatures the ledger builds from halt events enforce the domains;
-ready-made signatures in a descriptor are compared for identity as given. M42 and M47
-pass under this reading.
+M41's `halt_signature` also says `"simulator"` (lower case).
+
+**Interim (D-012; A-031 reversed).** Every signature, supplied or built, must lie in the L185
+domains. M42 and M47 are NOT_IMPLEMENTED for this defect.
 
 **To settle.** Either correct the M42/M47 descriptors to in-domain values, or define the
 outcome for an out-of-domain signature.
@@ -175,8 +176,8 @@ descriptors.
   disposition either: M42 and M47 are `lifecycle_unit_vector` but expect
   `DESIGN_ABORTED_NO_SLOTS_SCORED`.
 
-**Interim (A-012).** The input shape `{source_file, syntax_error}` applies the column
-rule with disposition `CONTROL_EXPECTATION`, on the strength of L177's "protocol".
+**Interim (D-012).** M36 has no adapter and is NOT_IMPLEMENTED; the M36 part of A-012 is
+superseded.
 
 **To settle.**
 - Define `parser_unit_vector`.
@@ -257,6 +258,8 @@ the L139 sentence quoted in PD-05 and the evaluation order.
 - A-025: event kinds map to stage-map rows, ranked by (step, row, file, line).
 - A-026: four run-record forms.
 - A-028: composite inputs run every available stage first.
+- D-012: a shape that only one fixture uses has no adapter. 15 fixtures are NOT_IMPLEMENTED
+  for this reason: M27, M36, M13, M14, M15, M17, M18, M19, M25, M26, M28, M37, M41, P17, R07.
 
 **To settle.** Give an input-shape table: shape, entry stage, field meanings and how
 the supplied outcomes stand in for later stages.

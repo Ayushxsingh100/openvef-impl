@@ -13,32 +13,34 @@ It is a status document: it claims no gate as passed.
   The v1.3.6 baseline files still record their own pre-implementation status (Files 16,
   21, 23 and 32); they are read-only and are not updated by this work.
 - **Not done:** step (5), the independent implementation re-audit. It is **not
-  started**. Under DEV-002 it will be done by a different AI model (ChatGPT, OpenAI), which is
-  not a human independent audit.
+  done**. Under DEV-002 a different AI model audits it, which is not a human independent
+  audit. Krishika states a report (OpenAI GPT-6) was received; it is not saved here yet, and
+  the code changed after it (D-012).
 - **Prohibited:** no LLM or provider call has been made by any code, test or script
   (CLAUDE.md hard rule 5). The LLM-call gate, step (6), is closed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T195537Z`**.
-- Run class `development`; commit `278e9aa`, clean tree; after DEV-001
+Latest evidence run: **`evidence/run-20261124T202333Z`**.
+- Run class `development`; commit `3e92b7d`, clean tree; after DEV-001
   ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
-  The run re-verified all 20 frozen items, the DEV-001 mask files and the 40 D-009 items
+  The run re-verified all 20 frozen items, the DEV-001 mask files and the 39 D-009 items
   against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Every fixture's outcome is identical to the previous run, `run-20261124T195043Z`
-  (commit `875ca7e`). Only the mask hashes changed (D-011).
+- 16 outcomes differ from the previous run, `run-20261124T195537Z` (commit `278e9aa`), all
+  PASS to NOT_IMPLEMENTED under D-012: 14 for A1-1 (M36 and 13 more), and M42 and M47 for
+  A8-1. The other 128 are identical.
 
 | Status | Count | Fixtures |
 |---|---|---|
-| PASS | 139 | 0 provisional; 129 unlabelled, 10 "cleared under DEV-001 (non-independent review saved)" (below) |
+| PASS | 123 | 0 provisional; 114 unlabelled, 9 "cleared under DEV-001 (non-independent review saved)" (below) |
 | FAIL | 0 | — |
-| NOT_IMPLEMENTED | 5 | M27 (A-038, revisited 24 Nov 2026); M48, M50, M54, M58 (A-033: no supporting Protocol sentence) |
+| NOT_IMPLEMENTED | 21 | M27, M36 and 13 more with no adapter for their input shape (D-012: M13, M14, M15, M17, M18, M19, M25, M26, M28, M37, M41, P17, R07); M42, M47 (PD-01, D-012); M48, M50, M54, M58 (A-033: no supporting Protocol sentence) |
 | ERROR | 0 | — |
 | **Total** | **144** | the full mandatory set (File 21: 59 P + 13 R + 72 M) |
 
-**Passes cleared under DEV-001 (10):** P01, P14, P17, P21, P42, M07, M31, M32, M33, M57.
+**Passes cleared under DEV-001 (9):** P01, P14, P21, P42, M07, M31, M32, M33, M57.
 They reach L166 (7)–(11) on the FIFO materials.
 - **Settled by the owner freeze (`a955245`, D-008):** the specification, frozen values,
   RTL, null-export script, `spec_version_sha256`, and readings A-040–A-044.
@@ -46,7 +48,7 @@ They reach L166 (7)–(11) on the FIFO materials.
   non-independent Claude (claude.ai) review, done after DEV-001 was recorded, is saved
   ([review](reviews/claude-mask-review-2026-11-25.md)); the mask is re-frozen under D-011. They
   carry the label "cleared under DEV-001 (non-independent review saved)". **L271 and File 21
-  L32 remain unmet**; the auditor decides whether these 10 can count toward F18.
+  L32 remain unmet**; the auditor decides whether these 9 can count toward F18.
 
 **Readings:** every other Claude-decided reading is approved by Krishika as decided, without
 itemised owner review (D-009). Claude decided them, and Claude recommended the approval. The
@@ -56,8 +58,9 @@ auditor should weigh them with that in mind.
 - File 21: "F18 must fail if any fixture is missing, not materialized, hash-mismatched,
   ambiguous, assigned an outcome not in the normative contract, or produces a different
   stage, error class, diagnostic byte string or terminal disposition".
-- Five fixtures are not run to an outcome, L271 is unmet (DEV-001), and the independent
-  implementation re-audit (L555 (5)) has not started.
+- 21 fixtures are not run to an outcome, L271 is unmet (DEV-001), and the independent
+  implementation re-audit (L555 (5)) is not done: the DEV-002 AI audit report is not saved, and
+  the code changed after it.
 
 ## 2a. Feasibility controls F1–F15, F17 (Protocol §17)
 
@@ -83,7 +86,7 @@ Latest control run: **`evidence/controls-20261124T195210Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T195537Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261124T202333Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -97,7 +100,7 @@ Status is checked against the latest evidence run, `evidence/run-20261124T195537
 | 5 | Per-fixture record: ID, descriptor SHA-256, actual disposition/stage/error class/diagnostic, expected, match | `results.jsonl`: `fixture_id`, `descriptor_sha256`, `actual` (four fields), `expected`, `status` (PASS = match, FAIL = mismatch), `note`; provisional block where applicable | **Met** |
 | 6 | Raw run logs with timestamps | `run.log`: run metadata (with `run_started_utc`), then one line per fixture, each prefixed with an ISO 8601 UTC timestamp in milliseconds (written and flushed as the fixture finishes); `summary.json` `run_finished_utc` | **Met** |
 | 7 | Results files and SHA-256 | `results.jsonl`, with its SHA-256 in `summary.json` `results_sha256`; `summary.json` itself is not hashed inside the run | **Met** for results; the summary's own hash is computable but not recorded |
-| 8 | Every failed/errored/skipped fixture, with reason | `results.jsonl` `note` for every non-PASS; this run has 0 FAIL, 0 ERROR and 5 NOT_IMPLEMENTED (M27, M48, M50, M54, M58), each with its blocking reason | **Met** |
+| 8 | Every failed/errored/skipped fixture, with reason | `results.jsonl` `note` for every non-PASS; this run has 0 FAIL, 0 ERROR and 21 NOT_IMPLEMENTED (listed above), each with its blocking reason | **Met** |
 | 9 | Isolation arrangement for LLM-generated code | artifact containers: no network, read-only root, all capabilities dropped, non-root, noexec tmpfs, limits, wall-clock kill; flags in each run's `artifact_container_flags`; [sandbox.md](sandbox.md); `tests/test_sandbox.py`, `tests/test_broker.py` (D-002, D-002a) | **Met** as built. Whether it is adequate as the security boundary for F16 is for the owners to decide (sandbox.md) |
 
 **Also available to the auditor:**
@@ -128,12 +131,14 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-011, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-012, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
-| Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item. Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
+| Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item; A-031 withdrawn (D-012). Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
-| Draft pack corrections for M27, M48, M50, M54, M58, PD-22 and PD-24: `proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md` (DRAFT; needs a new independent document audit) | owners | PD-02, PD-03, PD-06, PD-22, PD-24, PD-25 |
+| Save the GPT-6 audit report verbatim as docs/reviews/implementation-audit-gpt6-2026-11-25.md | Krishika | DEV-002; D-012 |
+| Input contracts for the 15 single-fixture shapes (PD-07), and the runner rule of D-012 | owners | D-012; PD-04, PD-07 |
+| Draft pack corrections for M27, M36, M42, M47, M48, M50, M54, M58, PD-22 and PD-24: `proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md` (DRAFT; needs a new independent document audit) | owners | PD-02, PD-03, PD-06, PD-22, PD-24, PD-25 |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |
 | TechRxiv preprint: retrieve it, or record its access status; make the Charter and File 10 agree | owners | PD-24 |
 
@@ -142,7 +147,7 @@ this run is on the pinned one.
 | Item | Owner | Reference |
 |---|---|---|
 | Independent human mask reviewer: none available (DEV-001). Signing would end the deviation | owners to appoint if one becomes available; must not have authored the templates or the mask | L271; File 21 "Independent reviewer"; package §G |
-| Independent human implementation auditor: none available (DEV-002). The audit will be performed by a different AI model (ChatGPT, OpenAI); **not yet performed**, and not a human independent audit | owners | L555 (5); [DEVIATIONS.md](DEVIATIONS.md) DEV-002; [AUDIT-BRIEF.md](AUDIT-BRIEF.md) |
+| Independent human implementation auditor: none available (DEV-002). An AI audit (OpenAI GPT-6) was received, as stated by Krishika; **its report is not saved yet**, and the D-012 changes are not re-audited. Not a human independent audit | owners | L555 (5); [DEVIATIONS.md](DEVIATIONS.md) DEV-002; [AUDIT-BRIEF.md](AUDIT-BRIEF.md) |
 
 **Human-written work (reserved by CLAUDE.md; Claude does not write it)**
 

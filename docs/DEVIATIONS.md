@@ -66,8 +66,15 @@ will be performed by a different AI model (ChatGPT, OpenAI), not the implementat
 using dist/openvef-audit-bundle.zip (e0ee23ff…fa01) and docs/AUDIT-BRIEF.md. This is NOT a
 human independent audit".
 
-**Status: the audit has not been performed.** The report will be saved verbatim under
-`docs/reviews/` when received.
+**Status: report received, as stated by Krishika (OpenAI GPT-6, 25 Nov 2026), but not yet
+saved.** Its text was not supplied to Claude Code, so it is not under `docs/reviews/` and
+Claude has not seen it; see the [note](reviews/implementation-audit-gpt6-2026-11-25-NOTE.md),
+which also covers the bundle-hash difference. Step (5) is not marked done.
+
+**Response (D-012):** A1-1 and A8-1 accepted and applied; limitations A2, A3, A5 and A9
+accepted and recorded, not treated as defects. The corrected code has **not** been re-audited.
+A later bundle (with evidence run-20261124T202333Z) replaces the zip in `dist/`; the audited
+zip is in git at `9c89b1c`.
 
 | Audit input | Identity |
 |---|---|
