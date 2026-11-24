@@ -19,15 +19,15 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T195043Z`**.
-- Run class `development`; commit `875ca7e`, clean tree; after DEV-001
+Latest evidence run: **`evidence/run-20261124T195537Z`**.
+- Run class `development`; commit `278e9aa`, clean tree; after DEV-001
   ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
   The run re-verified all 20 frozen items, the DEV-001 mask files and the 40 D-009 items
   against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Every fixture's outcome is identical to the previous run, `run-20261124T194216Z`
-  (commit `578cf11`). Only the mask hashes and the DEV-001 label changed; that run's label is superseded.
+- Every fixture's outcome is identical to the previous run, `run-20261124T195043Z`
+  (commit `875ca7e`). Only the mask hashes changed (D-011).
 
 | Status | Count | Fixtures |
 |---|---|---|
@@ -43,7 +43,7 @@ They reach L166 (7)–(11) on the FIFO materials.
   RTL, null-export script, `spec_version_sha256`, and readings A-040–A-044.
 - **Mask and File 24 table:** accepted by the owner without an independent review. A
   non-independent Claude (claude.ai) review, done after DEV-001 was recorded, is saved
-  ([review](reviews/claude-mask-review-2026-11-25.md)); the mask is re-frozen under D-010. They
+  ([review](reviews/claude-mask-review-2026-11-25.md)); the mask is re-frozen under D-011. They
   carry the label "cleared under DEV-001 (non-independent review saved)". **L271 and File 21
   L32 remain unmet**; the auditor decides whether these 10 can count toward F18.
 
@@ -82,7 +82,7 @@ Latest control run: **`evidence/controls-20261124T195210Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T195043Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261124T195537Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -127,7 +127,7 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-010, DEV-001, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-011, DEV-001, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item. Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
