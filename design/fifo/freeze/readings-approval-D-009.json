@@ -3,7 +3,7 @@
   "status": "Transcribed by Claude (Claude Opus 5.5, via Claude Code) at Krishika's instruction. Claude approved nothing.",
   "basis": "D-009 (Krishika, 24 Nov 2026): every reading decided under the standing delegation and not yet owner-approved (A-007..A-012, A-013 tie, A-015..A-037, A-039, A-045..A-052, F15 case table) is approved by Krishika as decided, without itemised owner review.",
   "label": "approved by Krishika as decided, without itemised owner review (D-009)",
-  "note": "Hashes are the bytes at commit 23e6193, unchanged by D-009. A changed section or file is not covered.",
+  "note": "sha256_as_approved: bytes at commit 23e6193 (approved by D-009). sha256: current bytes after a wording-only cleanup ('owner review pending' -> 'approved under D-009'). An item changed in any other way is not covered.",
   "items": [
     {
       "id": "A-007",
@@ -11,7 +11,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-007",
-          "sha256": "52ed2ea3ef5a7c9d984d8bcc5e04439d6bdbce7c1dade96b2d086c27430a7d33"
+          "sha256": "636e9058b6aa7341348211f3c3b170a466fce2f6345dbcb36625a4ce38c53d4c",
+          "sha256_as_approved": "52ed2ea3ef5a7c9d984d8bcc5e04439d6bdbce7c1dade96b2d086c27430a7d33"
         }
       ]
     },
@@ -21,7 +22,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-008",
-          "sha256": "9e0b534e679d24eb2c3ff25c94aa6ab1abf07ce3a2a295fbf256248cb1d074b7"
+          "sha256": "3f228fd893107d77f428163f4505bb287adbd926c6fefaec4704578c13e0ecbb",
+          "sha256_as_approved": "9e0b534e679d24eb2c3ff25c94aa6ab1abf07ce3a2a295fbf256248cb1d074b7"
         }
       ]
     },
@@ -31,7 +33,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-009",
-          "sha256": "13e1fc9a72305388471c6a45247f3d9ab5005382511cc74084f894c7d754de16"
+          "sha256": "20cdc18b8bdc2f97c70b70fb8dceaecb2ca6c455a957cd1a68305edc01be18de",
+          "sha256_as_approved": "13e1fc9a72305388471c6a45247f3d9ab5005382511cc74084f894c7d754de16"
         }
       ]
     },
@@ -41,7 +44,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-010",
-          "sha256": "d79b2b163e344e9ea043468ee7c97f9aa89fba7d6903d19210f012192cec8b05"
+          "sha256": "408c88f47610f99daf95bdd2947ea2ba27dc416c5af243243d03d8e5b13bc72e",
+          "sha256_as_approved": "d79b2b163e344e9ea043468ee7c97f9aa89fba7d6903d19210f012192cec8b05"
         }
       ]
     },
@@ -51,7 +55,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-011",
-          "sha256": "2bbfb525a2a03878d12c9377d59aad27fbe12cacba910d408cce4125dca0c2ef"
+          "sha256": "20d4982dbad0cf341942fa22499b667188a57e2f2c1f192434d0f10bef148931",
+          "sha256_as_approved": "2bbfb525a2a03878d12c9377d59aad27fbe12cacba910d408cce4125dca0c2ef"
         }
       ]
     },
@@ -61,7 +66,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-012",
-          "sha256": "42dcbeb66b530057de51f660968420f429cf19d79eaf5eb805e224801c011313"
+          "sha256": "442625df3d650d4b7af64585b512b33542ff17e80d6bfa7214b93977f6b6f37c",
+          "sha256_as_approved": "42dcbeb66b530057de51f660968420f429cf19d79eaf5eb805e224801c011313"
         }
       ]
     },
@@ -71,7 +77,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-013",
-          "sha256": "bb170b83148a4ebcdb77f8310038a4e3132bd41a2c575e08c9bc2559d0ed560f"
+          "sha256": "d5903508c9ff609c86d7aaae05077d6f3857aa3175a13c8e95dd299851e43ec2",
+          "sha256_as_approved": "bb170b83148a4ebcdb77f8310038a4e3132bd41a2c575e08c9bc2559d0ed560f"
         }
       ]
     },
@@ -81,7 +88,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-015",
-          "sha256": "63f12414e3fd1ba4090f426c1e1aac8ce22d675f30dff8e8b2e194dc53620374"
+          "sha256": "01049f5d4e1b7f8bd1996ae142506973dd22902949a3c3e7ea210d24f5ad4b4e",
+          "sha256_as_approved": "63f12414e3fd1ba4090f426c1e1aac8ce22d675f30dff8e8b2e194dc53620374"
         }
       ]
     },
@@ -91,7 +99,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-016",
-          "sha256": "4536e9c4e0a2b756de442e0a05b4b0fa40166678cec4b2ee46babfdd5ef55a23"
+          "sha256": "cd1560bd8f7b34631e0352a7fdeccf3c6373882a52a62bc994eac9121446b711",
+          "sha256_as_approved": "4536e9c4e0a2b756de442e0a05b4b0fa40166678cec4b2ee46babfdd5ef55a23"
         }
       ]
     },
@@ -101,7 +110,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-017",
-          "sha256": "64c2c5ce538ff349c69a666815a4149c55e41939eed6eff9057c006167d1a5fd"
+          "sha256": "509a9a73d3fc1d0dc1541816776267348c85fd7141e138780cd374678a993de3",
+          "sha256_as_approved": "64c2c5ce538ff349c69a666815a4149c55e41939eed6eff9057c006167d1a5fd"
         }
       ]
     },
@@ -111,7 +121,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-018",
-          "sha256": "b7878bb6baee3ee28ff434d711807cf9d6704e987413a59e304a15884c54a0f8"
+          "sha256": "15c68e2bd30a0ab1bd5074d24e4fec04ddd7ccadccbd00a8044fe090902fba35",
+          "sha256_as_approved": "b7878bb6baee3ee28ff434d711807cf9d6704e987413a59e304a15884c54a0f8"
         }
       ]
     },
@@ -121,7 +132,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-019",
-          "sha256": "8eb576a32584e58cc988ed9d127d1b06ba7e38151c801d2e1bc2c3b08caf536f"
+          "sha256": "d40169af9e294c08e6a78b20c15844ad3c99edbe2d43033242adae861446483f",
+          "sha256_as_approved": "8eb576a32584e58cc988ed9d127d1b06ba7e38151c801d2e1bc2c3b08caf536f"
         }
       ]
     },
@@ -131,7 +143,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-020",
-          "sha256": "f3352eb4c1258b4131af0953c73b2a15cc38f3d2f07b7e71004aff6ddb474cac"
+          "sha256": "95c92ee6c5797b6a4473990c80bb0205b8069630b2c86de3c1f70e3d789880af",
+          "sha256_as_approved": "f3352eb4c1258b4131af0953c73b2a15cc38f3d2f07b7e71004aff6ddb474cac"
         }
       ]
     },
@@ -141,7 +154,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-021",
-          "sha256": "b4f073178c7af4b8ea1b850eab2dc2269ac96b1a477c570623b8b61eef426176"
+          "sha256": "f2990ae7d5f3d3a8efb1a91c3cadadf8578029a95aecf4c3ac85d8bb925fe027",
+          "sha256_as_approved": "b4f073178c7af4b8ea1b850eab2dc2269ac96b1a477c570623b8b61eef426176"
         }
       ]
     },
@@ -151,7 +165,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-022",
-          "sha256": "f8d5b7a309318e90424e6a90f62b799dcf6c01c73b697db95ecf68261fb9dc13"
+          "sha256": "312dd23d96e714d9399e1fb798196167912fdce15f91702d545b56db4e73a9f1",
+          "sha256_as_approved": "f8d5b7a309318e90424e6a90f62b799dcf6c01c73b697db95ecf68261fb9dc13"
         }
       ]
     },
@@ -161,7 +176,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-023",
-          "sha256": "51a82a2e8d9a68fe3cbbdc1582351f0075da3083f59909baa4143b05f35a1a0f"
+          "sha256": "cd65ce387806c011f1d583a363180ca40cfb11ac9ab572f9669df4b58112b411",
+          "sha256_as_approved": "51a82a2e8d9a68fe3cbbdc1582351f0075da3083f59909baa4143b05f35a1a0f"
         }
       ]
     },
@@ -171,7 +187,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-024",
-          "sha256": "7ee29a5f3d157d71c14c849011acfda9448c5dc95153e79c3302f1c4f979b920"
+          "sha256": "b8e69aa488a362f4833bca7da56cececacec207ab70ddf6c5027d55a1e1dab1b",
+          "sha256_as_approved": "7ee29a5f3d157d71c14c849011acfda9448c5dc95153e79c3302f1c4f979b920"
         }
       ]
     },
@@ -181,7 +198,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-025",
-          "sha256": "8edf27dd7c4192dd607c7d589cf4859b88556db61144f9aa59092df4d5e0367e"
+          "sha256": "00a5f74badccebc395600ab3b9221e77ac3db5f1002b2e71ec51804bd923a2d3",
+          "sha256_as_approved": "8edf27dd7c4192dd607c7d589cf4859b88556db61144f9aa59092df4d5e0367e"
         }
       ]
     },
@@ -191,7 +209,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-026",
-          "sha256": "75d7fdbdd78327c43b45c74d77fe689b564353f443cb88830d8b32979adebcc4"
+          "sha256": "674ca6d82b6e1bf6d9a613677ff4f0a35b0ea515244ac5583a16de71a0b481d9",
+          "sha256_as_approved": "75d7fdbdd78327c43b45c74d77fe689b564353f443cb88830d8b32979adebcc4"
         }
       ]
     },
@@ -201,7 +220,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-027",
-          "sha256": "91a839dc6521590dc28000e97ece697c81db132c87efaed9d2fccc7ede5c8983"
+          "sha256": "8eeb0c7ef59f4a660500327f1cf16df6afcfd8fdc7acdc70eb70b62951ab1cc3",
+          "sha256_as_approved": "91a839dc6521590dc28000e97ece697c81db132c87efaed9d2fccc7ede5c8983"
         }
       ]
     },
@@ -211,7 +231,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-028",
-          "sha256": "18d19435061782a72604a994dd03df538260d32802a8591233e95fcfaef70645"
+          "sha256": "dd7a276d2f62c133b7efd22e320e0a5fc1f1c27918cfac6061a86afb03fcef6c",
+          "sha256_as_approved": "18d19435061782a72604a994dd03df538260d32802a8591233e95fcfaef70645"
         }
       ]
     },
@@ -221,7 +242,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-029",
-          "sha256": "375f15bdec02a7428f7c05f07d41808b53c48ce642da2ce8ec53c82c48480352"
+          "sha256": "bbcf5e38933247f38b17e5b3f117bbef38a82ee8edb7d24cc1152009abfab84d",
+          "sha256_as_approved": "375f15bdec02a7428f7c05f07d41808b53c48ce642da2ce8ec53c82c48480352"
         }
       ]
     },
@@ -231,7 +253,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-030",
-          "sha256": "f97e540119ea89ac9181683f869a1f338b0eba36b846dc0c20cd4ce2de6c06c7"
+          "sha256": "42e379d4219919386c07cdea81b1a692d099927bd55e04c7b164c3beae46cbc5",
+          "sha256_as_approved": "f97e540119ea89ac9181683f869a1f338b0eba36b846dc0c20cd4ce2de6c06c7"
         }
       ]
     },
@@ -241,7 +264,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-031",
-          "sha256": "2a6bf475eaca32a8ded5d227d1d839004c566540e25466e67d56a97fe7dc37db"
+          "sha256": "f4f6ea07bb83da3118533aba380c4d178972f7be97e64f6fe53e4e76a2aabc40",
+          "sha256_as_approved": "2a6bf475eaca32a8ded5d227d1d839004c566540e25466e67d56a97fe7dc37db"
         }
       ]
     },
@@ -251,7 +275,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-032",
-          "sha256": "0cd66cbced8525d683c8bc573c4f56cc0b26da10f32c43a367f7a0d8e20b9a3d"
+          "sha256": "0b9fcdc6d8930f9f8554bb34339be0537814a11ce7b665a6b51dbeb00ae2af85",
+          "sha256_as_approved": "0cd66cbced8525d683c8bc573c4f56cc0b26da10f32c43a367f7a0d8e20b9a3d"
         }
       ]
     },
@@ -261,7 +286,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-033",
-          "sha256": "3db14e4aa2bed72b3a32c31d243283af12d4339df6ec793ee4eccded318dabec"
+          "sha256": "3826d23828fbbe949d19ffb84c20109313a7113cc2dfda69c941e7c981e4a7f2",
+          "sha256_as_approved": "3db14e4aa2bed72b3a32c31d243283af12d4339df6ec793ee4eccded318dabec"
         }
       ]
     },
@@ -271,7 +297,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-034",
-          "sha256": "822e304937c63d1682143ce7aba0507a73970bdbc36f23951045082f2ddd76f7"
+          "sha256": "d04de698e5779c07229e6f311d00305fbac53e73d19818e7409c0717893d7141",
+          "sha256_as_approved": "822e304937c63d1682143ce7aba0507a73970bdbc36f23951045082f2ddd76f7"
         }
       ]
     },
@@ -281,7 +308,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-035",
-          "sha256": "9f70a838ccea17268d2f8f7ba9d4b9919dfa6a1e274de8551e28f9b415a7af7a"
+          "sha256": "d3a74f23c14baf93df06fde6a4f2dc97bbd77ffe688d9b2e7de3fbc04dd81ecd",
+          "sha256_as_approved": "9f70a838ccea17268d2f8f7ba9d4b9919dfa6a1e274de8551e28f9b415a7af7a"
         }
       ]
     },
@@ -291,7 +319,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-036",
-          "sha256": "96e91e42463f4898d93d9ff92d66c2dd253aed82251f31cf46323a262d61f022"
+          "sha256": "820bf21c6d413bd9a1cd0d18e233e73fc634a116d6dcab780c07d4de4d5466b6",
+          "sha256_as_approved": "96e91e42463f4898d93d9ff92d66c2dd253aed82251f31cf46323a262d61f022"
         }
       ]
     },
@@ -301,7 +330,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-037",
-          "sha256": "b4b4538ec7e24e3b65b3d8cacc8ca8b59ef26b7ea8e36de2bb57c473c11cf207"
+          "sha256": "c8960d958b437d465547e1d86be1fb72dea510fe310a7d8d00fb55b939e30730",
+          "sha256_as_approved": "b4b4538ec7e24e3b65b3d8cacc8ca8b59ef26b7ea8e36de2bb57c473c11cf207"
         }
       ]
     },
@@ -311,7 +341,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-039",
-          "sha256": "2ad003bb47ade9ea045e2c41f9a1670da362777a0d8e295199aa995b33bea03e"
+          "sha256": "1d68383412896ea9a143cea8a8065288cf5125a2a42f5067122fc4f19fa2cf9a",
+          "sha256_as_approved": "2ad003bb47ade9ea045e2c41f9a1670da362777a0d8e295199aa995b33bea03e"
         }
       ]
     },
@@ -321,7 +352,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-045",
-          "sha256": "ad7047b269ed2148ccdfa9b53dcf2babfdc7aed84ab399b00172111abf03269a"
+          "sha256": "e9c318e0eaa3cc183cbca746736701bc83dae6fee051d083620d9c453ee4cc7f",
+          "sha256_as_approved": "ad7047b269ed2148ccdfa9b53dcf2babfdc7aed84ab399b00172111abf03269a"
         }
       ]
     },
@@ -331,7 +363,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-046",
-          "sha256": "20f78a17d4c51612797ca0db05d0a9b358b55301ec9be37e3a471a37f3f4006e"
+          "sha256": "3220d6d25a640b90eee4a4586e05eaaccfa53fd680cd2da4a812a3a45717ef30",
+          "sha256_as_approved": "20f78a17d4c51612797ca0db05d0a9b358b55301ec9be37e3a471a37f3f4006e"
         }
       ]
     },
@@ -341,7 +374,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-047",
-          "sha256": "e102283c141838fb5d07b51b64289a4c7da74bfbfda3145db66deacd170d3f34"
+          "sha256": "2737c2c53ef8bf9c0a425a9c06da70a272db60cfc24d55191068e6c55a8421ad",
+          "sha256_as_approved": "e102283c141838fb5d07b51b64289a4c7da74bfbfda3145db66deacd170d3f34"
         }
       ]
     },
@@ -351,7 +385,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-048",
-          "sha256": "576cb1d5c5ef9be732799774c9d650cd76522d006c37987b00742d68292081b6"
+          "sha256": "afec49c20eefb74523a86e4905ba11b3e1751ffe3b6310aa21a1689ccaf2db80",
+          "sha256_as_approved": "576cb1d5c5ef9be732799774c9d650cd76522d006c37987b00742d68292081b6"
         }
       ]
     },
@@ -361,7 +396,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-049",
-          "sha256": "8f3747854c5c80396e1b52583032363aa659983ca9d978d3d574be5115a8218d"
+          "sha256": "484289dd7ae443df7a41355b1d6e4cbcbea13a4a47ac2e835e918e8e889754b8",
+          "sha256_as_approved": "8f3747854c5c80396e1b52583032363aa659983ca9d978d3d574be5115a8218d"
         }
       ]
     },
@@ -371,7 +407,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-050",
-          "sha256": "0ce7dd9fe980d851ecadd80640834afc0503764f8998d81b3f7fadae9d5975ae"
+          "sha256": "59f9aefecbe045f6409cbf42be56718c32e53ebfe3a258904039589724d87edb",
+          "sha256_as_approved": "0ce7dd9fe980d851ecadd80640834afc0503764f8998d81b3f7fadae9d5975ae"
         }
       ]
     },
@@ -381,7 +418,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-051",
-          "sha256": "a6293cfbb3189f11051e0950dd04e6b42d067509705e9dde27463c337fe3e66c"
+          "sha256": "da275ba96fb42e11af7425591c432f72a1e46bad9f7a7e1ca33e6ec045aa2172",
+          "sha256_as_approved": "a6293cfbb3189f11051e0950dd04e6b42d067509705e9dde27463c337fe3e66c"
         }
       ]
     },
@@ -391,7 +429,8 @@
       "refs": [
         {
           "ref": "docs/ambiguities.md#A-052",
-          "sha256": "e337b7a377e7decaeab524a110f492868b7e524510f64d3b83981f0e0c23073a"
+          "sha256": "c5eeee6d75a2733854d31715d30c868cc369358c5f1a6a1a984cf1306830d005",
+          "sha256_as_approved": "e337b7a377e7decaeab524a110f492868b7e524510f64d3b83981f0e0c23073a"
         }
       ]
     },
@@ -401,7 +440,8 @@
       "refs": [
         {
           "ref": "src/openvef/f15.py",
-          "sha256": "3d1ee7714cada226d7b054f49bf8691a682ecb5e0f733794f5028081fc55ccc3"
+          "sha256": "055dc60e3584bbd8ff1a11611c6b3b49b89ce089fcb1eaecaf3015d6404bdff1",
+          "sha256_as_approved": "3d1ee7714cada226d7b054f49bf8691a682ecb5e0f733794f5028081fc55ccc3"
         }
       ]
     }

@@ -56,7 +56,7 @@ class SingleFileTests(unittest.TestCase):
         self.assertEqual(check_source("driver.py", "  x = 1\n").error_class, "SOURCE_SYNTAX_REJECT")
 
     def test_claude_decided_cases(self):
-        # A-008..A-011, decided by Claude under standing delegation (owner review pending).
+        # A-008..A-011, decided by Claude under standing delegation (approved under D-009).
         rej = "SOURCE_SYNTAX_REJECT|file=driver.py|line={}|column={}"
         cases = {
             "\ufeffx = 1\n": rej.format(1, 1),          # A-008: BOM at line 1, column 1

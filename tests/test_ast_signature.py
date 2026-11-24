@@ -55,7 +55,7 @@ class RequiredSymbolTests(unittest.TestCase):
         self.assertEqual(run(driver_with(extra="Driver = None\n")), ep("driver.py", "Driver", "EXTRA_ENTRY_POINT"))
 
     def test_annotation_without_value_is_not_a_binding(self):
-        # A-021 (decided by Claude, owner review pending).
+        # A-021 (decided by Claude, approved under D-009).
         self.assertIsNone(run(driver_with(extra="create_driver: int\n")))
 
     def test_nested_definition_is_not_at_the_required_scope(self):
@@ -88,7 +88,7 @@ class RequiredSymbolTests(unittest.TestCase):
 
 
 class ParameterTests(unittest.TestCase):
-    """A-020 (decided by Claude, owner review pending)."""
+    """A-020 (decided by Claude, approved under D-009)."""
 
     def factory(self, params):
         return run(driver_with(factory=f"def create_driver({params}):"))
@@ -183,7 +183,7 @@ class CategoryTests(unittest.TestCase):
         self.assertEqual(run(driver, CHECKER + "class C:\n    pass\n"), ep("driver.py", "B", "CLASS_FORBIDDEN"))
 
     def test_driver_body_statements(self):
-        # A-022 (decided by Claude, owner review pending).
+        # A-022 (decided by Claude, approved under D-009).
         self.assertIsNone(run(driver_with(class_extra='    """doc"""\n    WIDTH = 8\n    MASKS: tuple = (1, -2)\n')))
         for body in ("    X = f()\n", "    X = Y = [n for n in ()]\n", "    pass\n", "    if True:\n        X = 1\n",
                      "    self.x = 1\n", '    X = 1\n    """late"""\n'):

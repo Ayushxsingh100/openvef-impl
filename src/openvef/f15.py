@@ -1,6 +1,6 @@
 """F15 — classifier, ledger and metric identities (Protocol L524, L529, L405-L411).
 
-Case table: built by Claude as ledger inputs (plan §2, label (a)); owner review pending.
+Case table: built by Claude as ledger inputs (plan §2, label (a)); approved under D-009.
 
 The hand-built cases are ledger inputs, not executable artifacts. Each expected class is
 fixed by the §12 rule text it cites, and each known-answer number is worked by hand from

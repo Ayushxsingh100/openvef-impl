@@ -13,7 +13,7 @@ Implements:
                    column CPython reports.
 
 Readings decided by Claude under the standing delegation (docs/ambiguities.md;
-owner review pending):
+approved under D-009):
   A-008 a leading U+FEFF is the BOM: SOURCE_SYNTAX_REJECT at line 1, column 1.
   A-009 a source that cannot be encoded as UTF-8 (lone surrogates) is invalid UTF-8:
         SOURCE_SYNTAX_REJECT with no position, so line 1, column 1 (A-011 fallback).
@@ -38,7 +38,7 @@ STAGE = "SOURCE_AST"
 FILE_ORDER = ("driver.py", "checker.py")
 BOM_CHAR = "\ufeff"
 
-# A-010 (decided by Claude, owner review pending): Python source whitespace -- space,
+# A-010 (decided by Claude, approved under D-009): Python source whitespace -- space,
 # tab and form feed between tokens (Language Reference 2.1.9) plus the line terminators
 # CR and LF (2.1.2). Other str.isspace() characters (U+000B, U+00A0, U+3000, ...) are
 # not whitespace in Python source; `ast.parse` decides them.

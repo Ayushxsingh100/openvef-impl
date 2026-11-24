@@ -90,7 +90,7 @@ class IdentifierScanTests(unittest.TestCase):
         self.assertEqual(scan("x = 1\r\ncafé = 2\r\n"), "NON_ASCII_IDENTIFIER|file=checker.py|line=2|column=1")
 
     def test_lone_cr_ends_a_line_as_for_ast_parse(self):
-        # A-019, decided by Claude (owner review pending): Python physical lines.
+        # A-019, decided by Claude (approved under D-009): Python physical lines.
         src = "x = 1\rcafé = 2\n"
         self.assertEqual(ast.parse(src).body[1].lineno, 2)
         self.assertEqual(scan(src), "NON_ASCII_IDENTIFIER|file=checker.py|line=2|column=1")
@@ -98,7 +98,7 @@ class IdentifierScanTests(unittest.TestCase):
                          "NON_ASCII_IDENTIFIER|file=checker.py|line=4|column=8")
 
     def test_fstring_identifier_not_scanned_on_311(self):
-        # A-018 (decided by Claude, owner review pending): the rule as written; the AST does
+        # A-018 (decided by Claude, approved under D-009): the rule as written; the AST does
         # contain the non-ASCII Name.
         src = 'x = f"{café}"\n'
         self.assertIn("café", [n.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Name)])
@@ -260,7 +260,7 @@ class ProhibitedNameTests(unittest.TestCase):
         self.assertEqual(self.names("def f():\n    return builtins.len\n"), [])
 
     def test_a016_not_matched(self):
-        # A-016 (decided by Claude, owner review pending): definitions/parameters and __builtins__ are not Name nodes.
+        # A-016 (decided by Claude, approved under D-009): definitions/parameters and __builtins__ are not Name nodes.
         self.assertEqual(self.names("def open():\n    pass\ndef f(eval):\n    return __builtins__.open\n"), [])
 
     def test_source_order_with_keys(self):
@@ -303,7 +303,7 @@ class GlobalRandomTests(unittest.TestCase):
         self.assertEqual(self.uses('import random\ndef f():\n    r = random\n    return r.random(), getattr(random, "random")\n'), [])
 
     def test_a017_syntactic_without_import(self):
-        # A-017 (decided by Claude, owner review pending): matched whether or not `random` is the imported module.
+        # A-017 (decided by Claude, approved under D-009): matched whether or not `random` is the imported module.
         self.assertEqual(self.uses("def f(random):\n    return random.choice\n"), ["GLOBAL_RANDOM_USE|name=random.choice"])
 
     def test_source_order(self):
@@ -373,7 +373,7 @@ class ModuleBodyTests(unittest.TestCase):
         self.assertEqual(self.body("X: int = f()\n"), self.reason(["NON_LITERAL_CONSTANT"]))
 
     def test_a015_decided_cases(self):
-        # A-015, decided by Claude under standing delegation (owner review pending).
+        # A-015, decided by Claude under standing delegation (approved under D-009).
         cases = {
             "MODULE_EXECUTABLE": ("x += 1\n", "pass\n", 'X = 1\n"late string"\n', '"""doc"""\n"""second"""\n',
                                   "global x\n", "nonlocal x\n", "return 1\n", "break\n", "continue\n",
@@ -438,7 +438,7 @@ class CombinedStageTests(unittest.TestCase):
         self.assertEqual(self.stage("x = eval('1')\n"), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=NON_LITERAL_CONSTANT")
 
     def test_equal_key_tie_uses_file30_stage_order(self):
-        # A-013 tie, decided by Claude (owner review pending): module-level policy first.
+        # A-013 tie, decided by Claude (approved under D-009): module-level policy first.
         for src in ("eval\n", "random.seed\n", "builtins.open\n"):
             with self.subTest(src=src):
                 self.assertEqual(self.stage(src), "MODULE_STATEMENT_REJECT|file=driver.py|line=1|reason=MODULE_EXECUTABLE")

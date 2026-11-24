@@ -90,7 +90,7 @@ NON_NORMATIVE = Failure("FEEDBACK_SERIALIZER", "FEEDBACK_SERIALIZER_REJECT",
 
 
 def check_diagnostic(diagnostic: str, emitted: Optional[list[str]] = None) -> Optional[Failure]:
-    """Step (1). A-029 (decided by Claude, owner review pending): when the set of
+    """Step (1). A-029 (decided by Claude, approved under D-009): when the set of
     diagnostics the stage map emitted is supplied, the diagnostic must also be one of
     them ("accepts only a complete diagnostic emitted by the authoritative stage map")."""
     if not in_grammar(diagnostic) or (emitted is not None and diagnostic not in emitted):

@@ -83,7 +83,7 @@ class FreezeRecordTests(unittest.TestCase):
         done = {i["id"] for i in self.record["items"]}
         provisional, cleared = self.stages.open_reasons(done, self.deviation())
         self.assertEqual(provisional, [])
-        self.assertEqual([c["label"] for c in cleared], ["cleared under DEV-001 (non-independent mask review)"])
+        self.assertEqual([c["label"] for c in cleared], ["cleared under DEV-001 — review pending"])
         provisional, cleared = self.stages.open_reasons(set(), self.deviation())
         self.assertEqual((len(provisional), len(cleared)), (5, 1))
 
@@ -104,6 +104,18 @@ class FreezeRecordTests(unittest.TestCase):
         v = self.freeze.verify(REPO, self.freeze.load(REPO, self.stages.READINGS_RECORD))
         self.assertEqual(v["changed"], [])
         self.assertEqual(len(v["frozen"]), 40)  # 7 + 23 + 1 + 8 readings and the F15 case table
+
+    def test_d009_cleanup_was_wording_only(self):
+        import hashlib
+        record = self.freeze.load(REPO, self.stages.READINGS_RECORD)
+        for item in record["items"]:
+            for r in item["refs"]:
+                path, _, ident = r["ref"].partition("#")
+                text = (self.freeze.section_text(REPO / path, ident) if ident
+                        else (REPO / path).read_text(encoding="utf-8"))
+                undone = re.sub(r"approved(\s+)under(\s+)D-009", r"owner\1review\2pending", text)
+                with self.subTest(item["id"]):
+                    self.assertEqual(hashlib.sha256(undone.encode("utf-8")).hexdigest(), r["sha256_as_approved"])
 
 
 if __name__ == "__main__":

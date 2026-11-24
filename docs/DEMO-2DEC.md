@@ -50,9 +50,9 @@ artifacts**.
 **What to say about these numbers:**
 - **F18 is not passed.**
 - **No pass is marked provisional, but 10 of the 139 carry a label:** "cleared under
-  DEV-001 (non-independent mask review)". No independent mask reviewer is available, so
-  Krishika accepted the mask on the basis of Claude's review. Claude also drafted the
-  mask. The Protocol's independent signature (L271) is still missing.
+  DEV-001 — review pending". No independent mask reviewer is available, so Krishika
+  accepted the mask. Claude drafted it, and the Claude (claude.ai) review that was meant to
+  support the acceptance had not been done at the time; it is still pending. The Protocol's independent signature (L271) is still missing.
 - **Many passes rest on readings of ambiguous pack text.** Claude decided them under a
   delegation. Krishika approved them as decided, without itemised owner review (D-009).
   They are listed in `docs/READINGS-REVIEW.md`; M36, R01–R13 and several M-fixtures would

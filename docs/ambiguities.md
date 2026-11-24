@@ -13,8 +13,9 @@ them counts toward F18.
 
 **Update, 24 Nov 2026:** A-038 and A-040–A-044 were approved in the owner freeze, and
 D-009 (end of this file) approves every other Claude-decided reading, as decided, without
-itemised owner review. The headings and text of the individual items keep their original
-wording ("owner review pending"), because the approvals are bound to their hashes.
+itemised owner review; those items now read "approved under D-009". A-038 and A-040–A-044
+keep the wording "owner review pending": the signed freeze covers their exact bytes, so
+they are not edited. They are approved.
 
 ## A-001 — OUTPUT_TRUNCATED versus envelope rejection (DECIDED — Ayush's confirmation pending)
 
@@ -127,7 +128,7 @@ counts (needs ≥ 11 assumptions or dependencies items). No current fixture exer
 **Decision:** the two rules stay as implemented: schema-error pointers sort tokens by
 Unicode code point (reading (a)); clause-ID rejection uses the lowest numeric index. Source: statement typed by Krishika in claude.ai on 23 Nov 2026 at 21:24 IST, naming Krishika and Ayush Kumar Singh. Ayush's own confirmation is pending.
 
-## A-007 — SOURCE_AST order across files: per file, or by stage-map row (DECIDED BY CLAUDE — owner review pending)
+## A-007 — SOURCE_AST order across files: per file, or by stage-map row (DECIDED BY CLAUDE — approved under D-009)
 
 - File 30 §3 L27: "For file-local stages, process each source file in this order: strict
   UTF-8 decode with BOM rejection; empty/whitespace-only rejection; `ast.parse`; …"
@@ -144,9 +145,9 @@ when `driver.py` is empty and `checker.py` has a syntax error: (a) gives
 Within one file, empty and syntax-error cannot both apply (whitespace-only source
 parses). No fixture covers the cross-file case; M16 (both empty) agrees with both.
 
-**Decision (decided by Claude under standing delegation, owner review pending):** reading (a), as implemented (unit test `test_driver_checked_before_checker`). Reason: File 30 §3 L27 is the only text that orders checks *within* a file, and it says to "process each source file in this order", i.e. complete one file before the next; Protocol step (2) also names the file order. The stage-map sentence chooses among rows *after* the evaluation order, so it does not reorder the per-file sequence.
+**Decision (decided by Claude under standing delegation, approved under D-009):** reading (a), as implemented (unit test `test_driver_checked_before_checker`). Reason: File 30 §3 L27 is the only text that orders checks *within* a file, and it says to "process each source file in this order", i.e. complete one file before the next; Protocol step (2) also names the file order. The stage-map sentence chooses among rows *after* the evaluation order, so it does not reorder the per-file sequence.
 
-## A-008 — U+FEFF at the start of a source string (DECIDED BY CLAUDE — owner review pending)
+## A-008 — U+FEFF at the start of a source string (DECIDED BY CLAUDE — approved under D-009)
 
 Stage map: "Invalid UTF-8/BOM or syntax parse error" → `SOURCE_SYNTAX_REJECT`; File 30 §3
 L27: "strict UTF-8 decode with BOM rejection". The source arrives as a JSON string, not
@@ -158,18 +159,18 @@ and `ast.parse` decides (on 3.11.18 it raises SyntaxError "invalid non-printable
 character U+FEFF", line 1, offset 1, so `…|line=1|column=1`); (c) strip it as Python
 does when reading a UTF-8-SIG file — excluded by "BOM rejection". (a) and (b) both
 reject; they can differ only in the line/column, which the pack does not give for (a).
-**Decision (decided by Claude under standing delegation, owner review pending):** a leading U+FEFF is rejected as the BOM, before the empty check: `SOURCE_SYNTAX_REJECT|file=<FILE>|line=1|column=1`. Reason: File 30 §3 L27 requires "BOM rejection" as part of the first step, and File 30 §1 forbids silently normalizing source code, which excludes (c). Readings (a) and (b) both reject; the only open point was the position, and a BOM is at line 1, column 1 by any count, which is also what `ast.parse` reports under (b). U+FEFF later in the source is still left to `ast.parse`. Unit test `test_claude_decided_cases`.
+**Decision (decided by Claude under standing delegation, approved under D-009):** a leading U+FEFF is rejected as the BOM, before the empty check: `SOURCE_SYNTAX_REJECT|file=<FILE>|line=1|column=1`. Reason: File 30 §3 L27 requires "BOM rejection" as part of the first step, and File 30 §1 forbids silently normalizing source code, which excludes (c). Readings (a) and (b) both reject; the only open point was the position, and a BOM is at line 1, column 1 by any count, which is also what `ast.parse` reports under (b). U+FEFF later in the source is still left to `ast.parse`. Unit test `test_claude_decided_cases`.
 
-## A-009 — Source string that is not valid UTF-8 (DECIDED BY CLAUDE — owner review pending)
+## A-009 — Source string that is not valid UTF-8 (DECIDED BY CLAUDE — approved under D-009)
 
 JSON `\ud800` escapes decode to lone surrogates, which cannot be encoded as UTF-8.
 `ast.parse` on 3.11.18 raises `UnicodeEncodeError`, not SyntaxError. The stage map
 puts this under "Invalid UTF-8 …" → `SOURCE_SYNTAX_REJECT|file=<FILE>|line=<LINE>|
 column=<COLUMN>` but says nothing about the line or column. (Raw input of this kind
 also passes PARSE_SCHEMA: Python's `json` accepts lone-surrogate escapes.)
-**Decision (decided by Claude under standing delegation, owner review pending):** `SOURCE_SYNTAX_REJECT|file=<FILE>|line=1|column=1`. Reason: the stage map assigns invalid UTF-8 to `SOURCE_SYNTAX_REJECT` at SOURCE_AST, so it is not moved to PARSE_SCHEMA (the response bytes themselves are valid UTF-8; File 30 §1's "Reject invalid UTF-8" applies to them). CPython reports no position for this failure, and the only position rule the pack gives for a missing position is the column rule's "absent … emit `column=1`"; line 1 is the same fallback (A-011). Competing reading not taken: report the line/column of the first lone surrogate — more informative, but no text defines it, and it is not "reported by CPython".
+**Decision (decided by Claude under standing delegation, approved under D-009):** `SOURCE_SYNTAX_REJECT|file=<FILE>|line=1|column=1`. Reason: the stage map assigns invalid UTF-8 to `SOURCE_SYNTAX_REJECT` at SOURCE_AST, so it is not moved to PARSE_SCHEMA (the response bytes themselves are valid UTF-8; File 30 §1's "Reject invalid UTF-8" applies to them). CPython reports no position for this failure, and the only position rule the pack gives for a missing position is the column rule's "absent … emit `column=1`"; line 1 is the same fallback (A-011). Competing reading not taken: report the line/column of the first lone surrogate — more informative, but no text defines it, and it is not "reported by CPython".
 
-## A-010 — Which characters count as whitespace for SOURCE_EMPTY (DECIDED BY CLAUDE — owner review pending)
+## A-010 — Which characters count as whitespace for SOURCE_EMPTY (DECIDED BY CLAUDE — approved under D-009)
 
 Stage map: "Empty/whitespace-only source". The pack does not define whitespace.
 Readings: (a) JSON whitespace (space, tab, LF, CR); (b) `str.isspace()`, which adds
@@ -179,9 +180,9 @@ What changes: a source of only U+000C parses on 3.11.18 (empty module, so it pas
 SOURCE_AST under (a)), but is SOURCE_EMPTY under (b) and (c); U+000B or U+00A0 alone is
 `SOURCE_SYNTAX_REJECT|…|line=1|column=1` under (a)/(c) but SOURCE_EMPTY under (b).
 
-**Decision (decided by Claude under standing delegation, owner review pending):** reading (c), Python source whitespace: space, tab, form feed, CR and LF (Python Language Reference 2.1.2 line terminators and 2.1.9 whitespace between tokens). A source made only of these is SOURCE_EMPTY; any other character, including U+000B, U+00A0 and U+3000, goes to `ast.parse` (on 3.11.18 those give `SOURCE_SYNTAX_REJECT`). Reason: the check is on Python source, inside a stage whose authority on source is CPython 3.11; JSON whitespace (a) belongs to the response envelope, and `str.isspace()` (b) would call "empty" sources that Python itself rejects as invalid characters. A comment-only source is still not empty. Unit test `test_claude_decided_cases`.
+**Decision (decided by Claude under standing delegation, approved under D-009):** reading (c), Python source whitespace: space, tab, form feed, CR and LF (Python Language Reference 2.1.2 line terminators and 2.1.9 whitespace between tokens). A source made only of these is SOURCE_EMPTY; any other character, including U+000B, U+00A0 and U+3000, goes to `ast.parse` (on 3.11.18 those give `SOURCE_SYNTAX_REJECT`). Reason: the check is on Python source, inside a stage whose authority on source is CPython 3.11; JSON whitespace (a) belongs to the response envelope, and `str.isspace()` (b) would call "empty" sources that Python itself rejects as invalid characters. A comment-only source is still not empty. Unit test `test_claude_decided_cases`.
 
-## A-011 — SyntaxError with no usable line, or another exception from ast.parse (DECIDED BY CLAUDE — owner review pending)
+## A-011 — SyntaxError with no usable line, or another exception from ast.parse (DECIDED BY CLAUDE — approved under D-009)
 
 The column rule covers a missing offset ("If `offset` is absent, null or less than 1,
 emit `column=1`") but nothing covers a missing or non-positive `lineno`, although
@@ -189,7 +190,7 @@ emit `column=1`") but nothing covers a missing or non-positive `lineno`, althoug
 gives SyntaxError "source code string cannot contain null bytes" with `lineno=None`.
 `ast.parse` may also raise exceptions that are not SyntaxError (e.g. `RecursionError`,
 `MemoryError`, `UnicodeEncodeError` — see A-009); the stage map does not say whether
-these are "syntax parse error". **Decision (decided by Claude under standing delegation, owner review pending):** a SyntaxError whose `lineno` is missing or less than 1 uses `line=1`, and its column follows the column rule as usual; any other exception from `ast.parse` (e.g. `MemoryError`, which 3.11.18 raises for very deep nesting such as 200,000 unary minus signs) is a syntax parse error with `line=1|column=1`. Reason: `LINE` must be a positive integer and the pack's only rule for a missing position is "If `offset` is absent, null or less than 1, emit `column=1`"; line 1 applies the same fallback. "Syntax parse error" in the stage map is read as "`ast.parse` did not produce a tree". Competing reading not taken for NUL bytes: report the line of the first NUL — not given by CPython or the text. Unit tests `test_claude_decided_cases`, `test_non_syntax_error_from_parse_is_line_1_column_1`.
+these are "syntax parse error". **Decision (decided by Claude under standing delegation, approved under D-009):** a SyntaxError whose `lineno` is missing or less than 1 uses `line=1`, and its column follows the column rule as usual; any other exception from `ast.parse` (e.g. `MemoryError`, which 3.11.18 raises for very deep nesting such as 200,000 unary minus signs) is a syntax parse error with `line=1|column=1`. Reason: `LINE` must be a positive integer and the pack's only rule for a missing position is "If `offset` is absent, null or less than 1, emit `column=1`"; line 1 applies the same fallback. "Syntax parse error" in the stage map is read as "`ast.parse` did not produce a tree". Competing reading not taken for NUL bytes: report the line of the first NUL — not given by CPython or the text. Unit tests `test_claude_decided_cases`, `test_non_syntax_error_from_parse_is_line_1_column_1`.
 
 Related observation (no change): the column rule says to emit "the positive one-based
 source-character column reported by CPython". On 3.11.18 `ast.parse` of a `str` reports
@@ -198,16 +199,16 @@ byte column — unit test `test_column_counts_characters_not_utf8_bytes`). Warni
 `ast.parse` (e.g. invalid escape sequences) are not failures; the runner must not be
 started with `-W error`, which would turn them into SyntaxError.
 
-## A-012 — Runner adapters for source-pair inputs and the M36 unit vector (DECIDED BY CLAUDE — owner review pending)
+## A-012 — Runner adapters for source-pair inputs and the M36 unit vector (DECIDED BY CLAUDE — approved under D-009)
 
 A-002's decision covers `response_object` only. Two more input shapes reach SOURCE_AST.
 
 **`{driver_source, checker_source}` (M16, M29) — PROVISIONAL.** Implemented: run
-**Decision (decided by Claude under standing delegation, owner review pending):** SOURCE_AST directly on the two strings (no envelope, schema or clause-ID step), then
+**Decision (decided by Claude under standing delegation, approved under D-009):** SOURCE_AST directly on the two strings (no envelope, schema or clause-ID step), then
 continue with later stages. Alternative: wrap them in a full response object first —
 the pack gives no wrapper, so this would need one.
 
-**Decision on the source pair (decided by Claude under standing delegation, owner review pending):** as implemented. Reason: the pack defines no wrapper, and inventing one would add text the pack does not contain; the input holds exactly the two strings that Protocol step (2) begins with.
+**Decision on the source pair (decided by Claude under standing delegation, approved under D-009):** as implemented. Reason: the pack defines no wrapper, and inventing one would add text the pack does not contain; the input holds exactly the two strings that Protocol step (2) begins with.
 
 **`{source_file, syntax_error: {lineno, offset}}` with `fixture_class:
 "parser_unit_vector"` (M36) — OPEN; M36 is NOT_IMPLEMENTED.**
@@ -241,11 +242,11 @@ Readings for the owners: (a) unit vectors of any class have disposition
 `parser_unit_vector`); (b) for unit vectors the runner compares stage, error class and
 diagnostic only, and records the disposition label without comparing it (would change
 Catalog requirement 2's "single exact expected disposition/stage/error/diagnostic");
-**Decision (decided by Claude under standing delegation, owner review pending):** (c) the pack is corrected so M36's class and disposition are defined.
+**Decision (decided by Claude under standing delegation, approved under D-009):** (c) the pack is corrected so M36's class and disposition are defined.
 
-**Decision on M36 (decided by Claude under standing delegation, owner review pending):** an input of shape `{source_file, syntax_error: {lineno, offset}}` applies the column rule (`syntax_reject`) and has disposition `CONTROL_EXPECTATION`. Reason: such an input is a SyntaxError position, not a model response, so it is not an artifact feedback event; it exercises a protocol rule (Protocol §3.4 column rule) directly, and Protocol L177 defines `CONTROL_EXPECTATION` as a fixture that "exercises a serializer, protocol or lifecycle rule". This is a variant of (a) that rests on L177's "protocol" rather than on a definition of `parser_unit_vector`. The rule is keyed on the input shape, never on `fixture_class`: checked against the pack, `fixture_class` does not determine disposition (two `lifecycle_unit_vector` descriptors are not `CONTROL_EXPECTATION`, and `f18_packet_fixture` descriptors are `F18_REJECT`), so a rule keyed on the class label would contradict the pack. The adapter accepts only `driver.py`/`checker.py`, a positive integer `lineno` and an integer-or-null `offset`; anything else is NOT_IMPLEMENTED. **Effect:** M36 moves from NOT_IMPLEMENTED to PASS. This is the one decision in this batch that changes a fixture result, so it should be the first one the owners review. Reading (c) remains open to the owners as a pack correction.
+**Decision on M36 (decided by Claude under standing delegation, approved under D-009):** an input of shape `{source_file, syntax_error: {lineno, offset}}` applies the column rule (`syntax_reject`) and has disposition `CONTROL_EXPECTATION`. Reason: such an input is a SyntaxError position, not a model response, so it is not an artifact feedback event; it exercises a protocol rule (Protocol §3.4 column rule) directly, and Protocol L177 defines `CONTROL_EXPECTATION` as a fixture that "exercises a serializer, protocol or lifecycle rule". This is a variant of (a) that rests on L177's "protocol" rather than on a definition of `parser_unit_vector`. The rule is keyed on the input shape, never on `fixture_class`: checked against the pack, `fixture_class` does not determine disposition (two `lifecycle_unit_vector` descriptors are not `CONTROL_EXPECTATION`, and `f18_packet_fixture` descriptors are `F18_REJECT`), so a rule keyed on the class label would contradict the pack. The adapter accepts only `driver.py`/`checker.py`, a positive integer `lineno` and an integer-or-null `offset`; anything else is NOT_IMPLEMENTED. **Effect:** M36 moves from NOT_IMPLEMENTED to PASS. This is the one decision in this batch that changes a fixture result, so it should be the first one the owners review. Reading (c) remains open to the owners as a pack correction.
 
-## A-013 — Order of IMPORT_POLICY categories within one file (DECIDED — Ayush's confirmation pending; tie case DECIDED BY CLAUDE — owner review pending)
+## A-013 — Order of IMPORT_POLICY categories within one file (DECIDED — Ayush's confirmation pending; tie case DECIDED BY CLAUDE — approved under D-009)
 
 - File 30 §3 L27 (per-file stage list): "`ast.parse`; module-level AST policy;
   import/prohibited-name policy; compilation; …"
@@ -295,9 +296,9 @@ the smallest key. A bare module-level `eval` or `random.seed` statement is an `E
 node and a `Name`/`Attribute` node with identical spans (CPython 3.11.18:
 `(1, 0, 1, 4)` for both), so "first violation wins" does not choose between
 `MODULE_EXECUTABLE` and `PROHIBITED_BUILTIN`/`GLOBAL_RANDOM_USE`. Implemented: such a
-**Decision (decided by Claude under standing delegation, owner review pending):** tie raised `UnsettledSpec("A-013")`. No current fixture has a tie.
+**Decision (decided by Claude under standing delegation, approved under D-009):** tie raised `UnsettledSpec("A-013")`. No current fixture has a tie.
 
-**Decision on the tie (decided by Claude under standing delegation, owner review pending):** equal keys are ordered by File 30 §3 L27's stage list — "module-level AST policy; import/prohibited-name policy" — so a module-body finding wins, then an import finding, then a prohibited name, then `random` use (File 30 §2 L20 follows L19). A bare module-level `eval`, `random.seed` or `builtins.open` statement is therefore `MODULE_STATEMENT_REJECT|…|reason=MODULE_EXECUTABLE`. Reason: L27's list is the only text that ranks the categories, and the node-order sentence that reading (c) applies is exhausted by the tie. Pre-order traversal (the statement before its child) gives the same answer. Unit test `test_equal_key_tie_uses_file30_stage_order`.
+**Decision on the tie (decided by Claude under standing delegation, approved under D-009):** equal keys are ordered by File 30 §3 L27's stage list — "module-level AST policy; import/prohibited-name policy" — so a module-body finding wins, then an import finding, then a prohibited name, then `random` use (File 30 §2 L20 follows L19). A bare module-level `eval`, `random.seed` or `builtins.open` statement is therefore `MODULE_STATEMENT_REJECT|…|reason=MODULE_EXECUTABLE`. Reason: L27's list is the only text that ranks the categories, and the node-order sentence that reading (c) applies is exhausted by the tie. Pre-order traversal (the statement before its child) gives the same answer. Unit test `test_equal_key_tie_uses_file30_stage_order`.
 
 ## A-014 — Order between PROHIBITED_BUILTIN and GLOBAL_RANDOM_USE (DECIDED — Ayush's confirmation pending)
 
@@ -318,7 +319,7 @@ No current fixture has both.
 
 **Decision:** reading (c), the single source-order pass of A-013. Source: statement typed by Krishika in Claude Code on 23 Nov 2026: "I, Krishika, decide A-013 and A-014 as reading (c): single source-order pass, first violation wins. Ayush's confirmation is pending."
 
-## A-015 — Module-body statements the text does not classify (DECIDED BY CLAUDE — owner review pending; case 2 REVISED BY OWNER — Ayush's confirmation pending)
+## A-015 — Module-body statements the text does not classify (DECIDED BY CLAUDE — approved under D-009; case 2 REVISED BY OWNER — Ayush's confirmation pending)
 
 Protocol §3.4 (file 02 L135): "At module scope, allow only permitted imports, one
 optional docstring expression, … and assignments/annotated assignments whose values are
@@ -364,9 +365,9 @@ expression statement that is not the first-statement string docstring, including
 `MODULE_CONTROL_FLOW` (`try`); tuple/list/starred unpacking targets made only of names
 count as assignments.
 
-**Decision (decided by Claude under standing delegation, owner review pending):** No current fixture uses any unsettled case (P28, M04a, M04b and M57 do not).
+**Decision (decided by Claude under standing delegation, approved under D-009):** No current fixture uses any unsettled case (P28, M04a, M04b and M57 do not).
 
-**Decision (decided by Claude under standing delegation, owner review pending):** Reasons, from L135/L29: the allowed list ("allow only …") is exhaustive; `MODULE_CONTROL_FLOW` covers only the statements it names; "assignments/annotated assignments" are read as `ast.Assign`/`ast.AnnAssign` (the section names AST node types throughout); the literal test is on "values"; and "calls" are named as `MODULE_EXECUTABLE`.
+**Decision (decided by Claude under standing delegation, approved under D-009):** Reasons, from L135/L29: the allowed list ("allow only …") is exhaustive; `MODULE_CONTROL_FLOW` covers only the statements it names; "assignments/annotated assignments" are read as `ast.Assign`/`ast.AnnAssign` (the section names AST node types throughout); the literal test is on "values"; and "calls" are named as `MODULE_EXECUTABLE`.
 
 | Case | Outcome |
 |---|---|
@@ -399,7 +400,7 @@ Detail decided by Claude under the delegation: the target check comes before the
 
 Unit tests `test_a015_decided_cases`, `test_attribute_target_is_executable_in_stage`. No current fixture has an attribute or subscript target, so no fixture result changes.
 
-## A-016 — Prohibited-name rule: definitions, parameters and `builtins` (DECIDED BY CLAUDE — owner review pending)
+## A-016 — Prohibited-name rule: definitions, parameters and `builtins` (DECIDED BY CLAUDE — approved under D-009)
 
 File 30 §2 L19: "AST `Name` nodes whose `id` is `__import__`, `eval`, `exec`, `compile`
 or `open` are rejected, regardless of call context. A `builtins` attribute whose
@@ -412,9 +413,9 @@ otherwise deferred to AST_SIGNATURE. (2) `import builtins` followed by `builtins
 `IMPORT_NOT_ALLOWED|module=builtins` or `PROHIBITED_BUILTIN|name=open` (same as A-013).
 (3) "A `builtins` attribute" — is it only `Attribute(value=Name("builtins"))`, or also
 e.g. `__builtins__.open`? M24 (`builtins.open` with no import) expects
-`PROHIBITED_BUILTIN|name=open`, consistent with the first form. **Decision (decided by Claude under standing delegation, owner review pending):** the planned implementation: `ast.Name` nodes in any context, and `Attribute(value=Name(id="builtins"))` only; (1) and `__builtins__` are not flagged; (2) is settled by A-013 reading (c) (the import comes first in source order, so `IMPORT_NOT_ALLOWED|module=builtins`). Reasons: the text says "AST `Name` nodes" and "`builtins.<name>`"; File 30 §3 says IMPORT_POLICY "never rejects or classifies a function/class definition", which excludes flagging `def open`; parameter names are `ast.arg`, not `ast.Name`.
+`PROHIBITED_BUILTIN|name=open`, consistent with the first form. **Decision (decided by Claude under standing delegation, approved under D-009):** the planned implementation: `ast.Name` nodes in any context, and `Attribute(value=Name(id="builtins"))` only; (1) and `__builtins__` are not flagged; (2) is settled by A-013 reading (c) (the import comes first in source order, so `IMPORT_NOT_ALLOWED|module=builtins`). Reasons: the text says "AST `Name` nodes" and "`builtins.<name>`"; File 30 §3 says IMPORT_POLICY "never rejects or classifies a function/class definition", which excludes flagging `def open`; parameter names are `ast.arg`, not `ast.Name`.
 
-## A-017 — `random.<attribute>` when `random` is not the imported module (DECIDED BY CLAUDE — owner review pending)
+## A-017 — `random.<attribute>` when `random` is not the imported module (DECIDED BY CLAUDE — approved under D-009)
 
 File 30 §2 L20: "Any direct attribute access on the module name `random` other than
 `random.Random` is rejected". Protocol §3.4 (file 02 L133): "direct `random.<attribute>`
@@ -422,10 +423,10 @@ use other than `random.Random` emits `GLOBAL_RANDOM_USE`."
 
 Unsettled: whether the check is purely syntactic (`Attribute(value=Name(id="random"))`
 anywhere) or applies only when `random` is the imported module — e.g. a parameter named
-`random`, or a file without `import random`. **Decision (decided by Claude under standing delegation, owner review pending):** M09, M22, M23 all `import random` and use
+`random`, or a file without `import random`. **Decision (decided by Claude under standing delegation, approved under D-009):** M09, M22, M23 all `import random` and use
 it inside a method, so both readings pass them. Syntactic, as planned. Reason: the text says "the module name `random`" and "direct `random.<attribute>`", and calls the check static, saying outright that aliasing and `getattr` are not detected; binding analysis would go beyond what it describes.
 
-## A-018 — Non-ASCII identifiers inside f-string replacement fields (DECIDED BY CLAUDE — owner review pending)
+## A-018 — Non-ASCII identifiers inside f-string replacement fields (DECIDED BY CLAUDE — approved under D-009)
 
 File 30 §2 L21: "Every Python identifier lexeme must be ASCII. … Unicode in STRING and
 COMMENT tokens is permitted." Protocol §3.4 (file 02 L133): "STRING and COMMENT tokens
@@ -445,21 +446,21 @@ behaviour.
 Readings: (a) literal text — the scan covers tokens only, so f-string identifiers pass;
 (b) "Every Python identifier lexeme must be ASCII" governs, so the scan must also check
 `ast.Name`/`ast.Attribute` nodes inside `ast.JoinedStr` (the text gives no column rule
-for that). **Decision (decided by Claude under standing delegation, owner review pending):** No current fixture uses an f-string with a non-ASCII identifier.
+for that). **Decision (decided by Claude under standing delegation, approved under D-009):** No current fixture uses an f-string with a non-ASCII identifier.
 Reading (a), as implemented. Reason: the operative rule is a token procedure pinned to CPython 3.11 ("scan `tokenize.NAME` and identifier-relevant `tokenize.ERRORTOKEN` tokens", "STRING and COMMENT tokens are not scanned"), and (b) would need a column rule the text does not give. The 3.11-specific gap should be disclosed alongside the alias limitation in File 30 §2 L20.
 
-## A-019 — Line breaks for the identifier scan: lone CR (DECIDED BY CLAUDE — owner review pending)
+## A-019 — Line breaks for the identifier scan: lone CR (DECIDED BY CLAUDE — approved under D-009)
 
 File 30 §2 L21 / Protocol §3.4 (file 02 L133): the column is computed "from the UTF-8
 byte length of the source-line prefix"; the pack does not define a source line. Probe
 on CPython 3.11.18: for `"x = 1\ry = 2\n"`, `ast.parse` puts `y = 2` on line 2, but
 `tokenize.generate_tokens` over the same string treats the lone CR as an `ERRORTOKEN`
 and reports `y` on line 1. A non-ASCII identifier after a lone CR would therefore get a
-line number that disagrees with the AST. CRLF is consistent in both. **Decision (decided by Claude under standing delegation, owner review pending):** Formerly a lone CR raised `UnsettledSpec("A-019")`. No current fixture contains a lone CR.
+line number that disagrees with the AST. CRLF is consistent in both. **Decision (decided by Claude under standing delegation, approved under D-009):** Formerly a lone CR raised `UnsettledSpec("A-019")`. No current fixture contains a lone CR.
 
-**Decision (decided by Claude under standing delegation, owner review pending):** a source line is a Python physical line, ended by LF, CRLF or a lone CR (Language Reference 2.1.2), which is how `ast.parse` counts lines on 3.11.18. The scanner tokenizes a copy in which each lone CR is replaced by LF; one character replaces one at a line end, so every line prefix and every UTF-8 byte column is unchanged. The source itself is not changed. Reason: the diagnostic's `line` must agree with the AST the rest of the stage uses, and CPython's own compiler translates a lone CR to a newline (so a raw CR inside a quoted string is already a syntax error at SOURCE_AST). Unit test `test_lone_cr_ends_a_line_as_for_ast_parse`.
+**Decision (decided by Claude under standing delegation, approved under D-009):** a source line is a Python physical line, ended by LF, CRLF or a lone CR (Language Reference 2.1.2), which is how `ast.parse` counts lines on 3.11.18. The scanner tokenizes a copy in which each lone CR is replaced by LF; one character replaces one at a line end, so every line prefix and every UTF-8 byte column is unchanged. The source itself is not changed. Reason: the diagnostic's `line` must agree with the AST the rest of the stage uses, and CPython's own compiler translates a lone CR to a newline (so a raw CR inside a quoted string is already a syntax error at SOURCE_AST). Unit test `test_lone_cr_ends_a_line_as_for_ast_parse`.
 
-## A-020 — What PARAMETER_NAMES, PARAMETER_KIND and DEFAULT_OR_VARIADIC each cover (DECIDED BY CLAUDE — owner review pending)
+## A-020 — What PARAMETER_NAMES, PARAMETER_KIND and DEFAULT_OR_VARIADIC each cover (DECIDED BY CLAUDE — approved under D-009)
 
 Protocol §3.4 (file 02 L164): "exactly one binding of the required kind proceeds to
 parameter checks in the order `PARAMETER_NAMES`, `PARAMETER_KIND`, then
@@ -476,7 +477,7 @@ create_driver(seed, *args)` is `DEFAULT_OR_VARIADIC` under (a) but `PARAMETER_NA
 under (b); `def create_driver(*, seed)` is `PARAMETER_NAMES` under (a) but
 `PARAMETER_KIND` under (b).
 
-**Decision (decided by Claude under standing delegation, owner review pending):** (a).
+**Decision (decided by Claude under standing delegation, approved under D-009):** (a).
 - The names check compares the positional parameter names, in order, with the required
   list.
 - The kind check rejects any positional-only parameter.
@@ -489,14 +490,14 @@ check. Under (b), a keyword-only or variadic parameter would already fail the na
 check, which would leave the third check almost unreachable. "Extra" positional
 parameters are a names mismatch under both readings. Unit tests `ParameterTests`.
 
-## A-021 — What counts as a "binding" in the required-symbol pass (DECIDED BY CLAUDE — owner review pending)
+## A-021 — What counts as a "binding" in the required-symbol pass (DECIDED BY CLAUDE — approved under D-009)
 
 Protocol §3.4 (file 02 L164): "count all same-name binding definitions at the required
 scope … more than one binding of any AST kind emits `EXTRA_ENTRY_POINT`; exactly one
 binding with the wrong AST kind emits `WRONG_ENTRY_POINT_KIND`". The text does not list
 which AST kinds bind.
 
-**Decision (decided by Claude under standing delegation, owner review pending):** a
+**Decision (decided by Claude under standing delegation, approved under D-009):** a
 binding is a statement in the scope's own body (module body, or `Driver`'s class body
 for `step`) that is:
 - a `def`, `async def` or `class` with that name;
@@ -514,7 +515,7 @@ binding forms (`for`, `with`, `global` from a function) cannot appear at module 
 by then. Unit tests `test_any_binding_kind_counts_as_extra`,
 `test_annotation_without_value_is_not_a_binding`.
 
-## A-022 — `Driver` class-body statements other than methods and nested classes (DECIDED BY CLAUDE — owner review pending)
+## A-022 — `Driver` class-body statements other than methods and nested classes (DECIDED BY CLAUDE — approved under D-009)
 
 File 30 §3 L35: "Its body may contain one docstring, literal-only class constants and
 exactly one synchronous undecorated instance method named `step`". IMPORT_POLICY checks
@@ -527,7 +528,7 @@ Readings: (a) not checked statically; later stages (restricted import) see its e
 (b) `DRIVER_CLASS_FORM`, the only reason about the `Driver` class's form, at rank 4;
 (c) a new reason — excluded, because "No unlisted value is permitted" (file 02 L125).
 
-**Decision (decided by Claude under standing delegation, owner review pending):** (b).
+**Decision (decided by Claude under standing delegation, approved under D-009):** (b).
 Any `Driver` class-body statement other than these is `DRIVER_CLASS_FORM` at rank 4,
 `symbol=Driver`, positioned at the statement:
 - a method or nested class (handled by the other ranks);
@@ -541,13 +542,13 @@ AST_SIGNATURE, and B5 (file 19 L25, file 30 L52) states the class-body allowance
 the model, so (a) would leave a stated rule unenforced. Unit test
 `test_driver_body_statements`. No current fixture has such a statement.
 
-## A-023 — Source position of definition violations in the global pass (DECIDED BY CLAUDE — owner review pending)
+## A-023 — Source position of definition violations in the global pass (DECIDED BY CLAUDE — approved under D-009)
 
 The global sort key is `(category, file_order, lineno, col_offset, end_lineno,
 end_col_offset)`. The text gives the node only for rank 7 ("the expression node's own
 source position").
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - Ranks 1–3, 5 and 6 use the offending `ClassDef`/`FunctionDef`/`AsyncFunctionDef`
   node's own position (on CPython 3.11 a decorated definition starts at its `def` or
   `class` line, not at the decorator).
@@ -557,25 +558,25 @@ Reason: the violation is a property of the definition node, which is how the tex
 names it ("any nested class", "any decorator on any function, class or method").
 Only ties between two violations of the same category in the same file depend on this.
 
-## A-024 — Compile errors without a line number (DECIDED BY CLAUDE — owner review pending)
+## A-024 — Compile errors without a line number (DECIDED BY CLAUDE — approved under D-009)
 
 Stage map: `COMPILE_ERROR|file=<FILE>|line=<LINE>`, and `LINE` must be positive. The
 pack does not say what to do if `compile()` raises a SyntaxError with no line, or
 another exception.
 
-**Decision (decided by Claude under standing delegation, owner review pending):** use
+**Decision (decided by Claude under standing delegation, approved under D-009):** use
 line 1, as A-011 does for SOURCE_AST; any other exception from `compile()` is a compile
 error at line 1. Reason: same as A-011. Sources reaching compilation have already parsed,
 so this is a defensive rule; no known 3.11.18 input reaches it.
 
-## A-025 — The `events` input vocabulary and multi-failure precedence (DECIDED BY CLAUDE — owner review pending)
+## A-025 — The `events` input vocabulary and multi-failure precedence (DECIDED BY CLAUDE — approved under D-009)
 
 R01–R06, R12 and R13 give a list of observed `events` (`{"kind": …, …}`). The pack
 defines neither the event vocabulary nor how several events are ranked, beyond the
 evaluation order (Protocol §3.4 L166) and "The first applicable row after the exact
 evaluation order below controls" (L139).
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - Each event kind names one stage-map row, and its fields fill that row's diagnostic
   template. The table is `EVENT_ROWS` in `src/openvef/stage_map.py`: `schema_reject`,
   `output_truncated`, `import_not_allowed`, `compile_error`, `driver_runtime`,
@@ -592,11 +593,11 @@ evaluation order below controls" (L139).
 Reason: the evaluation order is called "exact" and the row rule is the only tiebreak the
 text gives.
 
-## A-026 — Checker run-outcome records (DECIDED BY CLAUDE — owner review pending)
+## A-026 — Checker run-outcome records (DECIDED BY CLAUDE — approved under D-009)
 
 `checker_runs` (R08–R11) and `null_runs` (M10–M12, P18, P19, P22) give two records per
 fixture in four forms the pack does not define. **Decision (decided by Claude under
-standing delegation, owner review pending):**
+standing delegation, approved under D-009):**
 
 | Record | Outcome |
 |---|---|
@@ -613,14 +614,14 @@ and the CHECKER rows. A malformed item with both verdicts `PASS` gives
 `DIAGNOSTIC_FORMAT_WARNING` (Catalog L10). With both verdicts `FAIL`, the item is
 discarded and `CHECKER_NULL_REJECT` stands ("verdict retained").
 
-## A-027 — Driver-vector checks whose parameters are not supplied (DECIDED BY CLAUDE — owner review pending)
+## A-027 — Driver-vector checks whose parameters are not supplied (DECIDED BY CLAUDE — approved under D-009)
 
 File 30 L83 orders the vector checks: (a) key set, (b) string values, (c) width,
 (d) `0`/`1`, (e) "the design-specific legal-input predicate". M26 supplies only the
 expected keys (no widths). M27 supplies the predicate as English prose ("wr_en must be 0
 when full is 1"), and `full` is an output port.
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - Checks run in order. A check whose parameters are not supplied cannot be run.
 - If an earlier check fails, that is the result (M26: `EXTRA_KEYS`). If every runnable
   check passes, the outcome is not determined and the fixture is NOT_IMPLEMENTED,
@@ -633,12 +634,12 @@ when full is 1"), and `full` is an output port.
 - Re-examined after the owner's correction of 23 Nov 2026: see A-038 (still
   NOT_IMPLEMENTED; executing it would require inventing behaviour).
 
-## A-028 — Composite inputs: response plus a later-stage outcome (DECIDED BY CLAUDE — owner review pending)
+## A-028 — Composite inputs: response plus a later-stage outcome (DECIDED BY CLAUDE — approved under D-009)
 
 `null_runs` + `response_object` (M10–M12, P18, P19, P22) and `runtime_pair` +
 `response_object` (M37) supply a response and the outcome of a stage that needs the
-simulator. **Decision (decided by Claude under standing delegation, owner review
-pending):**
+simulator. **Decision (decided by Claude under standing delegation, approved under
+D-009):**
 - The response is first run through every stage that can run in this environment. Today
   that is PARSE_SCHEMA through COMPILE_CHECKER; after step 4, also the sandboxed runtime
   import, `inspect.signature` and factory checks.
@@ -650,20 +651,20 @@ Reason: these fixtures test the adjudication rule; the descriptor deliberately s
 what a simulator would produce. Limitation: the driver's simulator runs are not
 executed.
 
-## A-029 — Serializer: grammar and the emitted-diagnostic set (DECIDED BY CLAUDE — owner review pending)
+## A-029 — Serializer: grammar and the emitted-diagnostic set (DECIDED BY CLAUDE — approved under D-009)
 
 Protocol L168: "The serializer accepts only a complete diagnostic emitted by the
 authoritative stage map"; step (1) validates against "the normative closed grammar and
 its enumerated values". M15 also supplies `allowed_diagnostics`. **Decision (decided by
-Claude under standing delegation, owner review pending):** the diagnostic must match the
+Claude under standing delegation, approved under D-009):** the diagnostic must match the
 closed grammar (L94–L123 templates with L125 domains, `src/openvef/serializer.py`
 `GRAMMAR`), and, when the emitted set is supplied, be a member of it. Either failure is
 `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` at stage
 `FEEDBACK_SERIALIZER` with disposition `CONTROL_EXPECTATION` (Catalog L18).
 
-## A-030 — Clause-ID packet checks: order and default regexes (DECIDED BY CLAUDE — owner review pending)
+## A-030 — Clause-ID packet checks: order and default regexes (DECIDED BY CLAUDE — approved under D-009)
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - The near-match check (`MALFORMED_CLAUSE_ID_TOKEN`) runs before set equality
   (`VISIBLE_CLAUSE_ID_SET_MISMATCH`), in the order File 31 L30 states them.
 - A descriptor that omits a regex (M20 has no search or near-match regex) uses the value
@@ -671,7 +672,7 @@ closed grammar (L94–L123 templates with L125 domains, `src/openvef/serializer.
 - Reserved-heading lines are compared after LF normalization (CRLF and lone CR → LF,
   File 31 L11, L27). Unresolved placeholders match `\{\{[A-Z0-9_]+\}\}` (File 31 L28).
 
-## A-031 — Halt-signature domains versus supplied signatures (DECIDED BY CLAUDE — owner review pending; pack inconsistency found)
+## A-031 — Halt-signature domains versus supplied signatures (DECIDED BY CLAUDE — approved under D-009; pack inconsistency found)
 
 Protocol L185 gives exact domains: `evaluator_component` is one of `SIMULATOR`, …,
 `RTL_NULL_COMPARATOR`, and `stable_error_class` is the literal `NONE` for
@@ -680,7 +681,7 @@ Protocol L185 gives exact domains: `evaluator_component` is one of `SIMULATOR`, 
 trace-integrity signature has `"stable_error_class": "RecorderFault"`. These values are
 outside the L185 domains.
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - `HaltSignature.build` enforces the L185 domains for signatures the ledger constructs
   from halt events.
 - Ready-made signatures in a descriptor are compared for identity as given, because L185's
@@ -689,14 +690,14 @@ outside the L185 domains.
   L185's domains. If they should be invalid input, the pack needs a correction and a
   defined outcome for an invalid signature.
 
-## A-032 — Control-vector expectations with extra keys (DECIDED BY CLAUDE — owner review pending)
+## A-032 — Control-vector expectations with extra keys (DECIDED BY CLAUDE — approved under D-009)
 
 Catalog requirement 2 allows "a single exact expected disposition/stage/error/diagnostic
 (or exact control-vector expectation)". L176 says the runner compares "disposition,
 stage, error class and exact diagnostic bytes". M14, M17 and M41 add keys such as
 `output_diagnostic_bytes` and `rerun_slots`, and M14/M17 have no `diagnostic` key.
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - A control-vector expectation is compared as a whole object: the runner's record must
   have exactly the same keys and values.
 - Each extra key is a named property computed by a rule from the text:
@@ -710,7 +711,7 @@ stage, error class and exact diagnostic bytes". M14, M17 and M41 add keys such a
 - Comparing the four fields only was rejected, because it would report PASS while
   ignoring part of an "exact" expectation.
 
-## A-033 — Change-class lifecycle vectors M48, M50, M53, M54, M58 (REVISED per owner correction; field derivations DECIDED BY CLAUDE — owner review pending)
+## A-033 — Change-class lifecycle vectors M48, M50, M53, M54, M58 (REVISED per owner correction; field derivations DECIDED BY CLAUDE — approved under D-009)
 
 **History.** First recorded as OPEN, outside the delegation: the expected objects hold
 values that appear only in the descriptors, and the `required_action` literals are
@@ -722,7 +723,7 @@ Protocol text. Derive the remaining fields from Protocol sentences under the del
 citing each sentence. Any field with no supporting sentence: say so, and keep that
 fixture NOT_IMPLEMENTED.
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - Each `change_class` label is matched to the Protocol case its words name:
   - `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` → evaluator revision (L175
     "a frozen evaluator source/binary/…/configuration changed"; L183 (b));
@@ -918,24 +919,24 @@ recommendation by Claude (claude.ai), answering §8 of
 CLAUDE.md's Scope section is updated to match. The owner-artifact slots, their interfaces
 and the controls each feeds are listed in `design/fifo/controls/README.md`.
 
-## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — owner review pending)
+## A-036 — Hash randomization inside the sandbox (DECIDED BY CLAUDE — approved under D-009)
 
 File 30 §6 is headed "Import sandbox and deterministic execution". Paired runs compare
 next-input schedules (Protocol L166 (8)), so a driver that iterates over a `set` of
 strings would diverge between runs only because of Python's per-process hash
-randomization. **Decision (decided by Claude under standing delegation, owner review
-pending):** the sandbox sets `PYTHONHASHSEED=0`. Reason: the section requires
+randomization. **Decision (decided by Claude under standing delegation, approved under
+D-009):** the sandbox sets `PYTHONHASHSEED=0`. Reason: the section requires
 deterministic execution, and the variable is set by the evaluator, so artifacts cannot
 observe or change it (no `os`/`sys` import is allowed). The alternative, leaving
 randomization on, would let evaluator configuration turn an honest artifact into
 `DRIVER_NONDETERMINISM`.
 
-## A-034 — An exception while importing an artifact module (DECIDED BY CLAUDE — owner review pending)
+## A-034 — An exception while importing an artifact module (DECIDED BY CLAUDE — approved under D-009)
 
 After IMPORT_POLICY a module body holds only allowed imports, literal constants, a
 docstring and definitions, so raising during import is close to impossible. The stage
 map still has no row for it. **Decision (decided by Claude under standing delegation,
-owner review pending):** an exception while importing `driver.py` is
+approved under D-009):** an exception while importing `driver.py` is
 `RUNTIME_EXCEPTION|file=driver.py|phase=factory|class=<C>` at DRIVER_RUNTIME. Import is
 the first execution of driver code, and the `factory` phase is the stage map's earliest
 driver phase. The same rule applies to an import denied by the runtime allow-list. An
@@ -944,12 +945,12 @@ exception while importing `checker.py` in a checker invocation is
 Exceptions that are not `Exception` subclasses (e.g. `SystemExit` from `exit()`) are
 treated the same way.
 
-## A-035 — Order of post-construction checks; when `check_trace`'s signature is checked (DECIDED BY CLAUDE — owner review pending)
+## A-035 — Order of post-construction checks; when `check_trace`'s signature is checked (DECIDED BY CLAUDE — approved under D-009)
 
 Protocol L166 (7): "Factory return type and runtime signatures are checked immediately
 after factory construction." The order between them is not given, and `check_trace`
 lives in a file that runs "in a separate process after the trace is immutable" (B7).
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - After construction, check the return type, then `create_driver`'s signature, then
   `Driver.step`'s. This follows the sentence's order and the required-symbol sequence.
 - `check_trace`'s runtime signature is checked in the checker's own process, before its
@@ -958,12 +959,12 @@ lives in a file that runs "in a separate process after the trace is immutable" (
   `POSITIONAL_OR_KEYWORD`, no defaults (File 30 L35/L37 "the same parameter
   names/kinds/counts").
 
-## A-037 — Wall-clock limit during driver import or factory; F18 factory seed (DECIDED BY CLAUDE — owner review pending)
+## A-037 — Wall-clock limit during driver import or factory; F18 factory seed (DECIDED BY CLAUDE — approved under D-009)
 
 The watchdog row is `WATCHDOG_TIMEOUT|phase=driver_step`, and `PHASE` for
 `RUNTIME_EXCEPTION` is `factory` or `step`. No row covers a driver import or factory call
-that never returns. **Decision (decided by Claude under standing delegation, owner
-review pending):**
+that never returns. **Decision (decided by Claude under standing delegation, approved
+under D-009):**
 - That case is an evaluator-side error: the runner records ERROR, never a REPAIR verdict
   or a made-up exception class.
 - A checker invocation that exceeds the limit is `CHECKER_TIMEOUT|phase=null_check`, as
@@ -1029,13 +1030,13 @@ form:
 - or an owner decision that M27 is evaluated against the frozen FIFO materials, in which
   case its expected outcome must be revisited, because (a) fires before (e).
 
-## A-039 — Simulator failures: the `class` token and an overrun outside `step` (DECIDED BY CLAUDE — owner review pending)
+## A-039 — Simulator failures: the `class` token and an overrun outside `step` (DECIDED BY CLAUDE — approved under D-009)
 
 The stage-map row is `SIMULATOR_ERROR|target=<RTL_OR_NULL>|class=<EXCEPTION_CLASS>`
 (L154), and `EXCEPTION_CLASS` is "the simple Python exception class name" (L125). A
 failure of the `iverilog`/`vvp` processes is not a Python exception inside the
-simulation. **Decision (decided by Claude under standing delegation, owner review
-pending):**
+simulation. **Decision (decided by Claude under standing delegation, approved under
+D-009):**
 - The harness reports the exception its own process handling raises or would raise:
   - `CalledProcessError` when `iverilog` exits non-zero, or when `vvp` ends without the
     loop's result;
@@ -1228,7 +1229,7 @@ materials, because the driver's `step` receives the design's outputs.
 **What changes under (b):** for P17's vector `{"data": "0"}`, nothing does. It lacks
 keys under both readings, so the result is `MISSING_KEYS` either way.
 
-## A-045 — Construction of the mask-aware miter (DECIDED BY CLAUDE — owner review pending)
+## A-045 — Construction of the mask-aware miter (DECIDED BY CLAUDE — approved under D-009)
 
 > [02 L291] "Build the miter with the same observation mask as the trace comparator and with the same reset sequence and legal-input assumptions from the design specification."
 
@@ -1239,7 +1240,7 @@ The pack does not say:
 
 FIFO-043 (DRAFT spec) says the FIFO-042 rules are the miter's assumptions.
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - **Legal-input predicate:** evaluated on the null (gold) side's outputs at that step,
   i.e. the outputs the driver would have sampled. This is the same side as the mask
   predicate (L273: "evaluated using the null-netlist trace for both members of a pair").
@@ -1263,11 +1264,11 @@ FIFO-043 (DRAFT spec) says the FIFO-042 rules are the miter's assumptions.
   change which inputs are legal for the comparison.
 - Undefined initial state (`-set-init-undef`) would need X-aware triggers.
 
-## A-046 — Mapping harness events to §12 terminations in a pair run (DECIDED BY CLAUDE — owner review pending)
+## A-046 — Mapping harness events to §12 terminations in a pair run (DECIDED BY CLAUDE — approved under D-009)
 
 > [02 L306] "Driver/simulator error, split by whether a masked divergence was recorded before termination."
 
-**Decision (decided by Claude under standing delegation, owner review pending):** on the
+**Decision (decided by Claude under standing delegation, approved under D-009):** on the
 mutant run:
 
 | Harness event | §12 termination | Source |
@@ -1285,11 +1286,11 @@ The vector ends the run as the driver's fault, which is the "driver" half of rul
 The rows recorded before a watchdog kill are now kept (sandbox/sim.py `_truncated`), so
 "masked divergence recorded before termination" is measured on them.
 
-## A-047 — A null run that fails inside a pair (DECIDED BY CLAUDE — owner review pending)
+## A-047 — A null run that fails inside a pair (DECIDED BY CLAUDE — approved under D-009)
 
 > [02 L336] "A null run must complete within its watchdog for a mutant-run timeout to be interpreted."
 
-**Decision (decided by Claude under standing delegation, owner review pending):** if the
+**Decision (decided by Claude under standing delegation, approved under D-009):** if the
 null member of a pair does not complete, the pair is `INVALID_PAIR` as an integrity
 failure.
 
@@ -1297,31 +1298,31 @@ Reason: the artifact's null runs passed during validation, so a failing null in 
 can't be explained from predeclared evidence. L311: "If the cause cannot be determined
 from predeclared integrity evidence, classify conservatively as INVALID_PAIR."
 
-## A-048 — Checker invocations per pair (DECIDED BY CLAUDE — owner review pending)
+## A-048 — Checker invocations per pair (DECIDED BY CLAUDE — approved under D-009)
 
 §12 classifies a pair by what "checker returns" on the complete mutant trace. The repeat
 rule (two invocations) is stated for null traces (L247) and for the panel (L435), not for
 pair classification.
 
-**Decision (decided by Claude under standing delegation, owner review pending):** one
+**Decision (decided by Claude under standing delegation, approved under D-009):** one
 invocation, in its own process, on the frozen mutant trace bytes. The bytes are
 re-hashed afterwards. The pair record also says whether the mutant trace is
 byte-identical to the null trace (needed for F8, L311).
 
-## A-049 — Panel false-alarm event per benign trace (DECIDED BY CLAUDE — owner review pending)
+## A-049 — Panel false-alarm event per benign trace (DECIDED BY CLAUDE — approved under D-009)
 
 > [02 L429] "Define the false-alarm event rate as the number of `FAIL` outcomes on the `B_ds` benign original-RTL/null-netlist reference traces divided by `|G_cd| × B_ds`"
 
 Each benign trace is evaluated twice (L417).
 
-**Decision (decided by Claude under standing delegation, owner review pending):** a
+**Decision (decided by Claude under standing delegation, approved under D-009):** a
 benign trace carries one false-alarm event if either evaluation returned FAIL. This keeps
 the rate within [0, 1], and an inconsistent pair still counts the FAIL it contains, as
 L423 asks ("so an error does not hide a simultaneous false alarm").
 
-## A-050 — Which mutant traces the panel evaluates (DECIDED BY CLAUDE — owner review pending)
+## A-050 — Which mutant traces the panel evaluates (DECIDED BY CLAUDE — approved under D-009)
 
-**Decision (decided by Claude under standing delegation, owner review pending):** each
+**Decision (decided by Claude under standing delegation, approved under D-009):** each
 checker is evaluated twice on every exposed case in `Q_ds` (L427, L435), and twice on
 every raw-only unmasked case (for `PANEL_STRICTER_THAN_MASK_EVENT`, L427).
 
@@ -1331,11 +1332,11 @@ null trace of the same scenario, which is already in the benign set.
 Plan Q6 is settled the same way: the "valid" of F5 (L514) is `rd_valid`, the predicate of
 the DRAFT mask (MK05); this stays open until the mask is signed.
 
-## A-051 — Non-deterministic run-record fields for F1 (DECIDED BY CLAUDE — owner review pending)
+## A-051 — Non-deterministic run-record fields for F1 (DECIDED BY CLAUDE — approved under D-009)
 
 > [02 L510] "Traces match excluding explicitly non-deterministic metadata"
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - The checker-facing trace rows are compared byte for byte, with no exclusions.
 - In a simulation run record, only `waveform` is excluded, by an explicit list
   (`alignment.NONDETERMINISTIC_RESULT_FIELDS`).
@@ -1343,11 +1344,11 @@ the DRAFT mask (MK05); this stays open until the mask is signed.
   in the header date string ("… 15:16:49 2026") and in a later block. All other fields,
   including the per-row simulator times, are identical.
 
-## A-052 — F14 "ports" comparison (DECIDED BY CLAUDE — owner review pending)
+## A-052 — F14 "ports" comparison (DECIDED BY CLAUDE — approved under D-009)
 
 > [02 L523] "Stable null hash, top module and ports"
 
-**Decision (decided by Claude under standing delegation, owner review pending):**
+**Decision (decided by Claude under standing delegation, approved under D-009):**
 - Ports match when the set of (name, direction, width) is the same in the RTL and in both
   exported netlists.
 - Declaration order is recorded and compared separately (`port_order_same_as_rtl`), but
@@ -1384,8 +1385,11 @@ A-045..A-052, F15 case table) is approved by Krishika as decided, without itemis
 review."
 
 **Record:** `design/fifo/freeze/readings-approval-D-009.json` holds the SHA-256 of each
-approved section, and of `src/openvef/f15.py`, as at commit `23e6193`. A changed item is
-not covered. Summary table: [READINGS-REVIEW.md](READINGS-REVIEW.md).
+approved section, and of `src/openvef/f15.py`, as at commit `23e6193`
+(`sha256_as_approved`), and after the wording cleanup of "owner review pending" to
+"approved under D-009" (`sha256`). `tests/test_freeze_package.py` checks that undoing
+that wording gives the approved bytes back. An item changed in any other way is not
+covered. Summary table: [READINGS-REVIEW.md](READINGS-REVIEW.md).
 
 **Limits:** no reading was reviewed item by item, and the recommendation came from Claude,
 which also decided the readings. Pack defects stay defects; a reading approved here does

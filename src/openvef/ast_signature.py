@@ -15,8 +15,8 @@ Implements:
 The runtime part of AST_SIGNATURE (`inspect.signature` and the factory return type)
 runs after import in the restricted execution container and is not implemented here.
 
-Readings decided by Claude under the standing delegation (docs/ambiguities.md; owner
-review pending): A-020 parameter checks; A-021 what counts as a binding; A-022 Driver
+Readings decided by Claude under the standing delegation (docs/ambiguities.md; approved
+under D-009): A-020 parameter checks; A-021 what counts as a binding; A-022 Driver
 class-body statements; A-023 positions of definition violations; A-024 compile errors
 without a line number.
 """
@@ -70,7 +70,7 @@ def _bound_names(target: ast.expr) -> Iterator[str]:
 def bindings(body: list[ast.stmt], name: str) -> list[ast.stmt]:
     """Statements in one scope's own body that bind `name` (A-021).
 
-    A-021 (decided by Claude, owner review pending): a binding is a def, async def or
+    A-021 (decided by Claude, approved under D-009): a binding is a def, async def or
     class of that name, an assignment or annotated assignment with a value whose
     target binds that name, or an import whose bound name is that name. An annotated
     name without a value (`x: int`) binds nothing in Python and is not counted. Only
@@ -97,8 +97,8 @@ def check_parameters(file: str, symbol: str, node: ast.FunctionDef, expected: tu
     """PARAMETER_NAMES, then PARAMETER_KIND, then DEFAULT_OR_VARIADIC (A-020).
 
     File 30 §3 L33: "parameter checks in the order names, kinds, then
-    defaults/variadic/keyword-only shape". A-020 (decided by Claude, owner review
-    pending): the names check compares the positional parameter names (positional-only
+    defaults/variadic/keyword-only shape". A-020 (decided by Claude, approved under
+    D-009): the names check compares the positional parameter names (positional-only
     then positional-or-keyword, in order) with the required list; the kind check
     rejects any positional-only parameter; the last check rejects any default, `*args`,
     keyword-only parameter or `**kwargs`. Annotations are ignored (File 30 §3 L35).
@@ -166,7 +166,7 @@ def _driver_body_violations(file: str, cls: ast.ClassDef, add) -> None:
 
     File 30 §3 L35: "Its body may contain one docstring, literal-only class constants
     and exactly one synchronous undecorated instance method named `step`". A-022
-    (decided by Claude, owner review pending): any other class-body statement is
+    (decided by Claude, approved under D-009): any other class-body statement is
     `DRIVER_CLASS_FORM` at rank 4, positioned at the statement. Class constants follow
     the module-constant rules: plain-name targets and literal-only values.
     """
@@ -249,7 +249,7 @@ COMPILE_STAGES = {"driver.py": "COMPILE_DRIVER", "checker.py": "COMPILE_CHECKER"
 def check_compile(sources: dict[str, str]) -> Optional[Failure]:
     """`compile()` driver.py, then checker.py; the first SyntaxError wins.
 
-    A-024 (decided by Claude, owner review pending): a compile error without a positive
+    A-024 (decided by Claude, approved under D-009): a compile error without a positive
     line number uses line=1 (the A-011 fallback); any other exception from `compile()`
     is also a compile error at line 1.
     """

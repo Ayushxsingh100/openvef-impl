@@ -16,7 +16,7 @@ Implements:
   L336      — "A null run must complete within its watchdog for a mutant-run timeout to
               be interpreted."
 
-Readings decided under the standing delegation (owner review pending): A-046 (event
+Readings decided under the standing delegation (approved under D-009): A-046 (event
 mapping), A-047 (null-run failure in a pair), A-048 (one checker invocation per pair).
 """
 from __future__ import annotations

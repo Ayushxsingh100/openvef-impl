@@ -9,7 +9,7 @@ Implements (with sandbox/harness.py):
                    a separate container); a wall-clock watchdog is
                    `CHECKER_TIMEOUT|phase=null_check`.
 
-A-037 (decided by Claude, owner review pending): the stage map has no row for a driver
+A-037 (decided by Claude, approved under D-009): the stage map has no row for a driver
 import or factory call that exceeds the wall-clock limit (the watchdog row is
 `phase=driver_step` only), so that case raises `RuntimeStageError` and the runner records
 ERROR, never a verdict. The F18 factory call uses seed 0, because no fixture supplies a

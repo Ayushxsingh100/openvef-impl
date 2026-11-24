@@ -31,7 +31,7 @@ Latest evidence run: **`evidence/run-20261124T193435Z`**.
 
 | Status | Count | Fixtures |
 |---|---|---|
-| PASS | 139 | 0 provisional; 129 unlabelled, 10 "cleared under DEV-001 (non-independent mask review)" (below) |
+| PASS | 139 | 0 provisional; 129 unlabelled, 10 "cleared under DEV-001 — review pending" (below) |
 | FAIL | 0 | — |
 | NOT_IMPLEMENTED | 5 | M27 (A-038, revisited 24 Nov 2026); M48, M50, M54, M58 (A-033: no supporting Protocol sentence) |
 | ERROR | 0 | — |
@@ -41,8 +41,9 @@ Latest evidence run: **`evidence/run-20261124T193435Z`**.
 They reach L166 (7)–(11) on the FIFO materials.
 - **Settled by the owner freeze (`a955245`, D-008):** the specification, frozen values,
   RTL, null-export script, `spec_version_sha256`, and readings A-040–A-044.
-- **Mask and File 24 table:** accepted by the owner without an independent review. They
-  carry the label "cleared under DEV-001 (non-independent mask review)". **L271 and File 21
+- **Mask and File 24 table:** accepted by the owner without an independent review. The Claude
+  (claude.ai) review had not happened when DEV-001 was recorded and is still pending. They
+  carry the label "cleared under DEV-001 — review pending". **L271 and File 21
   L32 remain unmet**; the auditor decides whether these 10 can count toward F18.
 
 **Readings:** every other Claude-decided reading is approved by Krishika as decided, without
@@ -128,6 +129,7 @@ this run is on the pinned one.
 | **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-009, DEV-001, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item. Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
+| Save the claude.ai mask review as docs/reviews/claude-mask-review-2026-11-25.md, then decide the DEV-001 label | Krishika | [DEVIATIONS.md](DEVIATIONS.md) |
 | Placeholders inside the mask files as frozen under DEV-001 (`TO_FREEZE`, `DRAFT_UNSIGNED`) | owners | [DEVIATIONS.md](DEVIATIONS.md) |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |

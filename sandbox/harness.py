@@ -19,8 +19,8 @@ Implements:
                    ENTRY_POINT_REJECT|...|reason=RETURN_TYPE / RUNTIME_SIGNATURE;
                    CHECKER_RUNTIME_ERROR|class=<C>; File 30 L97 return classification.
 
-Readings decided by Claude under the standing delegation (docs/ambiguities.md; owner
-review pending): A-034 an exception while importing a module; A-035 order of the
+Readings decided by Claude under the standing delegation (docs/ambiguities.md; approved
+under D-009): A-034 an exception while importing a module; A-035 order of the
 post-construction checks and when check_trace's signature is checked.
 """
 from __future__ import annotations

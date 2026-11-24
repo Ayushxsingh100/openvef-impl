@@ -11,7 +11,7 @@ Implements:
          appear at the predicted cycle.
   Owner decision D-007 (3) — Yosys built-in `sat` (no new dependency).
 
-Construction (A-045, decided by Claude under the standing delegation, owner review pending):
+Construction (A-045, decided by Claude under the standing delegation, approved under D-009):
   - gold = null netlist, gate = mutant netlist, both read from the exported netlists;
   - mask: every "always" entry compares the port in every step; a window entry compares
     its port only where the GOLD (null) predicate signal has the stated value (L273);

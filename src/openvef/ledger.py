@@ -13,7 +13,7 @@ Implements:
                    FROZEN_ARTIFACTS` (error class `MID_RUN_REEVALUATION`) for a successful
                    operational recovery.
 
-A-031 (decided by Claude, owner review pending): `HaltSignature.build` enforces the
+A-031 (decided by Claude, approved under D-009): `HaltSignature.build` enforces the
 L185 domains for signatures the ledger constructs from halt events. Signatures supplied
 ready-made (as in a descriptor) are compared for identity as given, because recurrence
 detection needs only tuple equality.
@@ -106,7 +106,7 @@ def operational_recovery(*, scheduled_slots: int, frozen_evaluator_hashes_unchan
 # --- Change-class lifecycle control expectations (Protocol L175-L176, L181-L185) -------
 #
 # A-033 (revised per owner correction, 23 Nov 2026; field derivations decided by Claude
-# under standing delegation, owner review pending). Each `change_class` input label is
+# under standing delegation, approved under D-009). Each `change_class` input label is
 # matched to the Protocol case its words name; each output field is either a value with
 # the Protocol sentence that supports it, or UNSUPPORTED with the reason. Field NAMES
 # follow the control-vector expectations (A-032 disclosure); no VALUE is read from an

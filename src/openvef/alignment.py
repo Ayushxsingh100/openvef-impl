@@ -26,7 +26,7 @@ from typing import Any, Optional
 from openvef import trace as trace_mod
 from openvef.simulation import INPUTS, NEXT, OUTPUTS
 
-# A-051 (decided by Claude under the standing delegation, owner review pending).
+# A-051 (decided by Claude under the standing delegation, approved under D-009).
 NONDETERMINISTIC_RESULT_FIELDS = {
     "waveform": "the FST file header records its creation date and time",
 }

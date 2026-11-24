@@ -25,8 +25,8 @@ Each sub-rule function returns every violation as a `Finding` keyed by the node'
 applies reading (c): per file, after the identifier scan, the finding with the
 smallest key wins, whatever its category.
 
-Readings decided by Claude under the standing delegation (docs/ambiguities.md; owner
-review pending):
+Readings decided by Claude under the standing delegation (docs/ambiguities.md; approved
+under D-009):
   A-013 tie: findings with the same smallest key are ordered by File 30 §3 L27's stage
         list -- module-level AST policy, then import, then prohibited-name policy (with
         `random` use after prohibited names, as in File 30 §2 L19-L20). A bare
@@ -220,7 +220,7 @@ def find_prohibited_names(tree: ast.Module) -> list[Finding]:
     one of those names is also rejected." (File 30 §2 L19.) `re.compile` is an
     attribute of `re`, not a `Name`, so it is not matched.
 
-    A-016 (decided by Claude under standing delegation, owner review pending): only `ast.Name` nodes (any context) and
+    A-016 (decided by Claude under standing delegation, approved under D-009): only `ast.Name` nodes (any context) and
     `Attribute(value=Name(id="builtins"))` are matched; a function or parameter named
     e.g. `open`, and `__builtins__.<name>`, are not.
     """
@@ -247,7 +247,7 @@ def find_global_random_use(tree: ast.Module) -> list[Finding]:
     `random.SystemRandom`." (File 30 §2 L20.) `GLOBAL_RANDOM_USE.name` is the
     qualified name, e.g. `random.random` (Protocol §3.4 file 02 L125).
 
-    A-017 (decided by Claude under standing delegation, owner review pending): the match is syntactic,
+    A-017 (decided by Claude under standing delegation, approved under D-009): the match is syntactic,
     `Attribute(value=Name(id="random"))`, whether or not `random` is the imported
     module. Aliases such as `r = random; r.random()` and `getattr(random, "random")`
     are not statically detected, as the text says.
@@ -281,7 +281,7 @@ def is_literal_only(node: ast.expr) -> bool:
     f-strings, attribute access, binary operations and other expressions are not
     literal-only."
 
-    A-015 cases 6-8 (decided by Claude, owner review pending): `...`, `-True` and
+    A-015 cases 6-8 (decided by Claude, approved under D-009): `...`, `-True` and
     `-(-1)` are not literal-only; the operand of a unary must itself be a numeric
     `ast.Constant`.
     """
@@ -328,7 +328,7 @@ def classify_module_body(file: str, tree: ast.Module) -> list[Finding]:
     Imports are classified by `classify_import`/`classify_import_from`; function and
     class definitions are deferred to AST_SIGNATURE and never classified here.
 
-    A-015 (decided by Claude under standing delegation, owner review pending). The
+    A-015 (decided by Claude under standing delegation, approved under D-009). The
     allowed list is exhaustive, `MODULE_CONTROL_FLOW` covers only the statements it
     names, and "assignments/annotated assignments" are `ast.Assign`/`ast.AnnAssign`:
       - `x += 1`, `pass`, `global`/`nonlocal`, `return`/`break`/`continue` and any
@@ -410,7 +410,7 @@ def check_file(file: str, source: str, tree: ast.Module) -> Optional[Failure]:
     rejected = scan_identifiers(file, source)
     if rejected is not None:
         return rejected
-    # A-013 tie (decided by Claude, owner review pending): equal keys fall back to
+    # A-013 tie (decided by Claude, approved under D-009): equal keys fall back to
     # File 30 §3 L27's stage order -- module-level AST policy, import policy,
     # prohibited names -- then `random` use (File 30 §2 L20 follows L19).
     ranked = [(f.key, rank, f.outcome)

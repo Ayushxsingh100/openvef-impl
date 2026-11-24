@@ -17,7 +17,7 @@ Implements:
          on a mutant trace byte-identical to a benign null trace the checker passed is a
          PANEL_ERROR_EVENT.
 
-Readings decided under the standing delegation (owner review pending) are A-049 and
+Readings decided under the standing delegation (approved under D-009) are A-049 and
 A-050 in docs/ambiguities.md.
 """
 from __future__ import annotations

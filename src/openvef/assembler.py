@@ -13,7 +13,7 @@ Implements:
   Catalog (file 36) L18 — error class `ASSEMBLY_OR_MANIFEST_FAILURE`, disposition
                    `F18_REJECT`, stage `F18`.
 
-A-030 (decided by Claude, owner review pending): the near-match check runs before the
+A-030 (decided by Claude, approved under D-009): the near-match check runs before the
 set-equality check (File 31 L30 order), and when a descriptor omits a regex the value
 fixed by File 31 §8 is used.
 """

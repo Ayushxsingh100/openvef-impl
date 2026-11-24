@@ -57,6 +57,6 @@ def run(repo: Path, materials_file: str, export: Callable[[str, str], dict],
         "checks": checks,
         "status": "PASS" if all(checks.values()) else "FAIL",
         "provisional": ["export script and RTL are DRAFT under D-005; the frozen L544 export script is an "
-                        "owner item", "A-052 (port comparison) decided by Claude, owner review pending"],
+                        "owner item", "A-052 (port comparison) approved under D-009"],
     }
     return record

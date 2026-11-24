@@ -2,8 +2,8 @@
   "record_id": "DEV-001",
   "kind": "owner deviation from Protocol L271 (docs/DEVIATIONS.md)",
   "status": "Transcribed by Claude (Claude Opus 5.5, via Claude Code) at Krishika's instruction. Claude signed nothing and is not the independent reviewer.",
-  "basis": "Owner decision by Krishika, 24 Nov 2026: no independent human mask reviewer is available; the observation mask and File 24 table are accepted by the owner on the basis of Claude's review. This is NOT an independent review. The L271 signature does not exist.",
-  "label": "cleared under DEV-001 (non-independent mask review)",
+  "basis": "Owner decision by Krishika, 24 Nov 2026: no independent human mask reviewer is available; the observation mask and File 24 table are accepted by the owner on the basis of Claude's review, which had not happened when DEV-001 was recorded (correction by Krishika; review under way, to be saved as docs/reviews/claude-mask-review-2026-11-25.md). This is NOT an independent review. The L271 signature does not exist.",
+  "label": "cleared under DEV-001 — review pending",
   "items": [
     {
       "id": "G",

@@ -12,8 +12,8 @@ Implements:
   File 30 §3 L97 — checker return classification order and diagnostic-item form.
   Catalog (file 36) L5-L16 — local dispositions.
 
-Readings decided by Claude under the standing delegation (docs/ambiguities.md; owner
-review pending): A-025 the `events` vocabulary and precedence key; A-026 the checker
+Readings decided by Claude under the standing delegation (docs/ambiguities.md; approved
+under D-009): A-025 the `events` vocabulary and precedence key; A-026 the checker
 run-outcome records; A-027 driver-vector checks whose parameters are not supplied.
 """
 from __future__ import annotations
