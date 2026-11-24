@@ -393,5 +393,7 @@ behaviours listed. CLAUDE.md reserves these to the owners.
 
 The content of `[Execution envelope]` is not defined anywhere else in the pack.
 
-**Waiting here:** authoring-packet assembly and hashing. CLAUDE.md reserves
-authoring-packet text to the owners.
+**Waiting here:** authoring-packet assembly and hashing. Under owner decision D-005
+(Krishika, 24 Nov 2026; Ayush's confirmation pending) these payload blocks are
+AI-assisted: Claude drafts them, marked DRAFT, and the owners review, approve and freeze
+them. They are not drafted yet.

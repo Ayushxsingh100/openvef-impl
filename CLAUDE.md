@@ -24,7 +24,11 @@ human mask reviewer (Protocol L271). Claude is never that reviewer.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose
-only.
+only. Owner decision D-007 (Krishika, 24 Nov 2026; Ayush's confirmation pending) adds the
+control drivers and checkers for F1–F5 and F7–F13 to this list (independence from the
+harness author). Control mutants are RTL edits of `design/fifo/rtl/ovf_fifo.v` (D-007).
+Owner artifacts go in `design/fifo/controls/` (see its README); Claude builds only the
+harness that runs them and must not place content in their slots.
 
 Disclosure (D-005), carried in docs/assistance-log.md: "The FIFO specification, RTL and
 authoring-packet payloads were drafted by Claude (Anthropic) via Claude Code and reviewed
