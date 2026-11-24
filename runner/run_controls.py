@@ -16,7 +16,8 @@ Statuses:
   NOT_WIRED — the owner files exist, but the control's procedure has not yet been
       composed from the harness components (plan step 8). Never reported as a pass.
 
-Every control result on DRAFT materials is provisional (D-005); see each record.
+Each record lists what is still provisional and which approvals it rests on. No wired
+procedure (F14, F15) uses the mask; one that does must carry the DEV-001 label.
 
 Usage (evidence, D-002a):  runner/run_f18_container.sh <run_class> controls
 Usage (development only):  python3.11 -I runner/run_controls.py <baseline_root> <evidence_dir> <run_class>
@@ -46,7 +47,14 @@ SLOTS_FILE = CONTROLS_DIR / "slots.json"
 ORDER = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "F17")
 # Protocol L531: "F2, F4, F5, F9, F15, F16, F17 and F18 are critical gates."
 CRITICAL = {"F2", "F4", "F5", "F9", "F15", "F17"}
-DRAFT_PROVISIONAL = "depends on DRAFT, unfrozen or unsigned design materials (D-005); not counted until frozen"
+
+
+def reading_status(item: str, pending: str) -> tuple[list, list]:
+    """([provisional], [approval label]) for one Claude-decided item, from the D-009 record."""
+    record = freeze.load(REPO, simulator_stages.READINGS_RECORD)
+    if item in freeze.verify(REPO, record)["frozen"]:
+        return [], [f"{item}: {record['label']}"]
+    return [pending], []
 
 
 def needs(slots: dict, control: str) -> tuple[list, list]:
@@ -78,17 +86,17 @@ def run_f14() -> dict:
     record = freeze.load(REPO, simulator_stages.FREEZE_RECORD)
     fr = freeze.verify(REPO, record)
     rec["freeze"] = fr
-    provisional = ["A-052 (port comparison) decided by Claude, owner review pending"]
+    provisional, approvals = reading_status("A-052", "A-052 (port comparison) decided by Claude, approval absent or bytes changed")
     if not {"C1", "C2"} <= set(fr["frozen"]):
         provisional.insert(0, "RTL or null-netlist export script not frozen, or changed since the freeze (C1, C2)")
-    return {"status": rec.pop("status"), "provisional": provisional, "details": rec}
+    return {"status": rec.pop("status"), "provisional": provisional, "approvals": approvals, "details": rec}
 
 
 def run_f15(baseline: Path) -> dict:
     rec = f15.run(baseline)
-    return {"status": rec.pop("status"),
-            "provisional": ["case table built by Claude (plan §2 label (a)); owner review pending"],
-            "details": rec}
+    provisional, approvals = reading_status(
+        "F15-case-table", "case table built by Claude (plan §2 label (a)); approval absent or bytes changed")
+    return {"status": rec.pop("status"), "provisional": provisional, "approvals": approvals, "details": rec}
 
 
 PROCEDURES = {"F14": lambda baseline: run_f14(), "F15": run_f15}

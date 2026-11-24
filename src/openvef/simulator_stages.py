@@ -1,8 +1,8 @@
 """Protocol §3.4 L166 (7)-(11) for one response, on DRAFT design materials (D-005).
 
 Generic over designs and fixtures (CLAUDE.md rule 4): everything comes from a materials
-file. Every result produced here depends on DRAFT, unfrozen or unsigned items, so
-`prepare` lists them in `provisional` and callers must report results as provisional.
+file. `prepare` lists every item not frozen or approved in `provisional`, and every reason
+an owner deviation cleared in `cleared`; callers must report both on each result.
 
 Order for one response, after the factory checks have passed:
   (7)  L334 timeout from three null runs; driver on RTL, then on the null netlist
@@ -31,7 +31,14 @@ SEED = 0  # A-037: no F18 fixture supplies a slot seed
 # Owner freeze record (Krishika's signature a955245 under D-008). Each provisional reason
 # below is dropped only if every item it names is frozen AND its bytes still match.
 FREEZE_RECORD = "design/fifo/freeze/freeze-record-2026-11-24.json"
-# (reason, freeze-package items that settle it); an empty tuple is never settled by owners.
+# Owner deviation DEV-001 from Protocol L271 (docs/DEVIATIONS.md): the mask is accepted
+# without an independent review. It clears only the mask reason, only while the mask bytes
+# match, and every result that relied on it carries the record's label.
+DEVIATION_RECORD = "design/fifo/freeze/deviation-DEV-001.json"
+# Owner approval D-009 of Claude-decided readings (docs/READINGS-REVIEW.md), hash-bound.
+READINGS_RECORD = "design/fifo/freeze/readings-approval-D-009.json"
+MASK_ITEMS = ("G",)  # never in FREEZE_RECORD's items: no owner signature replaces L271
+# (reason, items that settle it).
 PROVISIONAL_REASONS = (
     ("FIFO specification, port manifest, reset/legal-input rules: not frozen", ("A1",)),
     ("cycle cap, safe idle, watchdog, scheduler, trace schema, metadata: not frozen (items 7-12)",
@@ -39,13 +46,26 @@ PROVISIONAL_REASONS = (
     ("FIFO RTL and null-netlist export script: not frozen", ("C1", "C2")),
     ("spec_version_sha256 in checker metadata: not a frozen value", ("A1", "B6")),
     ("readings A-040, A-041, A-043, A-044: owner approval pending", ("E1", "E2", "E4", "E5")),
-    ("observation mask and File 24 table: unsigned; require an independent human reviewer (L271)", ()),
+    ("observation mask and File 24 table: unsigned; require an independent human reviewer (L271)", MASK_ITEMS),
 )
 EXPORT_TIMEOUT_S = 300.0  # build default
 
 
 def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def open_reasons(done: set, deviation: Optional[dict]) -> tuple[list, list]:
+    """(provisional reasons still open, deviation labels that cleared a reason)."""
+    provisional, cleared = [], []
+    for reason, items in PROVISIONAL_REASONS:
+        if set(items) <= done:
+            continue
+        if items == MASK_ITEMS and deviation and set(items) <= set(deviation["frozen"]):
+            cleared.append({"reason": reason, "label": deviation["label"], "record": deviation["record"]})
+        else:
+            provisional.append(reason)
+    return provisional, cleared
 
 
 def export_null(rtl_text: str, script: str) -> dict:
@@ -74,16 +94,20 @@ def prepare(repo: Path, materials_file: str) -> dict[str, Any]:
     spec_sha = _sha((repo / m["spec"]).read_bytes())
     frozen = freeze.verify(repo, freeze.load(repo, FREEZE_RECORD)) if (repo / FREEZE_RECORD).exists() else None
     done = set(frozen["frozen"]) if frozen else set()
-    provisional = [reason for reason, items in PROVISIONAL_REASONS if not items or not set(items) <= done]
+    dev = freeze.load(repo, DEVIATION_RECORD) if (repo / DEVIATION_RECORD).exists() else None
+    deviation = dict(freeze.verify(repo, dev), label=dev["label"]) if dev else None
+    provisional, cleared = open_reasons(done, deviation)
+    readings = freeze.verify(repo, freeze.load(repo, READINGS_RECORD)) if (repo / READINGS_RECORD).exists() else None
     metadata = {"design_id": m["design_id"], "spec_version_sha256": spec_sha,
                 "trace_schema_version": m["trace_schema_version"], "cycle_cap": m["cycle_cap"],
                 "reset_release_cycle": m["reset_release_cycle"], "trace_integrity_status": "VALID"}
     return {"rtl": loaded["rtl"], "null": null, "mask": mask, "metadata": metadata, "provisional": provisional,
-            "record": {"materials_file": materials_file, "status": m["status"],
+            "cleared": cleared, "record": {"materials_file": materials_file, "status": m["status"],
                        "file_sha256": {f: _sha((repo / f).read_bytes()) for f in files},
                        "null_netlist_sha256": [first["sha256"], second["sha256"]],
                        "yosys_version": first["yosys_version"], "checker_metadata": metadata,
-                       "mask_variant": "primary", "provisional": provisional, "freeze": frozen}}
+                       "mask_variant": "primary", "provisional": provisional, "freeze": frozen,
+                       "deviation": deviation, "cleared_under_deviation": cleared, "reading_approvals": readings}}
 
 
 def run_response(ctx: dict[str, Any], driver_source: str, checker_source: str,

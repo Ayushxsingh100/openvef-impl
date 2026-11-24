@@ -127,7 +127,7 @@ ACCEPT = {"disposition": "ACCEPT", "stage_id": None, "error_class": None, "diagn
 
 SANDBOX: dict | None = None  # set by main() once the pinned image is verified
 # D-005 DRAFT design materials for L166 (7)-(11); set by main(). Every result that uses
-# them is provisional (simulator_stages.prepare lists why).
+# them says what is still provisional or was cleared under a deviation (simulator_stages.prepare).
 DESIGN_MATERIALS_FILE = "design/fifo/design-materials-DRAFT.json"
 SIM: dict | None = None
 SIM_UNAVAILABLE = "not prepared"
@@ -164,7 +164,7 @@ def response_object(inp: dict) -> dict:
 
 
 def sim_stages(desc: dict, obj: dict, port_names: list | None = None) -> Failure | None:
-    """L166 (7)-(11) on the DRAFT design materials (D-005); results are provisional."""
+    """L166 (7)-(11) on the design materials (D-005); see SIM provisional/cleared."""
     if SIM is None:
         raise Blocked(RUNTIME_NEXT + f" [D-005 materials: {SIM_UNAVAILABLE}]")
     failure, details = simulator_stages.run_response(SIM, obj["driver"]["source"], obj["checker"]["source"],
@@ -502,6 +502,7 @@ def main() -> int:
             SIM, SIM_UNAVAILABLE = None, f"{type(exc).__name__}: {exc}"
             meta["design_materials"] = {"unavailable": SIM_UNAVAILABLE}
     provisional_ids: list = []
+    deviation_ids: list = []
     counts = {"PASS": 0, "FAIL": 0, "NOT_IMPLEMENTED": 0, "ERROR": 0}
     with open(out_dir / "results.jsonl", "w", encoding="utf-8") as res, open(out_dir / "run.log", "w", encoding="utf-8") as log:
         log.write(json.dumps(meta, indent=2) + "\n")
@@ -527,6 +528,12 @@ def main() -> int:
                                                 + "; ".join(SIM["provisional"]),
                                       "simulator": sim_details}
                 provisional_ids.append(entry["fixture_id"])
+            if sim_details is not None and SIM["cleared"]:
+                rec["cleared_under_deviation"] = SIM["cleared"]
+                rec["label"] = "; ".join(c["label"] for c in SIM["cleared"])
+                rec.setdefault("simulator", sim_details)
+                note = f"{note} [{rec['label']}]".strip()
+                deviation_ids.append(entry["fixture_id"])
             res.write(json.dumps(rec, ensure_ascii=False, sort_keys=True) + "\n")
             log.write(f"{utc_stamp()} {entry['fixture_id']}: {status} {note}\n")
             log.flush()
@@ -534,6 +541,8 @@ def main() -> int:
     meta["run_finished_utc"] = utc_stamp()
     summary = {**meta, "counts": counts, "total": sum(counts.values()),
                "provisional_fixtures": provisional_ids,
+               "deviation_cleared_fixtures": deviation_ids,
+               "deviation_labels": sorted({c["label"] for c in SIM["cleared"]}) if SIM else [],
                "results_sha256": sha256_file(out_dir / "results.jsonl")}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"out_dir": str(out_dir), "run": f"run-{started}", "counts": counts}), file=sys.stderr)

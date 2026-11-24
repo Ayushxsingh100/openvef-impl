@@ -21,6 +21,10 @@ frozen; only the owners do that.
 
 The observation mask may be drafted by Claude, but it must be signed by an independent
 human mask reviewer (Protocol L271). Claude is never that reviewer.
+Deviation DEV-001 (Krishika, 24 Nov 2026; docs/DEVIATIONS.md): no such reviewer is
+available, so the owner accepted the FIFO mask and File 24 table at their current hashes
+without an independent review. L271 stays unmet. Every affected result carries "cleared
+under DEV-001 (non-independent mask review)"; never call the mask independently reviewed.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose
@@ -70,7 +74,12 @@ covers A-007 to A-019, the tie case, and all future cases."
   alone take effect. Ayush's agreement is recorded once, as the single "Ayush ratification
   pending" entry in docs/AUDIT-READINESS.md, not on individual items. Claude never signs or
   approves for either owner. The independent mask reviewer's signature (L271) is still
-  required and no owner signature replaces it.
+  required and no owner signature replaces it (except as DEV-001 records, for the
+  FIFO mask at its frozen hashes only).
+- Owner decision D-009 (Krishika, 24 Nov 2026): every reading decided under this
+  delegation and not yet owner-approved (A-007..A-012, A-013 tie, A-015..A-037, A-039,
+  A-045..A-052, F15 case table) is approved by Krishika as decided, without itemised owner
+  review. Later readings start as "owner review pending" again.
 - Evidence runs that depend on a Claude-decided reading say so in `docs/traceability.md`,
   and do not count toward F18 until the owners have reviewed that reading.
 7. Every commit message names the clause it implements, e.g. `File 30 §1: reject BOM`.

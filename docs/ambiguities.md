@@ -11,6 +11,11 @@ They are implemented, but like PROVISIONAL items they must be reviewed by the ow
 (both: the delegation came from Krishika alone) before any evidence run that depends on
 them counts toward F18.
 
+**Update, 24 Nov 2026:** A-038 and A-040–A-044 were approved in the owner freeze, and
+D-009 (end of this file) approves every other Claude-decided reading, as decided, without
+itemised owner review. The headings and text of the individual items keep their original
+wording ("owner review pending"), because the approvals are bound to their hashes.
+
 ## A-001 — OUTPUT_TRUNCATED versus envelope rejection (DECIDED — Ayush's confirmation pending)
 
 - Protocol §3.4 stage map lists "Envelope, schema or clause manifest rejection" first and
@@ -1369,3 +1374,26 @@ both owners review it".
   replaces;
 - the standing-delegation readings that no owner has reviewed yet;
 - earlier records, which keep their wording as written.
+
+## D-009 — Approval of the remaining Claude-decided readings (DECIDED)
+
+**Owner decision by Krishika (sole builder), 24 Nov 2026**, adopting a Claude (claude.ai)
+recommendation; pasted into Claude Code: "every reading decided under the standing
+delegation and not yet owner-approved (A-007..A-012, A-013 tie, A-015..A-037, A-039,
+A-045..A-052, F15 case table) is approved by Krishika as decided, without itemised owner
+review."
+
+**Record:** `design/fifo/freeze/readings-approval-D-009.json` holds the SHA-256 of each
+approved section, and of `src/openvef/f15.py`, as at commit `23e6193`. A changed item is
+not covered. Summary table: [READINGS-REVIEW.md](READINGS-REVIEW.md).
+
+**Limits:** no reading was reviewed item by item, and the recommendation came from Claude,
+which also decided the readings. Pack defects stay defects; a reading approved here does
+not correct the pack. Readings decided later are not covered. Takes effect under D-008;
+Ayush's ratification stays the single entry in AUDIT-READINESS.md.
+
+## DEV-001 — Deviation from Protocol L271 (DECIDED)
+
+The owner accepted the observation mask and File 24 table without an independent review.
+Full record: [DEVIATIONS.md](DEVIATIONS.md). This supersedes, for this mask only, D-008's
+statement that no owner signature replaces the L271 signature. L271 itself stays unmet.

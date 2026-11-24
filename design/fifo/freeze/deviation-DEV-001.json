@@ -1,0 +1,23 @@
+{
+  "record_id": "DEV-001",
+  "kind": "owner deviation from Protocol L271 (docs/DEVIATIONS.md)",
+  "status": "Transcribed by Claude (Claude Opus 5.5, via Claude Code) at Krishika's instruction. Claude signed nothing and is not the independent reviewer.",
+  "basis": "Owner decision by Krishika, 24 Nov 2026: no independent human mask reviewer is available; the observation mask and File 24 table are accepted by the owner on the basis of Claude's review. This is NOT an independent review. The L271 signature does not exist.",
+  "label": "cleared under DEV-001 (non-independent mask review)",
+  "items": [
+    {
+      "id": "G",
+      "item": "Observation mask (primary and stricter variants) and File 24 traceability table, at the hashes of OWNER-FREEZE-PACKAGE.md section G",
+      "refs": [
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-DRAFT.json",
+          "sha256": "78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f"
+        },
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",
+          "sha256": "3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92"
+        }
+      ]
+    }
+  ]
+}

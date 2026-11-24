@@ -1,0 +1,409 @@
+{
+  "record_id": "D-009",
+  "status": "Transcribed by Claude (Claude Opus 5.5, via Claude Code) at Krishika's instruction. Claude approved nothing.",
+  "basis": "D-009 (Krishika, 24 Nov 2026): every reading decided under the standing delegation and not yet owner-approved (A-007..A-012, A-013 tie, A-015..A-037, A-039, A-045..A-052, F15 case table) is approved by Krishika as decided, without itemised owner review.",
+  "label": "approved by Krishika as decided, without itemised owner review (D-009)",
+  "note": "Hashes are the bytes at commit 23e6193, unchanged by D-009. A changed section or file is not covered.",
+  "items": [
+    {
+      "id": "A-007",
+      "item": "A-007",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-007",
+          "sha256": "52ed2ea3ef5a7c9d984d8bcc5e04439d6bdbce7c1dade96b2d086c27430a7d33"
+        }
+      ]
+    },
+    {
+      "id": "A-008",
+      "item": "A-008",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-008",
+          "sha256": "9e0b534e679d24eb2c3ff25c94aa6ab1abf07ce3a2a295fbf256248cb1d074b7"
+        }
+      ]
+    },
+    {
+      "id": "A-009",
+      "item": "A-009",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-009",
+          "sha256": "13e1fc9a72305388471c6a45247f3d9ab5005382511cc74084f894c7d754de16"
+        }
+      ]
+    },
+    {
+      "id": "A-010",
+      "item": "A-010",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-010",
+          "sha256": "d79b2b163e344e9ea043468ee7c97f9aa89fba7d6903d19210f012192cec8b05"
+        }
+      ]
+    },
+    {
+      "id": "A-011",
+      "item": "A-011",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-011",
+          "sha256": "2bbfb525a2a03878d12c9377d59aad27fbe12cacba910d408cce4125dca0c2ef"
+        }
+      ]
+    },
+    {
+      "id": "A-012",
+      "item": "A-012",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-012",
+          "sha256": "42dcbeb66b530057de51f660968420f429cf19d79eaf5eb805e224801c011313"
+        }
+      ]
+    },
+    {
+      "id": "A-013",
+      "item": "A-013",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-013",
+          "sha256": "bb170b83148a4ebcdb77f8310038a4e3132bd41a2c575e08c9bc2559d0ed560f"
+        }
+      ]
+    },
+    {
+      "id": "A-015",
+      "item": "A-015",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-015",
+          "sha256": "63f12414e3fd1ba4090f426c1e1aac8ce22d675f30dff8e8b2e194dc53620374"
+        }
+      ]
+    },
+    {
+      "id": "A-016",
+      "item": "A-016",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-016",
+          "sha256": "4536e9c4e0a2b756de442e0a05b4b0fa40166678cec4b2ee46babfdd5ef55a23"
+        }
+      ]
+    },
+    {
+      "id": "A-017",
+      "item": "A-017",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-017",
+          "sha256": "64c2c5ce538ff349c69a666815a4149c55e41939eed6eff9057c006167d1a5fd"
+        }
+      ]
+    },
+    {
+      "id": "A-018",
+      "item": "A-018",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-018",
+          "sha256": "b7878bb6baee3ee28ff434d711807cf9d6704e987413a59e304a15884c54a0f8"
+        }
+      ]
+    },
+    {
+      "id": "A-019",
+      "item": "A-019",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-019",
+          "sha256": "8eb576a32584e58cc988ed9d127d1b06ba7e38151c801d2e1bc2c3b08caf536f"
+        }
+      ]
+    },
+    {
+      "id": "A-020",
+      "item": "A-020",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-020",
+          "sha256": "f3352eb4c1258b4131af0953c73b2a15cc38f3d2f07b7e71004aff6ddb474cac"
+        }
+      ]
+    },
+    {
+      "id": "A-021",
+      "item": "A-021",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-021",
+          "sha256": "b4f073178c7af4b8ea1b850eab2dc2269ac96b1a477c570623b8b61eef426176"
+        }
+      ]
+    },
+    {
+      "id": "A-022",
+      "item": "A-022",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-022",
+          "sha256": "f8d5b7a309318e90424e6a90f62b799dcf6c01c73b697db95ecf68261fb9dc13"
+        }
+      ]
+    },
+    {
+      "id": "A-023",
+      "item": "A-023",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-023",
+          "sha256": "51a82a2e8d9a68fe3cbbdc1582351f0075da3083f59909baa4143b05f35a1a0f"
+        }
+      ]
+    },
+    {
+      "id": "A-024",
+      "item": "A-024",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-024",
+          "sha256": "7ee29a5f3d157d71c14c849011acfda9448c5dc95153e79c3302f1c4f979b920"
+        }
+      ]
+    },
+    {
+      "id": "A-025",
+      "item": "A-025",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-025",
+          "sha256": "8edf27dd7c4192dd607c7d589cf4859b88556db61144f9aa59092df4d5e0367e"
+        }
+      ]
+    },
+    {
+      "id": "A-026",
+      "item": "A-026",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-026",
+          "sha256": "75d7fdbdd78327c43b45c74d77fe689b564353f443cb88830d8b32979adebcc4"
+        }
+      ]
+    },
+    {
+      "id": "A-027",
+      "item": "A-027",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-027",
+          "sha256": "91a839dc6521590dc28000e97ece697c81db132c87efaed9d2fccc7ede5c8983"
+        }
+      ]
+    },
+    {
+      "id": "A-028",
+      "item": "A-028",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-028",
+          "sha256": "18d19435061782a72604a994dd03df538260d32802a8591233e95fcfaef70645"
+        }
+      ]
+    },
+    {
+      "id": "A-029",
+      "item": "A-029",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-029",
+          "sha256": "375f15bdec02a7428f7c05f07d41808b53c48ce642da2ce8ec53c82c48480352"
+        }
+      ]
+    },
+    {
+      "id": "A-030",
+      "item": "A-030",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-030",
+          "sha256": "f97e540119ea89ac9181683f869a1f338b0eba36b846dc0c20cd4ce2de6c06c7"
+        }
+      ]
+    },
+    {
+      "id": "A-031",
+      "item": "A-031",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-031",
+          "sha256": "2a6bf475eaca32a8ded5d227d1d839004c566540e25466e67d56a97fe7dc37db"
+        }
+      ]
+    },
+    {
+      "id": "A-032",
+      "item": "A-032",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-032",
+          "sha256": "0cd66cbced8525d683c8bc573c4f56cc0b26da10f32c43a367f7a0d8e20b9a3d"
+        }
+      ]
+    },
+    {
+      "id": "A-033",
+      "item": "A-033",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-033",
+          "sha256": "3db14e4aa2bed72b3a32c31d243283af12d4339df6ec793ee4eccded318dabec"
+        }
+      ]
+    },
+    {
+      "id": "A-034",
+      "item": "A-034",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-034",
+          "sha256": "822e304937c63d1682143ce7aba0507a73970bdbc36f23951045082f2ddd76f7"
+        }
+      ]
+    },
+    {
+      "id": "A-035",
+      "item": "A-035",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-035",
+          "sha256": "9f70a838ccea17268d2f8f7ba9d4b9919dfa6a1e274de8551e28f9b415a7af7a"
+        }
+      ]
+    },
+    {
+      "id": "A-036",
+      "item": "A-036",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-036",
+          "sha256": "96e91e42463f4898d93d9ff92d66c2dd253aed82251f31cf46323a262d61f022"
+        }
+      ]
+    },
+    {
+      "id": "A-037",
+      "item": "A-037",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-037",
+          "sha256": "b4b4538ec7e24e3b65b3d8cacc8ca8b59ef26b7ea8e36de2bb57c473c11cf207"
+        }
+      ]
+    },
+    {
+      "id": "A-039",
+      "item": "A-039",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-039",
+          "sha256": "2ad003bb47ade9ea045e2c41f9a1670da362777a0d8e295199aa995b33bea03e"
+        }
+      ]
+    },
+    {
+      "id": "A-045",
+      "item": "A-045",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-045",
+          "sha256": "ad7047b269ed2148ccdfa9b53dcf2babfdc7aed84ab399b00172111abf03269a"
+        }
+      ]
+    },
+    {
+      "id": "A-046",
+      "item": "A-046",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-046",
+          "sha256": "20f78a17d4c51612797ca0db05d0a9b358b55301ec9be37e3a471a37f3f4006e"
+        }
+      ]
+    },
+    {
+      "id": "A-047",
+      "item": "A-047",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-047",
+          "sha256": "e102283c141838fb5d07b51b64289a4c7da74bfbfda3145db66deacd170d3f34"
+        }
+      ]
+    },
+    {
+      "id": "A-048",
+      "item": "A-048",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-048",
+          "sha256": "576cb1d5c5ef9be732799774c9d650cd76522d006c37987b00742d68292081b6"
+        }
+      ]
+    },
+    {
+      "id": "A-049",
+      "item": "A-049",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-049",
+          "sha256": "8f3747854c5c80396e1b52583032363aa659983ca9d978d3d574be5115a8218d"
+        }
+      ]
+    },
+    {
+      "id": "A-050",
+      "item": "A-050",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-050",
+          "sha256": "0ce7dd9fe980d851ecadd80640834afc0503764f8998d81b3f7fadae9d5975ae"
+        }
+      ]
+    },
+    {
+      "id": "A-051",
+      "item": "A-051",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-051",
+          "sha256": "a6293cfbb3189f11051e0950dd04e6b42d067509705e9dde27463c337fe3e66c"
+        }
+      ]
+    },
+    {
+      "id": "A-052",
+      "item": "A-052",
+      "refs": [
+        {
+          "ref": "docs/ambiguities.md#A-052",
+          "sha256": "e337b7a377e7decaeab524a110f492868b7e524510f64d3b83981f0e0c23073a"
+        }
+      ]
+    },
+    {
+      "id": "F15-case-table",
+      "item": "F15 case table",
+      "refs": [
+        {
+          "ref": "src/openvef/f15.py",
+          "sha256": "3d1ee7714cada226d7b054f49bf8691a682ecb5e0f733794f5028081fc55ccc3"
+        }
+      ]
+    }
+  ]
+}

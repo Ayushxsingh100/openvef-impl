@@ -68,9 +68,42 @@ class FreezeRecordTests(unittest.TestCase):
         self.assertEqual(v["changed"], ["C1"])
 
     def test_mask_never_settled_by_owner_freeze(self):
-        never = [r for r, items in self.stages.PROVISIONAL_REASONS if not items]
-        self.assertEqual(len(never), 1)
-        self.assertIn("independent human reviewer", never[0])
+        self.assertNotIn("G", [i["id"] for i in self.record["items"]])
+        done = {i["id"] for i in self.record["items"]}
+        provisional, cleared = self.stages.open_reasons(done, None)
+        self.assertEqual(len(provisional), 1)
+        self.assertIn("independent human reviewer", provisional[0])
+        self.assertEqual(cleared, [])
+
+    def deviation(self):
+        dev = self.freeze.load(REPO, self.stages.DEVIATION_RECORD)
+        return dict(self.freeze.verify(REPO, dev), label=dev["label"])
+
+    def test_dev001_clears_only_the_mask_reason_with_its_label(self):
+        done = {i["id"] for i in self.record["items"]}
+        provisional, cleared = self.stages.open_reasons(done, self.deviation())
+        self.assertEqual(provisional, [])
+        self.assertEqual([c["label"] for c in cleared], ["cleared under DEV-001 (non-independent mask review)"])
+        provisional, cleared = self.stages.open_reasons(set(), self.deviation())
+        self.assertEqual((len(provisional), len(cleared)), (5, 1))
+
+    def test_dev001_hashes_are_package_section_g(self):
+        g = dict(re.findall(r"^\| `(design/fifo/mask/[^`]+)` \| `([0-9a-f]{64})` \|", PACKAGE, re.M))
+        dev = self.freeze.load(REPO, self.stages.DEVIATION_RECORD)
+        self.assertEqual({r["ref"]: r["sha256"] for r in dev["items"][0]["refs"]}, g)
+
+    def test_changed_mask_is_not_cleared(self):
+        real = self.freeze.ref_sha256
+        def fake(ref, repo=REPO):
+            return "0" * 64 if ref.startswith("design/fifo/mask/") else real(ref, repo)
+        with unittest.mock.patch.object(self.freeze, "ref_sha256", fake):
+            provisional, cleared = self.stages.open_reasons({i["id"] for i in self.record["items"]}, self.deviation())
+        self.assertEqual((len(provisional), cleared), (1, []))
+
+    def test_d009_readings_match(self):
+        v = self.freeze.verify(REPO, self.freeze.load(REPO, self.stages.READINGS_RECORD))
+        self.assertEqual(v["changed"], [])
+        self.assertEqual(len(v["frozen"]), 40)  # 7 + 23 + 1 + 8 readings and the F15 case table
 
 
 if __name__ == "__main__":

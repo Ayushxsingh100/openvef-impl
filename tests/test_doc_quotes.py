@@ -11,7 +11,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 BASE = REPO / "baseline/OpenVEF_Planning_v1_3_6"
-DOCS = ("docs/pack-defects.md", "docs/fifo-owner-checklist.md", "docs/fifo-spec-v0.1.md",
+DOCS = ("docs/pack-defects.md", "docs/DEVIATIONS.md", "docs/fifo-owner-checklist.md", "docs/fifo-spec-v0.1.md",
         "docs/fifo-spec-v0.2.md", "docs/fifo-benchmark-overlap-disclosure-DRAFT.md",
         "docs/fifo-frozen-values-proposal-DRAFT.md",
         "docs/OWNER-FREEZE-PACKAGE.md", "docs/AUDIT-READINESS.md", "docs/F1-F17-plan.md")
