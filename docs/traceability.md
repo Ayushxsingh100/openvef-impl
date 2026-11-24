@@ -82,5 +82,7 @@ Related documents:
 - [OWNER-FREEZE-PACKAGE.md](OWNER-FREEZE-PACKAGE.md): hashed signing checklist for the owners and
   the independent mask reviewer.
 - [AUDIT-READINESS.md](AUDIT-READINESS.md): status, auditor needs and open items.
+- [F1-F17-plan.md](F1-F17-plan.md): plan for feasibility controls F1–F15 and pre-freeze F17
+  (pack text, harness work, who builds each artifact, build order). Nothing built yet.
 
 Every quote in both documents is checked verbatim by `tests/test_doc_quotes.py`.
