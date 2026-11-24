@@ -18,7 +18,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "src"))
 
 from openvef import sandbox  # noqa: E402
-from openvef.simulation import SimulationError, driver_run, driver_stages, run_outcome  # noqa: E402
+from openvef.simulation import (SimulationError, compare_runs, driver_run, driver_stages, l334_timeout,  # noqa: E402
+                                 run_outcome, simulate_pair)
 from openvef.stage_map import NotDetermined  # noqa: E402
 
 INP, OUT, NXT = "inputs_consumed_at_edge_n", "outputs_after_edge_n", "next_inputs_scheduled_for_edge_n_plus_1"
@@ -61,6 +62,37 @@ class SimulationTests(unittest.TestCase):
     def diag(self, src, **kw):
         f = run_outcome(self.run1(src, **kw))
         return None if f is None else f.diagnostic
+
+    def test_check_e_executable_predicate(self):
+        # File 30 L83 (e) with a design-pack predicate over (vector, sampled outputs) (A-041).
+        pred = {"language": "python3.11", "function": "legal",
+                "source": "def legal(vector, sampled):\n    return not (sampled['flag'] == '1' and vector['b'] == '1')\n"}
+        r = self.run1(COUNTER, design(legal_input_predicate=pred))
+        # Cycle 0 is legal (flag 0 after reset) and drives b = 1; cycle 1 sees flag = 1 and
+        # returns b = 1 again: illegal, not driven.
+        self.assertEqual(run_outcome(r).diagnostic, "DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE")
+        self.assertEqual(r["events"][0]["cycle"], r["reset_release_cycle"] + 1)
+        self.assertIsNone(r["rows"][-1][NXT])
+
+    def test_check_e_predicate_failure_is_a_harness_error(self):
+        for body in ("    raise KeyError('x')\n", "    return 1\n"):
+            pred = {"language": "python3.11", "function": "legal", "source": "def legal(vector, sampled):\n" + body}
+            with self.assertRaises(SimulationError):
+                run_outcome(self.run1(COUNTER, design(legal_input_predicate=pred)))
+
+    def test_check_e_non_executable_predicate_is_not_determined(self):
+        with self.assertRaises(NotDetermined):
+            run_outcome(self.run1(COUNTER, design(legal_input_predicate="b must be 0 when flag is 1")))
+
+    def test_l334_timeout_and_simulate_pair(self):
+        t = l334_timeout(COUNTER, design(), 0)
+        self.assertEqual(len(t["wall_times_s"]), 3)
+        self.assertGreaterEqual(t["t_timeout_s"], 2.0)
+        self.assertAlmostEqual(t["t_timeout_s"], max(5 * t["median_s"], 2.0), places=2)
+        out = simulate_pair(COUNTER, design(), design(), 0,
+                            lambda a, b: compare_runs(a, b, ["flag", "q"]), timeout_s=t["t_timeout_s"])
+        self.assertIsNone(out["failure"])
+        self.assertEqual(len(out["null_rows"]), 8)
 
     def test_held_inputs_are_not_driver_keys(self):
         # A-042: rst is harness-owned; driver vectors omit it, the harness holds it at 0

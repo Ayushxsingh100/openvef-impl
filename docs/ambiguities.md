@@ -1121,3 +1121,33 @@ pack text:
 
 **Competing consequence:** under reading (a), the FIFO's `rst` returns to the driver key
 set (v0.1), and `held_inputs` is unused.
+
+## A-043 — What the L334 "null-netlist wall time" measures (DECIDED BY CLAUDE — owner review pending)
+
+Protocol L334: "Proposed timeout: `T_timeout = max(5 × median(null-netlist wall time over
+3 runs for the same artifact/design), 2 seconds)`." Item 9 is approved per run (D-006).
+The pack does not say what one "wall time" covers, or what happens to the three runs'
+outcomes.
+
+**Readings:**
+- (a) The evaluator's elapsed time for one complete null-netlist driver run, including the
+  sandbox container start and teardown.
+- (b) Only the simulator's own elapsed time inside the container.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (a).**
+Reasons:
+- "wall time" is the elapsed real time of a "run"; L229 says "A wall-clock timeout is
+  separate" from the cycle cap, which points to a limit on the run as a whole.
+- (a) can be measured identically for every artifact without instrumenting the
+  simulator.
+
+**Details:**
+- The resulting T_timeout is applied as the per-run budget and as the per-step watchdog
+  inside the container. That makes the limit slightly more lenient than the measurement,
+  because container start is outside the in-container budget.
+- The three calibration runs are used only for their wall times; their outcomes are
+  ignored. Each calibration run has a build-default ceiling of 120 s (not from the pack),
+  and a run that hits it counts as 120 s.
+
+**What changes under (b):** T_timeout is smaller, and container start-up time no longer
+affects it.

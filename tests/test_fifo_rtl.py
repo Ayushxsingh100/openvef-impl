@@ -1,11 +1,10 @@
 """DRAFT FIFO RTL (D-005) checked against DRAFT spec v0.2 in the pinned sandbox.
 
 Uses the production harness (Icarus 12 -g2012 + cocotb, A-040 trace rows, A-042 held
-reset) and the DRAFT design materials in design/fifo/. These tests verify Claude's own
-RTL draft. They are NOT the directed suite or the reference driver (checklist item 14,
-human-written), and the legality check here uses the spec's FIFO-042 predicate inside
-the test, not harness check (e), which still accepts only the test-only
-ALL_INPUTS_LEGAL literal.
+reset) and the DRAFT design materials in design/fifo/, loaded by
+openvef.design_materials. Harness check (e) runs the spec's FIFO-042 predicate. These
+tests verify Claude's own RTL draft. They are NOT the directed suite or the reference
+driver (checklist item 14, human-written).
 
 - the worked example of fifo-spec-v0.2.md, on RTL and on the null netlist;
 - the null netlist exported twice with the DRAFT export script, with identical hashes and
@@ -28,7 +27,8 @@ sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(HERE))
 
 from openvef import sandbox  # noqa: E402
-from openvef.simulation import driver_run, driver_stages  # noqa: E402
+from openvef import design_materials  # noqa: E402
+from openvef.simulation import driver_run, driver_stages, run_outcome  # noqa: E402
 from test_netlist_export import ports, run_text  # noqa: E402
 
 DOCKER = shutil.which("docker") is not None
@@ -60,13 +60,11 @@ def example_rows() -> list[dict]:
     return rows
 
 
+LOADED = design_materials.load(REPO, "design/fifo/design-materials-DRAFT.json")
+
+
 def design(sources: dict) -> dict:
-    keys = ("toplevel", "clock_port", "input_ports", "held_inputs", "output_ports", "reset_sequence",
-            "cycle_cap", "safe_idle")
-    d = {k: MATERIALS[k] for k in keys}
-    d["verilog_sources"] = sources
-    d["legal_input_predicate"] = "ALL_INPUTS_LEGAL"  # test-only literal (A-038); legality checked below
-    return d
+    return dict(LOADED["base"], verilog_sources=sources)  # check (e) runs FIFO-042
 
 
 def replay_driver(vectors: list[dict]) -> str:
@@ -183,6 +181,15 @@ class FifoRtlTests(unittest.TestCase):
         for src in (replay_driver(vectors), RANDOM_DRIVER):
             self.assertIsNone(driver_stages(src, self.rtl, self.null, MATERIALS["output_ports"], 7,
                                             step_timeout_s=5.0, budget_s=120.0))
+
+    def test_check_e_rejects_write_while_full_without_read(self):
+        # Five writes and no reads: the fifth vector is applied while the sampled full = 1.
+        src = replay_driver([{"wr_en": "1", "wr_data": "00000001", "rd_en": "0"}] * 6)
+        result = driver_run(src, self.rtl, "rtl", 0, step_timeout_s=5.0, budget_s=120.0)
+        self.assertEqual(run_outcome(result).diagnostic, "DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE")
+        self.assertEqual(result["events"][0]["cycle"], MATERIALS["reset_release_cycle"] + 4)
+        self.assertEqual(result["rows"][-1][OUT]["full"], "1")
+        self.assertIsNone(result["rows"][-1][NXT])  # the invalid vector is not driven
 
     def test_random_legal_driver_matches_model(self):
         legal = legal_input()

@@ -5,16 +5,50 @@
   "toplevel": "ovf_fifo",
   "rtl": "design/fifo/rtl/ovf_fifo.v",
   "clock_port": "clk",
-  "input_ports": {"wr_en": 1, "wr_data": 8, "rd_en": 1},
-  "held_inputs": {"rst": "0"},
-  "output_ports": ["almost_full", "empty", "full", "rd_data", "rd_valid"],
+  "input_ports": {
+    "wr_en": 1,
+    "wr_data": 8,
+    "rd_en": 1
+  },
+  "held_inputs": {
+    "rst": "0"
+  },
+  "output_ports": [
+    "almost_full",
+    "empty",
+    "full",
+    "rd_data",
+    "rd_valid"
+  ],
   "reset_sequence": [
-    {"rst": "1", "wr_en": "0", "wr_data": "00000000", "rd_en": "0"},
-    {"rst": "1", "wr_en": "0", "wr_data": "00000000", "rd_en": "0"}
+    {
+      "rst": "1",
+      "wr_en": "0",
+      "wr_data": "00000000",
+      "rd_en": "0"
+    },
+    {
+      "rst": "1",
+      "wr_en": "0",
+      "wr_data": "00000000",
+      "rd_en": "0"
+    }
   ],
   "reset_release_cycle": 1,
   "cycle_cap": 64,
-  "safe_idle": {"wr_en": "0", "wr_data": "00000000", "rd_en": "0"},
+  "safe_idle": {
+    "wr_en": "0",
+    "wr_data": "00000000",
+    "rd_en": "0"
+  },
   "trace_schema_version": "openvef-trace-0.1-draft",
-  "watchdog": {"formula": "max(5 * median(null-netlist wall time over 3 runs for the same artifact/design), 2 s)", "applies_to": "each simulation run (wall clock)"}
+  "watchdog": {
+    "formula": "max(5 * median(null-netlist wall time over 3 runs for the same artifact/design), 2 s)",
+    "applies_to": "each simulation run (wall clock)"
+  },
+  "legal_input_predicate": {
+    "language": "python3.11",
+    "function": "legal_input",
+    "spec_clause": "FIFO-042"
+  }
 }

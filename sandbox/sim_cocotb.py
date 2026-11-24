@@ -43,7 +43,28 @@ def finish(result: dict) -> None:
         json.dump(result, f)
 
 
-def vector_reason(value, widths: dict, predicate) -> str | None:
+class PredicateError(RuntimeError):
+    """The design pack's legal-input predicate failed (evaluator-side, not the driver's)."""
+
+
+def load_predicate(spec):
+    """Check (e)'s predicate from the design materials.
+
+    - the test-only literal ALL_INPUTS_LEGAL;
+    - or a design-pack Python 3.11 function, {"language": "python3.11", "function": <name>,
+      "source": <text>}, called as f(vector, sampled) -> bool, where `sampled` is the
+      outputs the driver was given in the same step (A-041; FIFO spec FIFO-042 form).
+    Anything else is not executable: None, and (e) is NOT_DETERMINED (A-027, A-038)."""
+    if spec == ALL_INPUTS_LEGAL:
+        return spec
+    if isinstance(spec, dict) and set(spec) == {"language", "function", "source"} and spec["language"] == "python3.11":
+        namespace: dict = {}
+        exec(compile(spec["source"], "<legal_input_predicate>", "exec"), namespace)  # noqa: S102 - design pack
+        return namespace[spec["function"]]
+    return None
+
+
+def vector_reason(value, widths: dict, predicate, sampled: dict) -> str | None:
     """File 30 §4 (a)-(e) on a non-COMPLETE return; None if the vector may be driven.
     Returns "NOT_DETERMINED" when (e) cannot be run (A-027)."""
     if not isinstance(value, dict):
@@ -59,9 +80,17 @@ def vector_reason(value, widths: dict, predicate) -> str | None:
         return "WRONG_WIDTH"
     if any(c not in "01" for v in value.values() for c in v):
         return "ILLEGAL_SYMBOL"
-    if predicate != ALL_INPUTS_LEGAL:
+    if predicate == ALL_INPUTS_LEGAL:
+        return None
+    if predicate is None:
         return "NOT_DETERMINED"
-    return None
+    try:
+        verdict = predicate(dict(value), dict(sampled))
+    except Exception as exc:  # noqa: BLE001 - a design-pack defect, reported as a harness error
+        raise PredicateError(f"legal-input predicate raised {type(exc).__name__}") from exc
+    if not isinstance(verdict, bool):
+        raise PredicateError("legal-input predicate returned a non-bool")
+    return None if verdict else "ILLEGAL_PROTOCOL_STATE"  # File 30 L83 (e); Protocol L125
 
 
 def sample(dut, ports) -> dict:
@@ -81,7 +110,7 @@ async def openvef_driver_run(dut):
     outputs = design["output_ports"]
     cap = design["cycle_cap"]
     safe_idle = design["safe_idle"]
-    predicate = design.get("legal_input_predicate")
+    predicate = load_predicate(design.get("legal_input_predicate"))
     # A-042: harness-owned inputs (e.g. a reset port) that are not driver-vector keys. Each
     # reset-sequence vector gives them; from the reset-release drive phase onward they are
     # held at these values. They are still recorded as consumed top-level inputs (L217).
@@ -165,7 +194,11 @@ async def openvef_driver_run(dut):
                 completed = True
                 vector = applied(safe_idle)
             else:
-                reason = vector_reason(value, widths, predicate)
+                try:
+                    reason = vector_reason(value, widths, predicate, snapshot)
+                except PredicateError as exc:
+                    finish({"error": f"design materials: {exc}", "cycle": n})
+                    return
                 if reason == "NOT_DETERMINED":
                     finish({"not_determined": "legal-input predicate not executable (A-027, A-038)",
                             "cycle": n, "rows": rows, "target": target})

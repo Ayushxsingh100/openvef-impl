@@ -12,17 +12,17 @@ Implements:
             divergence is terminal driver nondeterminism; a same-input masked output
             divergence is a design halt."
 
-Not implemented here, because the inputs are owner materials or TO FREEZE:
-  - the design materials themselves (FIFO RTL, null netlist, port manifest, reset
-    sequence, legal-input predicate, cycle cap, safe-idle vector; Protocol L61-L64,
-    L229, L542);
-  - the observation mask (owner-written; Scope section) — `compare_runs` takes the set
-    of observed output ports as a parameter;
-  - L166 (9)-(11) on a real null trace: the checker-facing trace schema and metadata
-    (`spec_version_sha256`, `trace_schema_version`) are TO FREEZE (L543).
+Also implemented (DRAFT materials under D-005; frozen values pending):
+  - check (e) with an executable design-pack predicate (sandbox/sim_cocotb.py, A-041);
+  - the L334 timeout, per run and per step (`l334_timeout`, A-043, D-006);
+  - `simulate_pair`, which keeps the null trace for L166 (9)-(10).
+The design materials themselves come from openvef.design_materials; the observation mask
+is passed in as the comparison.
 """
 from __future__ import annotations
 
+import statistics
+import time
 from typing import Any, Iterable, Mapping, Optional
 
 from openvef.envelope import Failure
@@ -106,3 +106,47 @@ def driver_stages(driver_source: str, rtl: Mapping[str, Any], null: Mapping[str,
             return failure
         runs.append(result["rows"])
     return compare_runs(runs[0], runs[1], observed_outputs)
+
+
+# Protocol L334: "Proposed timeout: `T_timeout = max(5 × median(null-netlist wall time over
+# 3 runs for the same artifact/design), 2 seconds)`." Applied per run, and as the per-step
+# watchdog bound (proposal item 9, approved under D-006; frozen values pending).
+L334_FACTOR = 5.0
+L334_FLOOR_S = 2.0
+# Build default, not from the pack: the limit for the three calibration runs themselves.
+CALIBRATION_CEILING_S = 120.0
+
+
+def l334_timeout(driver_source: str, null: Mapping[str, Any], seed: int) -> dict:
+    """Three null-netlist runs of this artifact; T_timeout from their wall times (A-043).
+
+    Wall time is the evaluator's elapsed time for one complete null-netlist driver run
+    (one sandbox container). The calibration runs' outcomes are not used, only their
+    wall times; a calibration run that hits the ceiling counts as the ceiling."""
+    walls = []
+    for _ in range(3):
+        start = time.monotonic()
+        driver_run(driver_source, null, "null", seed, step_timeout_s=CALIBRATION_CEILING_S,
+                   budget_s=CALIBRATION_CEILING_S)
+        walls.append(round(time.monotonic() - start, 3))
+    median = statistics.median(walls)
+    return {"wall_times_s": walls, "median_s": median,
+            "t_timeout_s": round(max(L334_FACTOR * median, L334_FLOOR_S), 3),
+            "rule": "Protocol L334, per run and per step (D-006); wall time per A-043"}
+
+
+def simulate_pair(driver_source: str, rtl: Mapping[str, Any], null: Mapping[str, Any], seed: int,
+                  compare, *, timeout_s: float) -> dict:
+    """L166 (7) on RTL then null, then (8) through `compare(rtl_rows, null_rows)`.
+
+    Returns {"failure": Failure | None, "null_rows": ..., "null_result": ...}; the null rows
+    are kept for the checker's null invocations (L166 (9)-(10))."""
+    runs = []
+    for target, design in (("rtl", rtl), ("null", null)):
+        result = driver_run(driver_source, design, target, seed, step_timeout_s=timeout_s, budget_s=timeout_s)
+        failure = run_outcome(result)
+        if failure is not None:
+            return {"failure": failure, "failed_target": target, "null_rows": None, "null_result": None}
+        runs.append(result)
+    return {"failure": compare(runs[0]["rows"], runs[1]["rows"]), "failed_target": None,
+            "null_rows": runs[1]["rows"], "null_result": runs[1]}

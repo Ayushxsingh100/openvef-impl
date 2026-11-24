@@ -162,9 +162,27 @@ Request fields (design materials; **all supplied by the caller, no defaults**):
 `reset_sequence`, `cycle_cap`, `safe_idle`, `legal_input_predicate`, plus `seed`,
 `step_timeout_s`, `budget_s`. Optional: `held_inputs` (name → bits), harness-owned inputs
 such as a reset port. They are not driver-vector keys, are held after reset release, and
-are recorded as consumed inputs (A-042). The only executable predicate is the literal
-`ALL_INPUTS_LEGAL` (used by the toy tests). Any other value makes the result not
-determined (A-027, A-038), never a pass.
+are recorded as consumed inputs (A-042).
+
+`legal_input_predicate` is either:
+- the test-only literal `ALL_INPUTS_LEGAL`;
+- or a design-pack Python 3.11 function `{"language": "python3.11", "function": <name>,
+  "source": <text>}`, called as `f(vector, sampled)`, where `sampled` is the outputs the
+  driver was given in the same step (A-041). False gives
+  `DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE`. An exception or a non-bool return
+  is a design-materials error (ERROR), not a driver failure.
+
+Anything else makes the result not determined (A-027, A-038), never a pass. For the FIFO,
+[src/openvef/design_materials.py](../src/openvef/design_materials.py) takes the source
+verbatim from the FIFO-042 code block of the specification.
+
+Timeout (Protocol L334, A-043): `simulation.l334_timeout` makes three null-netlist runs
+of the artifact (each capped at 120 s, a build default). T_timeout = max(5 × median wall
+time, 2 s) is then the per-run budget and the per-step watchdog.
+
+Trace for the checker (DRAFT schema, item 11): [src/openvef/trace.py](../src/openvef/trace.py)
+serializes the rows as UTF-8 JSON (sorted keys, no whitespace) and records the bytes'
+SHA-256. Each checker invocation gets a value freshly decoded from those bytes.
 
 **Build defaults for choices the pack leaves TO FREEZE** (Protocol L229 "Cycle cap,
 safe-idle vectors and timeout formula are **TO FREEZE**"; L542 "Freeze driver API,
