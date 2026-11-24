@@ -99,7 +99,7 @@ once to warm the image (about 15 s).
    python3 -c "import json;s=json.load(open('evidence/run-20261124T195537Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
    grep '"fixture_id": "M27"' evidence/run-20261124T195537Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
-6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the independent auditor will check).
+6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the auditor will check; DEV-002: an AI model, not a human independent auditor).
 
 *Optional, if there is time:* start a full containerized run at the beginning, writing
 outside the evidence tree, and show its counts at the end. It takes a few minutes, so

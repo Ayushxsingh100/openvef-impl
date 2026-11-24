@@ -61,7 +61,7 @@ Evidence runs since then: `run-20261124T195537Z`, `controls-20261124T195210Z`.
 | Protocol L223, L216–L221 (F2/F10 ordering); L510 (F1 repeats) | `sandbox/sim_cocotb.py` ordering probe (H9); `src/openvef/alignment.py` (H9, H10) | F1, F2, F10 | Built; toy-design runs in the sandbox; A-051 Claude-decided, approved under D-009 |
 | Charter L74; L233; D-007 (2) (control mutants) | `src/openvef/mutants.py` (H1); `design/fifo/controls/` slots (owner-written content) | F4–F10, F12, F17 | Loader built; **no mutant exists yet** (owner item 15) |
 | Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261124T195210Z`: F14, F15 PASS (D-009); 14 controls BLOCKED_OWNER_ARTIFACTS |
-| L555 (5): preparation for an external AI-assisted audit | `docs/AUDIT-BRIEF.md`, `tools/build_audit_bundle.py`, `dist/openvef-audit-bundle.zip` | all 144 (audited run: run-20261124T195537Z) | Prepared; audit **not** run. Not claimed to satisfy L555 (5) |
+| L555 (5): preparation for an external AI-assisted audit | `docs/AUDIT-BRIEF.md`, `tools/build_audit_bundle.py`, `dist/openvef-audit-bundle.zip` | all 144 (audited run: run-20261124T195537Z) | Prepared; audit **not** run (DEV-002: to be done by ChatGPT, OpenAI; not a human independent audit). Not claimed to satisfy L555 (5) |
 
 Latest F18 run: `evidence/run-20261124T195537Z`. It was started by `runner/run_f18_container.sh development`
 at commit 278e9aa, on a clean tree, after DEV-001, D-009, D-010 and D-011:

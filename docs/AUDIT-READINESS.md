@@ -13,7 +13,8 @@ It is a status document: it claims no gate as passed.
   The v1.3.6 baseline files still record their own pre-implementation status (Files 16,
   21, 23 and 32); they are read-only and are not updated by this work.
 - **Not done:** step (5), the independent implementation re-audit. It is **not
-  started**, and an auditor is not yet named.
+  started**. Under DEV-002 it will be done by a different AI model (ChatGPT, OpenAI), which is
+  not a human independent audit.
 - **Prohibited:** no LLM or provider call has been made by any code, test or script
   (CLAUDE.md hard rule 5). The LLM-call gate, step (6), is closed.
 
@@ -127,7 +128,7 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-011, DEV-001, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-011, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item. Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
@@ -141,7 +142,7 @@ this run is on the pinned one.
 | Item | Owner | Reference |
 |---|---|---|
 | Independent human mask reviewer: none available (DEV-001). Signing would end the deviation | owners to appoint if one becomes available; must not have authored the templates or the mask | L271; File 21 "Independent reviewer"; package §G |
-| Independent implementation auditor | owners to appoint. An AI-assisted audit by a different model is prepared ([AUDIT-BRIEF.md](AUDIT-BRIEF.md), `tools/build_audit_bundle.py`) but not run; whether it can count toward L555 (5) is an owner decision, to be disclosed | L555 (5) |
+| Independent human implementation auditor: none available (DEV-002). The audit will be performed by a different AI model (ChatGPT, OpenAI); **not yet performed**, and not a human independent audit | owners | L555 (5); [DEVIATIONS.md](DEVIATIONS.md) DEV-002; [AUDIT-BRIEF.md](AUDIT-BRIEF.md) |
 
 **Human-written work (reserved by CLAUDE.md; Claude does not write it)**
 

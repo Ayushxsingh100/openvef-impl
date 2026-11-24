@@ -1430,3 +1430,9 @@ at the owner's instruction):
   wording, because the package says signed files are not edited in place. Frozen status is
   set by the freeze record and its hashes, not by the word "DRAFT".
 - The saved review covers those cells, and changing them has no effect on what is compared.
+
+## DEV-002 — Implementation audit by an AI model (DECIDED)
+
+The L555 (5) implementation audit will be performed by a different AI model (ChatGPT,
+OpenAI); not yet performed, and not a human independent audit. Full record:
+[DEVIATIONS.md](DEVIATIONS.md).

@@ -27,6 +27,10 @@ available, so the owner accepted the FIFO mask and File 24 table at their frozen
 (docs/reviews/claude-mask-review-2026-11-25.md). L271 stays unmet. Every affected result
 carries "cleared under DEV-001 (non-independent review saved)";
 never call the mask independently reviewed.
+Deviation DEV-002 (Krishika; docs/DEVIATIONS.md): the L555 (5) implementation audit will be
+performed by a different AI model (ChatGPT, OpenAI), not a human. Never call it a human
+independent audit, and never report it done before its report is saved verbatim under
+docs/reviews/.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

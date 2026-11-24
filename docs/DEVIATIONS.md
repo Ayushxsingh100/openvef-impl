@@ -55,3 +55,46 @@ pending").
 F18 can pass with it is for the independent implementation auditor (L555 (5)).
 
 **Ends when** an independent human reviewer signs the mask.
+
+## DEV-002 — Implementation audit by an AI model (Protocol L555 (5))
+
+> [02 L555] "(5) Independently re-audit the implementation, parser/assembler, Python 3.11 behavior and all mandatory fixture results."
+
+**Owner decision (Krishika, recorded 24 Nov 2026 UTC; pasted into Claude Code):** "no
+independent human implementation auditor is available. The implementation audit (L555 (5))
+will be performed by a different AI model (ChatGPT, OpenAI), not the implementation author,
+using dist/openvef-audit-bundle.zip (e0ee23ff…fa01) and docs/AUDIT-BRIEF.md. This is NOT a
+human independent audit".
+
+**Status: the audit has not been performed.** The report will be saved verbatim under
+`docs/reviews/` when received.
+
+| Audit input | Identity |
+|---|---|
+| `dist/openvef-audit-bundle.zip` | SHA-256 `e0ee23ff6e29ec78c5310405edd6dd50d7625a8893c75bffdb0d6d026464fa01`, built from commit `5341c28` |
+| `docs/AUDIT-BRIEF.md` | the copy inside that bundle |
+| Evidence run | `run-20261124T195537Z` |
+
+The bundle is not rebuilt for this record, so its documents predate DEV-002.
+
+**What this does not do:**
+- It does not mark step (5) done. Recording DEV-002 is not an audit result, and a report's
+  findings must be settled before anyone relies on it.
+- It opens no later gate. The LLM-call gate, step (6), stays closed, and F18 is not passed.
+- It does not cover DEV-001: L271 stays unmet, and an AI auditor is not the independent
+  human mask reviewer.
+- It does not cover the document audit that `proposals/v1.3.7/` requires.
+
+**Limits to disclose with the report:**
+- The auditor is an AI model, and Claude, the implementation author, wrote the brief and
+  the bundle script.
+- ChatGPT had an earlier role in this project (assistance-log.md, retrospective entry):
+  handoff text, reviews of Claude's reports and interpretation-note drafts, with its role in
+  drafting the pack "not recorded". The auditor is a different model from the author, but
+  not a stranger to the project.
+- The report must state the exact model and version, and which checks were run rather than
+  read. Checks that need Docker may not be possible for it.
+- If a ChatGPT/OpenAI model is later evaluated in the study, the owners should disclose its
+  role as auditor, as D-005 does for Claude.
+
+**Ends when** an independent human auditor performs the implementation audit.
