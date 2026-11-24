@@ -54,7 +54,7 @@ artifacts**.
   Krishika accepted the mask with a saved Claude (claude.ai) review. Claude Code drafted the
   mask, so the review is not independent. The Protocol's independent signature (L271) is still missing.
 - **Many passes rest on readings of ambiguous pack text.** Claude decided them under a
-  delegation. Krishika approved them as decided, without itemised owner review (D-009); A-053 is still unreviewed.
+  delegation. Krishika approved them as decided, without itemised owner review (D-009); A-053 is approved (D-014), subject to re-audit.
   They are listed in `docs/READINGS-REVIEW.md`; R01–R13 and several M-fixtures would
   change under a competing reading.
 - **The count went 139, 123, 127 around an AI audit. Say so.** Krishika accepted a finding

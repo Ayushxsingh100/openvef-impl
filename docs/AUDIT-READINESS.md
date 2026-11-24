@@ -131,14 +131,14 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-013, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-014, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item; A-031 withdrawn (D-012). Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
 | Save the GPT-6 audit report verbatim as docs/reviews/implementation-audit-gpt6-2026-11-25.md | Krishika | DEV-002; D-012 |
 | Input contracts and outcomes for the 15 fixtures without one (PD-03, PD-04, PD-07, PD-26) | owners | D-013 |
-| Review A-053 (what counts as a cited input contract); re-audit of D-013 | an owner; the auditor | D-013, A-053 |
+| Re-audit of D-013 and A-053 (approved, D-014); the passes resting on A-053 count subject to it | the auditor | D-013, D-014, A-053 |
 | Draft pack corrections for M27, M36, M42, M47, M48, M50, M54, M58, PD-22 and PD-24: `proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md` (DRAFT; needs a new independent document audit) | owners | PD-02, PD-03, PD-06, PD-22, PD-24, PD-25 |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |
 | TechRxiv preprint: retrieve it, or record its access status; make the Charter and File 10 agree | owners | PD-24 |

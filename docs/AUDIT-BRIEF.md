@@ -57,7 +57,7 @@ the build refuses to run if any file the run hashed has changed.
 | **F18 is not passed** | docs/AUDIT-READINESS.md |
 | 0 results provisional; 9 labelled "cleared under DEV-001 (non-independent review saved)" | `summary.json` |
 | The run used the pinned CPython 3.11.18 in the pinned image | `summary.json` |
-| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 unreviewed | docs/READINGS-REVIEW.md |
+| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to this re-audit | docs/READINGS-REVIEW.md |
 
 ## 4. Audit areas
 

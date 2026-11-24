@@ -1,8 +1,8 @@
 # Traceability: requirement → component → fixtures → evidence
 
 **Reading status, 24 Nov 2026:** every Claude-decided reading below is approved by Krishika
-(D-008): A-038 and A-040–A-044 in FREEZE-2026-11-24; all others under D-009, as decided,
-without itemised owner review.
+(D-008): A-038 and A-040–A-044 in FREEZE-2026-11-24; A-053 under D-014;
+all others under D-009, as decided, without itemised owner review.
 Evidence runs since then: `run-20261124T203551Z`, `controls-20261124T195210Z`.
 
 | Requirement | Component | Fixtures | Status |
@@ -61,7 +61,7 @@ Evidence runs since then: `run-20261124T203551Z`, `controls-20261124T195210Z`.
 | Protocol L223, L216–L221 (F2/F10 ordering); L510 (F1 repeats) | `sandbox/sim_cocotb.py` ordering probe (H9); `src/openvef/alignment.py` (H9, H10) | F1, F2, F10 | Built; toy-design runs in the sandbox; A-051 Claude-decided, approved under D-009 |
 | Charter L74; L233; D-007 (2) (control mutants) | `src/openvef/mutants.py` (H1); `design/fifo/controls/` slots (owner-written content) | F4–F10, F12, F17 | Loader built; **no mutant exists yet** (owner item 15) |
 | Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261124T195210Z`: F14, F15 PASS (D-009); 14 controls BLOCKED_OWNER_ARTIFACTS |
-| CLAUDE.md rule 4; D-013 (A1-1): adapters need a cited contract and synthetic vectors | `runner/run_f18.py` `ADAPTERS`, `runner/adapter_contracts.py`; `tests/adapter_vectors.py`, `tests/test_dispatch_shapes.py` | all 144 | Implemented; evidence/run-20261124T203551Z; A-053 owner review pending; requires re-audit |
+| CLAUDE.md rule 4; D-013 (A1-1): adapters need a cited contract and synthetic vectors | `runner/run_f18.py` `ADAPTERS`, `runner/adapter_contracts.py`; `tests/adapter_vectors.py`, `tests/test_dispatch_shapes.py` | all 144 | Implemented; evidence/run-20261124T203551Z; A-053 approved (D-014); requires re-audit |
 | Protocol L185; D-012 (A8-1): supplied halt signatures validated | `src/openvef/ledger.py` `HaltSignature.given`; `tests/test_local_rules.py` | M42, M47 NOT_IMPLEMENTED (PD-01) | Implemented; A-031 reversed |
 | L555 (5): preparation for an external AI-assisted audit | `docs/AUDIT-BRIEF.md`, `tools/build_audit_bundle.py`, `dist/openvef-audit-bundle.zip` | all 144 (audited run: run-20261124T195537Z; bundle rebuilt with run-20261124T203551Z) | DEV-002 AI audit (OpenAI GPT-6) received, as stated by Krishika; report not saved yet; not a human independent audit. Not claimed to satisfy L555 (5) |
 
@@ -77,7 +77,7 @@ at commit 0d50a7d, on a clean tree, after D-013:
 - 9 PASS (P01, P14, P21, P42, M07, M31, M32, M33, M57) are "cleared under DEV-001
   (non-independent review saved)". The independent mask signature (L271) does not exist.
 - Earlier runs with other DEV-001 labels, or before D-013, are superseded.
-- Results that rest on A-053 (owner review pending) do not count toward F18 until reviewed:
+- Results that rest on A-053 (approved as decided, D-014) count subject to re-audit of D-013:
   M16, M18–M20, M25, M26, M28, M29, M40, R01–R06, R08–R13, M10–M12, P18, P19, P22.
 
 Latest control run: `evidence/controls-20261124T195210Z`, commit 875ca7e, same image:

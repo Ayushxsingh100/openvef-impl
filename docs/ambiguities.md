@@ -1523,7 +1523,7 @@ Mechanism: `runner/adapter_contracts.py` (citations), `tests/adapter_vectors.py`
 vectors), `tests/test_dispatch_shapes.py` (both conditions; flags uncited selecting values).
 The scan checks that a citation is verbatim, not that it is the right text.
 
-## A-053 — What counts as a cited input contract (DECIDED BY CLAUDE — owner review pending)
+## A-053 — What counts as a cited input contract (DECIDED BY CLAUDE — approved under D-014)
 
 D-013 (a) asks for an input contract "defined by cited pack text". The pack spells no descriptor
 JSON keys apart from the response schema (PD-07). Readings: (i) keys must be spelled in the
@@ -1531,9 +1531,28 @@ pack, which would remove nearly every adapter other than the response object, in
 `events`, run-record and packet fixtures; (ii) the pack must state the meaning and domain of
 every property, the rule each selecting value names, and the whole outcome; spelling is a carrier.
 
-**Decision (decided by Claude under standing delegation, owner review pending): (ii).** File 36
+**Decision (decided by Claude under standing delegation, approved under D-014): (ii).** File 36
 L23 requires "a literal JSON input" and defines no key names, so a rule that needs spellings
 would contradict the fixture set the pack makes mandatory. Under (ii) a property without a
 stated meaning keeps an adapter out even if unused, and so does an outcome field that only a
 descriptor states. Not covered by D-009. The results that rest on it are the five restored
 fixtures, the `events`, `checker_runs` and `null_runs` fixtures, M16, M20, M29 and M40.
+
+## D-014 — A-053 approved (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) recommendation, given in Claude Code:
+"A-053 approved as decided (strict reading). Record it; the passes resting on it now count,
+subject to re-audit."
+
+- **What is approved:** A-053 as decided, which is reading (ii): the pack must state each
+  property's meaning and domain, each selecting value's rule and the whole outcome, while key
+  spelling is a carrier. The stricter reading on spelling was (i), which A-053 rejects. "Strict
+  reading" is recorded as the owner's wording; "as decided" is taken to control.
+- **Approved text:** SHA-256 of the A-053 section before this record changed its status wording:
+  `162af6d93b0d0957c68a14aa81ec1baf08c929dd8c8ec03cfe78c9fd615147c8`; after: `1efb1d29d091d4000f2f09584c3123ed35c6db0618e546b0a0db58f6bd479625`.
+- **Effect:** the results resting on A-053 are no longer held back by owner review: M16, M18–M20,
+  M25, M26, M28, M29, M40, R01–R06, R08–R13, M10–M12, P18, P19 and P22. They count **subject to
+  re-audit** of D-013, which has not happened. Other conditions still apply.
+- **Not changed:** F18 is not passed. Claude decided A-053 and Claude (claude.ai) recommended its
+  approval. Takes effect under D-008; Ayush's ratification stays the single entry in
+  AUDIT-READINESS.md.
