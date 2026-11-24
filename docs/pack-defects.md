@@ -557,3 +557,21 @@ an entry in ambiguities.md.
 domain, fix the row numbering and its relation to `reset_release_cycle`, and say whether
 `n` is literal in the field names.
 
+
+## PD-24 — Inconsistent status of the TechRxiv preprint's FIFO (I)
+
+> [01 L99] "The TechRxiv checker-gap preprint was mentioned in an earlier note as containing a FIFO, but that detail was not verified during the abstract-only access recorded in the provenance log and is not relied upon here."
+
+> [10 L174] "It evaluates a round-robin arbiter and synchronous FIFO (150–350 LOC), with 12 total test cases."
+
+> [10 L353] "the TechRxiv checker-gap preprint also evaluates a synchronous FIFO"
+
+**Defect.** The Charter (and File 12 L85) treat the preprint's FIFO as unverified and
+not relied on. The literature review states it as fact, with section-level detail.
+
+**Interim.** The benchmark-overlap disclosure draft lists the preprint's FIFO as
+"reported by File 10, not verified". The preprint could not be retrieved on
+24 Nov 2026: techrxiv.org returned HTTP 403.
+
+**To settle.** The owners retrieve the preprint, or record the access status in the
+provenance log (File 22), and make the Charter and File 10 agree.
