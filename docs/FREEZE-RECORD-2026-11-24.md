@@ -55,7 +55,21 @@ frozen.
 `spec_version_sha256` = `5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5`, the SHA-256 of
 `docs/fifo-spec-v0.2.md` as frozen in A1.
 
+## Amendment D-010: observation mask (Krishika, recorded 24 Nov 2026 UTC)
+
+Frozen at Krishika's instruction (D-010, under DEV-001). It is **not** covered by the
+signature `a955245`, and the review behind it is **not independent**; L271 stays unmet.
+The runner reads it from `design/fifo/freeze/deviation-DEV-001.json`.
+
+| File | SHA-256 (frozen) | SHA-256 (as reviewed, before the placeholder fixes) |
+|---|---|---|
+| `design/fifo/mask/ovf_fifo-mask-DRAFT.json` | `ea877da0046541550a23cc2beb69c2b9960ede422727ee080e1e00827602acbe` | `78477cd41df36074c06aca31bfca3aae4de7a085980559480a35e2a08c180b0f` |
+| `design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv` | `af2a846174bead3924d10212b36bf3c46cc41380811bf1d84f636e17caf6c97e` | `3e443a68368b693e33608db0daa94ae52e8e61a9a6b7a55b55de834862360f92` |
+
 ## Not frozen by this record
+
+The first row below was written before D-010: the mask is now frozen by the amendment
+above, but the signature it names still does not exist.
 
 | Item | Why |
 |---|---|

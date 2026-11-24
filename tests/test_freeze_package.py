@@ -25,6 +25,8 @@ class FreezePackageTests(unittest.TestCase):
         rows = ROW.findall(PACKAGE)
         self.assertGreaterEqual(len(rows), 18)
         for ref, sha in rows:
+            if ref.startswith("design/fifo/mask/"):
+                continue  # section G was never signed; superseded by D-010 (checked below)
             with self.subTest(ref=ref):
                 self.assertEqual(ref_sha256(ref), sha)
 
@@ -83,14 +85,36 @@ class FreezeRecordTests(unittest.TestCase):
         done = {i["id"] for i in self.record["items"]}
         provisional, cleared = self.stages.open_reasons(done, self.deviation())
         self.assertEqual(provisional, [])
-        self.assertEqual([c["label"] for c in cleared], ["cleared under DEV-001 — review pending"])
+        self.assertEqual([c["label"] for c in cleared], ["cleared under DEV-001 (non-independent review saved)"])
         provisional, cleared = self.stages.open_reasons(set(), self.deviation())
         self.assertEqual((len(provisional), len(cleared)), (5, 1))
 
     def test_dev001_hashes_are_package_section_g(self):
         g = dict(re.findall(r"^\| `(design/fifo/mask/[^`]+)` \| `([0-9a-f]{64})` \|", PACKAGE, re.M))
         dev = self.freeze.load(REPO, self.stages.DEVIATION_RECORD)
-        self.assertEqual({r["ref"]: r["sha256"] for r in dev["items"][0]["refs"]}, g)
+        refs = dev["items"][0]["refs"]
+        self.assertEqual({r["ref"]: r["sha256_reviewed"] for r in refs}, g)
+        self.assertEqual({r["ref"]: r["sha256_reviewed"] for r in refs},
+                         {r["ref"]: r["sha256"] for r in dev["review"]["reviewed"]})
+        self.assertEqual({r["ref"]: r["sha256"] for r in refs},
+                         {r["ref"]: r["sha256"] for r in self.record["amendments"][0]["refs"]})
+        self.assertEqual(self.freeze.ref_sha256(dev["review"]["file"]), dev["review"]["sha256"])
+
+    def test_d010_changed_only_placeholders(self):
+        import hashlib
+        dev = self.freeze.load(REPO, self.stages.DEVIATION_RECORD)
+        spec = self.record["frozen_values"]["spec_version_sha256"]
+        status = "FROZEN under D-010; reviewed non-independently (DEV-001)"
+        who = '"Claude (claude.ai), non-independent, DEV-001; accepted by owner Krishika"'
+        for r in dev["items"][0]["refs"]:
+            t = (REPO / r["ref"]).read_bytes().decode("utf-8").replace(spec, "TO_FREEZE")
+            if r["ref"].endswith(".json"):
+                t = t.replace(status, "DRAFT under D-005 — requires independent human reviewer signature (Protocol L271). Evaluator-only: never part of an authoring packet (L270). "
+                              "Not frozen (L540).")
+            else:
+                t = t.replace(f"{who},{who},{status}", "UNSIGNED (drafted by Claude under D-005; Claude is not the mask reviewer),"
+                              "REQUIRED: independent human reviewer signature (Protocol L271),DRAFT_UNSIGNED")
+            self.assertEqual(hashlib.sha256(t.encode("utf-8")).hexdigest(), r["sha256_reviewed"], r["ref"])
 
     def test_changed_mask_is_not_cleared(self):
         real = self.freeze.ref_sha256

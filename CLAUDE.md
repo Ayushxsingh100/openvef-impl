@@ -22,10 +22,11 @@ frozen; only the owners do that.
 The observation mask may be drafted by Claude, but it must be signed by an independent
 human mask reviewer (Protocol L271). Claude is never that reviewer.
 Deviation DEV-001 (Krishika, 24 Nov 2026; docs/DEVIATIONS.md): no such reviewer is
-available, so the owner accepted the FIFO mask and File 24 table at their current hashes
-without an independent review. L271 stays unmet. Every affected result carries "cleared
-under DEV-001 — review pending" until the claude.ai review (not done when DEV-001 was
-recorded) is saved as docs/reviews/claude-mask-review-2026-11-25.md; never call the mask independently reviewed.
+available, so the owner accepted the FIFO mask and File 24 table at their frozen hashes
+(D-010) with a saved, non-independent Claude review
+(docs/reviews/claude-mask-review-2026-11-25.md). L271 stays unmet. Every affected result
+carries "cleared under DEV-001 (non-independent review saved)";
+never call the mask independently reviewed.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

@@ -1401,3 +1401,14 @@ Ayush's ratification stays the single entry in AUDIT-READINESS.md.
 The owner accepted the observation mask and File 24 table without an independent review.
 Full record: [DEVIATIONS.md](DEVIATIONS.md). This supersedes, for this mask only, D-008's
 statement that no owner signature replaces the L271 signature. L271 itself stays unmet.
+
+## D-010 — Mask placeholder fixes and re-freeze (DECIDED)
+
+**Owner decision by Krishika**, given in Claude Code with the saved mask review: "fill
+spec_version_sha256 with the frozen spec hash in both mask files; set status to "FROZEN under D-010; reviewed non-independently (DEV-001)"; set reviewer fields to "Claude (claude.ai), non-independent, DEV-001; accepted by owner Krishika". Re-freeze the mask at the new hashes". Labels
+become "cleared under DEV-001 (non-independent review saved)".
+
+**Applied to:** every row's `mask_reviewer`, `independent_reviewer` and `review_status`, and
+the JSON `status`. Mask content is unchanged. The JSON status no longer repeats
+"evaluator-only: never part of an authoring packet"; that Protocol rule (L270) still applies.
+L271 stays unmet ([DEVIATIONS.md](DEVIATIONS.md)).

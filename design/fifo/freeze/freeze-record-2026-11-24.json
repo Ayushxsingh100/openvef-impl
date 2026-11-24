@@ -259,5 +259,22 @@
       "item": "Frozen L544 mutant export script, mutation modes, mutant population, bounded-equivalence assumptions",
       "reason": "separate owner items; C2 freezes only the null-netlist export script"
     }
+  ],
+  "amendments": [
+    {
+      "id": "D-010",
+      "item": "Observation mask and File 24 table frozen under D-010 / DEV-001. Not covered by signature a955245 and not an independent review; supersedes the 'G' entry under not_frozen as to freezing only. L271 stays unmet.",
+      "record": "design/fifo/freeze/deviation-DEV-001.json",
+      "refs": [
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-DRAFT.json",
+          "sha256": "ea877da0046541550a23cc2beb69c2b9960ede422727ee080e1e00827602acbe"
+        },
+        {
+          "ref": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",
+          "sha256": "af2a846174bead3924d10212b36bf3c46cc41380811bf1d84f636e17caf6c97e"
+        }
+      ]
+    }
   ]
 }

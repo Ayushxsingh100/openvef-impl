@@ -1,7 +1,7 @@
 {
-  "status": "DRAFT under D-005 — requires independent human reviewer signature (Protocol L271). Evaluator-only: never part of an authoring packet (L270). Not frozen (L540).",
+  "status": "FROZEN under D-010; reviewed non-independently (DEV-001)",
   "spec": "docs/fifo-spec-v0.2.md",
-  "spec_version_sha256": "TO_FREEZE",
+  "spec_version_sha256": "5e57ce18c8297aaed27e80b1a7a49476f41c70359e331fe8f5c54f96594c24b5",
   "traceability_table": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",
   "predicate_evaluated_on": "null-netlist trace, for both members of a pair (L273)",
   "variants": {
