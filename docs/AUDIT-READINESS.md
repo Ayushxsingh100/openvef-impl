@@ -19,15 +19,15 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T193435Z`**.
-- Run class `development`; commit `c2db767`, clean tree; the first run after DEV-001
+Latest evidence run: **`evidence/run-20261124T194216Z`**.
+- Run class `development`; commit `578cf11`, clean tree; after DEV-001
   ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
   The run re-verified all 20 frozen items, the DEV-001 mask files and the 40 D-009 items
   against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Every fixture's outcome is identical to the previous run, `run-20261124T163535Z`
-  (commit `5116e9b`). Only the provisional status and labels changed.
+- Every fixture's outcome is identical to the previous run, `run-20261124T193435Z`
+  (commit `c2db767`). Only the DEV-001 label changed; that run's label is superseded.
 
 | Status | Count | Fixtures |
 |---|---|---|
@@ -62,8 +62,8 @@ auditor should weigh them with that in mind.
 Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
 [design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
 
-Latest control run: **`evidence/controls-20261124T193604Z`**, pinned image, commit
-`c2db767`. It carries the same identity records as an F18 run.
+Latest control run: **`evidence/controls-20261124T194343Z`**, pinned image, commit
+`578cf11`. It carries the same identity records as an F18 run.
 
 | Status | Controls |
 |---|---|
@@ -81,7 +81,7 @@ Latest control run: **`evidence/controls-20261124T193604Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T193435Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261124T194216Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
