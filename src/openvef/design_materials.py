@@ -34,4 +34,5 @@ def load(repo: Path, materials_file: str) -> dict[str, Any]:
     base["legal_input_predicate"] = {"language": pred["language"], "function": pred["function"],
                                      "source": predicate_source(spec_text, pred["spec_clause"])}
     rtl = dict(base, verilog_sources={rtl_name: (repo / materials["rtl"]).read_text(encoding="utf-8")})
-    return {"materials": materials, "spec_text": spec_text, "base": base, "rtl": rtl}
+    mask = json.loads((repo / materials["mask"]).read_text(encoding="utf-8")) if "mask" in materials else None
+    return {"materials": materials, "spec_text": spec_text, "base": base, "rtl": rtl, "mask": mask}

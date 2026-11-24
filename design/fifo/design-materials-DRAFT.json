@@ -50,5 +50,6 @@
     "language": "python3.11",
     "function": "legal_input",
     "spec_clause": "FIFO-042"
-  }
+  },
+  "mask": "design/fifo/mask/ovf_fifo-mask-DRAFT.json"
 }

@@ -22,6 +22,8 @@ form, the item says so.
   - [fifo-spec-v0.2.md](fifo-spec-v0.2.md): items 1–5, DRAFT; v0.1 superseded;
   - [fifo-frozen-values-proposal-DRAFT.md](fifo-frozen-values-proposal-DRAFT.md):
     items 7–12, DRAFT;
+  - [design/fifo/mask/](../design/fifo/mask/): item 6, mask and File 24 table, DRAFT;
+    requires an independent human reviewer's signature (L271);
   - [design/fifo/rtl/ovf_fifo.v](../design/fifo/rtl/ovf_fifo.v): item 13, RTL, DRAFT, with
     the draft export script [design/fifo/export_null.ys](../design/fifo/export_null.ys).
 

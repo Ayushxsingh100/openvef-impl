@@ -72,11 +72,57 @@ def run_outcome(result: Mapping[str, Any]) -> Optional[Failure]:
     return first_event(events) if events else None
 
 
-def compare_runs(rtl_rows: list, null_rows: list, observed_outputs: Iterable[str]) -> Optional[Failure]:
-    """L166 (8) on two completed runs."""
+def validate_mask(entries: list, output_ports: Iterable[str]) -> None:
+    """Structural rules for a mask (Protocol L271-L276), checked before use.
+
+    Every output has exactly one entry. A window predicate refers only to a signal whose
+    own entry is "always", so a predicate signal is always observable and compared (L274)."""
+    outputs = set(output_ports)
+    signals = [e["signal"] for e in entries]
+    if sorted(signals) != sorted(outputs):
+        raise ValueError(f"mask entries {sorted(signals)} do not cover the outputs {sorted(outputs)} exactly once")
+    always = {e["signal"] for e in entries if e["when"] == "always"}
+    for e in entries:
+        w = e["when"]
+        if w != "always" and (set(w) != {"null_signal", "equals"} or w["null_signal"] not in always):
+            raise ValueError(f"mask entry {e.get('entry')} has a window not over an always-observed predicate")
+
+
+def mask_comparator(entries: list):
+    """observed(a_out, b_out, null_out) -> True if a masked output differs in this row.
+    Windows are evaluated on the null-netlist row (L273)."""
+    def differs(a_out: Mapping[str, str], b_out: Mapping[str, str], null_out: Mapping[str, str]) -> bool:
+        for e in entries:
+            w = e["when"]
+            if (w == "always" or null_out[w["null_signal"]] == w["equals"]) and a_out[e["signal"]] != b_out[e["signal"]]:
+                return True
+        return False
+    return differs
+
+
+def null_trace_xz(null_rows: list, entries: list) -> Optional[int]:
+    """L277: X/Z on an always-observable output in a null trace fails design validation.
+    Returns the first offending row index, or None."""
+    always = [e["signal"] for e in entries if e["when"] == "always"]
+    for i, row in enumerate(null_rows):
+        if any(c in "XZxz" for s in always for c in row[OUTPUTS][s]):
+            return i
+    return None
+
+
+def compare_runs(rtl_rows: list, null_rows: list, observed_outputs: Iterable[str] = (), *,
+                 mask: Optional[list] = None) -> Optional[Failure]:
+    """L166 (8) on two completed runs. With `mask`, the masked comparison uses the mask's
+    windows, evaluated on the null run's rows (L273); otherwise every port in
+    `observed_outputs` is compared in every row."""
     if len(rtl_rows) != len(null_rows):
         raise SimulationError("completed runs have different lengths")
     observed = set(observed_outputs)
+    if mask is not None:
+        differs = mask_comparator(mask)
+    else:
+        def differs(a_out, b_out, null_out):
+            return any(a_out[p] != b_out[p] for p in observed)
     raw_div = next_div = masked_same_input = None
     for i, (a, b) in enumerate(zip(rtl_rows, null_rows)):
         if raw_div is None and a[OUTPUTS] != b[OUTPUTS]:
@@ -84,7 +130,7 @@ def compare_runs(rtl_rows: list, null_rows: list, observed_outputs: Iterable[str
         if next_div is None and a[NEXT] != b[NEXT]:
             next_div = i
         same_inputs_so_far = next_div is None
-        if masked_same_input is None and same_inputs_so_far and any(a[OUTPUTS][p] != b[OUTPUTS][p] for p in observed):
+        if masked_same_input is None and same_inputs_so_far and differs(a[OUTPUTS], b[OUTPUTS], b[OUTPUTS]):
             masked_same_input = i
     nondeterminism = paired_run_failure(raw_div, next_div)
     if nondeterminism is not None:

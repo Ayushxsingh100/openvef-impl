@@ -1,0 +1,23 @@
+{
+  "status": "DRAFT under D-005 — requires independent human reviewer signature (Protocol L271). Evaluator-only: never part of an authoring packet (L270). Not frozen (L540).",
+  "spec": "docs/fifo-spec-v0.2.md",
+  "spec_version_sha256": "TO_FREEZE",
+  "traceability_table": "design/fifo/mask/ovf_fifo-mask-traceability-DRAFT.csv",
+  "predicate_evaluated_on": "null-netlist trace, for both members of a pair (L273)",
+  "variants": {
+    "primary": [
+      {"entry": "MK01", "signal": "rd_valid", "when": "always"},
+      {"entry": "MK02", "signal": "full", "when": "always"},
+      {"entry": "MK03", "signal": "almost_full", "when": "always"},
+      {"entry": "MK04", "signal": "empty", "when": "always"},
+      {"entry": "MK05", "signal": "rd_data", "when": {"null_signal": "rd_valid", "equals": "1"}}
+    ],
+    "stricter": [
+      {"entry": "SK01", "signal": "rd_valid", "when": "always"},
+      {"entry": "SK02", "signal": "full", "when": "always"},
+      {"entry": "SK03", "signal": "almost_full", "when": "always"},
+      {"entry": "SK04", "signal": "empty", "when": "always"},
+      {"entry": "SK05", "signal": "rd_data", "when": "always"}
+    ]
+  }
+}
