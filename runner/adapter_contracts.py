@@ -38,7 +38,7 @@ CONTRACTS = {
                    "response_object": ("30", 7, "The canonical JSON Schema is `34_OpenVEF_Response_Schema_v1.0.json`"),
                    "provider_finish_reason": ("02", 144, "Provider finish reason explicitly reports max-token truncation")},
         "values": {"length": ("02", 144, "Provider finish reason explicitly reports max-token truncation"),
-                   "stop": ("02", 143, "Envelope, schema or clause manifest rejection")},
+                   "stop": ("02", 144, "Provider finish reason explicitly reports max-token truncation")},
         "outcome": _MAP},
     "adapt_source_pair": {
         "inputs": {"driver_source": ("30", 27, "For file-local stages, process each source file in this order"),
@@ -118,7 +118,9 @@ _RESP_DOMAIN = {"lines": [("30", 7)], "terms": ["one UTF-8 JSON object", "34_Ope
 DOMAINS = {
     "adapt_response": {
         "raw_response_utf8": _RESP_DOMAIN, "raw_response_base64": _RESP_DOMAIN, "response_object": _RESP_DOMAIN,
-        "provider_finish_reason": {"lines": [("02", 144)], "terms": ["explicitly reports max-token truncation"]}},
+        "provider_finish_reason": {  # "stop" is the complement of L144's condition (A-057)
+            "lines": [("02", 144), ("30", 7)],
+            "terms": ["explicitly reports max-token truncation", "Provider max-token truncation is `OUTPUT_TRUNCATED`"]}},
     "adapt_source_pair": {
         "driver_source": {"lines": [("30", 27)], "terms": ["strict UTF-8 decode", "`driver.py`"]},
         "checker_source": {"lines": [("30", 27)], "terms": ["strict UTF-8 decode", "`checker.py`"]}},

@@ -141,8 +141,35 @@ runtime checks miss.
   schema-checked tagged plain data out. It and the harness compute every verdict.
 - A separate process without seccomp is not enough: a same-uid child can write to the
   evaluator's stdout through `/proc` (observed). Tests: `tests/test_artifact_isolation.py`.
-- Residuals: the artifact's own signature facts are measured in its own interpreter; CPU is
+- Residuals: those under "Runtime checks" (D-019); CPU is
   shared, so the watchdog still matters; and those under "Wall-clock reads" below.
+
+### Runtime checks (D-019, audit A9-2; File 30 §3 L35, L37, L39)
+
+A process in which artifact code has run can report anything: it can replace globals, code objects and
+closures, or write to the pipe. So:
+
+| Check | Where measured | Can artifact code forge it? |
+|---|---|---|
+| `create_driver`, `Driver.step`, `check_trace` as defined: names, kinds, counts, defaults, plain `def`, bound once | a fresh confined process that only compiles the source (`inspect_source`) | No: no artifact code has run there |
+| the same functions as they are after execution (replaced at run time) | the artifact process, self-reported; a wrong report rejects | **Yes** |
+| `create_driver(seed)` returned a `Driver` | the artifact process, self-reported; a wrong report rejects | **Yes** |
+| driver vectors, checker returns, verdicts | computed by the evaluator from plain data | No; the data is the artifact's own answer |
+
+**Static proof.** `src/openvef/runtime_basis.py` marks each source PROVEN or SELF_REPORTED from its text. PROVEN
+means the source uses only listed builtins and module names, no dunder, frame or namespace access, never
+rebinds or passes on `Driver` or `create_driver`, and returns only `Driver()` objects, so the two forgeable rows
+hold by construction, if CPython behaves as documented. SELF_REPORTED means not shown; it is not evidence of forgery.
+F18 runs record it per fixture (`runtime_checks`) and list the rest (`runtime_checks_self_reported`).
+
+**Residual (not closed).** A SELF_REPORTED driver can return an object that is not a `Driver`, or replace
+`Driver.step` at run time, and report otherwise; a SELF_REPORTED checker can replace `check_trace` likewise.
+`test_residual_forged_state_after_execution` pins this.
+- **Consequence:** a structurally invalid artifact can be counted valid (no `ENTRY_POINT_REJECT`, `RETURN_TYPE` or
+  `RUNTIME_SIGNATURE`), which affects the validity endpoint for that artifact.
+- **Not affected:** traces, masked comparison, verdict classification, other artifacts and later runs. A driver's
+  vectors are still checked one by one, and the checker's return is classified by the evaluator.
+- **For the owners:** whether a SELF_REPORTED artifact may count as valid in confirmatory use.
 
 ### Wall-clock reads (D-016; File 30 §6 L101)
 

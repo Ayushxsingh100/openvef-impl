@@ -318,7 +318,9 @@ BOUNDARIES = {
         replaced({}, "response_object", "34_OpenVEF_Response_Schema_v1.0.json", _OBJECT, SOCKET,
                  dict(_OBJECT, schema_version="1.00"), SCHEMA("/schema_version")),
         replaced({"raw_response_utf8": "{"}, "provider_finish_reason", "explicitly reports max-token truncation", "length",
-                 repair("PARSE_SCHEMA", "OUTPUT_TRUNCATED", "OUTPUT_TRUNCATED"), "lengths", BLOCKED + "finish reason")],
+                 repair("PARSE_SCHEMA", "OUTPUT_TRUNCATED", "OUTPUT_TRUNCATED"), "lengths", BLOCKED + "finish reason"),
+        replaced({"raw_response_utf8": "{"}, "provider_finish_reason", "explicitly reports max-token truncation", "stop",
+                 SCHEMA("/"), "stops", BLOCKED + "finish reason")],
     "adapt_source_pair": [
         replaced({"checker_source": CHECKER}, "driver_source", "strict UTF-8 decode", "# \ud7ff\nimport socket\n", SOCKET,
                  "# \ud800\nimport socket\n",

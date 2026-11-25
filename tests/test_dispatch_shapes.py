@@ -200,6 +200,14 @@ class DispatchShapeTests(unittest.TestCase):
                     with self.subTest(adapter=adapter, prop=prop, term=term):
                         self.assertIn(term, text)
 
+    def test_every_selecting_value_is_cited_within_a_domain(self):
+        """D-019 (audit A1-1): a value's citation must be among the cited lines of a property's domain."""
+        for adapter, c in CONTRACTS.items():
+            lines = {l for d in DOMAINS[adapter].values() for l in d["lines"]}
+            for value, (tag, n, _) in c["values"].items():
+                with self.subTest(adapter=adapter, value=value):
+                    self.assertIn((tag, n), lines)
+
     def test_every_property_is_checked_against_its_domain(self):
         self.assertEqual({a: set(d) for a, d in OUT_OF_DOMAIN.items()}, {a: set(d) for a, d in DOMAINS.items()})
         validator = run_f18.load_schema_validator(PACK)

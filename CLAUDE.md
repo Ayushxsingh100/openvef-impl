@@ -43,6 +43,10 @@ residuals in docs/sandbox.md and docs/DEVIATIONS.md. Not yet re-audited.
 Owner decision D-017: the D-013 rule is kept (disclosed) and strengthened: every adapter also needs, per
 input property, a boundary pair for its cited domain (in-domain edge, just outside), enforced by
 tests/test_dispatch_shapes.py. Container test logs (tools/run_container_tests.py) are not F18 evidence.
+Owner decision D-019: no trust-critical measurement may be produced by a process in which artifact code has
+executed; the rest is labelled SELF_REPORTED and recorded as a residual, never called closed. The original
+single-fixture-shape criterion is superseded by D-013 and will not be met by design; disclose it for every
+audit. Not yet re-audited.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

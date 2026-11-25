@@ -12,14 +12,19 @@ with EPERM: clocks, opening any file, /proc, sockets, fork/exec, signals, ptrace
 therefore corrupt this interpreter, but only this interpreter, and the only effect it can have
 outside is the bytes it sends as its own answers.
 
+D-019 (audit A9-2): nothing this process says after artifact code has run can be trusted; artifact
+code can replace any global or closure here, or write to the pipe itself. So the evaluator takes
+the parameters from a separate process that is only ever sent `inspect`, which compiles the
+source and never executes it. What is reported after execution (`constructed`, `loaded`) can only
+count against the artifact.
+
 Implements, on the artifact's side: File 30 §3 L27 restricted-runtime import and File 30 §6
-"Enforce the same import allow-list statically and at runtime" (guarded_import). What is
-measured here (return type, signatures) is reported as facts; the verdict is the evaluator's.
+"Enforce the same import allow-list statically and at runtime" (guarded_import).
 """
 from __future__ import annotations
 
 import builtins
-import inspect
+import dis
 import os
 import sys
 import types
@@ -256,13 +261,76 @@ def raised(phase: str, exc) -> str:
     return '{"raised":[' + _quote(phase) + "," + _quote(exc_name(exc)) + "]}"
 
 
-def parameters(func) -> str:
-    """The runtime signature as plain facts, or null if there is none."""
+def code_parameters(code, defaults: bool) -> list | None:
+    """[name, kind, has default] from a code object (names/kinds/counts of inspect.signature)."""
+    if code.co_flags & 0x380:  # coroutine, iterable coroutine, async generator
+        return None
+    names, n, k = code.co_varnames, code.co_argcount, code.co_kwonlyargcount
+    out = [[p, "POSITIONAL_ONLY" if i < code.co_posonlyargcount else "POSITIONAL_OR_KEYWORD", defaults]
+           for i, p in enumerate(names[:n])]
+    i = n + k
+    if code.co_flags & 4:
+        out.append([names[i], "VAR_POSITIONAL", False])
+        i += 1
+    out += [[p, "KEYWORD_ONLY", defaults] for p in names[n:n + k]]
+    if code.co_flags & 8:
+        out.append([names[i], "VAR_KEYWORD", False])
+    return out
+
+
+def _bound_once(code, name: str):
+    """(instructions, index) of the single STORE_NAME of `name`, if it is bound exactly once."""
+    ins = [i for i in dis.get_instructions(code) if i.opname not in ("EXTENDED_ARG", "PRECALL", "CACHE")]
+    at = [k for k, i in enumerate(ins) if i.opname.startswith(("STORE_", "DELETE_")) and i.argval == name]
+    return (ins, at[0]) if len(at) == 1 and ins[at[0]].opname == "STORE_NAME" else (ins, None)
+
+
+def _is_code(i, name: str) -> bool:
+    return i.opname == "LOAD_CONST" and type(i.argval) is types.CodeType and i.argval.co_name == name
+
+
+def defined_function(code, name: str) -> list | None:
+    """Parameters of the plain undecorated `def name` that is the only binding of `name`."""
+    ins, k = _bound_once(code, name)
+    if k is None or k < 2 or ins[k - 1].opname != "MAKE_FUNCTION" or not _is_code(ins[k - 2], name):
+        return None
+    return code_parameters(ins[k - 2].argval, bool(ins[k - 1].arg & 3))
+
+
+def defined_class(code, name: str):
+    """The body code of the undecorated `class name` that is the only binding of `name`."""
+    ins, k = _bound_once(code, name)
+    starts = [j for j in range(k or 0) if ins[j].opname == "LOAD_BUILD_CLASS"]
+    if not starts or ins[k - 1].opname != "CALL":
+        return None
+    j = starts[-1]
+    ok = k - j >= 5 and _is_code(ins[j + 1], name) and ins[j + 2].opname == "MAKE_FUNCTION" and \
+        sum(i.opname == "CALL" for i in ins[j:k]) == 1
+    return ins[j + 1].argval if ok else None
+
+
+def inspect_source(name: str, source: str) -> dict:
+    """D-019: facts from compiled code objects. The source is compiled, never executed."""
     try:
-        ps = list(inspect.signature(func).parameters.values())
-        return "[" + ",".join("[" + _quote(_plain(p.name)) + "," + _quote(p.kind.name) + ","
-                              + ("true" if p.default is not inspect.Parameter.empty else "false") + "]" for p in ps) + "]"
-    except (TypeError, ValueError):
+        code = compile(source, name + ".py", "exec", dont_inherit=True)
+    except Exception:
+        return {}
+    if name == "checker":
+        return {"check_trace": defined_function(code, "check_trace")}
+    body = defined_class(code, "Driver")
+    return {"create_driver": defined_function(code, "create_driver"),
+            "Driver.step": defined_function(body, "step") if body is not None else None}
+
+
+def parameters(func) -> str:
+    """Self-reported after execution (never trusted); __signature__ is ignored."""
+    try:
+        if type(func) is not types.FunctionType:
+            return "null"
+        ps = code_parameters(func.__code__, bool(func.__defaults__ or func.__kwdefaults__))
+        return "null" if ps is None else "[" + ",".join(
+            "[" + _quote(n) + "," + _quote(k) + "," + ("true" if d else "false") + "]" for n, k, d in ps) + "]"
+    except Exception:
         return "null"
 
 
@@ -285,7 +353,9 @@ def main() -> None:
     while True:
         msg = scan(receive().decode("ascii"), 0)[0]
         op = msg["op"]
-        if op == "driver":
+        if op == "inspect":
+            send(json.dumps({"inspected": inspect_source(msg["name"], msg["source"])}))
+        elif op == "driver":
             phase = "import"
             try:
                 module = load("driver", msg["source"])
@@ -295,7 +365,7 @@ def main() -> None:
                 send(raised(phase, exc))
                 continue
             cls = getattr(module, "Driver", None)
-            ok = isinstance(cls, type) and isinstance(instance, cls)
+            ok = type(cls) is type and cls in type.__dict__["__mro__"].__get__(type(instance))
             send('{"constructed":[' + ("true" if ok else "false") + "," + parameters(module.create_driver) + ","
                  + (parameters(cls.__dict__.get("step")) if ok else "null") + "]}")
         elif op == "step":

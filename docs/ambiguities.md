@@ -1693,3 +1693,55 @@ No fixture has such a value; no F18 outcome changes (see the run in traceability
 - **Not changed:** F18 is not passed, and D-017 still requires re-audit. Claude decided both readings and
   Claude (claude.ai) recommended their approval. Takes effect under D-008; Ayush's ratification stays
   the single entry in AUDIT-READINESS.md.
+
+## D-019 — Response to the third audit report (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) triage of the report saved as
+[implementation-reaudit3-gpt6-2026-11-25.md](reviews/implementation-reaudit3-gpt6-2026-11-25.md) (NOT CLEARED).
+The decision reached Claude Code before the report; the report was committed before any change.
+
+1. **A9-2 (BLOCKER) accepted.** Principle: "no trust-critical measurement may be produced by a process
+   in which artifact code has executed".
+   - **Confirmed in the pinned container:** on the audited `sandbox/`, 38 of the new test cases fail,
+     because a forged report was accepted.
+   - **(a) Parameters.** `artifact_proc.inspect_source` asks a fresh confined process that compiles the
+     source and reads names, kinds and counts from code objects. **It does not import.** The decision asked for an
+     import-only process on the ground that import runs no artifact logic. That ground does not hold: helper-function
+     defaults, and annotations, are evaluated when the `def` runs, and the static stages
+     accept them (`test_forgery_at_import_time`). Compile-only keeps the principle.
+     `__signature__` and `__wrapped__` are ignored.
+   - The artifact process's own report is still required to be right. It can reject, never accept.
+   - **(b) Return type, and state changed after execution: not fully closed.** A process that has run
+     artifact code can report anything. `src/openvef/runtime_basis.py` decides from the source alone
+     whether the artifact stays in a closed fragment where it cannot reach interpreter internals and every
+     return of `create_driver` is `Driver()`: PROVEN, else SELF_REPORTED. Each result that
+     reaches the runtime stage records it. SELF_REPORTED is not a rejection, because the pack allows
+     code outside the fragment. Residual: [sandbox.md](sandbox.md) "Runtime checks" and
+     [DEVIATIONS.md](DEVIATIONS.md).
+   - **The auditor's own example** (valid `def`, then a variadic `step` installed at run time with a forged
+     report) is part of that residual: still accepted, but marked SELF_REPORTED.
+2. **A1-1, citation:** `stop` now cites the text that defines the property (A-057). A new test requires every
+   selecting value's citation to lie within a property's cited domain; the old citation fails it.
+3. **A1-1, original criterion. Owner statement:** "The original single-fixture-shape criterion is
+   superseded by D-013 because the v1.3.6 pack itself contains one-of-a-kind fixtures; it will not be
+   met by design; disclosed for every audit."
+
+Not re-audited. F18 is not passed.
+
+## A-057 — The finish reason `stop` (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L144] "Provider finish reason explicitly reports max-token truncation"
+
+> [30 L7] "Provider max-token truncation is `OUTPUT_TRUNCATED` at `PARSE_SCHEMA` and is reported separately."
+
+The pack names the property only by this condition and spells no value. Readings: (i) only a value
+that reports truncation has a stated meaning, so `stop` is refused; (ii) the condition divides the
+domain in two, and a value that does not report truncation is stated by its complement: L144 does not
+apply and the response is judged on its text; (iii) as (ii), for any other string too.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (ii), for `stop` only.**
+A row whose condition is "explicitly reports" presumes reasons that do not, and File 36 L48 describes
+that state in words ("without provider truncation status"). Like `length`, `stop` is a spelling that
+carries it (A-053). Not (iii): another spelling may be a truncation report, and the pack does not say
+which. `stop` selects no outcome of its own; it gives the result an absent reason gives. P11b depends
+on this reading: under (i) it would be NOT_IMPLEMENTED. Until an owner reviews A-057, **P11b's pass does not count toward F18**.

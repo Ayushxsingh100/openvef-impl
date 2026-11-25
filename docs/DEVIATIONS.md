@@ -80,7 +80,17 @@ marked done.
 Disposition **NOT CLEARED**: BLOCKERs A1-1 (not fully resolved) and A9-1, MAJOR A4-1 (A8-2 is a
 cross-reference), limitations A2, A3, A7. A8-1 is resolved. D-015 accepted its findings and fixed
 A9-1, A4-1 and the M18 contract before Claude Code had seen the report; the note lists two points
-D-015 leaves open. **D-015, D-016 and D-017 are not re-audited.** Step (5) is not marked done.
+D-015 leaves open. Step (5) is not marked done.
+
+**Third audit: report received and saved** (OpenAI GPT-6, operator Krishika, 25 Nov 2026, bundle
+`b1235ba376442eead14c338b59d73060cb927532c67cdd59324d0f2a0a08327d`):
+[report](reviews/implementation-reaudit3-gpt6-2026-11-25.md), SHA-256
+`5acba72c970fa5ecb7e3994ebc706222538e64056bca314aee4882d59357cf0a`; [note](reviews/implementation-reaudit3-gpt6-2026-11-25-NOTE.md).
+Disposition **NOT CLEARED**: BLOCKERs A1-1 and A9-2 (new), limitations A3-1 and A7-1; A4-1, A8-2 and the
+original A9-1 attack resolved. D-019 accepts A9-2, which is **not fully closed** ("Open residual (D-019)" below).
+Owner statement on A1-1: "The original single-fixture-shape criterion is superseded by D-013 because the
+v1.3.6 pack itself contains one-of-a-kind fixtures; it will not be met by design; disclosed for every
+audit." **D-019 is not re-audited.** Step (5) is not marked done.
 
 **Response (D-012):** A1-1 and A8-1 accepted and applied; limitations A2, A3, A5 and A9
 accepted and recorded, not treated as defects. The D-012 to D-014 code was then
@@ -150,3 +160,24 @@ Every clock route found was closed and tested in the pinned container on the dev
 5. **Related, not a clock:** process ID, addresses and unseeded `random.Random()` vary between runs.
 
 **Not re-audited.** Evidence with this change: run-20261125T075113Z (also in the bundle in `dist/`).
+
+## Open residual (D-019) — runtime checks an artifact can forge
+
+Not an accepted deviation: recorded for the auditor, at Krishika's instruction (D-019).
+
+> [30 L35] "Runtime `inspect.signature` must confirm the same parameter names/kinds/counts. `create_driver(seed)` must return an instance of the module's `Driver` class."
+
+> [30 L39] "Runtime signature checks and the `create_driver` return-type check run after import in the restricted execution container. The container sandbox is the security boundary and must be pinned and tested before F16."
+
+1. **Return type (L35).** Known only from the process that ran `create_driver`, so a hostile driver can
+   report it falsely. Closed only for sources the evaluator can prove from their text (PROVEN).
+2. **Signatures after execution (L35, L37).** The definitions are measured where no artifact code has run. A replacement
+   made at run time is seen only by self-report, with the same limit.
+3. **"after import" (L39) and `inspect.signature` (L35).** The trusted measurement is made on compiled code
+   objects, before and without import, because import can run artifact expressions. It gives the same names, kinds and
+   counts for a plain undecorated `def`, the only form L35 and L37 allow. The check after import is the self-reported one.
+4. **Consequence:** an invalid artifact may be counted valid. No trace, verdict or other artifact is affected
+   ([sandbox.md](sandbox.md) "Runtime checks"). The proof rests on CPython behaving as documented, and its
+   list of allowed names was written by the implementation author.
+
+**Not re-audited.** Owner decision open: whether a SELF_REPORTED artifact may count as valid in confirmatory use.

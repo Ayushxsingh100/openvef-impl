@@ -82,6 +82,19 @@ def _is_params(value: Any) -> bool:
         and isinstance(p[2], bool) for p in value))
 
 
+def inspect_source(name: str, source: str) -> dict:
+    """{symbol: parameters or None} from a fresh process that compiles and never executes the
+    source (D-019). No artifact code has run in it, so its answer can be trusted."""
+    with ArtifactProcess() as p:
+        try:
+            facts = p._call("inspect", {"op": "inspect", "name": name, "source": source}, "inspected")
+        except ArtifactFailed as exc:
+            raise ArtifactHostError("inspection process failed") from exc
+    if not (isinstance(facts, dict) and all(_is_params(v) for v in facts.values())):
+        raise ArtifactHostError("inspection process answer")
+    return facts
+
+
 def signature_ok(params: Optional[list], symbol: str) -> bool:
     """File 30 L35/L37: the same parameter names, kinds and counts, no defaults."""
     return params == [[n, "POSITIONAL_OR_KEYWORD", False] for n in REQUIRED_SIGNATURES[symbol]]
@@ -153,7 +166,8 @@ class ArtifactProcess:
 
     # --- operations
     def construct(self, source: str, seed: int) -> tuple[bool, Optional[list], Optional[list]]:
-        """Import and create_driver: (return type ok, create_driver params, step params)."""
+        """Import and create_driver: (return type ok, create_driver params, step params), all
+        self-reported after artifact code ran: usable only against the artifact (D-019)."""
         facts = self._call("factory", {"op": "driver", "source": source, "seed": seed}, "constructed")
         if not (isinstance(facts, list) and len(facts) == 3 and isinstance(facts[0], bool)
                 and _is_params(facts[1]) and _is_params(facts[2])):

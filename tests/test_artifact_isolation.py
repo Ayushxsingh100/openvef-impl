@@ -190,6 +190,199 @@ class IsolationTests(unittest.TestCase):
                          "CHECKER_RUNTIME_ERROR|class=PermissionError")
 
 
+# --- forged runtime checks (D-019, audit A9-2; File 30 §3 L35, L37, L39) ----------------------
+GOOD = {"create_driver": '[["seed","POSITIONAL_OR_KEYWORD",false]]',
+        "step": '[["self","POSITIONAL_OR_KEYWORD",false],["cycle_index","POSITIONAL_OR_KEYWORD",false],'
+                '["outputs_after_edge","POSITIONAL_OR_KEYWORD",false]]',
+        "check": '[["trace","POSITIONAL_OR_KEYWORD",false],["metadata","POSITIONAL_OR_KEYWORD",false]]'}
+CONSTRUCTED = '{"constructed":[true,' + GOOD["create_driver"] + "," + GOOD["step"] + "]}"
+LOADED = '{"loaded":' + GOOD["check"] + "}"
+
+
+def forgeries(answer, good):
+    """The auditor's routes (A9-2) and others, as statements run before the worker measures."""
+    main = "w = collections._sys.modules['__main__']\n"
+    frame = f"b = {answer!r}.encode()\n"
+    return {
+        "replace parameters": main + f"g = {list(good)!r}\nw.parameters = lambda f: g.pop(0)\n",
+        "replace parameters and isinstance": main + f"g = {list(good)!r}\nw.parameters = lambda f: g.pop(0)\n"
+                                                    "w.isinstance = lambda *a: True\n",
+        "replace code_parameters": main + "w.code_parameters = lambda *a: None\nw._quote = lambda t: t\n"
+                                          f"g = {list(good)!r}\nw.parameters = lambda f: g.pop(0)\n",
+        "replace send": main + f"s = w.send\nw.send = lambda body: s({answer!r})\n",
+        "replace code object": main + f"g = {answer!r}\nw.send.__code__ = (lambda body: _write(3, len(G).to_bytes(4, 'big')"
+                                      " + G)).__code__\nw.G = g.encode()\n",
+        "replace builtins": main + f"g = {list(good)!r}\nw.parameters = lambda f: g.pop(0)\n"
+                                   "bi = print.__self__\nbi.isinstance = bi.issubclass = lambda *a: True\n",
+        "pipe write then exit": frame + "o = collections._sys.modules['os']\n"
+                                        "o.write(3, len(b).to_bytes(4, 'big') + b)\no._exit(0)\n",
+        "pipe write then hang": frame + "o = collections._sys.modules['os']\n"
+                                        "o.write(3, len(b).to_bytes(4, 'big') + b)\nwhile True:\n    pass\n"}
+
+
+def block(text, n=4):
+    return "".join(" " * n + x + "\n" for x in text.splitlines())
+
+
+STEP = "class Driver:\n    def step({params}):\n        return 'COMPLETE'\n\n"
+OK_STEP = STEP.format(params="self, cycle_index, outputs_after_edge")
+DRIVER_FORGERIES = forgeries(CONSTRUCTED, (GOOD["create_driver"], GOOD["step"]))
+CHECKER_FORGERIES = forgeries(LOADED, (GOOD["check"],))
+CHECKER_OK = "def check_trace(trace, metadata):\n    return {'verdict': 'PASS', 'diagnostics': []}\n"
+
+
+def static_stages(driver, checker=CHECKER_OK):
+    from openvef.ast_signature import check_ast_signature, check_compile
+    from openvef.source_ast import check_sources
+    sources = {"driver.py": driver, "checker.py": checker}
+    trees = check_sources(list(sources.items()))
+    return import_policy.check_import_policy(sources, trees) or check_ast_signature(trees) or check_compile(sources)
+
+
+@unittest.skipUnless(DOCKER, "docker not available")
+class ForgedRuntimeCheckTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sandbox.ensure_image()
+
+    def diag(self, src):
+        r = runtime.factory_checks(src, timeout_s=8.0)
+        return None if r is None else r.diagnostic
+
+    def test_a_wrong_definition_cannot_be_forged_right(self):
+        """Parameters are measured where no artifact code has run, so no forgery reaches them."""
+        reject = "ENTRY_POINT_REJECT|file=driver.py|symbol={}|reason=RUNTIME_SIGNATURE"
+        for name, forge in DRIVER_FORGERIES.items():
+            for params in ("self, *a", "self, cycle_index, outputs_after_edge, x=1"):
+                with self.subTest(forge=name, step=params):
+                    src = ("import collections\n\n" + STEP.format(params=params)
+                           + "def create_driver(seed):\n" + block(forge) + "    return Driver()\n")
+                    self.assertEqual(self.diag(src), reject.format("Driver.step"))
+        for head in ("seed, extra=1", "*seed", "seed, /", "seed, *, k=0"):
+            for name in ("replace send", "replace parameters", "pipe write then exit"):
+                with self.subTest(forge=name, head=head):
+                    src = ("import collections\n\n" + OK_STEP + f"def create_driver({head}):\n"
+                           + block(DRIVER_FORGERIES[name]) + "    return Driver()\n")
+                    self.assertEqual(self.diag(src), reject.format("create_driver"))
+
+    def test_forgery_at_import_time(self):
+        """Helper defaults run at import (the static stages accept them): no help to the forger."""
+        src = ("import collections\n\ndef forge(x=collections._sys.modules['__main__'].__dict__.update(\n"
+               f"        parameters=lambda f, g={[GOOD['create_driver'], GOOD['step']]!r}: g.pop(0))):\n    return x\n\n")
+        self.assertIsNone(static_stages(src + OK_STEP + "def create_driver(seed):\n    return Driver()\n"))
+        self.assertEqual(self.diag(src + STEP.format(params="self, *a") + "def create_driver(seed):\n    return Driver()\n"),
+                         "ENTRY_POINT_REJECT|file=driver.py|symbol=Driver.step|reason=RUNTIME_SIGNATURE")
+
+    def test_spoofed_signature_attribute_is_ignored(self):
+        src = (STEP.format(params="self, *a") + "def create_driver(seed):\n"
+               "    def good(self, cycle_index, outputs_after_edge):\n        return None\n"
+               "    Driver.step.__wrapped__ = good\n    Driver.step.__signature__ = good\n    return Driver()\n")
+        self.assertEqual(self.diag(src), "ENTRY_POINT_REJECT|file=driver.py|symbol=Driver.step|reason=RUNTIME_SIGNATURE")
+        dynamic = (OK_STEP + "def create_driver(seed):\n    def good(self, cycle_index, outputs_after_edge):\n"
+                   "        return None\n    def v(*a):\n        return 'COMPLETE'\n    v.__wrapped__ = good\n"
+                   "    Driver.step = v\n    return Driver()\n")
+        self.assertEqual(self.diag(dynamic), "ENTRY_POINT_REJECT|file=driver.py|symbol=Driver.step|reason=RUNTIME_SIGNATURE")
+        self.assertIsNone(static_stages(dynamic))
+
+    def test_class_spoof_is_not_a_driver(self):
+        src = OK_STEP + ("def create_driver(seed):\n    o = type('O', (), {'__class__': Driver})()\n"
+                         "    o.step = len\n    return o\n")
+        self.assertEqual(self.diag(src), "ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RETURN_TYPE")
+
+    def test_checker_definition_cannot_be_forged_right(self):
+        for name, forge in CHECKER_FORGERIES.items():
+            if name == "pipe write then hang":  # ends as a timeout: no verdict (below)
+                continue
+            with self.subTest(forge=name):
+                src = ("import collections\n\ndef check_trace(trace, *metadata):\n"
+                       "    return {'verdict': 'PASS', 'diagnostics': []}\n" + forge)
+                r = runtime.checker_invocation(src, [], {}, 8.0)
+                self.assertEqual(r.diagnostic, "ENTRY_POINT_REJECT|file=checker.py|symbol=check_trace|reason=RUNTIME_SIGNATURE")
+
+    def test_residual_forged_state_after_execution(self):
+        """NOT closed (docs/sandbox.md "Runtime checks"): state that exists only after artifact code
+        has run is self-reported, so a forger passes. Pinned here so that the limit is visible; every
+        such source is marked SELF_REPORTED by the evaluator, whatever the process says."""
+        from openvef.runtime_basis import SELF_REPORTED, basis
+        bodies = {"dynamic variadic step": "def v(*a):\n    return 'COMPLETE'\nDriver.step = v\n{}return Driver()\n",
+                  "not a Driver": "{}return len\n"}
+        for what, body in bodies.items():
+            for name in ("replace send", "replace code object", "pipe write then exit"):
+                with self.subTest(what=what, forge=name):
+                    src = "import collections\n\n" + OK_STEP + "def create_driver(seed):\n" + \
+                        block(body.format(DRIVER_FORGERIES[name]))
+                    self.assertIsNone(self.diag(src))
+                    self.assertEqual(basis("driver.py", src)["basis"], SELF_REPORTED)
+        # A forger that is no driver at all gains nothing in a run: its next answer fails it.
+        src = "import collections\n\n" + OK_STEP + "def create_driver(seed):\n" + \
+            block(DRIVER_FORGERIES["replace send"] + "return len\n")
+        r = driver_run(src, DESIGN, "rtl", 0, step_timeout_s=3.0, budget_s=30.0)
+        self.assertEqual([e["kind"] for e in r["events"]], ["driver_runtime"])
+
+
+class RuntimeBasisTests(unittest.TestCase):
+    """src/openvef/runtime_basis.py (D-019): no container needed."""
+
+    def basis(self, driver):
+        from openvef.runtime_basis import basis
+        return basis("driver.py", driver)["basis"]
+
+    def make(self, factory, pre="", step="return 'COMPLETE'", post=""):
+        return (pre + "class Driver:\n    def step(self, cycle_index, outputs_after_edge):\n" + block(step, 8)
+                + "\ndef create_driver(seed):\n" + block(factory) + post)
+
+    def test_ordinary_drivers_are_proven(self):
+        for src in (self.make("return Driver()"),
+                    self.make("d = Driver()\nd.rng = random.Random(seed)\nd.q = [0] * 4\nreturn d", "import random\n\n",
+                              "v = {'a': format(self.rng.randrange(4), '02b')}\nself.q.append(int(v['a'], 2))\nreturn v"),
+                    self.make("if seed:\n    d = Driver()\n    return d\nreturn Driver()"),
+                    self.make("d = Driver()\nd.x = math.floor(seed / 2)\nreturn d", "import math\n\nLIMIT = 4\n\n")):
+            with self.subTest(src=src):
+                self.assertIsNone(static_stages(src))
+                self.assertEqual(self.basis(src), "PROVEN")
+
+    def test_anything_else_is_not(self):
+        imp = "import collections\n\n"
+        cases = [self.make(f, imp) for f in (
+            "return None", "pass", "yield Driver()", "d = Driver()\nd = len\nreturn d", "d = seed or Driver()\nreturn d",
+            "d = Driver()\nfor d in (1,):\n    pass\nreturn d", "d = Driver()\ntry:\n    pass\nexcept Exception as d:\n    pass\nreturn d",
+            "d = Driver()\n[d := x for x in (1,)]\nreturn d", "d = Driver()\ndef d():\n    return 1\nreturn d",
+            "if seed:\n    return Driver()", "c = Driver\nreturn c()", "Driver.step = len\nreturn Driver()",
+            "d = Driver()\nd.step = len\nreturn d", "d = Driver()\nsetattr(d, 'step', len)\nreturn d",
+            "d = Driver()\nd.__class__ = int\nreturn d", "type(Driver()).step = len\nreturn Driver()",
+            "vars(Driver)\nreturn Driver()", "global Driver\nDriver = len\nreturn Driver()", "Driver = len\nreturn Driver()",
+            "collections._sys\nreturn Driver()", "m = collections\nreturn Driver()", "collections.abc\nreturn Driver()",
+            "print.__self__\nreturn Driver()", "globals()\nreturn Driver()", "getattr(1, 'x')\nreturn Driver()",
+            "g = (x for x in ())\ng.gi_frame.f_globals\nreturn Driver()", "__builtins__\nreturn Driver()",
+            "try:\n    1 / 0\nexcept Exception as e:\n    e.__traceback__\nreturn Driver()",
+            "create_driver.x = 1\nreturn Driver()", "exit()\nreturn Driver()",
+            "match seed:\n    case int(__class__=c):\n        pass\nreturn Driver()",
+            "import random\nrandom._os\nreturn Driver()", "import statistics\nstatistics.sys\nreturn Driver()",
+            "import operator\noperator.attrgetter('__class__')\nreturn Driver()",
+            "import json\njson.codecs\nreturn Driver()", "import copy\ncopy.types\nreturn Driver()",
+            "import collections as c\nreturn Driver()", "from random import Random\nreturn Driver()")]
+        cases += [self.make("return Driver()", step="self.step = len\nreturn 'COMPLETE'"),
+                  self.make("return Driver()", step="Driver.step = len\nreturn 'COMPLETE'"),
+                  self.make("return Driver()", post="\nclass Driver:\n    pass\n"),
+                  self.make("return Driver()", post="\ndef h(Driver):\n    return Driver()\n"),
+                  self.make("return Driver()", post="\ndef h(x=print.__self__):\n    return x\n"),
+                  self.make("return Driver()", pre="def h():\n    global Driver\n    Driver = 1\n\n")]
+        for src in cases:
+            with self.subTest(src=src):
+                self.assertEqual(self.basis(src), "SELF_REPORTED")
+
+    def test_every_forgery_is_not_proven(self):
+        from openvef.runtime_basis import basis
+        for name, forge in DRIVER_FORGERIES.items():
+            with self.subTest(forge=name):
+                self.assertEqual(self.basis(self.make(forge + "return Driver()", "import collections\n\n")), "SELF_REPORTED")
+        for name, forge in CHECKER_FORGERIES.items():
+            with self.subTest(checker=name):
+                src = "import collections\n\ndef check_trace(trace, metadata):\n" + block(forge) + "    return {}\n"
+                self.assertEqual(basis("checker.py", src)["basis"], "SELF_REPORTED")
+        self.assertEqual(basis("checker.py", CHECKER_OK)["basis"], "PROVEN")
+
+
 # --- wall-clock reads (D-016; File 30 §6 L101) ---------------------------------------------
 NATIVE = ("import collections\n\ndef native(code):\n"
           "    c = collections._sys.modules['ctypes']\n    lib = c.CDLL(None)\n"
@@ -332,7 +525,7 @@ class StaticSeparationTests(unittest.TestCase):
         tree = ast.parse((HERE.parent / "sandbox/artifact_worker.py").read_text("utf-8"))
         names = {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
         names |= {n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
-        self.assertLessEqual(names, {"__future__", "builtins", "inspect", "os", "sys", "types", "encodings", "importlib",
+        self.assertLessEqual(names, {"__future__", "builtins", "dis", "os", "sys", "types", "encodings", "importlib",
                                      "pkgutil", "ctypes", "resource", "struct", "json", "time"})
 
 

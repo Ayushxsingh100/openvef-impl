@@ -36,6 +36,7 @@ from openvef.assembler import (CLAUSE_ID_REGEX_DEFAULT, NEAR_MATCH_REGEX_DEFAULT
                                SEARCH_REGEX_DEFAULT, check_reserved_heading_lines,  # noqa: E402
                                check_unresolved_placeholders, check_visible_clause_ids)
 from openvef.runtime import RuntimeStageError, factory_checks  # noqa: E402
+from openvef import runtime_basis  # noqa: E402
 from openvef.sandbox import SandboxUnavailable, broker_mode, ensure_image  # noqa: E402
 from openvef import simulator_stages  # noqa: E402
 from openvef.simulation import SimulationError  # noqa: E402
@@ -130,6 +131,7 @@ SANDBOX: dict | None = None  # set by main() once the pinned image is verified
 DESIGN_MATERIALS_FILE = "design/fifo/design-materials-DRAFT.json"
 SIM: dict | None = None
 SIM_UNAVAILABLE = "not prepared"
+RUNTIME_BASIS: dict | None = None  # D-019: whether the runtime checks of the current fixture could be forged
 PROVISIONAL: dict = {}  # fixture descriptor id -> simulator details, filled by sim_stages
 
 
@@ -148,6 +150,8 @@ def source_stages(driver_source: str, checker_source: str) -> Failure | None:
         raise Blocked(f"blocked on docs/ambiguities.md {exc}") from exc
     if static is not None:
         return static
+    global RUNTIME_BASIS
+    RUNTIME_BASIS = {name: runtime_basis.basis(name, text) for name, text in sources.items()}
     if SANDBOX is None:
         raise Blocked("static stages and compilation passed; sandbox unavailable, runtime stage not run")
     return factory_checks(driver_source)
@@ -476,7 +480,7 @@ def main() -> int:
         "sandbox": SANDBOX,
     }
 
-    global SIM, SIM_UNAVAILABLE
+    global SIM, SIM_UNAVAILABLE, RUNTIME_BASIS
     if SANDBOX is not None:
         try:
             SIM = simulator_stages.prepare(REPO, DESIGN_MATERIALS_FILE)
@@ -486,6 +490,7 @@ def main() -> int:
             meta["design_materials"] = {"unavailable": SIM_UNAVAILABLE}
     provisional_ids: list = []
     deviation_ids: list = []
+    self_reported: list = []
     counts = {"PASS": 0, "FAIL": 0, "NOT_IMPLEMENTED": 0, "ERROR": 0}
     with open(out_dir / "results.jsonl", "w", encoding="utf-8") as res, open(out_dir / "run.log", "w", encoding="utf-8") as log:
         log.write(json.dumps(meta, indent=2) + "\n")
@@ -494,6 +499,7 @@ def main() -> int:
         for entry in fixtures:
             desc = load_descriptor(root, entry)
             expected = desc["expected"]
+            RUNTIME_BASIS = None
             try:
                 status, actual, note = execute(desc, validator)
             except Exception as exc:  # recorded, never hidden
@@ -505,6 +511,11 @@ def main() -> int:
             counts[status] += 1
             rec = {"fixture_id": entry["fixture_id"], "descriptor_sha256": entry["sha256"], "status": status,
                    "expected": expected, "actual": actual, "note": note}
+            if RUNTIME_BASIS is not None:
+                rec["runtime_checks"] = RUNTIME_BASIS
+                for name, b in RUNTIME_BASIS.items():
+                    if b["basis"] != runtime_basis.PROVEN:
+                        self_reported.append(f"{entry['fixture_id']}:{name}")
             sim_details = PROVISIONAL.pop(id(desc), None)
             if sim_details is not None and SIM["provisional"]:  # reached L166 (7)-(11); items still open
                 rec["provisional"] = {"reason": "depends on design items not yet frozen or signed: "
@@ -525,6 +536,7 @@ def main() -> int:
     summary = {**meta, "counts": counts, "total": sum(counts.values()),
                "provisional_fixtures": provisional_ids,
                "deviation_cleared_fixtures": deviation_ids,
+               "runtime_checks_self_reported": self_reported,
                "deviation_labels": sorted({c["label"] for c in SIM["cleared"]}) if SIM else [],
                "results_sha256": sha256_file(out_dir / "results.jsonl")}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
