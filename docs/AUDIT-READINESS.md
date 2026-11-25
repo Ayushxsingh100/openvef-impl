@@ -21,16 +21,16 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261124T211459Z`**.
-- Run class `development`; commit `a1d2e9c`, clean tree; after DEV-001
+Latest evidence run: **`evidence/run-20261125T040905Z`**.
+- Run class `development`; commit `e4fef20`, clean tree; after DEV-001
   ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
   The run re-verified all 20 frozen items, the DEV-001 mask files and the 39 D-009 items
   against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
 - Every outcome, and the null-trace hash of each simulated pass, is identical to the previous
-  run, `run-20261124T203551Z` (commit `0d50a7d`). D-015 changed how artifacts are isolated, the adapter domain
-  checks and the serializer. **The adapter rule (D-013) and the D-015 fixes require re-audit.**
+  run, `run-20261124T211459Z` (commit `a1d2e9c`). D-016 changed only the artifact worker (wall-clock
+  reads denied). **The adapter rule (D-013), the D-015 fixes and the D-016 change require re-audit.**
 
 | Status | Count | Fixtures |
 |---|---|---|
@@ -67,8 +67,8 @@ auditor should weigh them with that in mind.
 Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
 [design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
 
-Latest control run: **`evidence/controls-20261124T211644Z`**, pinned image, commit
-`a1d2e9c`. It carries the same identity records as an F18 run.
+Latest control run: **`evidence/controls-20261125T041047Z`**, pinned image, commit
+`e4fef20`. It carries the same identity records as an F18 run.
 
 | Status | Controls |
 |---|---|
@@ -86,7 +86,7 @@ Latest control run: **`evidence/controls-20261124T211644Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261124T211459Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261125T040905Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -138,7 +138,7 @@ this run is on the pinned one.
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
 | Upload the re-audit report (SHA-256 `8ef52f96…1ec7`), with the model shown and the prompt; add the auditor's A4-1 case as a test | Krishika, then Claude | DEV-002; D-015 |
 | Re-audit of the D-015 and D-016 changes (A-054 approved, D-016); wall-clock residuals in [DEVIATIONS.md](DEVIATIONS.md) | the auditor | D-015, D-016 |
-| Evidence and control runs after D-016 (the latest, `run-20261124T211459Z` and `controls-20261124T211644Z`, predate it) | Claude, when an owner asks | D-016 |
+| Rebuild the audit bundle with the post-D-016 runs, after the re-audit report is uploaded. `dist/`, `docs/AUDIT-BRIEF.md` and `tools/build_audit_bundle.py` still name `run-20261124T211459Z` | Claude | DEV-002; D-016 |
 | Input contracts and outcomes for the 15 fixtures without one (PD-03, PD-04, PD-07, PD-26) | owners | D-013 |
 | Re-audit of D-013 and A-053 (approved, D-014); the passes resting on A-053 count subject to it | the auditor | D-013, D-014, A-053 |
 | Draft pack corrections for M27, M36, M42, M47, M48, M50, M54, M58, PD-22 and PD-24: `proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md` (DRAFT; needs a new independent document audit) | owners | PD-02, PD-03, PD-06, PD-22, PD-24, PD-25 |

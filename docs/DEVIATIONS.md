@@ -144,4 +144,4 @@ Every clock route found was closed and tested in the pinned container on the dev
    so such an artifact fails as a runtime error, not at IMPORT_POLICY.
 5. **Related, not a clock:** process ID, addresses and unseeded `random.Random()` vary between runs.
 
-**Not re-audited.** Evidence run-20261124T211459Z predates this change.
+**Not re-audited.** Evidence with this change: run-20261125T040905Z; the bundle in `dist/` holds run-20261124T211459Z, which predates it.
