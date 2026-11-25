@@ -217,12 +217,27 @@ def in_domain(ok: bool, name: str) -> None:
         raise Blocked(f"{name} outside its cited domain")
 
 
+def utf8_text(value, bom_ok: bool = True) -> bool:
+    """A string that has UTF-8 bytes (D-017). File 31 L26, L74 also reject a BOM."""
+    try:
+        return isinstance(value, str) and bool(value.encode("utf-8") or True) and (bom_ok or not value.startswith("\ufeff"))
+    except UnicodeEncodeError:
+        return False
+
+
+def base64_text(value) -> bool:
+    try:
+        return isinstance(value, str) and base64.b64decode(value, validate=True) is not None
+    except ValueError:
+        return False
+
+
 def strings(value) -> bool:
     return isinstance(value, list) and all(isinstance(v, str) for v in value)
 
 
 def adapt_response(desc: dict, validator) -> Failure | dict | None:
-    in_domain(all(isinstance(desc["input"].get(k, ""), str) for k in ("raw_response_utf8", "raw_response_base64")),
+    in_domain(utf8_text(desc["input"].get("raw_response_utf8", "")) and base64_text(desc["input"].get("raw_response_base64", "")),
               "raw response")
     if desc["input"].get("provider_finish_reason", "stop") not in ("length", "stop"):
         raise Blocked("provider finish reason outside the cited values")
@@ -261,7 +276,7 @@ def adapt_halt_recurrence(desc: dict, validator) -> Failure | dict | None:
     inp = desc["input"]
     in_domain(inp["design_id"] in ("FIFO", "UART"), "design_id")
     in_domain(type(inp["recovery_cycles_used"]) is int and inp["recovery_cycles_used"] == 1, "recovery_cycles_used")
-    in_domain(type(inp["scheduled_slots"]) is int and inp["scheduled_slots"] >= 1, "scheduled_slots")
+    in_domain(type(inp["scheduled_slots"]) is int and inp["scheduled_slots"] >= 1, "scheduled_slots")  # A-055: no stated maximum
     in_domain(all(isinstance(inp[k], dict) for k in ("first_halt_signature", "second_halt_signature")), "halt signature")
     try:
         first, second = (HaltSignature.given(inp[k]) for k in ("first_halt_signature", "second_halt_signature"))
@@ -275,7 +290,7 @@ def adapt_clause_ids(desc: dict, validator) -> Failure | dict | None:
     """The patterns are File 31 §8's; a supplied pattern must equal it and is never used (D-015)."""
     inp = desc["input"]
     ids = inp["manifest_clause_ids"]
-    in_domain(isinstance(inp["visible_payload"], str), "visible_payload")
+    in_domain(utf8_text(inp["visible_payload"], bom_ok=False), "visible_payload")
     in_domain(strings(ids) and ids == sorted(set(ids)) and all(re.fullmatch(CLAUSE_ID_REGEX_DEFAULT, i) for i in ids),
               "manifest_clause_ids")
     for name, fixed in (("clause_id_regex", CLAUSE_ID_REGEX_DEFAULT), ("clause_id_search_regex", SEARCH_REGEX_DEFAULT),
@@ -296,12 +311,12 @@ def adapt_reserved_headings(desc: dict, validator) -> Failure | dict | None:
     """The headings are the sidecar's; supplied ones must be a subset and are never used (D-015)."""
     supplied = desc["input"]["reserved_headings"]
     in_domain(strings(supplied) and set(supplied) <= set(RESERVED_HEADINGS), "reserved_headings")
-    in_domain(isinstance(desc["input"]["payload"], str), "payload")
+    in_domain(utf8_text(desc["input"]["payload"], bom_ok=False), "payload")
     return rejected(check_reserved_heading_lines(desc["input"]["payload"]))
 
 
 def adapt_rendered(desc: dict, validator) -> Failure | dict | None:
-    in_domain(isinstance(desc["input"]["rendered"], str), "rendered")
+    in_domain(utf8_text(desc["input"]["rendered"], bom_ok=False), "rendered")
     return rejected(check_unresolved_placeholders(desc["input"]["rendered"]))
 
 
@@ -339,8 +354,8 @@ def adapt_paired_runs(desc: dict, validator) -> Failure | dict | None:
 
 # (required keys, optional keys, adapter). This table is the ONLY place an input shape
 # selects code. D-013: each adapter needs an input contract cited to the pack
-# (runner/adapter_contracts.py) and at least three synthetic non-fixture vectors
-# (tests/adapter_vectors.py); tests/test_dispatch_shapes.py enforces both.
+# (runner/adapter_contracts.py) and at least three synthetic non-fixture vectors, and
+# D-017 boundary pairs per property (tests/adapter_vectors.py); tests/test_dispatch_shapes.py enforces both.
 ADAPTERS = (
     ({"raw_response_utf8"}, {"provider_finish_reason"}, adapt_response),
     ({"raw_response_base64"}, set(), adapt_response),

@@ -22,12 +22,15 @@ import re
 from typing import Any, Callable, Iterable, Mapping, NamedTuple, Optional, Sequence
 
 from openvef.envelope import Failure
+from openvef.import_policy import ALLOWED_ROOTS
+from openvef.serializer import in_grammar
 
 REPAIR = "REPAIR"
 TERMINAL = "TERMINAL_INVALID_NO_REPAIR"
 HALT = "DESIGN_HALT_NO_SLOT_SCORED"
 ACCEPT_WITH_WARNING = "ACCEPT_WITH_WARNING"
 
+_POINTER = re.compile(r"/|(?:/(?:[^/~]|~[01])*)+")  # JSON Pointer; `/` is the document root
 _EXCEPTION_CLASS = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 FILE_ORDER = ("driver.py", "checker.py")
 
@@ -94,11 +97,13 @@ def _validate_event(e: Mapping[str, Any]) -> None:
         "driver_vector": lambda: e["reason"] in _VECTOR_REASONS,
         "simulator_error": lambda: e["target"] in _TARGETS,
         "trace_integrity": lambda: e["reason"] in _TRACE_REASONS,
-        "import_not_allowed": lambda: isinstance(e["module"], str) and e["module"] != "",
-        "schema_reject": lambda: isinstance(e["pointer"], str) and e["pointer"].startswith("/"),
+        "import_not_allowed": lambda: isinstance(e["module"], str) and e["module"] not in ALLOWED_ROOTS,  # a disallowed root
+        "schema_reject": lambda: isinstance(e["pointer"], str) and bool(_POINTER.fullmatch(e["pointer"])),
     }
     try:
         ok = checks.get(kind, lambda: True)()
+        # The row's diagnostic must be in the closed grammar (L94-L127): "No unlisted value is permitted."
+        ok = ok and in_grammar(EVENT_ROWS[kind].build(e).diagnostic)
     except (KeyError, TypeError) as exc:
         raise EventError(f"event {kind!r} lacks a field: {exc}") from exc
     if not ok:

@@ -2,6 +2,7 @@
 
 Only files tracked by git are bundled, and the bundled paths must have no uncommitted
 changes. The build fails if a file that the evidence run hashed has changed since the run,
+if the container-test evidence (D-017) is not clean, not intact or not from these sources,
 or if the zip reaches 20 MB. Entries are sorted with fixed timestamps and modes, so the
 same commit gives the same bytes (for the same Python/zlib). Usage:
     python3 tools/build_audit_bundle.py
@@ -21,7 +22,8 @@ PACK = "baseline/OpenVEF_Planning_v1_3_6"
 # Pack files the code, tests, documents or the brief rely on (audit exports omitted).
 PACK_TAGS = ("01", "02", "03", "10", "11", "12", "16", "19", "20", "21", "22", "23", "24", "25", "27", "30", "31",
              "32", "33", "34", "36", "38", "50", "54", "56", "57", "58")
-PATHS = ["src", "runner", "sandbox", "tests", "docs", "design", RUN, "requirements.in", "requirements.lock",
+TESTS = max((p.parent for p in (REPO / "evidence").glob("container-tests-*/summary.json")), default=REPO / "missing").relative_to(REPO).as_posix()
+PATHS = ["src", "runner", "sandbox", "tests", "tools", "docs", "design", RUN, TESTS, "requirements.in", "requirements.lock",
          "CLAUDE.md"]
 OUT = REPO / "dist" / "openvef-audit-bundle.zip"
 LIMIT = 20_000_000
@@ -49,7 +51,14 @@ def main() -> int:
         sys.exit(f"changed since the evidence run: {changed}")
     if sha(files[f"{RUN}/results.jsonl"]) != summary["results_sha256"]:
         sys.exit("results.jsonl does not match the run summary")
-    info = {"brief": "docs/AUDIT-BRIEF.md", "evidence_run": RUN, "evidence_commit": summary["git_commit"],
+    tests = json.loads(files[f"{TESTS}/summary.json"])
+    stale = [n for n, h in tests["source_sha256"].items() if n not in files or sha(files[n]) != h]
+    sums = dict(reversed(l.split("  ", 1)) for l in files[f"{TESTS}/SHA256SUMS"].decode().splitlines())
+    have = {n[len(TESTS) + 1:]: sha(d) for n, d in files.items() if n.startswith(TESTS + "/") and not n.endswith("/SHA256SUMS")}
+    if stale or sums != have or "+" in tests["git_commit"] or tests["returncode"] != 0:
+        sys.exit(f"container-test evidence not usable: stale {stale}, intact {sums == have}, {tests['git_commit']}, {tests['returncode']}")
+    info = {"container_tests": TESTS, "container_tests_commit": tests["git_commit"], "container_tests_totals": tests["totals"],
+            "brief": "docs/AUDIT-BRIEF.md", "evidence_run": RUN, "evidence_commit": summary["git_commit"],
             "source_commit": git("log", "-1", "--format=%H", "--", *PATHS, PACK).strip(), "files": len(files),
             "disclosure": "AI-assisted audit. The auditor must not be the implementation author (Claude, Anthropic)."}
     files["BUNDLE-INFO.json"] = (json.dumps(info, indent=2) + "\n").encode()

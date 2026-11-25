@@ -4,7 +4,8 @@ Data only: nothing here selects code. tests/test_dispatch_shapes.py checks that 
 adapter has a contract, that `inputs` names every property of its shape, that every quoted
 text is verbatim at that line, that every value that selects code is cited in `values`, and
 that `DOMAINS` gives, for every property, the cited lines and the domain terms they state
-(D-015, A8-2), with an out-of-domain vector per property that the adapter must refuse.
+(D-015, A8-2), with an out-of-domain vector per property that the adapter must refuse, and (D-017) boundary
+pairs per property: one in-domain edge and one value just outside it.
 
 Reading A-053 (docs/ambiguities.md): the pack does not spell descriptor JSON keys, so a key
 or label spelling is only a carrier. What the pack must state is each property's meaning and
@@ -124,11 +125,13 @@ DOMAINS = {
     "adapt_null_runs": {"response_object": _RESP_DOMAIN, "null_runs": _RUN_DOMAIN},
     "adapt_checker_runs": {"checker_runs": _RUN_DOMAIN},
     "adapt_events": {"events": {
-        "lines": [("02", n) for n in (125, 139, 143, 144, 147, 149, 150, 151, 152, 153, 154, 155)],
+        "lines": [("02", n) for n in (125, 137, 139, 143, 144, 147, 149, 150, 151, 152, 153, 154, 155)],
         "terms": ["SCHEMA_REJECT", "OUTPUT_TRUNCATED", "IMPORT_NOT_ALLOWED", "COMPILE_ERROR", "RUNTIME_EXCEPTION",
                   "DRIVER_VECTOR_INVALID", "WATCHDOG_TIMEOUT", "SIMULATOR_ERROR", "TRACE_INTEGRITY_FAILURE",
                   "`FILE` is `driver.py` or `checker.py`", "`PHASE` is `factory` or `step`",
-                  "`RTL_OR_NULL` is `rtl` or `null`", "`LINE` and `COLUMN` are positive decimal integers"]}},
+                  "`RTL_OR_NULL` is `rtl` or `null`", "`LINE` and `COLUMN` are positive decimal integers", "the offending root as written",
+                  "escape `~` as `~0` and `/` as `~1`", "show root as `/`",
+                  "`TRACE_INTEGRITY_FAILURE.reason` is one of", "`DRIVER_VECTOR_INVALID.reason` is one of"]}},
     "adapt_halt_recurrence": {
         "design_id": {"lines": [("02", 185)], "terms": ["`design_id` is `FIFO` or `UART`"]},
         "recovery_cycles_used": {"lines": [("02", 185)], "terms": ["one permitted recovery cycle"]},
@@ -139,7 +142,7 @@ DOMAINS = {
             "`evaluator_component` is `SIMULATOR`", "`stable_error_class` is", "`stable_diagnostic_code` is exactly"]},
         "second_halt_signature": {"lines": [("02", 185)], "terms": ["Its components have these exact domains"]}},
     "adapt_clause_ids": {
-        "visible_payload": {"lines": [("31", 30)], "terms": ["those payload bytes"]},
+        "visible_payload": {"lines": [("31", 26), ("31", 30)], "terms": ["those payload bytes", "reject invalid UTF-8 and BOM"]},
         "manifest_clause_ids": {"lines": [("31", 29)], "terms": ["duplicate-free, lexicographically sorted array of strings",
                                                                  "fully matches that pattern"]},
         "clause_id_regex": {"lines": [("31", 91)], "terms": ["^[A-Z]{2,6}-[0-9]{3}$"]},
@@ -147,10 +150,12 @@ DOMAINS = {
         "clause_id_near_match_regex": {"lines": [("31", 93)],
                                        "terms": ["(?<![A-Za-z0-9_-])[A-Za-z]{2,6}-[0-9]{1,3}(?![A-Za-z0-9_-])"]}},
     "adapt_reserved_headings": {
-        "payload": {"lines": [("31", 27)], "terms": ["any payload line", "after LF normalization"]},
+        "payload": {"lines": [("31", 26), ("31", 27)],
+                    "terms": ["any payload line", "after LF normalization", "reject invalid UTF-8 and BOM"]},
         "reserved_headings": {"lines": [("31", 9), *(("33", n) for n in _HEADINGS)],
                               "terms": ["one of the nine reserved headings in the sidecar", *_HEADINGS.values()]}},
-    "adapt_rendered": {"rendered": {"lines": [("31", 28)], "terms": ["\\{\\{[A-Z0-9_]+\\}\\}"]}},
+    "adapt_rendered": {"rendered": {"lines": [("31", 28), ("31", 74)],
+                                    "terms": ["\\{\\{[A-Z0-9_]+\\}\\}", "reject BOM and invalid sequences"]}},
     "adapt_runtime_signature": {"runtime_signature": {
         "lines": [("30", 35), ("30", 37)],
         "terms": ["named `seed`", "`self`, `cycle_index`, `outputs_after_edge`", "`trace` and `metadata`",

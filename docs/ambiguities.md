@@ -1621,3 +1621,60 @@ send signals. No current fixture reaches it. Not covered by D-009 or D-014.
    mechanisms and tests are in [sandbox.md](sandbox.md) "Wall-clock reads"; what is not closed is in
    [DEVIATIONS.md](DEVIATIONS.md) "Open residuals".
 3. Not re-audited. No pack reading changed: the static rules are as the pack states them.
+
+## D-017 — Adapter rule kept and strengthened; container test evidence (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) recommendation, given in Claude Code: "keep the
+D-013 adapter rule (disclosed); strengthen it: every adapter needs, besides the 3 synthetic vectors,
+boundary tests for each input property's cited domain (one in-domain edge, one just outside it) —
+extend the contract test to enforce this." Takes effect under D-008.
+
+1. **Rule kept.** The second audit report said five single-fixture input shapes violate the original
+   A1 criterion, and that three vectors are insufficient. D-017 keeps the shapes (disclosed) and
+   answers the second point with boundary tests. It does not clear A1-1; that is for the auditor.
+2. **Boundary tests.** `BOUNDARIES` in `tests/adapter_vectors.py`; `boundary_problems` in
+   `tests/test_dispatch_shapes.py` fails if a property has no pair, if a pair is not tied to a cited
+   domain term, changes another property, is not adjacent, gives equal outcomes, has a refused edge
+   or uses a fixture input, or if no outside value of a property is refused or rejected.
+   - **Limits.** At least one pair per property, not one per domain term. "Adjacent" is approximated:
+     same JSON type, integers one apart, other values at most 24 characters of JSON text apart. Some
+     domains have no numeric edge; there the pair is a listed value and a near-miss spelling. For
+     some pairs the outside value is judged by a pack rule (REPAIR) instead of refused.
+   - **Claude chose the pairs**, as it wrote the adapters.
+3. **What the boundaries exposed (fixed):** a base64 string that does not decode, text with no UTF-8
+   bytes, a BOM in packet text, events whose diagnostic is outside the closed grammar (L94–L127), a
+   malformed JSON Pointer, and an `import_not_allowed` event naming an allowed root. On the
+   code before D-017 (dba77c7) 11 of the cases fail: 9 were accepted and 2 raised an uncaught error
+   (A-056). All are refused now.
+4. **Container test evidence.** `tools/run_container_tests.py` runs the whole unit-test suite in the
+   pinned container; output in `evidence/container-tests-<UTC>/`. It is not an F18 run and no fixture
+   status comes from it. The auditor may inspect these logs for A2, A3, A7 and A9; inspecting is not
+   re-running. Requires re-audit with D-015 and D-016.
+
+## A-055 — Upper bound of `scheduled_slots` (DECIDED BY CLAUDE — owner review pending)
+
+> [02 L181] "a *slot* is exactly one arm × design combination"
+
+> [02 L396] "The scheduled denominator is `|G_cd| × |M_d|`. Every scheduled slot remains in it."
+
+Readings: (i) L181 as a count: two arms and two designs give at most four slots, so the fixtures' 10
+is outside the domain; (ii) L181 states what a slot belongs to; an arm/design cell holds `|G_cd|`
+scheduled slots, and the pack states no maximum.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (ii).** L396 and L429
+divide by `|G_cd|` per arm and design, and L34 assigns "Scheduled slots ... to arms by a balanced
+within-design schedule", which has no meaning if each cell is one slot. So only the lower edge (1 in,
+0 out) is tested. Under (i) M42 and M47 would still be NOT_IMPLEMENTED (PD-01). No outcome changes.
+
+## A-056 — Domains of event fields and packet text (DECIDED BY CLAUDE — owner review pending)
+
+Values the cited text excludes but for which it states no outcome. Readings: (i) refuse the input
+(NOT_IMPLEMENTED); (ii) process it as before.
+
+**Decision (decided by Claude under standing delegation, owner review pending): (i).**
+- Events: "No unlisted value is permitted" (02 L125), so an event whose diagnostic is outside the
+  grammar is refused. A pointer is RFC 6901 with `/` as root (L137). `import_not_allowed` is the
+  "Disallowed import form/root" row (L147), so an allowed root is refused.
+- Packet text: File 31 L26 and L74 reject invalid UTF-8 and a BOM but state no diagnostic for it.
+
+No fixture has such a value; no F18 outcome changes (see the run in traceability.md).

@@ -1,5 +1,6 @@
 """D-013: every runner adapter has (a) an input contract cited to the pack and (b) at least
-three synthetic non-fixture vectors, one of whose outcomes no fixture expects.
+three synthetic non-fixture vectors, one of whose outcomes no fixture expects; and (c) boundary pairs
+(an in-domain edge and a value just outside) for every property's cited domain (D-017).
 
 Also checked:
 - only the ADAPTERS table selects code by input shape, and no descriptor fits two rows;
@@ -28,7 +29,7 @@ for p in (HERE, REPO / "src", REPO / "runner"):
 
 import run_f18  # noqa: E402
 from adapter_contracts import CONTRACTS, DOMAINS  # noqa: E402
-from adapter_vectors import BLOCKED, JUDGED_BY_RULE, OUT_OF_DOMAIN, VECTORS  # noqa: E402
+from adapter_vectors import BLOCKED, BOUNDARIES, JUDGED_BY_RULE, OUT_OF_DOMAIN, PASSED, VECTORS  # noqa: E402
 from openvef import envelope, stage_map  # noqa: E402
 
 PACK = REPO / "baseline/OpenVEF_Planning_v1_3_6"
@@ -83,6 +84,47 @@ def vector_problems(adapters, vectors, descs) -> list[str]:
             out.append(f"{name}: a vector is a fixture input")
         if not any(isinstance(e, str) or e not in expected for _, e in vs):
             out.append(f"{name}: no outcome differs from every fixture's")
+    return out
+
+
+def changed_span(a: object, b: object) -> int:
+    """Length of the differing middle of two values' JSON texts (common ends removed)."""
+    x, y = (json.dumps(v, sort_keys=True) for v in (a, b))
+    i = 0
+    while i < min(len(x), len(y)) and x[i] == y[i]:
+        i += 1
+    j = 0
+    while j < min(len(x), len(y)) - i and x[-1 - j] == y[-1 - j]:
+        j += 1
+    return max(len(x), len(y)) - i - j
+
+
+def boundary_problems(domains, boundaries, descs) -> list[str]:
+    """Condition (c), D-017: per property, an in-domain edge and a value just outside it, each pair
+    tied to a cited domain term, differing in that property only and by little, and with
+    different outcomes. "Just outside" is approximated: same JSON type, integers one apart,
+    other values at most 24 characters of JSON text apart."""
+    inputs = [d["input"] for d in descs.values()]
+    out = [f"{a}: no boundary tests" for a in domains if a not in boundaries]
+    for adapter, pairs in boundaries.items():
+        out += [f"{adapter}: {p} has no boundary pair" for p in set(domains[adapter]) - {p for _, p, *_ in pairs}]
+        out += [f"{adapter}: {p}: no outside value is refused or rejected" for p in sorted({p for _, p, *_ in pairs})
+                if all(o == PASSED for _, q, _, _, _, o in pairs if q == p)]
+        for term, prop, edge, edge_exp, outside, outside_exp in pairs:
+            where = f"{adapter}.{prop} ({term})"
+            if prop not in domains[adapter] or term not in domains[adapter][prop]["terms"]:
+                out.append(f"{where}: not a cited domain term")
+            if {k: v for k, v in edge.items() if k != prop} != {k: v for k, v in outside.items() if k != prop}:
+                out.append(f"{where}: more than the property differs")
+            a, b = edge[prop], outside[prop]
+            if type(a) is not type(b) or a == b or (abs(a - b) != 1 if type(a) is int else changed_span(a, b) > 24):
+                out.append(f"{where}: not adjacent values")
+            if edge_exp == outside_exp:
+                out.append(f"{where}: the outcomes do not differ")
+            if isinstance(edge_exp, str) and ("outside" in edge_exp or "PD-01" in edge_exp):
+                out.append(f"{where}: the edge is refused")
+            if edge in inputs or outside in inputs:
+                out.append(f"{where}: a fixture input")
     return out
 
 
@@ -204,6 +246,40 @@ class DispatchShapeTests(unittest.TestCase):
                             self.assertIn(expected[len(BLOCKED):], note)
                         else:
                             self.assertEqual((status, actual), ("EXECUTED", expected))
+
+    # --- (c) boundaries (D-017)
+    def test_every_property_has_boundary_pairs(self):
+        self.assertEqual(boundary_problems(DOMAINS, BOUNDARIES, self.descs), [])
+        self.assertEqual(set(BOUNDARIES), {fn.__name__ for _, _, fn in run_f18.ADAPTERS})
+
+    def test_scan_detects_weak_boundaries(self):
+        domains = {"a": {"x": {"lines": [], "terms": ["t"]}, "y": {"lines": [], "terms": ["u"]}}}
+        ok = ("t", "x", {"x": 1, "y": 0}, {}, {"x": 2, "y": 0}, "BLOCKED:outside")
+        self.assertEqual(boundary_problems(domains, {}, {}), ["a: no boundary tests"])
+        self.assertEqual(boundary_problems(domains, {"a": [ok]}, {}), ["a: y has no boundary pair"])
+        domains["a"].pop("y")
+        self.assertEqual(boundary_problems(domains, {"a": [ok]}, {}), [])
+        for bad in (("z", *ok[1:]), (*ok[:4], {"x": 2, "y": 1}, ok[5]), (*ok[:4], {"x": 9, "y": 0}, ok[5]),
+                    (*ok[:4], {"x": "2", "y": 0}, ok[5]), (*ok[:5], {}), (*ok[:3], "BLOCKED:outside x", *ok[4:]), (*ok[:5], PASSED)):
+            with self.subTest(bad=bad):
+                self.assertEqual(len(boundary_problems(domains, {"a": [bad]}, {})), 1)
+        self.assertEqual(len(boundary_problems(domains, {"a": [ok]}, {"F": {"input": ok[2]}})), 1)
+
+    def test_boundary_pairs_give_the_expected_outcomes(self):
+        validator = run_f18.load_schema_validator(PACK)
+        with unittest.mock.patch.object(run_f18, "SANDBOX", {}), \
+                unittest.mock.patch.object(run_f18, "factory_checks", lambda source: None):
+            for adapter, pairs in BOUNDARIES.items():
+                for term, prop, edge, edge_exp, outside, outside_exp in pairs:
+                    for inp, expected in ((edge, edge_exp), (outside, outside_exp)):
+                        with self.subTest(adapter=adapter, prop=prop, term=term, inp=ascii(inp[prop])[:100]):
+                            self.assertEqual([r[2].__name__ for r in run_f18.find_adapters(inp)], [adapter])
+                            status, actual, note = run_f18.execute({"input": inp, "manifest_clause_ids": ["UART-001"]}, validator)
+                            if isinstance(expected, str):
+                                self.assertEqual(status, "NOT_IMPLEMENTED", actual)
+                                self.assertIn(expected[len(BLOCKED):], note)
+                            else:
+                                self.assertEqual((status, actual), ("EXECUTED", expected))
 
     # --- value selection
     def test_every_selecting_value_is_cited(self):

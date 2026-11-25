@@ -1,0 +1,17 @@
+#!/usr/local/bin/python3.11 -I
+"""`docker` inside the test container (D-017): forwards argv and stdin to the host broker
+(tools/run_container_tests.py), which accepts only the commands the tests need."""
+import base64
+import json
+import socket
+import sys
+
+s = socket.socket(socket.AF_UNIX)
+s.connect("/broker/sock")
+stdin = b"" if sys.stdin is None else sys.stdin.buffer.read()
+s.sendall(json.dumps({"argv": sys.argv[1:], "stdin": base64.b64encode(stdin).decode()}).encode() + b"\n")
+reply = json.loads(s.makefile("rb").readline())
+sys.stdout.buffer.write(base64.b64decode(reply["out"]))
+sys.stderr.buffer.write(base64.b64decode(reply["err"]))
+sys.stdout.flush()
+sys.exit(reply["rc"])
