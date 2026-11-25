@@ -16,23 +16,27 @@ It is a status document: it claims no gate as passed.
   done**. Under DEV-002 a different AI model audits it, which is not a human independent
   audit. A first report (OpenAI GPT-6) is saved ([report](reviews/implementation-audit-gpt6-2026-11-25.md)): one BLOCKER, one MAJOR and four limitations. The
   re-audit after D-012 to D-014 ([report](reviews/implementation-reaudit-gpt6-2026-11-25.md)) ended NOT CLEARED: two BLOCKERs, one
-  MAJOR and a cross-reference, three limitations. The code changed after it (D-015, D-016, D-017), and that
-  is not re-audited.
+  MAJOR and a cross-reference, three limitations. A third audit
+  ([report](reviews/implementation-reaudit3-gpt6-2026-11-25.md), after D-015 to D-018) also ended NOT CLEARED: BLOCKERs A1-1 and
+  A9-2. The code changed after it (D-019), and that is not re-audited.
 - **Prohibited:** no LLM or provider call has been made by any code, test or script
   (CLAUDE.md hard rule 5). The LLM-call gate, step (6), is closed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261125T075113Z`**.
-- Run class `development`; commit `646f2ac`, clean tree; after DEV-001
+Latest evidence run: **`evidence/run-20261125T081829Z`**.
+- Run class `development`; commit `c520888`, clean tree; after DEV-001
   ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
   The run re-verified all 20 frozen items, the DEV-001 mask files and the 39 D-009 items
   against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
 - Every outcome, and the null-trace hash of each simulated pass, is identical to the previous
-  run, `run-20261125T040905Z` (commit `e4fef20`). D-017 changed only what the adapters refuse
-  (boundary tests). **The adapter rule (D-013, D-017), the D-015 fixes and the D-016 change require re-audit.**
+  run, `run-20261125T075113Z` (commit `646f2ac`). D-019 changed how runtime checks are measured and one
+  citation. **D-019 requires re-audit; A9-2 is not fully closed.**
+- **Runtime checks (D-019):** 16 fixtures reach them. M06's driver is SELF_REPORTED (it returns a non-Driver and is rejected); the
+  rest are PROVEN, so no accepted result rests on a report the artifact could forge.
+- **P11b rests on A-057 (owner review pending), so its pass does not count toward F18 until an owner reviews it.**
 
 | Status | Count | Fixtures |
 |---|---|---|
@@ -62,15 +66,15 @@ auditor should weigh them with that in mind.
   stage, error class, diagnostic byte string or terminal disposition".
 - 17 fixtures are not run to an outcome, L271 is unmet (DEV-001), and the independent
   implementation re-audit (L555 (5)) is not done: the DEV-002 AI audit found a BLOCKER (A1-1), the
-  re-audit ended NOT CLEARED, and the code changed after both.
+  re-audit and the third audit ended NOT CLEARED, and the code changed after all three.
 
 ## 2a. Feasibility controls F1–F15, F17 (Protocol §17)
 
 Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
 [design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
 
-Latest control run: **`evidence/controls-20261125T075247Z`**, pinned image, commit
-`646f2ac`. It carries the same identity records as an F18 run.
+Latest control run: **`evidence/controls-20261125T082020Z`**, pinned image, commit
+`c520888`. It carries the same identity records as an F18 run.
 
 | Status | Controls |
 |---|---|
@@ -88,7 +92,7 @@ Latest control run: **`evidence/controls-20261125T075247Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261125T075113Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261125T081829Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -134,12 +138,15 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-018, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-019, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item; A-031 withdrawn (D-012). Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
-| Points the re-audit left open: single-fixture shapes under the original A1 criterion are kept (D-017, disclosed); the three-vector minimum is kept and boundary tests added ([note](reviews/implementation-reaudit-gpt6-2026-11-25-NOTE.md)). Re-audit needed | the auditor | DEV-002; D-013; D-017 |
+| Points the re-audit left open: single-fixture shapes under the original A1 criterion are kept; owner statement: "it will not be met by design; disclosed for every audit" (D-019); the three-vector minimum is kept and boundary tests added ([note](reviews/implementation-reaudit-gpt6-2026-11-25-NOTE.md)). Re-audit needed | the auditor | DEV-002; D-013; D-017 |
+| Whether a SELF_REPORTED artifact may count as valid in confirmatory use (A9-2 residual) | owners | D-019 |
+| Review of A-057 (P11b depends on it) | an owner | D-019 |
+| Re-audit of D-019 | the auditor | D-019 |
 | Re-audit of the D-015, D-016 and D-017 changes (A-054 approved, D-016; A-055 and A-056 approved, D-018); wall-clock residuals in [DEVIATIONS.md](DEVIATIONS.md) | the auditor | D-015, D-016 |
 | Input contracts and outcomes for the 15 fixtures without one (PD-03, PD-04, PD-07, PD-26) | owners | D-013 |
 | Re-audit of D-013 and A-053 (approved, D-014); the passes resting on A-053 count subject to it | the auditor | D-013, D-014, A-053 |

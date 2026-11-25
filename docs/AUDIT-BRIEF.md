@@ -33,12 +33,27 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   author of the code also chose the reading of "defined" (A-053), and not-rejected outcomes
   count as differing outcomes for M18, M19 and M28.
 
-- **Two earlier audits, both by OpenAI GPT-6; both reports and notes are in `docs/reviews/`.** The
+- **Three earlier audits, all by OpenAI GPT-6; reports and notes are in `docs/reviews/`.** The
   second (bundle `34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0`) ended **NOT
   CLEARED**: BLOCKERs A1-1 (M18) and A9-1, MAJOR A4-1 (and A8-2, a cross-reference). It found A8-1
   resolved. Judge each yourself. The notes are by the implementation author.
-- **D-015 (fixes for that report), D-016 and D-017 have not been audited by anyone.** Do not assume they are
-  right:
+- The third (bundle `b1235ba376442eead14c338b59d73060cb927532c67cdd59324d0f2a0a08327d`, after D-015 to D-018) also ended **NOT
+  CLEARED**: BLOCKERs A1-1 and **A9-2** (new). It found A4-1, A8-2 and the original A9-1 attack resolved.
+- **Owner statement on A1-1 (D-019):** "The original single-fixture-shape criterion is superseded by D-013
+  because the v1.3.6 pack itself contains one-of-a-kind fixtures; it will not be met by design; disclosed
+  for every audit." You may still disagree; say which criterion each verdict uses.
+- **D-019 has not been audited by anyone.** Do not assume it is right:
+  - A9-2 is **not fully closed**, and nothing here says it is. Signatures as defined are measured in a process that compiles
+    and never executes the source. The return type, and anything changed after execution, stay self-reported:
+    docs/sandbox.md "Runtime checks", docs/DEVIATIONS.md "Open residual (D-019)". The previous auditor's own
+    example (valid `def`, variadic `step` installed at run time, forged report) is still accepted, marked SELF_REPORTED.
+  - Attack `src/openvef/runtime_basis.py`: find a source it calls PROVEN that can reach interpreter internals, change
+    `Driver.step`, or return a non-Driver. Is the list of allowed names safe? Is the residual's stated consequence right?
+    Can `inspect_source` be fooled by compiled code alone?
+  - D-019 asked for an import-only process; the author used compile-only instead, because import can run artifact
+    expressions. Is that sound against File 30 L35 and L39?
+  - A-057 (`stop`) is owner review pending; P11b depends on it.
+- **D-015 to D-018 were covered by the third audit.** Judge them again as you see fit:
   - A9-1 (D-015): artifact code now runs in `sandbox/artifact_worker.py`, driven by
     `artifact_proc.py`. Attack both. Is the seccomp list tight, is anything inherited, can a frame be
     confused with another, what can the artifact learn? `tests/test_artifact_isolation.py` shows
@@ -61,7 +76,8 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
 - Other superseded bundles: `cdb6362b21522f21919116ef2e8862bf90dc994904bf6af06c00e327b95c5b13` (after D-015,
   before D-016; not known to have been audited);
   `19fbafb858b08b6509ff6e5089353c678bdfdbe8f95f3e42c93ca4bb40cf8ee3` (before D-017; not known to have been audited);
-  `e1918422a32d4a4fc612c293d8257218b4488758add17d19a1bec6486929dfbd` (before D-018; documents only differ).
+  `e1918422a32d4a4fc612c293d8257218b4488758add17d19a1bec6486929dfbd` (before D-018; documents only differ);
+  `b1235ba376442eead14c338b59d73060cb927532c67cdd59324d0f2a0a08327d` (third audit; before D-019).
 
 ## 2. What the bundle contains
 
@@ -69,7 +85,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
 (`sha256sum -c MANIFEST.sha256`). `BUNDLE-INFO.json` records the source commit.
 - `src/`, `runner/`, `sandbox/`, `tests/`, `tools/`, `docs/`, `design/`: the implementation.
 - `requirements.in`, `requirements.lock`, `CLAUDE.md`: pins and the project rules.
-- `evidence/run-20261125T075113Z/`: the one F18 run under audit. Other runs named in the
+- `evidence/run-20261125T081829Z/`: the one F18 run under audit. Other runs named in the
   documents, including the feasibility-control runs, are **not** in the bundle.
 - `evidence/container-tests-<UTC>/` (one; named in `BUNDLE-INFO.json`): logs of the full unit-test suite
   inside the pinned container. See section 6.
@@ -78,7 +94,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   whole pack, so use `sha256sum -c --ignore-missing`.
 
 The bundle has no git history, and commit IDs quoted in documents cannot be checked from
-it. The evidence run's commit is `646f2ac`. Documents and tests may be newer than the run;
+it. The evidence run's commit is `c520888`. Documents and tests may be newer than the run;
 the build refuses to run if any file the run hashed has changed.
 
 ## 3. Current claims to test
@@ -89,7 +105,7 @@ the build refuses to run if any file the run hashed has changed.
 | **F18 is not passed** | docs/AUDIT-READINESS.md |
 | 0 results provisional; 9 labelled "cleared under DEV-001 (non-independent review saved)" | `summary.json` |
 | The run used the pinned CPython 3.11.18 in the pinned image | `summary.json` |
-| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to re-audit; the re-audit found M18 unsupported (A8-2), fixed in D-015, not re-audited; A-054 approved as decided (D-016); A-055, A-056 approved as decided (D-018; no fixture outcome depends on them) | docs/READINGS-REVIEW.md |
+| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to re-audit; the re-audit found M18 unsupported (A8-2), fixed in D-015, not re-audited; A-054 approved as decided (D-016); A-057 owner review pending (P11b depends on it); A-055, A-056 approved as decided (D-018; no fixture outcome depends on them) | docs/READINGS-REVIEW.md |
 
 ## 4. Audit areas
 
@@ -117,7 +133,7 @@ L334; File 30 §4–§6)
 **A4. Serializer, assembler, lifecycle** (`serializer.py`, `assembler.py`, `ledger.py`;
 Protocol L168–L185, File 31)
 
-**A5. Evidence run** `run-20261125T075113Z`
+**A5. Evidence run** `run-20261125T081829Z`
 - `results_sha256` matches; counts recompute from `results.jsonl`; every `expected` equals
   its descriptor; every PASS has `actual == expected`.
 - Every `source_sha256` entry equals the bundled file. Interpreter and image identity are
