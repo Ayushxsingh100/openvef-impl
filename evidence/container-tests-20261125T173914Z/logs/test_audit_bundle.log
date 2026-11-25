@@ -1,0 +1,8 @@
+test_records_build_commit_and_keeps_source_commit (test_audit_bundle.BundleGuardTests.test_records_build_commit_and_keeps_source_commit) ... ok
+test_refuses_dirty_tree (test_audit_bundle.BundleGuardTests.test_refuses_dirty_tree)
+A full-tree `git status --porcelain` that is non-empty stops the build before ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.002s
+
+OK
