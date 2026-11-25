@@ -440,6 +440,19 @@ def utc_stamp() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
+def self_reported_parts(note: str, basis: dict | None) -> tuple[str, dict, list]:
+    """D-020/D-021: the note, the extra record fields and the SELF_REPORTED file names for one
+    fixture. The verdict is not touched."""
+    if basis is None:
+        return note, {}, []
+    extra: dict = {"runtime_checks": basis}
+    sr = sorted(name for name, b in basis.items() if b["basis"] != runtime_basis.PROVEN)
+    if sr:
+        note = f"{note} [{SELF_REPORTED_LABEL}: {', '.join(sr)}]".strip()
+        extra.update(self_reported_runtime_checks=sr, self_reported_label=SELF_REPORTED_LABEL)
+    return note, extra, sr
+
+
 def main() -> int:
     root, evidence_root, run_class = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
     if broker_mode():  # D-002a: the broker created and mounted the (empty) run directory
@@ -512,17 +525,11 @@ def main() -> int:
                 # expectation compares the whole object exactly (A-032).
                 status = "PASS" if actual == expected else "FAIL"
             counts[status] += 1
+            # D-021: the label goes into the note before the record is built, so that every output agrees.
+            note, extra, sr = self_reported_parts(note, RUNTIME_BASIS)
             rec = {"fixture_id": entry["fixture_id"], "descriptor_sha256": entry["sha256"], "status": status,
-                   "expected": expected, "actual": actual, "note": note}
-            if RUNTIME_BASIS is not None:
-                rec["runtime_checks"] = RUNTIME_BASIS
-                sr = sorted(name for name, b in RUNTIME_BASIS.items() if b["basis"] != runtime_basis.PROVEN)
-                if sr:
-                    # D-020: keep the PASS, attach a visible SELF_REPORTED label and list it.
-                    self_reported.extend(f"{entry['fixture_id']}:{name}" for name in sr)
-                    rec["self_reported_runtime_checks"] = sr
-                    rec["self_reported_label"] = SELF_REPORTED_LABEL
-                    note = f"{note} [{SELF_REPORTED_LABEL}: {', '.join(sr)}]".strip()
+                   "expected": expected, "actual": actual, "note": note, **extra}
+            self_reported.extend(f"{entry['fixture_id']}:{name}" for name in sr)
             sim_details = PROVISIONAL.pop(id(desc), None)
             if sim_details is not None and SIM["provisional"]:  # reached L166 (7)-(11); items still open
                 rec["provisional"] = {"reason": "depends on design items not yet frozen or signed: "

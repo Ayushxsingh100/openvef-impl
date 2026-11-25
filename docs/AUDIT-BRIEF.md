@@ -54,7 +54,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
     expressions. Is that sound against File 30 L35 and L39?
   - A-057 (`stop`) was owner review pending; it is now approved as decided (D-020). P11b depends on it.
 
-- **Re-audit #4 is scoped to D-019 + D-020 (added 25 Nov 2026, Krishika).** All prior findings must
+- **Re-audit #4 is scoped to D-019 + D-020 (added 25 Nov 2026, Krishika), with the D-021 fixes below.** All prior findings must
   stay fixed; re-audit the earlier decisions as you see fit, but prioritise:
   - **(a)** `src/openvef/runtime_basis.py`'s allow-list: find any source it marks **PROVEN** that can
     still forge the `create_driver` return type, replace `Driver.step` or `check_trace`, or reach
@@ -72,6 +72,10 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED count (docs/F1-F17-plan.md,
   docs/sandbox.md, docs/DEVIATIONS.md). This is an owner decision, not a closure of A9-2; D-019 and
   D-020 are **not** re-audited.
+- **D-021 (fixes before re-audit #4).** The SELF_REPORTED label now also appears in the fixture's `note` in
+  `results.jsonl` (`runner/run_f18.py` `self_reported_parts`; `tests/test_self_reported_label.py`), and
+  `tests/test_audit_bundle.py` checks the bundle builder's behaviour. No verdict changed. **Not** re-audited.
+  The D-020 bundle (`0e8ea3f2…`) was not sent to an auditor, as Krishika states.
 - **D-015 to D-018 were covered by the third audit.** Judge them again as you see fit:
   - A9-1 (D-015): artifact code now runs in `sandbox/artifact_worker.py`, driven by
     `artifact_proc.py`. Attack both. Is the seccomp list tight, is anything inherited, can a frame be

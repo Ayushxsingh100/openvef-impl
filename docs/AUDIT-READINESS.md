@@ -140,7 +140,7 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-020, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-021, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item; A-031 withdrawn (D-012). Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
@@ -148,7 +148,7 @@ this run is on the pinned one.
 | Points the re-audit left open: single-fixture shapes under the original A1 criterion are kept; owner statement: "it will not be met by design; disclosed for every audit" (D-019); the three-vector minimum is kept and boundary tests added ([note](reviews/implementation-reaudit-gpt6-2026-11-25-NOTE.md)). Re-audit needed | the auditor | DEV-002; D-013; D-017 |
 | How a SELF_REPORTED artifact is treated (A9-2 residual): **owner decision taken (D-020)** — F18 keeps the verdict with a visible label; confirmatory use reports the validity endpoint as measured (primary) and with every SELF_REPORTED artifact counted invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED count. Still not re-audited | the auditor | D-020 |
 | Review of A-057 (P11b depends on it): **approved as decided (D-020)** | — (done) | D-020 |
-| Re-audit of D-019 and D-020 | the auditor | D-019, D-020 |
+| Re-audit of D-019, D-020 and D-021 | the auditor | D-019, D-020, D-021 |
 | Re-audit of the D-015, D-016 and D-017 changes (A-054 approved, D-016; A-055 and A-056 approved, D-018); wall-clock residuals in [DEVIATIONS.md](DEVIATIONS.md) | the auditor | D-015, D-016 |
 | Input contracts and outcomes for the 15 fixtures without one (PD-03, PD-04, PD-07, PD-26) | owners | D-013 |
 | Re-audit of D-013 and A-053 (approved, D-014); the passes resting on A-053 count subject to it | the auditor | D-013, D-014, A-053 |

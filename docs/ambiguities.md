@@ -1780,3 +1780,21 @@ Ayush's ratification stays the single entry in AUDIT-READINESS.md.
    targets).
 
 Not re-audited. F18 is not passed.
+
+## D-021 — Fixes before re-audit #4, then a freeze (DECIDED)
+
+**Owner decision by Krishika**, on a Claude (claude.ai) review of the session 10 and 11 reports. No
+pack rule changes. Takes effect under D-008; Ayush's ratification stays the single entry in
+AUDIT-READINESS.md. The D-020 bundle (`0e8ea3f2…`) was **not sent to the auditor** (stated by Krishika).
+
+1. **tests/test_audit_bundle.py:** the string check is replaced by a behavioural test. The real script
+   runs as its own process with git stubbed at the subprocess boundary: `build_commit` equals HEAD,
+   and a dirty tree exits 1 and writes nothing.
+2. **runner/run_f18.py:** the SELF_REPORTED label is added to the fixture note before the record is
+   built, so `note` and `self_reported_label` in `results.jsonl`, `run.log` and the summary agree
+   (`tests/test_self_reported_label.py`). In the D-020 run, M06's `note` in `results.jsonl` lacked it.
+3. **docs/assistance-log.md:** entries for the verification of D-020 and for this session.
+4. **Freeze:** after the bundle is published as a GitHub release, no further commits until re-audit #4
+   is triaged.
+
+Not re-audited. F18 is not passed.
