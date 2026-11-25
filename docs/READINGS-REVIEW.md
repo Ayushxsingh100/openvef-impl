@@ -27,8 +27,8 @@ A-031 is reversed. These fixtures no longer have an adapter, and the Dependants 
 them describe an earlier state: M36 (A-012), M13 (A-025), M37 (A-028), M15 (A-029), M14, M17
 and M41 (A-032), M53 (A-033).
 
-**A-054** (an artifact process that ends or breaks its message schema, D-015) is new; owner review
-is **pending**. No current fixture reaches it.
+**A-054** (an artifact process that ends or breaks its message schema, D-015) is approved by Krishika as
+decided (D-016). It is **not** covered by D-009. No current fixture reaches it.
 
 **A-053** (what counts as a cited input contract, D-013) is approved by Krishika as decided
 (D-014), subject to re-audit. It is **not** covered by D-009. It affects M16, M18–M20, M25, M26, M28, M29, M40, R01–R06, R08–R13,

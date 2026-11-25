@@ -1576,8 +1576,8 @@ this repository when the fixes were made, so they follow the decision's wording,
    - Tests: `tests/test_artifact_isolation.py`, in the pinned container.
    - **Residual:** the runtime return-type and signature facts are measured inside the artifact's
      interpreter, so a hostile driver could misreport its own. That can only affect its own
-     disposition, and the static AST_SIGNATURE checks do not depend on it. The wall clock stays
-     readable (vDSO).
+     disposition, and the static AST_SIGNATURE checks do not depend on it. The wall clock stayed
+     readable (vDSO) at D-015; see D-016.
 2. **A1-1/A8-2.** The reserved headings are the sidecar's nine (File 31 L9; File 33 L10–L50).
    Descriptor headings must be a subset and are never used; descriptor clause-ID patterns must
    equal File 31 §8's and are never used. `DOMAINS` cites each property's domain, and a test
@@ -1592,14 +1592,31 @@ this repository when the fixes were made, so they follow the decision's wording,
 only in simulations. The worker now starts without `-I` and with a fixed environment, so it takes
 effect everywhere. No fixture outcome changed.
 
-## A-054 — An artifact process that ends or breaks its message schema (DECIDED BY CLAUDE — owner review pending)
+## A-054 — An artifact process that ends or breaks its message schema (APPROVED as decided — D-016)
 
 The stage map has rows for a driver that raises and for a checker "process crash" (File 30 L97),
 but `<EXCEPTION_CLASS>` presumes an exception. With process isolation the artifact can also exit,
 crash, or send malformed data. Readings: (i) an evaluator error; (ii) the artifact's own failure.
 
-**Decision (decided by Claude under standing delegation, owner review pending): (ii)**, with the
+**Decision (decided by Claude under standing delegation; approved as decided by Krishika, D-016):
+(ii)**, with the
 L125 fallback class: "otherwise the fixed fallback `Exception`". File 30 L97 says a process crash is
 `CHECKER_RUNTIME_ERROR|class=<EXCEPTION_CLASS>`; the driver row covers factory and step. A process
 killed by SIGKILL (memory), or never confined, stays an evaluator error, because the artifact cannot
 send signals. No current fixture reaches it. Not covered by D-009 or D-014.
+
+## D-016 — A-054 and the wall-clock residual (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) recommendation. Takes effect under D-008.
+
+1. **A-054 approved as decided.** Claude decided it and Claude (claude.ai) recommended its approval.
+2. **Wall clock.** File 30 L101: "The runtime sandbox denies network, filesystem access beyond the
+   designated temporary output directory, environment variables, wall-clock reads, subprocess and
+   simulator access." D-015 recorded only the vDSO. A probe in the pinned container
+   (25 Nov 2026) read live time by more routes: the `time` and `clock_gettime` system calls, `fstat`
+   on a pipe (its mtime is the current time), RDTSC, RDTSCP, RDPRU and the legacy vsyscall page.
+   `futex` with an absolute CLOCK_REALTIME deadline also answered whether a given time had passed.
+   All of these are now closed in `sandbox/artifact_worker.py` before artifact code loads. Routes,
+   mechanisms and tests are in [sandbox.md](sandbox.md) "Wall-clock reads"; what is not closed is in
+   [DEVIATIONS.md](DEVIATIONS.md) "Open residuals".
+3. Not re-audited. No pack reading changed: the static rules are as the pack states them.

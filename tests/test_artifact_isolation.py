@@ -1,4 +1,5 @@
-"""Adversarial tests for artifact process isolation (D-015, audit A9-1), in the pinned container.
+"""Adversarial tests for artifact process isolation (D-015, audit A9-1) and for
+wall-clock denial (D-016), in the pinned container.
 
 Hostile drivers and checkers go straight to the runtime (the static stages would reject most
 of them) and must not alter any trace row, event or result. Skipped only without Docker; a skip
@@ -7,6 +8,7 @@ is never a pass.
 from __future__ import annotations
 
 import ast
+import random
 import shutil
 import sys
 import unittest
@@ -15,7 +17,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "src"))
 
-from openvef import runtime, sandbox  # noqa: E402
+from openvef import import_policy, runtime, sandbox  # noqa: E402
 from openvef.simulation import driver_run, run_outcome  # noqa: E402
 
 DOCKER = shutil.which("docker") is not None
@@ -188,6 +190,130 @@ class IsolationTests(unittest.TestCase):
                          "CHECKER_RUNTIME_ERROR|class=PermissionError")
 
 
+# --- wall-clock reads (D-016; File 30 §6 L101) ---------------------------------------------
+NATIVE = ("import collections\n\ndef native(code):\n"
+          "    c = collections._sys.modules['ctypes']\n    lib = c.CDLL(None)\n"
+          "    lib.mmap.restype = c.c_void_p\n"
+          "    lib.mmap.argtypes = [c.c_void_p, c.c_size_t, c.c_int, c.c_int, c.c_int, c.c_long]\n"
+          "    p = lib.mmap(None, 4096, 7, 0x22, -1, 0)\n    code = bytes.fromhex(code)\n"
+          "    c.memmove(p, code, len(code))\n    return c.CFUNCTYPE(c.c_long)(p)()\n\n")
+RET64 = "48c1e2204809d0c3"  # shl rdx,32; or rax,rdx; ret
+
+
+@unittest.skipUnless(DOCKER, "docker not available")
+class WallClockTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        sandbox.ensure_image()
+
+    def factory(self, body, pre=""):
+        """The class of the exception the factory ended with."""
+        r = driver_run(source(pre=pre, factory=body), DESIGN, "rtl", 0, step_timeout_s=3.0, budget_s=30.0)
+        prefix = "RUNTIME_EXCEPTION|file=driver.py|phase=factory|class="
+        self.assertTrue(r["failure"]["diagnostic"].startswith(prefix), r)
+        return r["failure"]["diagnostic"][len(prefix):]
+
+    def test_python_clocks_are_denied(self):
+        body = ("sysm, osm = reach()\nt = sysm.modules['time']\n"
+                "def no(name, fn, *a):\n    try:\n        fn(*a)\n    except PermissionError:\n        return\n"
+                "    raise type('Clock_' + name, (Exception,), {})()\n"
+                "for n in ('time', 'time_ns', 'monotonic', 'monotonic_ns', 'perf_counter', 'perf_counter_ns',\n"
+                "          'thread_time'):\n    no(n, getattr(t, n))\n"
+                "for i in range(12):\n    no('id%d' % i, t.clock_gettime, i)\n"
+                "no('sleep', t.sleep, 0.01)\n"
+                "for fd in range(5):\n    no('fstat', osm.fstat, fd)\n"  # a pipe's mtime is the current time
+                "no('stat', osm.stat, '/tmp')\nno('utime', osm.utime, '/tmp')\n"
+                "if t.localtime()[0] != 1969 or t.gmtime()[0] != 1969 or not t.asctime().endswith('1969'):\n"
+                "    raise type('Clock_calendar', (Exception,), {})()\n"
+                "raise type('AllDenied', (Exception,), {})()\n")
+        self.assertEqual(self.factory(body), "AllDenied")
+
+    def test_process_time_does_not_advance_with_work(self):
+        # CPython falls back to glibc times(), which hides the denied call and returns garbage.
+        body = ("t = reach()[0].modules['time']\n"
+                "seen = []\nfor i in range(4):\n    seen.append(t.process_time())\n    sum(range(4000000))\n"
+                "raise type('Constant' if len(set(seen[1:])) == 1 else 'Varies', (Exception,), {})()\n")
+        self.assertEqual(self.factory(body), "Constant")
+
+    def test_libc_and_raw_system_calls_are_denied(self):
+        body = ("sysm, osm = reach()\nc = sysm.modules['ctypes']\nlib = c.CDLL(None, use_errno=True)\n"
+                "def check(name, ok):\n    if not ok:\n        raise type('Clock_' + name, (Exception,), {})()\n"
+                "b = c.create_string_buffer(144)\n"
+                "check('time', lib.time(None) == -1)\n"
+                "check('gettimeofday', lib.gettimeofday(b, None) == -1 and not any(b.raw))\n"
+                "for i in range(12):\n    check('clock_gettime', lib.clock_gettime(i, b) == -1 and not any(b.raw))\n"
+                "check('timespec_get', lib.timespec_get(b, 1) != 1 or not any(b.raw))\n"
+                # gettimeofday times time clock_gettime clock_getres clock_nanosleep fstat stat newfstatat statx
+                # getrusage sysinfo adjtimex clock_adjtime nanosleep setitimer getitimer alarm timer_create
+                # timerfd_create poll select ppoll epoll_create io_uring_setup perf_event_open bpf getcpu
+                "for nr in (96, 100, 201, 228, 229, 230, 5, 4, 262, 332, 98, 99, 159, 305, 35, 38, 36, 37, 222,\n"
+                "           283, 7, 23, 271, 213, 425, 298, 321, 309, 128, 232, 61, 302, 157):\n"
+                "    c.set_errno(0)\n"
+                "    check('syscall_%d' % nr, lib.syscall(nr, b, b, b, b, b) == -1 and c.get_errno() == 1)\n"
+                # FUTEX_WAIT_BITSET|CLOCK_REALTIME with a deadline in the past: would say ETIMEDOUT
+                "word, past = c.c_int(0), (c.c_long * 2)(1, 0)\n"
+                "check('futex', lib.syscall(202, c.byref(word), 0x189, 0, past, None, -1) == -1 and c.get_errno() == 1)\n"
+                "raise type('AllDenied', (Exception,), {})()\n")
+        self.assertEqual(self.factory(body), "AllDenied")
+
+    def test_native_clock_instructions(self):
+        def run(code):
+            return self.factory("raise type('V%d' % (native('" + code + "') & 0xffffffffffffffff), (Exception,), {})()\n",
+                                pre=NATIVE)
+        self.assertEqual(run("b82a000000c3"), "V42")  # control: native code does run
+        # "Exception": the process was killed (A-054 fallback), so no value was obtained.
+        for name, code in (("rdtsc", "0f31" + RET64), ("rdtscp", "0f01f9" + RET64), ("rdpmc", "31c90f33" + RET64),
+                           ("rdpru", "31c90f01fd" + RET64), ("int80_time", "53b80d00000031dbcd805bc3")):
+            with self.subTest(name=name):
+                self.assertEqual(run(code), "Exception")
+        # The legacy vsyscall page: time() returns -1, through the seccomp filter.
+        self.assertEqual(run("4883ec0848c7c0000460ff31ffffd04883c408c3"), "V%d" % (2 ** 64 - 1))
+
+    def test_route_through_allowed_imports_is_denied(self):
+        # Passes every static rule (test below); denied only by the sandbox.
+        self.assertEqual(self.factory("collections._sys.modules['time'].time()\n", pre="import collections\n\n"),
+                         "PermissionError")
+
+    def test_checker_is_denied_too(self):
+        src = "import collections\n\ndef check_trace(trace, metadata):\n    collections._sys.modules['time'].time()\n"
+        self.assertEqual(runtime.checker_invocation(src, [], {"design_id": "X"}, 6.0).error[1],
+                         "CHECKER_RUNTIME_ERROR|class=PermissionError")
+
+    def test_seeded_random_and_allowed_modules_still_work(self):
+        body = ("r = random.Random(7)\n"
+                "x = (r.random(), statistics.mean([1, 2]), json.dumps({'a': 1}), re.compile('a').match('a'))\n"
+                "raise type('Works' if x[0] == " + repr(random.Random(7).random()) + " else 'Wrong', (Exception,), {})()\n")
+        pre = "".join(f"import {m}\n" for m in ("collections", "copy", "functools", "itertools", "json", "math", "operator",
+                                                "random", "re", "statistics", "typing")) + "\n"
+        self.assertEqual(self.factory(body, pre=pre), "Works")
+
+
+class StaticClockRouteTests(unittest.TestCase):
+    """Which clock routes IMPORT_POLICY already rejects, and which only the sandbox stops."""
+
+    def verdict(self, body):
+        result = import_policy.check_import_policy({"driver.py": body, "checker.py": ""},
+                                                   {"driver.py": ast.parse(body), "checker.py": ast.parse("")})
+        return result.diagnostic if result is not None else None
+
+    def test_rejected_statically(self):
+        for module in ("time", "datetime", "os", "sys", "ctypes", "threading", "asyncio", "signal", "select", "resource"):
+            self.assertEqual(self.verdict(f"import {module}\n"), f"IMPORT_NOT_ALLOWED|module={module}")
+            self.assertEqual(self.verdict(f"def f():\n    from {module} import x\n"), f"IMPORT_NOT_ALLOWED|module={module}")
+        for name, code in (("__import__", "__import__('time')"), ("eval", "eval('1')"), ("exec", "exec('1')"),
+                           ("open", "open('/proc/uptime')")):
+            self.assertEqual(self.verdict(f"def f():\n    return {code}\n"), f"PROHIBITED_BUILTIN|name={name}")
+        self.assertEqual(self.verdict("import random\ndef f():\n    return random._os\n"),
+                         "GLOBAL_RANDOM_USE|name=random._os")
+
+    def test_not_rejected_statically(self):
+        for code in ("import collections\ndef f():\n    return collections._sys.modules['time'].time()\n",
+                     "import statistics\ndef f():\n    return statistics.sys.modules['time'].time()\n",
+                     "import random\ndef f():\n    return getattr(random, '_os').times()\n",
+                     "def f():\n    return object.__subclasses__()\n"):
+            self.assertIsNone(self.verdict(code))
+
+
 class StaticSeparationTests(unittest.TestCase):
     def test_only_the_worker_executes_artifact_source(self):
         sb = HERE.parent / "sandbox"
@@ -207,7 +333,7 @@ class StaticSeparationTests(unittest.TestCase):
         names = {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
         names |= {n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
         self.assertLessEqual(names, {"__future__", "builtins", "inspect", "os", "sys", "types", "encodings", "importlib",
-                                     "pkgutil", "ctypes", "resource", "struct", "json"})
+                                     "pkgutil", "ctypes", "resource", "struct", "json", "time"})
 
 
 if __name__ == "__main__":

@@ -120,3 +120,28 @@ The bundle is not rebuilt for this record, so its documents predate DEV-002.
   role as auditor, as D-005 does for Claude.
 
 **Ends when** an independent human auditor performs the implementation audit.
+
+## Open residuals (D-016) — wall-clock reads
+
+Not an accepted deviation: recorded for the auditor, at Krishika's instruction (D-016).
+
+> [30 L101] "The runtime sandbox denies network, filesystem access beyond the designated temporary output directory, environment variables, wall-clock reads, subprocess and simulator access."
+
+> [30 L22] "No third-party package, dynamic import, filesystem access, network access, environment access, wall-clock access, process/thread creation, subprocess call or package installation is permitted."
+
+> [30 L54] "Do not obtain unseeded entropy."
+
+Every clock route found was closed and tested in the pinned container on the development host
+([sandbox.md](sandbox.md) "Wall-clock reads"). Not closed, or not shown:
+1. **Hardware and kernel.** Tested on one host only (AMD EPYC 7763, Linux 6.8.0-1070-azure).
+   TPAUSE and UMWAIT are absent there and untested. RDPRU is blocked there by observation, not
+   by a documented guarantee of the setting used.
+2. **Native code** stays possible inside the confined process, so the list of denied instructions is
+   only as complete as the tests.
+3. **Startup remnants:** a clock value read by the interpreter before confinement may remain in its
+   own memory. It is a past instant, not the current time.
+4. **Static rules** accept paths such as `collections._sys.modules["time"]`. Denial is at run time only,
+   so such an artifact fails as a runtime error, not at IMPORT_POLICY.
+5. **Related, not a clock:** process ID, addresses and unseeded `random.Random()` vary between runs.
+
+**Not re-audited.** Evidence run-20261124T211459Z predates this change.

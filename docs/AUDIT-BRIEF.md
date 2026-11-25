@@ -40,6 +40,8 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   - A9: attack `sandbox/artifact_worker.py` and `artifact_proc.py`. Is the seccomp list tight, is
     anything inherited, can a frame be confused with another, what can the artifact learn?
     `tests/test_artifact_isolation.py` shows what was tried. Residuals are in docs/sandbox.md.
+    D-016 then closed the wall-clock routes found (File 30 L101); the open ones are in
+    docs/DEVIATIONS.md "Open residuals". Look for a clock that was missed.
   - A1/A8: is each `DOMAINS` citation the right text, and does each adapter enforce it?
   - A4: is `STAGE_MAP` in `serializer.py` exactly the stage map? The auditor's own case was not in
     hand when the tests were written.

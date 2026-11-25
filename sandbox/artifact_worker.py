@@ -8,7 +8,7 @@ treats everything it sends as untrusted. Standard library only.
 Before any artifact code runs it: moves the two pipes to private descriptors and closes every
 other one; makes itself the first process the OOM killer picks; limits its address space; and
 installs a seccomp allow-list (a few memory, pipe and exit system calls; everything else fails
-with EPERM: opening any file, /proc, sockets, fork/exec, signals, ptrace). Artifact code can
+with EPERM: clocks, opening any file, /proc, sockets, fork/exec, signals, ptrace). Artifact code can
 therefore corrupt this interpreter, but only this interpreter, and the only effect it can have
 outside is the bytes it sends as its own answers.
 
@@ -31,10 +31,11 @@ ADDRESS_SPACE = 160 * 1024 * 1024  # build default
 MAX_FRAME, MAX_NODES, MAX_DEPTH = 4 * 1024 * 1024, 200_000, 20
 FD_OUT, FD_IN = 3, 4
 
-# x86_64: read write close fstat lseek mmap mprotect munmap brk rt_sigaction rt_sigprocmask
-# rt_sigreturn sched_yield mremap madvise getpid exit sigaltstack gettid time futex
-# clock_gettime exit_group rseq
-SYSCALLS = (0, 1, 3, 5, 8, 9, 10, 11, 12, 13, 14, 15, 24, 25, 28, 39, 60, 131, 186, 201, 202, 228, 231, 334)
+# x86_64: read write close lseek mmap mprotect munmap brk rt_sigaction rt_sigprocmask
+# rt_sigreturn sched_yield mremap madvise getpid exit sigaltstack gettid exit_group rseq.
+# No clock (D-016): not time, gettimeofday or clock_gettime; not fstat (a pipe's mtime is the
+# current time); not futex (an absolute CLOCK_REALTIME deadline tells whether it has passed).
+SYSCALLS = (0, 1, 3, 8, 9, 10, 11, 12, 13, 14, 15, 24, 25, 28, 39, 60, 131, 186, 231, 334)
 
 # Names used after artifact code has run are bound here, so a patched `builtins` or `json`
 # does not reach this file by accident. (Deliberate tampering is contained by the process.)
@@ -68,10 +69,58 @@ def preload() -> None:
             pass
 
 
+def remove_clocks(libc) -> None:
+    """D-016, File 30 §6 L101 ("denies ... wall-clock reads"): clocks that need no system call.
+
+    vDSO: libc calls it without entering the kernel, so seccomp does not see it. Its code is
+    replaced (its ELF headers stay) by "return -EPERM", which glibc reports as the error; the
+    real clock system calls are denied by seccomp; the kernel's time data pages ([vvar*]) are unmapped. Time-stamp
+    counter: PR_SET_TSC/PR_TSC_SIGSEGV makes RDTSC and RDTSCP fault.
+    """
+    import ctypes
+    def maps():
+        with open("/proc/self/maps") as f:
+            rows = [line.split() for line in f]
+        out = []
+        for r in rows:
+            if len(r) == 6 and r[5].startswith(("[vdso", "[vvar")):
+                lo, hi = (int(x, 16) for x in r[0].split("-"))
+                out.append((r[5], lo, hi - lo))
+        return out
+    ptr, size, num = ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int
+    libc.mmap.restype, libc.mmap.argtypes = ptr, (ptr, size, num, num, num, ctypes.c_long)
+    libc.mremap.restype, libc.mremap.argtypes = ptr, (ptr, size, size, num, ptr)
+    libc.mprotect.argtypes, libc.munmap.argtypes = (ptr, size, num), (ptr, size)
+    failed = ptr(-1).value
+    regions = maps()
+    for name, lo, n in regions:
+        if name.startswith("[vdso"):
+            image = ctypes.string_at(lo, n)
+            keep = int.from_bytes(image[32:40], "little") + (  # e_phoff + e_phentsize * e_phnum
+                int.from_bytes(image[54:56], "little") * int.from_bytes(image[56:58], "little"))
+            ret = bytes.fromhex("48c7c0ffffffffc3")  # mov rax, -EPERM; ret
+            code = image[:keep] + b"\x90" * (n - keep - len(ret)) + ret
+            new = libc.mmap(None, n, 3, 0x22, -1, 0)
+            if new == failed:
+                raise OSError("mmap")
+            ctypes.memmove(new, code, n)
+            if libc.mprotect(new, n, 5) != 0 or libc.mremap(new, n, n, 3, lo) != lo:  # MAYMOVE|FIXED
+                raise OSError("vdso")
+    for name, lo, n in regions:
+        if name.startswith("[vvar") and libc.munmap(lo, n) != 0:
+            raise OSError("vvar")
+    if maps():
+        raise OSError("vDSO or vvar still mapped")
+    mode = num(0)
+    if libc.prctl(26, 2, 0, 0, 0) != 0 or libc.prctl(25, ctypes.byref(mode), 0, 0, 0) != 0 or mode.value != 2:
+        raise OSError("PR_SET_TSC")
+
+
 def confine() -> None:
     import ctypes
     import resource
     import struct
+    import time
     os.dup2(os.dup(1), 10)
     os.dup2(os.dup(0), 11)
     null = os.open(os.devnull, os.O_RDWR)
@@ -99,13 +148,21 @@ def confine() -> None:
     fprog = Fprog(len(prog), ctypes.cast(buf, ctypes.c_void_p))
     if libc.prctl(1, 9, 0, 0, 0) != 0 or libc.prctl(38, 1, 0, 0, 0) != 0:  # PDEATHSIG, NO_NEW_PRIVS
         raise OSError("prctl")
+    remove_clocks(libc)
     if libc.prctl(22, 2, ctypes.byref(fprog), 0, 0) != 0:  # SECCOMP_MODE_FILTER
         raise OSError(ctypes.get_errno(), "seccomp")
-    try:  # the confinement must be effective, not merely requested
-        os.open("/proc/self/status", os.O_RDONLY)
-    except PermissionError:
-        return
-    raise OSError("seccomp is not effective")
+    def denied(call, *args):  # the confinement must be effective, not merely requested
+        try:
+            call(*args)
+        except PermissionError:
+            return
+        raise OSError("confinement is not effective")
+    denied(os.open, "/proc/self/status", os.O_RDONLY)
+    denied(os.fstat, FD_OUT)
+    for clock in (time.time, time.monotonic):
+        denied(clock)
+    for clock_id in range(12):
+        denied(time.clock_gettime, clock_id)
 
 
 def guarded_import(name, globals=None, locals=None, fromlist=(), level=0):

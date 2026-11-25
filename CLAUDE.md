@@ -38,6 +38,8 @@ specific fixture are forbidden. The rule changed after audit A1-1 and requires r
 reversed, and D-009's approval of it is withdrawn.
 Owner decision D-015: artifact code runs only in sandbox/artifact_worker.py (confined process); no
 evaluator module may share an interpreter with it. Not yet re-audited.
+Owner decision D-016: A-054 approved as decided; the worker denies wall-clock reads (File 30 L101),
+residuals in docs/sandbox.md and docs/DEVIATIONS.md. Not yet re-audited.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

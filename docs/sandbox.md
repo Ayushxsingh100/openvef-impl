@@ -141,8 +141,62 @@ runtime checks miss.
   schema-checked tagged plain data out. It and the harness compute every verdict.
 - A separate process without seccomp is not enough: a same-uid child can write to the
   evaluator's stdout through `/proc` (observed). Tests: `tests/test_artifact_isolation.py`.
-- Residuals: the artifact's own signature facts are measured in its own interpreter; the wall
-  clock is readable (vDSO); CPU is shared, so the watchdog still matters.
+- Residuals: the artifact's own signature facts are measured in its own interpreter; CPU is
+  shared, so the watchdog still matters; and those under "Wall-clock reads" below.
+
+### Wall-clock reads (D-016; File 30 §6 L101)
+
+**What IMPORT_POLICY already rejects** (File 30 §2; `StaticClockRouteTests`):
+- importing `time`, `datetime`, `os`, `sys`, `ctypes`, `threading`, `asyncio`, `signal`, `select` or
+  `resource`, at any depth (`IMPORT_NOT_ALLOWED`);
+- `__import__`, `eval`, `exec`, `compile`, `open` as names (`PROHIBITED_BUILTIN`);
+- `random._os` and every other direct `random.` attribute except `Random` (`GLOBAL_RANDOM_USE`).
+
+**What it does not reject:** attribute paths through allowed modules, such as
+`collections._sys.modules["time"].time()` or `statistics.sys`, `getattr(random, "_os")`, and
+`object.__subclasses__()`. The pack's static rules do not cover them (A-016, A-017), so only the
+sandbox stops them.
+
+**What the worker removes before artifact code loads** (`remove_clocks`, `SYSCALLS`). "Before" is the
+D-015 worker probed in the pinned container on 25 Nov 2026.
+
+| Clock source | Before | Now | Relies on |
+|---|---|---|---|
+| `time`, `clock_gettime` system calls | allowed | not on the seccomp allow-list: EPERM, every clock ID | seccomp(2) filter, deny by default |
+| vDSO (libc `clock_gettime`, `time`, `gettimeofday`; Python `time.time()` and the rest) | live time | vDSO code replaced by "return -EPERM"; `[vvar*]` data pages unmapped; `/proc/self/maps` is re-read and must list neither | vdso(7): these calls need no kernel entry, so seccomp does not see them |
+| `fstat` on the pipes | `st_mtime` is the current time | EPERM (also stat, newfstatat, statx) | seccomp allow-list |
+| `futex` with an absolute CLOCK_REALTIME deadline | says whether that time has passed | EPERM; the worker has one thread and needs no futex | futex(2) FUTEX_WAIT_BITSET, FUTEX_CLOCK_REALTIME |
+| RDTSC, RDTSCP | live counter | SIGSEGV | prctl(2) PR_SET_TSC, PR_TSC_SIGSEGV (read back with PR_GET_TSC) |
+| RDPRU (AMD) | live counter | killed (SIGILL) | observed on this host with the same setting; not documented in prctl(2) |
+| vsyscall page `time()` | live time | returns -1 | the kernel applies the seccomp filter when emulating it; observed |
+| RDPMC; `int 0x80` | already killed | killed | observed; the filter's architecture check |
+| sleeps, timers, poll/select, getrusage, times, sysinfo, perf events, `/proc` | already EPERM | EPERM | seccomp allow-list |
+
+After installing the filter the worker requires `os.open`, `fstat`, `time.time`, `time.monotonic`
+and `clock_gettime` for IDs 0–11 to fail with EPERM, and otherwise does not start. Any failed step
+is an evaluator error, never a run with a clock. A native instruction that traps kills the artifact
+process (A-054: `class=Exception`).
+
+Calls that hide the error return a constant or garbage instead of time: `localtime`, `gmtime` and
+`asctime` give 31 Dec 1969; libc `time` gives -1; `process_time` falls back to glibc `times()` and
+does not advance with work.
+
+Tests: `WallClockTests` (7, in the pinned container) and `StaticClockRouteTests` (2). With the D-015
+worker in place, six of the seven `WallClockTests` fail (the seventh is the allowed-modules check).
+
+**Not closed** (also in [DEVIATIONS.md](DEVIATIONS.md)):
+1. **Hardware.** RDTSC, RDTSCP and RDPRU were tested on one host (AMD EPYC 7763, Linux
+   6.8.0-1070-azure, x86_64). TPAUSE and UMWAIT do not exist on it (SIGILL) and are untested where
+   they do exist. Another CPU or kernel needs `WallClockTests` re-run, as does any unprivileged
+   counter instruction not listed here.
+2. **Native code.** `ctypes` stays in the worker's memory and executable pages can be mapped, so an
+   artifact that escapes Python can run instructions. The clocks are denied at that level too, but
+   only for the instructions tested.
+3. **Startup remnants.** Interpreter startup reads clocks before confinement. A stale value may remain
+   in the process's own memory. It would give an earlier instant, not the current time.
+4. **Not clocks, but not constant:** process ID, memory addresses and uninitialised stack values
+   (`times()`). `random.Random()` without a seed differs between runs. The pack prohibits it
+   (File 30 L54), and no static rule here detects it.
 
 [sandbox/harness.py](../sandbox/harness.py) runs inside each container (standard library
 only). Each request runs one task:
