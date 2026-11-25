@@ -108,7 +108,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
 (`sha256sum -c MANIFEST.sha256`). `BUNDLE-INFO.json` records the source commit and the build commit (D-020).
 - `src/`, `runner/`, `sandbox/`, `tests/`, `tools/`, `docs/`, `design/`: the implementation.
 - `requirements.in`, `requirements.lock`, `CLAUDE.md`: pins and the project rules.
-- `evidence/run-20261125T173501Z/`: the one F18 run under audit. Other runs named in the
+- `evidence/run-20261125T183002Z/`: the one F18 run under audit. Other runs named in the
   documents, including the feasibility-control runs, are **not** in the bundle.
 - `evidence/container-tests-<UTC>/` (one; named in `BUNDLE-INFO.json`): logs of the full unit-test suite
   inside the pinned container. See section 6.
@@ -117,7 +117,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   whole pack, so use `sha256sum -c --ignore-missing`.
 
 The bundle has no git history, and commit IDs quoted in documents cannot be checked from
-it. The evidence run's commit is `31a4290`. Documents and tests may be newer than the run;
+it. The evidence run's commit is `d146110`. Documents and tests may be newer than the run;
 the build refuses to run if any file the run hashed has changed.
 
 ## 3. Current claims to test
@@ -156,7 +156,7 @@ L334; File 30 §4–§6)
 **A4. Serializer, assembler, lifecycle** (`serializer.py`, `assembler.py`, `ledger.py`;
 Protocol L168–L185, File 31)
 
-**A5. Evidence run** `run-20261125T173501Z`
+**A5. Evidence run** `run-20261125T183002Z`
 - `results_sha256` matches; counts recompute from `results.jsonl`; every `expected` equals
   its descriptor; every PASS has `actual == expected`.
 - Every `source_sha256` entry equals the bundled file. Interpreter and image identity are

@@ -41,7 +41,7 @@ artifacts**.
   repeatability) and F15 (ledger identities) pass; each rests on a D-009 approval. The other controls wait
   for owner-written mutants, drivers and checkers.
 
-## Results (latest evidence run `run-20261125T173501Z`, pinned image)
+## Results (latest evidence run `run-20261125T183002Z`, pinned image)
 
 | PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
 |---|---|---|---|---|
@@ -104,8 +104,8 @@ once to warm the image (about 15 s).
 5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
    provisional or cleared under DEV-001.
    ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261125T173501Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261125T173501Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
+   python3 -c "import json;s=json.load(open('evidence/run-20261125T183002Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
+   grep '"fixture_id": "M27"' evidence/run-20261125T183002Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
 6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the auditor will check; DEV-002: an AI model, not a human independent auditor).
 
