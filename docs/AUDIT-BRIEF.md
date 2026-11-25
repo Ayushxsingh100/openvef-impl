@@ -37,7 +37,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   second (bundle `34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0`) ended **NOT
   CLEARED**: BLOCKERs A1-1 (M18) and A9-1, MAJOR A4-1 (and A8-2, a cross-reference). It found A8-1
   resolved. Judge each yourself. The notes are by the implementation author.
-- **D-015 (fixes for that report) and D-016 have not been audited by anyone.** Do not assume they are
+- **D-015 (fixes for that report), D-016 and D-017 have not been audited by anyone.** Do not assume they are
   right:
   - A9-1 (D-015): artifact code now runs in `sandbox/artifact_worker.py`, driven by
     `artifact_proc.py`. Attack both. Is the seccomp list tight, is anything inherited, can a frame be
@@ -49,27 +49,34 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
     clock that was missed, and test other hardware if you have it.
   - A1-1, A8-2 (D-015): M18 uses the sidecar's headings; `DOMAINS` in `runner/adapter_contracts.py`
     cites a domain per property. Is each citation the right text, and does each adapter enforce
-    it? **Not changed:** single-fixture shapes remain, and so does the three-vector minimum, which
-    the report called insufficient.
+    it? **Not changed:** single-fixture shapes remain (D-017 keeps the D-013 rule), and so does the
+    three-vector minimum, which the report called insufficient.
+  - D-017 adds boundary tests: for every input property, an in-domain edge and a value just outside its
+    cited domain (`BOUNDARIES`, enforced by `boundary_problems`). Claude chose the pairs; docs/ambiguities.md
+    D-017 lists the limits (one pair per property suffices; adjacency is approximated). Look for an
+    edge that was missed. A-055 and A-056 are owner review pending.
   - A4-1 (D-015): is `STAGE_MAP` in `serializer.py` exactly L143–L162? The report's own case is now
     a test (`test_auditor_case_a4_1`).
-- Other superseded bundle: `cdb6362b21522f21919116ef2e8862bf90dc994904bf6af06c00e327b95c5b13` (after D-015,
-  before D-016; not known to have been audited).
+- Other superseded bundles: `cdb6362b21522f21919116ef2e8862bf90dc994904bf6af06c00e327b95c5b13` (after D-015,
+  before D-016; not known to have been audited);
+  `19fbafb858b08b6509ff6e5089353c678bdfdbe8f95f3e42c93ca4bb40cf8ee3` (before D-017; not known to have been audited).
 
 ## 2. What the bundle contains
 
 `MANIFEST.sha256` lists the SHA-256 of every other file; check it first
 (`sha256sum -c MANIFEST.sha256`). `BUNDLE-INFO.json` records the source commit.
-- `src/`, `runner/`, `sandbox/`, `tests/`, `docs/`, `design/`: the implementation.
+- `src/`, `runner/`, `sandbox/`, `tests/`, `tools/`, `docs/`, `design/`: the implementation.
 - `requirements.in`, `requirements.lock`, `CLAUDE.md`: pins and the project rules.
-- `evidence/run-20261125T040905Z/`: the one F18 run under audit. Other runs named in the
+- `evidence/run-20261125T075113Z/`: the one F18 run under audit. Other runs named in the
   documents, including the feasibility-control runs, are **not** in the bundle.
+- `evidence/container-tests-<UTC>/` (one; named in `BUNDLE-INFO.json`): logs of the full unit-test suite
+  inside the pinned container. See section 6.
 - `baseline/OpenVEF_Planning_v1_3_6/`: the relevant pack files and all 144 fixture
   descriptors. Pack files not needed here are omitted. `27_SHA256SUMS.txt` lists the
   whole pack, so use `sha256sum -c --ignore-missing`.
 
 The bundle has no git history, and commit IDs quoted in documents cannot be checked from
-it. The evidence run's commit is `e4fef20`. Documents and tests may be newer than the run;
+it. The evidence run's commit is `646f2ac`. Documents and tests may be newer than the run;
 the build refuses to run if any file the run hashed has changed.
 
 ## 3. Current claims to test
@@ -80,7 +87,7 @@ the build refuses to run if any file the run hashed has changed.
 | **F18 is not passed** | docs/AUDIT-READINESS.md |
 | 0 results provisional; 9 labelled "cleared under DEV-001 (non-independent review saved)" | `summary.json` |
 | The run used the pinned CPython 3.11.18 in the pinned image | `summary.json` |
-| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to re-audit; the re-audit found M18 unsupported (A8-2), fixed in D-015, not re-audited; A-054 approved as decided (D-016) | docs/READINGS-REVIEW.md |
+| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to re-audit; the re-audit found M18 unsupported (A8-2), fixed in D-015, not re-audited; A-054 approved as decided (D-016); A-055, A-056 owner review pending (no fixture outcome depends on them) | docs/READINGS-REVIEW.md |
 
 ## 4. Audit areas
 
@@ -108,7 +115,7 @@ L334; File 30 §4–§6)
 **A4. Serializer, assembler, lifecycle** (`serializer.py`, `assembler.py`, `ledger.py`;
 Protocol L168–L185, File 31)
 
-**A5. Evidence run** `run-20261125T040905Z`
+**A5. Evidence run** `run-20261125T075113Z`
 - `results_sha256` matches; counts recompute from `results.jsonl`; every `expected` equals
   its descriptor; every PASS has `actual == expected`.
 - Every `source_sha256` entry equals the bundled file. Interpreter and image identity are
@@ -165,6 +172,24 @@ or **reasoned** from reading.
 - Tests that start containers, and a full re-run, need Docker. A re-run also needs a git
   checkout, because the script records the commit. If you cannot run them, report a
   LIMITATION.
+- **Container test logs (D-017).** If you have no Docker or no pinned CPython 3.11.18, you may
+  **inspect, not re-run**, `evidence/container-tests-<UTC>/` as evidence for **A2, A3, A7 and A9**.
+  Check its `SHA256SUMS` first, then compare `summary.json` `source_sha256` with the bundled files, and
+  the image and interpreter hashes with those in the F18 run's `summary.json`.
+  - `logs/<test file>.log`: verbose output. `results.jsonl`: one record per test (pass, FAIL,
+    ERROR, skip). `files.json`: each file's command line, return code and SHA-256.
+  - `environment.json`: interpreter path and hash, toolchain and environment variables inside.
+    `summary.json`: the image identity and `docker run` command. `docker-commands.jsonl`: every `docker` call the
+    tests made, through the broker in `tools/run_container_tests.py` (it forwards only the artifact-container
+    flags; the Docker socket is not mounted).
+  - **Weigh it as what it is:** logs made by the implementation author's own harness, on one
+    development host, from tests the author wrote. The hashes show the files agree with each
+    other, not that the run happened. Give the method as **read (container logs)**, never as ran. A log does
+    not replace reading the test: a passing test that checks too little is a finding. Anything the tests
+    do not exercise is still a LIMITATION. For A7 the logs cover only the mask checks (`test_fifo_mask`, `test_fifo_rtl`,
+    `test_fifo_spec`, `test_freeze_package`); L271 stays unmet.
+  - The tests are not the F18 run, and no fixture status comes from them. `test_proposal_v137.py`
+    ran there on `proposals/`, which is not bundled.
 - Do not edit the bundle. Do not call any LLM or provider API from its code.
 
 ## 7. Required report format
@@ -179,7 +204,7 @@ Bundle SHA-256:                MANIFEST.sha256 verified: yes/no
 Environment (Python version, Docker available, tools):
 
 ## Summary
-| Area | Verdict (PASS or FINDINGS) | Blocker | Major | Minor | Limitation | Method (ran / read) |
+| Area | Verdict (PASS or FINDINGS) | Blocker | Major | Minor | Limitation | Method (ran / read / read container logs) |
 (one row for each of A1 to A10)
 
 ## Findings

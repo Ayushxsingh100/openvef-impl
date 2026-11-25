@@ -41,7 +41,7 @@ artifacts**.
   repeatability) and F15 (ledger identities) pass; each rests on a D-009 approval. The other controls wait
   for owner-written mutants, drivers and checkers.
 
-## Results (latest evidence run `run-20261125T040905Z`, pinned image)
+## Results (latest evidence run `run-20261125T075113Z`, pinned image)
 
 | PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
 |---|---|---|---|---|
@@ -67,7 +67,7 @@ artifacts**.
 - **The audit was by an AI model, not a human (DEV-002).** It found one
   blocker and one major issue, and could not run Docker or the pinned Python. A re-audit followed;
   its result was **NOT CLEARED** (two blockers). All its findings were accepted and fixed (D-015), including artifact
-  isolation, and a later change denies wall-clock reads (D-016). None of those fixes has been re-audited. Both reports are in `docs/reviews/`.
+  isolation, and later changes deny wall-clock reads (D-016) and test the edges of every adapter input (D-017). None of those fixes has been re-audited. Both reports are in `docs/reviews/`.
 - **The pack has 26 recorded defects** (pack-defects.md).
 - **AI-assisted, disclosed:** the FIFO specification, RTL and mask drafts were written
   by Claude via Claude Code. The specification and RTL were approved by Krishika in the
@@ -104,8 +104,8 @@ once to warm the image (about 15 s).
 5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
    provisional or cleared under DEV-001.
    ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261125T040905Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261125T040905Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
+   python3 -c "import json;s=json.load(open('evidence/run-20261125T075113Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
+   grep '"fixture_id": "M27"' evidence/run-20261125T075113Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
    ```
 6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the auditor will check; DEV-002: an AI model, not a human independent auditor).
 
