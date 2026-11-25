@@ -43,6 +43,8 @@ def main() -> int:
     names = sorted({p for p in git("ls-files", "-z", "--", *PATHS).split("\0") if p} | set(pack))
     if git("status", "--porcelain", "--", *PATHS, PACK):
         sys.exit("uncommitted changes in the bundled paths")
+    if git("status", "--porcelain"):  # D-020: refuse to build on a dirty tree (any path)
+        sys.exit("working tree is not clean (D-020: refuse to build on a dirty tree)")
     files = {n: (REPO / n).read_bytes() for n in names}
     summary = json.loads(files[f"{RUN}/summary.json"])
     changed = [n for n, h in {**summary["source_sha256"], **summary["design_materials"]["file_sha256"]}.items()
@@ -59,7 +61,9 @@ def main() -> int:
         sys.exit(f"container-test evidence not usable: stale {stale}, intact {sums == have}, {tests['git_commit']}, {tests['returncode']}")
     info = {"container_tests": TESTS, "container_tests_commit": tests["git_commit"], "container_tests_totals": tests["totals"],
             "brief": "docs/AUDIT-BRIEF.md", "evidence_run": RUN, "evidence_commit": summary["git_commit"],
-            "source_commit": git("log", "-1", "--format=%H", "--", *PATHS, PACK).strip(), "files": len(files),
+            "source_commit": git("log", "-1", "--format=%H", "--", *PATHS, PACK).strip(),
+            "build_commit": git("rev-parse", "HEAD").strip(),  # D-020: git HEAD at build time (clean tree)
+            "files": len(files),
             "disclosure": "AI-assisted audit. The auditor must not be the implementation author (Claude, Anthropic)."}
     files["BUNDLE-INFO.json"] = (json.dumps(info, indent=2) + "\n").encode()
     files["MANIFEST.sha256"] = "".join(f"{sha(d)}  {n}\n" for n, d in sorted(files.items())).encode()

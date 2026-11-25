@@ -132,6 +132,9 @@ DESIGN_MATERIALS_FILE = "design/fifo/design-materials-DRAFT.json"
 SIM: dict | None = None
 SIM_UNAVAILABLE = "not prepared"
 RUNTIME_BASIS: dict | None = None  # D-019: whether the runtime checks of the current fixture could be forged
+# D-020: a SELF_REPORTED pass stays PASS with this visible label (like DEV-001), listed per record
+# and in the summary. See docs/sandbox.md "Runtime checks" and docs/DEVIATIONS.md "Open residual (D-019)".
+SELF_REPORTED_LABEL = "SELF_REPORTED (D-020): runtime check not statically PROVEN"
 PROVISIONAL: dict = {}  # fixture descriptor id -> simulator details, filled by sim_stages
 
 
@@ -513,9 +516,13 @@ def main() -> int:
                    "expected": expected, "actual": actual, "note": note}
             if RUNTIME_BASIS is not None:
                 rec["runtime_checks"] = RUNTIME_BASIS
-                for name, b in RUNTIME_BASIS.items():
-                    if b["basis"] != runtime_basis.PROVEN:
-                        self_reported.append(f"{entry['fixture_id']}:{name}")
+                sr = sorted(name for name, b in RUNTIME_BASIS.items() if b["basis"] != runtime_basis.PROVEN)
+                if sr:
+                    # D-020: keep the PASS, attach a visible SELF_REPORTED label and list it.
+                    self_reported.extend(f"{entry['fixture_id']}:{name}" for name in sr)
+                    rec["self_reported_runtime_checks"] = sr
+                    rec["self_reported_label"] = SELF_REPORTED_LABEL
+                    note = f"{note} [{SELF_REPORTED_LABEL}: {', '.join(sr)}]".strip()
             sim_details = PROVISIONAL.pop(id(desc), None)
             if sim_details is not None and SIM["provisional"]:  # reached L166 (7)-(11); items still open
                 rec["provisional"] = {"reason": "depends on design items not yet frozen or signed: "
@@ -537,6 +544,7 @@ def main() -> int:
                "provisional_fixtures": provisional_ids,
                "deviation_cleared_fixtures": deviation_ids,
                "runtime_checks_self_reported": self_reported,
+               "self_reported_label": SELF_REPORTED_LABEL if self_reported else None,
                "deviation_labels": sorted({c["label"] for c in SIM["cleared"]}) if SIM else [],
                "results_sha256": sha256_file(out_dir / "results.jsonl")}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")

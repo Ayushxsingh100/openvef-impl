@@ -1728,7 +1728,7 @@ The decision reached Claude Code before the report; the report was committed bef
 
 Not re-audited. F18 is not passed.
 
-## A-057 — The finish reason `stop` (DECIDED BY CLAUDE — owner review pending)
+## A-057 — The finish reason `stop` (DECIDED BY CLAUDE — approved under D-020)
 
 > [02 L144] "Provider finish reason explicitly reports max-token truncation"
 
@@ -1744,4 +1744,39 @@ A row whose condition is "explicitly reports" presumes reasons that do not, and 
 that state in words ("without provider truncation status"). Like `length`, `stop` is a spelling that
 carries it (A-053). Not (iii): another spelling may be a truncation report, and the pack does not say
 which. `stop` selects no outcome of its own; it gives the result an absent reason gives. P11b depends
-on this reading: under (i) it would be NOT_IMPLEMENTED. Until an owner reviews A-057, **P11b's pass does not count toward F18**.
+on this reading: under (i) it would be NOT_IMPLEMENTED.
+
+**Approved by Krishika as decided (D-020), without itemised owner review: reading (ii) for `stop`
+only, with File 36 L48 ("without provider truncation status") as the primary support for the
+complement of File 02 L144.** P11b's pass now counts toward F18. (Takes effect under D-008;
+Ayush's ratification stays the single entry in AUDIT-READINESS.md.)
+
+## D-020 — Response to the D-019 read-only report (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) review of the D-019 read-only report. No
+pack rule changes, so this is an owner decision, not a deviation. Takes effect under D-008;
+Ayush's ratification stays the single entry in AUDIT-READINESS.md.
+
+1. **A-057 approved** (reading (ii) for `stop`; primary support File 36 L48, the complement of
+   File 02 L144). Marked decided in this file and in [READINGS-REVIEW.md](READINGS-REVIEW.md);
+   **P11b's pass now counts toward F18.**
+2. **SELF_REPORTED policy.**
+   - **F18:** a SELF_REPORTED runtime check does not change the fixture verdict. A SELF_REPORTED
+     pass stays PASS and carries a visible label, "SELF_REPORTED (D-020): runtime check not
+     statically PROVEN", recorded per result (`self_reported_runtime_checks`, `self_reported_label`)
+     and listed in the run summary (`runtime_checks_self_reported`, `self_reported_label`). It is
+     listed in AUDIT-READINESS.md (currently `M06:driver.py`).
+   - **Confirmatory use:** the validity endpoint is reported two ways — **primary**, as measured
+     (each runtime report at face value); and a **pre-registered sensitivity**, with every
+     SELF_REPORTED artifact counted invalid. The **count of SELF_REPORTED artifacts per arm** (and
+     design) is reported alongside. Recorded in [sandbox.md](sandbox.md) "Runtime checks",
+     [DEVIATIONS.md](DEVIATIONS.md) "Open residual (D-019)", and [F1-F17-plan.md](F1-F17-plan.md)
+     (analysis rules). This takes the owner decision the A9-2 residual left open; it does **not**
+     close A9-2, which is still not re-audited.
+3. **build_audit_bundle.py:** records `build_commit` = git HEAD at build time and refuses to build
+   on a dirty tree (any path), keeping `source_commit` as the last commit touching the bundled
+   paths. Guarded by `tests/test_audit_bundle.py`.
+4. **AUDIT-BRIEF.md:** re-audit #4 is scoped to D-019 + D-020 (see the brief for the priority
+   targets).
+
+Not re-audited. F18 is not passed.

@@ -27,7 +27,8 @@ A-031 is reversed. These fixtures no longer have an adapter, and the Dependants 
 them describe an earlier state: M36 (A-012), M13 (A-025), M37 (A-028), M15 (A-029), M14, M17
 and M41 (A-032), M53 (A-033).
 
-**A-057** (the finish reason `stop`, D-019) is decided by Claude and **owner review pending**. P11b depends on it.
+**A-057** (the finish reason `stop`, D-019) is approved by Krishika as decided (D-020), without
+itemised owner review. It is **not** covered by D-009. P11b depends on it and now counts toward F18.
 
 **A-055** (no stated maximum for `scheduled_slots`) and **A-056** (domains of event fields and packet
 text), both from D-017, are approved by Krishika as decided (D-018). They are **not** covered by D-009. No fixture outcome depends on them.

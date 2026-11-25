@@ -180,4 +180,13 @@ Not an accepted deviation: recorded for the auditor, at Krishika's instruction (
    ([sandbox.md](sandbox.md) "Runtime checks"). The proof rests on CPython behaving as documented, and its
    list of allowed names was written by the implementation author.
 
-**Not re-audited.** Owner decision open: whether a SELF_REPORTED artifact may count as valid in confirmatory use.
+**Owner decision taken (D-020)** — no pack rule changed, so a decision, not a deviation:
+- **F18** keeps the fixture verdict and attaches a visible label, "SELF_REPORTED (D-020): runtime
+  check not statically PROVEN" (`self_reported_runtime_checks`/`self_reported_label` per result,
+  and in the run summary). A SELF_REPORTED pass stays PASS.
+- **Confirmatory use:** the validity endpoint is reported as measured (primary) **and** with every
+  SELF_REPORTED artifact counted invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED
+  count. Analysis rule in [F1-F17-plan.md](F1-F17-plan.md); see also [sandbox.md](sandbox.md) "Runtime checks".
+
+**Not re-audited.** D-020 takes the open owner decision but does not close A9-2; the forgery residual
+above stands, and D-019 + D-020 still require re-audit.

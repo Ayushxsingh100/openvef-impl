@@ -52,7 +52,26 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
     Can `inspect_source` be fooled by compiled code alone?
   - D-019 asked for an import-only process; the author used compile-only instead, because import can run artifact
     expressions. Is that sound against File 30 L35 and L39?
-  - A-057 (`stop`) is owner review pending; P11b depends on it.
+  - A-057 (`stop`) was owner review pending; it is now approved as decided (D-020). P11b depends on it.
+
+- **Re-audit #4 is scoped to D-019 + D-020 (added 25 Nov 2026, Krishika).** All prior findings must
+  stay fixed; re-audit the earlier decisions as you see fit, but prioritise:
+  - **(a)** `src/openvef/runtime_basis.py`'s allow-list: find any source it marks **PROVEN** that can
+    still forge the `create_driver` return type, replace `Driver.step` or `check_trace`, or reach
+    interpreter internals. The allowed-name lists were written by the implementation author — judge
+    whether they are complete and safe.
+  - **(b)** the **compile-only** `inspect` path (`sandbox/artifact_worker.inspect_source`,
+    `sandbox/artifact_proc.inspect_source`): can it be fooled by compiled code alone, before any
+    import, into reporting a signature that the imported module will not have?
+  - **(c)** the **A-057** reading (reading (ii) for `stop`; File 36 L48 as the complement of File 02 L144).
+  - **(d)** confirm all prior findings (A1-1, A4-1, A8-1/A8-2, A9-1, A9-2 residual, wall-clock) remain
+    fixed under the current code.
+- **D-020 (SELF_REPORTED policy).** No pack rule changed. F18 keeps each fixture verdict and labels a
+  SELF_REPORTED runtime check (`self_reported_label`, currently `M06:driver.py`). For confirmatory use
+  the validity endpoint is reported as measured (primary) and with every SELF_REPORTED artifact counted
+  invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED count (docs/F1-F17-plan.md,
+  docs/sandbox.md, docs/DEVIATIONS.md). This is an owner decision, not a closure of A9-2; D-019 and
+  D-020 are **not** re-audited.
 - **D-015 to D-018 were covered by the third audit.** Judge them again as you see fit:
   - A9-1 (D-015): artifact code now runs in `sandbox/artifact_worker.py`, driven by
     `artifact_proc.py`. Attack both. Is the seccomp list tight, is anything inherited, can a frame be

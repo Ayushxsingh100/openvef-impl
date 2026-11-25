@@ -171,6 +171,18 @@ F18 runs record it per fixture (`runtime_checks`) and list the rest (`runtime_ch
   vectors are still checked one by one, and the checker's return is classified by the evaluator.
 - **For the owners:** whether a SELF_REPORTED artifact may count as valid in confirmatory use.
 
+**Owner decision (D-020).** No pack rule changed, so this is a decision, not a deviation.
+- **F18:** a SELF_REPORTED runtime check does not change the fixture verdict. A SELF_REPORTED pass
+  stays PASS and carries the visible label "SELF_REPORTED (D-020): runtime check not statically
+  PROVEN", recorded per result (`self_reported_runtime_checks`, `self_reported_label`) and listed
+  in the run summary (`runtime_checks_self_reported`, `self_reported_label`).
+- **Confirmatory use:** the validity endpoint is reported two ways — **primary**, as measured (each
+  runtime report at face value); and a **pre-registered sensitivity**, with every SELF_REPORTED
+  artifact counted invalid. The **count of SELF_REPORTED artifacts per arm** (and design) is
+  reported alongside (analysis rule in [F1-F17-plan.md](F1-F17-plan.md)).
+- This takes the owner decision the residual left open; it does **not** close A9-2, which is still
+  not re-audited.
+
 ### Wall-clock reads (D-016; File 30 §6 L101)
 
 **What IMPORT_POLICY already rejects** (File 30 §2; `StaticClockRouteTests`):

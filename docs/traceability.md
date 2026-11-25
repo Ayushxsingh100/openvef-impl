@@ -83,8 +83,10 @@ at commit c520888, on a clean tree, after D-019. Outcomes and null-trace hashes 
 - 9 PASS (P01, P14, P21, P42, M07, M31, M32, M33, M57) are "cleared under DEV-001
   (non-independent review saved)". The independent mask signature (L271) does not exist.
 - **Runtime checks (D-019):** 16 fixtures reach them. M06's driver is SELF_REPORTED (it returns a non-Driver and is rejected); the
-  rest are PROVEN, so no accepted result rests on a report the artifact could forge.
-- **P11b rests on A-057 (owner review pending), so its pass does not count toward F18 until an owner reviews it.**
+  rest are PROVEN, so no accepted result rests on a report the artifact could forge. Per D-020 a
+  SELF_REPORTED fixture keeps its verdict and carries the visible label "SELF_REPORTED (D-020)";
+  M06 stays PASS, labelled.
+- **P11b rests on A-057, approved as decided (D-020); its pass now counts toward F18.**
 - Earlier runs with other DEV-001 labels, or before D-013, are superseded.
 - Results that rest on A-053 (approved as decided, D-014) count subject to re-audit of D-013:
   M16, M18–M20, M25, M26, M28, M29, M40, R01–R06, R08–R13, M10–M12, P18, P19, P22.

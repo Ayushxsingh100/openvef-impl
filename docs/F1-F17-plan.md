@@ -412,6 +412,23 @@ The result is provisional until the script is frozen.
 Critical gate. **F15 can be built and run now:** it needs no simulator and no owner
 artifact.
 
+#### Analysis rule — SELF_REPORTED artifacts in the validity endpoint (D-020)
+
+Owner decision D-020 (confirmatory use; no pack rule changed). An artifact is classified
+`PROVEN` or `SELF_REPORTED` by `src/openvef/runtime_basis.py` (D-019): `SELF_REPORTED` means the
+runtime return-type and post-execution signature checks rest on the artifact process's own report,
+which it could forge (docs/sandbox.md "Runtime checks"). For the confirmatory validity endpoint:
+- **Primary:** validity is taken as measured — a `SELF_REPORTED` artifact that the runtime checks
+  accept is counted valid, like any other.
+- **Pre-registered sensitivity:** recompute the validity endpoint with **every `SELF_REPORTED`
+  artifact counted invalid** (an `INVALID_ARTIFACT_SLOT` for every scheduled mutant combination,
+  as L529 (2) requires for invalid artifacts). Report it beside the primary.
+- Report the **count of `SELF_REPORTED` artifacts per arm** (and design) with both.
+
+This is confirmatory-analysis guidance only; F18 (above) keeps each fixture verdict and attaches the
+visible `SELF_REPORTED (D-020)` label. F16/F17 confirmatory analysis is not authorized yet, so this
+rule is recorded for when it is, and belongs in the frozen analysis plan when that is written.
+
 ### F17 Common-trace panel controls (pre-freeze feasibility only)
 
 > [02 L526] "| F17 | Common-trace panel controls and freeze ordering | Pre-freeze feasibility F17 uses only hand-built FIFO control mutants, not the confirmatory MCY manifest. Build separate legal `REACTIVE_RANDOM` and `DIRECTED` streams through the production harness; run RTL and null benign traces; repeat each checker twice on identical benign and mutant trace bytes; exclude paired-input/integrity-invalid corpus pairs from `Q_ds`. Confirmatory F17 is run only after F16/re-pilots and the complete authoring packet, directed suite, mask and analysis plan are frozen and hashed, before any confirmatory panel mutant trace is scored by an LLM checker. | Correct reference checker: compatible and detects every exposed case; always-PASS: compatible with zero sensitivity; always-FAIL: `PANEL_FALSE_ALARM`; stimulus-literal: false alarm on at least one distinct legal benign trace; crashing checker: `PANEL_ERROR`; stricter-than-mask checker: `PANEL_STRICTER_THAN_MASK_EVENT`, not detection; nondeterministic checker: `PANEL_ERROR`. Mutant-trace errors/disagreements count as `PANEL_ERROR_EVENT`, not detection, but do not change the benign-trace compatibility partition. Report event counts separately; `PANEL_ERROR`, `PANEL_FALSE_ALARM` and `PANEL_COMPATIBLE` partition proportions sum to `V_cd` within each stream/design/arm. |"
