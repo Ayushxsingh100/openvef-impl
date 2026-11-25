@@ -33,18 +33,28 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   author of the code also chose the reading of "defined" (A-053), and not-rejected outcomes
   count as differing outcomes for M18, M19 and M28.
 
-- **Two earlier audits.** The first report is in `docs/reviews/`. A re-audit of bundle
-  `34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0` followed, as Krishika
-  states; its report is in `docs/reviews/` only if it arrived before this bundle was built. All its
-  findings were accepted (D-015) and fixed **without re-audit**. Do not assume the fixes are right:
-  - A9: attack `sandbox/artifact_worker.py` and `artifact_proc.py`. Is the seccomp list tight, is
-    anything inherited, can a frame be confused with another, what can the artifact learn?
-    `tests/test_artifact_isolation.py` shows what was tried. Residuals are in docs/sandbox.md.
-    D-016 then closed the wall-clock routes found (File 30 L101); the open ones are in
-    docs/DEVIATIONS.md "Open residuals". Look for a clock that was missed.
-  - A1/A8: is each `DOMAINS` citation the right text, and does each adapter enforce it?
-  - A4: is `STAGE_MAP` in `serializer.py` exactly the stage map? The auditor's own case was not in
-    hand when the tests were written.
+- **Two earlier audits, both by OpenAI GPT-6; both reports and notes are in `docs/reviews/`.** The
+  second (bundle `34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0`) ended **NOT
+  CLEARED**: BLOCKERs A1-1 (M18) and A9-1, MAJOR A4-1 (and A8-2, a cross-reference). It found A8-1
+  resolved. Judge each yourself. The notes are by the implementation author.
+- **D-015 (fixes for that report) and D-016 have not been audited by anyone.** Do not assume they are
+  right:
+  - A9-1 (D-015): artifact code now runs in `sandbox/artifact_worker.py`, driven by
+    `artifact_proc.py`. Attack both. Is the seccomp list tight, is anything inherited, can a frame be
+    confused with another, what can the artifact learn? `tests/test_artifact_isolation.py` shows
+    what was tried. A-054 (what a dead artifact process means) was decided by the author.
+  - Wall clock (D-016; File 30 L101): the worker removes the vDSO, the time data pages, the
+    time-stamp counter and the clock, `fstat` and `futex` system calls. docs/sandbox.md "Wall-clock
+    reads" lists mechanisms; docs/DEVIATIONS.md "Open residuals" lists what is not closed. Look for a
+    clock that was missed, and test other hardware if you have it.
+  - A1-1, A8-2 (D-015): M18 uses the sidecar's headings; `DOMAINS` in `runner/adapter_contracts.py`
+    cites a domain per property. Is each citation the right text, and does each adapter enforce
+    it? **Not changed:** single-fixture shapes remain, and so does the three-vector minimum, which
+    the report called insufficient.
+  - A4-1 (D-015): is `STAGE_MAP` in `serializer.py` exactly L143–L162? The report's own case is now
+    a test (`test_auditor_case_a4_1`).
+- Other superseded bundle: `cdb6362b21522f21919116ef2e8862bf90dc994904bf6af06c00e327b95c5b13` (after D-015,
+  before D-016; not known to have been audited).
 
 ## 2. What the bundle contains
 
@@ -52,14 +62,14 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
 (`sha256sum -c MANIFEST.sha256`). `BUNDLE-INFO.json` records the source commit.
 - `src/`, `runner/`, `sandbox/`, `tests/`, `docs/`, `design/`: the implementation.
 - `requirements.in`, `requirements.lock`, `CLAUDE.md`: pins and the project rules.
-- `evidence/run-20261124T211459Z/`: the one F18 run under audit. Other runs named in the
+- `evidence/run-20261125T040905Z/`: the one F18 run under audit. Other runs named in the
   documents, including the feasibility-control runs, are **not** in the bundle.
 - `baseline/OpenVEF_Planning_v1_3_6/`: the relevant pack files and all 144 fixture
   descriptors. Pack files not needed here are omitted. `27_SHA256SUMS.txt` lists the
   whole pack, so use `sha256sum -c --ignore-missing`.
 
 The bundle has no git history, and commit IDs quoted in documents cannot be checked from
-it. The evidence run's commit is `a1d2e9c`. Documents and tests may be newer than the run;
+it. The evidence run's commit is `e4fef20`. Documents and tests may be newer than the run;
 the build refuses to run if any file the run hashed has changed.
 
 ## 3. Current claims to test
@@ -70,7 +80,7 @@ the build refuses to run if any file the run hashed has changed.
 | **F18 is not passed** | docs/AUDIT-READINESS.md |
 | 0 results provisional; 9 labelled "cleared under DEV-001 (non-independent review saved)" | `summary.json` |
 | The run used the pinned CPython 3.11.18 in the pinned image | `summary.json` |
-| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to this re-audit | docs/READINGS-REVIEW.md |
+| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to re-audit; the re-audit found M18 unsupported (A8-2), fixed in D-015, not re-audited; A-054 approved as decided (D-016) | docs/READINGS-REVIEW.md |
 
 ## 4. Audit areas
 
@@ -98,7 +108,7 @@ L334; File 30 §4–§6)
 **A4. Serializer, assembler, lifecycle** (`serializer.py`, `assembler.py`, `ledger.py`;
 Protocol L168–L185, File 31)
 
-**A5. Evidence run** `run-20261124T211459Z`
+**A5. Evidence run** `run-20261125T040905Z`
 - `results_sha256` matches; counts recompute from `results.jsonl`; every `expected` equals
   its descriptor; every PASS has `actual == expected`.
 - Every `source_sha256` entry equals the bundled file. Interpreter and image identity are

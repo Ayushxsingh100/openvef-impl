@@ -61,13 +61,13 @@ artifacts**.
   against runner branches only one fixture could reach, and all 15 were removed (123). The rule
   was then replaced (D-013): an adapter now needs pack text that defines its input, plus
   synthetic tests. Five came back and one more went (127). Changing a rule after a finding
-  needs a re-audit, which hasn't happened.
+  needs a re-audit. It happened: the finding was **not fully resolved** (M18, since fixed, not re-audited).
 - **The 17 NOT IMPLEMENTED:** 15 have an input or outcome the pack doesn't define, and two
   (M42, M47) supply halt signatures the Protocol doesn't allow (PD-01).
 - **The audit was by an AI model, not a human (DEV-002).** It found one
   blocker and one major issue, and could not run Docker or the pinned Python. A re-audit followed;
-  its report isn't saved yet. All its findings were accepted and fixed (D-015), including artifact
-  isolation, and a later change denies wall-clock reads (D-016). None of this has been re-audited. The first report is in `docs/reviews/`.
+  its result was **NOT CLEARED** (two blockers). All its findings were accepted and fixed (D-015), including artifact
+  isolation, and a later change denies wall-clock reads (D-016). None of those fixes has been re-audited. Both reports are in `docs/reviews/`.
 - **The pack has 26 recorded defects** (pack-defects.md).
 - **AI-assisted, disclosed:** the FIFO specification, RTL and mask drafts were written
   by Claude via Claude Code. The specification and RTL were approved by Krishika in the

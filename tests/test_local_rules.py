@@ -173,6 +173,12 @@ class SerializerTests(unittest.TestCase):
                 self.assertIsNone(serialize(*bad))
                 self.assertIsNone(feedback_bytes(Failure(*bad)))
 
+    def test_auditor_case_a4_1(self):
+        # The re-auditor's own input (docs/reviews/implementation-reaudit-gpt6-2026-11-25.md, A4-1).
+        case = ("CHECKER_NULL", "WRONG_CLASS", "COMPILE_ERROR|file=driver.py|line=1")
+        self.assertIsNone(feedback_bytes(Failure(*case)))
+        self.assertIsNone(serialize(*case))
+
     def test_every_repair_expectation_is_in_the_stage_map(self):
         root = Path(__file__).resolve().parent.parent / "baseline/OpenVEF_Planning_v1_3_6/41_F18_Fixture_Inputs"
         n = 0

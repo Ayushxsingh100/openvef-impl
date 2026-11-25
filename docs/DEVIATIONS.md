@@ -73,14 +73,18 @@ It found one BLOCKER (A1-1) and one MAJOR (A8-1); A2, A3, A5 and A9 are limitati
 no CPython 3.11.18). It states a 63-digit bundle hash; the note explains. Step (5) is not
 marked done.
 
-**Re-audit (as stated by Krishika):** received from GPT-6, operator Krishika, on bundle
-`34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0`. The report is to be uploaded as
-`reviews/implementation-reaudit-gpt6-2026-11-25.md` (SHA-256 `8ef52f96…1ec7`) and is **not saved
-yet**; Claude Code has not seen it. D-015 accepts all its findings. **The D-015 fixes are not
-re-audited**, and include a new isolation mechanism.
+**Re-audit: report received and saved** (OpenAI GPT-6, operator Krishika, 25 Nov 2026, bundle
+`34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0`):
+[report](reviews/implementation-reaudit-gpt6-2026-11-25.md), SHA-256
+`8ef52f96f75f5be983ae7032b59ab5ccc56afc2ec3d02e37e937890a2f001ec7`, equal to the hash Krishika gave; [note](reviews/implementation-reaudit-gpt6-2026-11-25-NOTE.md).
+Disposition **NOT CLEARED**: BLOCKERs A1-1 (not fully resolved) and A9-1, MAJOR A4-1 (A8-2 is a
+cross-reference), limitations A2, A3, A7. A8-1 is resolved. D-015 accepted its findings and fixed
+A9-1, A4-1 and the M18 contract before Claude Code had seen the report; the note lists two points
+D-015 leaves open. **D-015 and D-016 are not re-audited.** Step (5) is not marked done.
 
 **Response (D-012):** A1-1 and A8-1 accepted and applied; limitations A2, A3, A5 and A9
-accepted and recorded, not treated as defects. The corrected code has **not** been re-audited.
+accepted and recorded, not treated as defects. The D-012 to D-014 code was then
+re-audited (above).
 
 **The rule applied to A1-1 was changed afterwards (D-013).** D-012 first removed every
 single-fixture adapter (123 PASS). D-013, on Claude (claude.ai) recommendation, replaced that
@@ -88,7 +92,7 @@ rule with "cited input contract plus synthetic vectors" and restored five of the
 M25, M26, M28), while removing one more (`change_class`, M53): 127 PASS. The relaxation raises
 the pass count after an adverse finding, so **it requires re-audit** and must be disclosed
 wherever the count is quoted. Whether A1-1 is resolved is for the auditor.
-A later bundle (now with evidence run-20261124T211459Z) replaces the zip in `dist/`; the audited
+A later bundle (now with evidence run-20261125T040905Z) replaces the zip in `dist/`; the audited
 zip is in git at `9c89b1c`.
 
 | Audit input | Identity |
@@ -144,4 +148,4 @@ Every clock route found was closed and tested in the pinned container on the dev
    so such an artifact fails as a runtime error, not at IMPORT_POLICY.
 5. **Related, not a clock:** process ID, addresses and unseeded `random.Random()` vary between runs.
 
-**Not re-audited.** Evidence with this change: run-20261125T040905Z; the bundle in `dist/` holds run-20261124T211459Z, which predates it.
+**Not re-audited.** Evidence with this change: run-20261125T040905Z (also in the bundle in `dist/`).

@@ -14,8 +14,10 @@ It is a status document: it claims no gate as passed.
   21, 23 and 32); they are read-only and are not updated by this work.
 - **Not done:** step (5), the independent implementation re-audit. It is **not
   done**. Under DEV-002 a different AI model audits it, which is not a human independent
-  audit. A first report (OpenAI GPT-6) is saved ([report](reviews/implementation-audit-gpt6-2026-11-25.md)): one BLOCKER, one MAJOR and four limitations; and
-  the code changed after it (D-012).
+  audit. A first report (OpenAI GPT-6) is saved ([report](reviews/implementation-audit-gpt6-2026-11-25.md)): one BLOCKER, one MAJOR and four limitations. The
+  re-audit after D-012 to D-014 ([report](reviews/implementation-reaudit-gpt6-2026-11-25.md)) ended NOT CLEARED: two BLOCKERs, one
+  MAJOR and a cross-reference, three limitations. The code changed after it (D-015, D-016), and that
+  is not re-audited.
 - **Prohibited:** no LLM or provider call has been made by any code, test or script
   (CLAUDE.md hard rule 5). The LLM-call gate, step (6), is closed.
 
@@ -59,8 +61,8 @@ auditor should weigh them with that in mind.
   ambiguous, assigned an outcome not in the normative contract, or produces a different
   stage, error class, diagnostic byte string or terminal disposition".
 - 17 fixtures are not run to an outcome, L271 is unmet (DEV-001), and the independent
-  implementation re-audit (L555 (5)) is not done: the first DEV-002 AI audit found a BLOCKER (A1-1), and
-  the code and the adapter rule changed after it.
+  implementation re-audit (L555 (5)) is not done: the DEV-002 AI audit found a BLOCKER (A1-1), the
+  re-audit ended NOT CLEARED, and the code changed after both.
 
 ## 2a. Feasibility controls F1–F15, F17 (Protocol §17)
 
@@ -136,9 +138,8 @@ this run is on the pinned one.
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item; A-031 withdrawn (D-012). Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
-| Upload the re-audit report (SHA-256 `8ef52f96…1ec7`), with the model shown and the prompt; add the auditor's A4-1 case as a test | Krishika, then Claude | DEV-002; D-015 |
+| Points of the re-audit that D-015 leaves open: single-fixture shapes under the original A1 criterion, and the three-vector minimum ([note](reviews/implementation-reaudit-gpt6-2026-11-25-NOTE.md)) | Krishika | DEV-002; D-013 |
 | Re-audit of the D-015 and D-016 changes (A-054 approved, D-016); wall-clock residuals in [DEVIATIONS.md](DEVIATIONS.md) | the auditor | D-015, D-016 |
-| Rebuild the audit bundle with the post-D-016 runs, after the re-audit report is uploaded. `dist/`, `docs/AUDIT-BRIEF.md` and `tools/build_audit_bundle.py` still name `run-20261124T211459Z` | Claude | DEV-002; D-016 |
 | Input contracts and outcomes for the 15 fixtures without one (PD-03, PD-04, PD-07, PD-26) | owners | D-013 |
 | Re-audit of D-013 and A-053 (approved, D-014); the passes resting on A-053 count subject to it | the auditor | D-013, D-014, A-053 |
 | Draft pack corrections for M27, M36, M42, M47, M48, M50, M54, M58, PD-22 and PD-24: `proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md` (DRAFT; needs a new independent document audit) | owners | PD-02, PD-03, PD-06, PD-22, PD-24, PD-25 |

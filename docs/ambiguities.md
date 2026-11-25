@@ -1583,7 +1583,8 @@ this repository when the fixes were made, so they follow the decision's wording,
    equal File 31 §8's and are never used. `DOMAINS` cites each property's domain, and a test
    requires every adapter to refuse an out-of-domain value for each property.
 3. **A4-1.** `serialize` and `feedback_bytes` require the whole (stage, error class, diagnostic) to
-   be what one stage-map row emits (L143–L162). **The auditor's own case is not in hand**; the
+   be what one stage-map row emits (L143–L162). The auditor's own case was not in hand then; it is
+   now a test (`test_auditor_case_a4_1`). The other
    tests cover wrong stage, class, file, unknown labels, null and trailing newlines.
 4. The 3.11-specific f-string test skips on other versions.
 
