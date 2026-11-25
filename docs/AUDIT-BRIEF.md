@@ -54,12 +54,14 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   - D-017 adds boundary tests: for every input property, an in-domain edge and a value just outside its
     cited domain (`BOUNDARIES`, enforced by `boundary_problems`). Claude chose the pairs; docs/ambiguities.md
     D-017 lists the limits (one pair per property suffices; adjacency is approximated). Look for an
-    edge that was missed. A-055 and A-056 are owner review pending.
+    edge that was missed. A-055 and A-056 were decided by
+    the author and approved as decided (D-018).
   - A4-1 (D-015): is `STAGE_MAP` in `serializer.py` exactly L143–L162? The report's own case is now
     a test (`test_auditor_case_a4_1`).
 - Other superseded bundles: `cdb6362b21522f21919116ef2e8862bf90dc994904bf6af06c00e327b95c5b13` (after D-015,
   before D-016; not known to have been audited);
-  `19fbafb858b08b6509ff6e5089353c678bdfdbe8f95f3e42c93ca4bb40cf8ee3` (before D-017; not known to have been audited).
+  `19fbafb858b08b6509ff6e5089353c678bdfdbe8f95f3e42c93ca4bb40cf8ee3` (before D-017; not known to have been audited);
+  `e1918422a32d4a4fc612c293d8257218b4488758add17d19a1bec6486929dfbd` (before D-018; documents only differ).
 
 ## 2. What the bundle contains
 
@@ -87,7 +89,7 @@ the build refuses to run if any file the run hashed has changed.
 | **F18 is not passed** | docs/AUDIT-READINESS.md |
 | 0 results provisional; 9 labelled "cleared under DEV-001 (non-independent review saved)" | `summary.json` |
 | The run used the pinned CPython 3.11.18 in the pinned image | `summary.json` |
-| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to re-audit; the re-audit found M18 unsupported (A8-2), fixed in D-015, not re-audited; A-054 approved as decided (D-016); A-055, A-056 owner review pending (no fixture outcome depends on them) | docs/READINGS-REVIEW.md |
+| Readings were approved "as decided, without itemised owner review" (D-009); A-031 withdrawn (D-012); A-053 approved as decided (D-014), subject to re-audit; the re-audit found M18 unsupported (A8-2), fixed in D-015, not re-audited; A-054 approved as decided (D-016); A-055, A-056 approved as decided (D-018; no fixture outcome depends on them) | docs/READINGS-REVIEW.md |
 
 ## 4. Audit areas
 

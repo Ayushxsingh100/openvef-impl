@@ -1651,7 +1651,7 @@ extend the contract test to enforce this." Takes effect under D-008.
    status comes from it. The auditor may inspect these logs for A2, A3, A7 and A9; inspecting is not
    re-running. Requires re-audit with D-015 and D-016.
 
-## A-055 — Upper bound of `scheduled_slots` (DECIDED BY CLAUDE — owner review pending)
+## A-055 — Upper bound of `scheduled_slots` (DECIDED BY CLAUDE — approved under D-018)
 
 > [02 L181] "a *slot* is exactly one arm × design combination"
 
@@ -1661,20 +1661,35 @@ Readings: (i) L181 as a count: two arms and two designs give at most four slots,
 is outside the domain; (ii) L181 states what a slot belongs to; an arm/design cell holds `|G_cd|`
 scheduled slots, and the pack states no maximum.
 
-**Decision (decided by Claude under standing delegation, owner review pending): (ii).** L396 and L429
+**Decision (decided by Claude under standing delegation, approved under D-018): (ii).** L396 and L429
 divide by `|G_cd|` per arm and design, and L34 assigns "Scheduled slots ... to arms by a balanced
 within-design schedule", which has no meaning if each cell is one slot. So only the lower edge (1 in,
 0 out) is tested. Under (i) M42 and M47 would still be NOT_IMPLEMENTED (PD-01). No outcome changes.
 
-## A-056 — Domains of event fields and packet text (DECIDED BY CLAUDE — owner review pending)
+## A-056 — Domains of event fields and packet text (DECIDED BY CLAUDE — approved under D-018)
 
 Values the cited text excludes but for which it states no outcome. Readings: (i) refuse the input
 (NOT_IMPLEMENTED); (ii) process it as before.
 
-**Decision (decided by Claude under standing delegation, owner review pending): (i).**
+**Decision (decided by Claude under standing delegation, approved under D-018): (i).**
 - Events: "No unlisted value is permitted" (02 L125), so an event whose diagnostic is outside the
   grammar is refused. A pointer is RFC 6901 with `/` as root (L137). `import_not_allowed` is the
   "Disallowed import form/root" row (L147), so an allowed root is refused.
 - Packet text: File 31 L26 and L74 reject invalid UTF-8 and a BOM but state no diagnostic for it.
 
 No fixture has such a value; no F18 outcome changes (see the run in traceability.md).
+
+## D-018 — A-055 and A-056 approved (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) recommendation, given in Claude Code:
+"A-055 and A-056 approved as decided."
+
+- **What is approved:** A-055 reading (ii), no stated maximum for `scheduled_slots`; A-056 reading (i),
+  values the cited text excludes without stating an outcome are refused. Not covered by D-009.
+- **Approved text** (SHA-256 of each section before this record changed its status wording; after):
+  - A-055: `4fe531e2bbb5c705eb1a84a2a84c3d840e3915f49400188b9822b6b377ce0b0f`; `4fe31b31ece3ee14b7fa99a9875ec59780c6150a928c15b33188086af7c658aa`.
+  - A-056: `ea4ae0c6895ce32c43c2f7a73c6999b8c3019736935e8286b2575c556cc276b3`; `7c446adc077d28b87dda5b5e81e24de6dbf21275ab22d0e184b7350ca3b52d68`.
+- **Effect:** none on results; no fixture outcome depends on either. Code and evidence are unchanged.
+- **Not changed:** F18 is not passed, and D-017 still requires re-audit. Claude decided both readings and
+  Claude (claude.ai) recommended their approval. Takes effect under D-008; Ayush's ratification stays
+  the single entry in AUDIT-READINESS.md.

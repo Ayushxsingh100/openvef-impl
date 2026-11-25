@@ -1,7 +1,7 @@
 # Traceability: requirement → component → fixtures → evidence
 
 **Reading status, 24 Nov 2026:** every Claude-decided reading below is approved by Krishika
-(D-008), except A-055 and A-056 (owner review pending): A-038 and A-040–A-044 in FREEZE-2026-11-24; A-053 under D-014;
+(D-008): A-055 and A-056 under D-018; A-038 and A-040–A-044 in FREEZE-2026-11-24; A-053 under D-014;
 all others under D-009, as decided, without itemised owner review.
 Evidence runs since then: `run-20261125T075113Z`, `controls-20261125T075247Z`.
 
@@ -61,7 +61,7 @@ Evidence runs since then: `run-20261125T075113Z`, `controls-20261125T075247Z`.
 | Protocol L223, L216–L221 (F2/F10 ordering); L510 (F1 repeats) | `sandbox/sim_cocotb.py` ordering probe (H9); `src/openvef/alignment.py` (H9, H10) | F1, F2, F10 | Built; toy-design runs in the sandbox; A-051 Claude-decided, approved under D-009 |
 | Charter L74; L233; D-007 (2) (control mutants) | `src/openvef/mutants.py` (H1); `design/fifo/controls/` slots (owner-written content) | F4–F10, F12, F17 | Loader built; **no mutant exists yet** (owner item 15) |
 | Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261125T075247Z`: F14, F15 PASS (D-009); 14 controls BLOCKED_OWNER_ARTIFACTS |
-| CLAUDE.md rule 4; D-013 (A1-1), D-017: adapters need a cited contract, synthetic vectors and a boundary pair per property | `runner/run_f18.py` `ADAPTERS`, `runner/adapter_contracts.py`; `tests/adapter_vectors.py`, `tests/test_dispatch_shapes.py` | all 144 | Implemented; evidence/run-20261125T075113Z; A-053 approved (D-014); A-055, A-056 owner review pending (no fixture outcome depends on them); requires re-audit |
+| CLAUDE.md rule 4; D-013 (A1-1), D-017: adapters need a cited contract, synthetic vectors and a boundary pair per property | `runner/run_f18.py` `ADAPTERS`, `runner/adapter_contracts.py`; `tests/adapter_vectors.py`, `tests/test_dispatch_shapes.py` | all 144 | Implemented; evidence/run-20261125T075113Z; A-053 approved (D-014); A-055, A-056 approved (D-018; no fixture outcome depends on them); requires re-audit |
 | Protocol L185; D-012 (A8-1): supplied halt signatures validated | `src/openvef/ledger.py` `HaltSignature.given`; `tests/test_local_rules.py` | M42, M47 NOT_IMPLEMENTED (PD-01) | Implemented; A-031 reversed |
 | File 30 §3 L27, L39, §6; D-015 (A9-1): no artifact code in an evaluator interpreter | `sandbox/artifact_worker.py`, `sandbox/artifact_proc.py`; `tests/test_artifact_isolation.py` | every fixture reaching the runtime stage | Implemented; evidence/run-20261125T075113Z; A-054 approved (D-016); requires re-audit |
 | File 30 §6 L101; D-016: wall-clock reads denied | `sandbox/artifact_worker.py` `remove_clocks`, `SYSCALLS`; `tests/test_artifact_isolation.py` `WallClockTests`, `StaticClockRouteTests` | every fixture reaching the runtime stage | Implemented; evidence/run-20261125T075113Z; residuals in docs/DEVIATIONS.md; requires re-audit |

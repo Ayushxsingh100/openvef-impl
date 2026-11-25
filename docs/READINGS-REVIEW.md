@@ -28,7 +28,7 @@ them describe an earlier state: M36 (A-012), M13 (A-025), M37 (A-028), M15 (A-02
 and M41 (A-032), M53 (A-033).
 
 **A-055** (no stated maximum for `scheduled_slots`) and **A-056** (domains of event fields and packet
-text), both from D-017, are decided by Claude and **owner review pending**. No fixture outcome depends on them.
+text), both from D-017, are approved by Krishika as decided (D-018). They are **not** covered by D-009. No fixture outcome depends on them.
 
 **A-054** (an artifact process that ends or breaks its message schema, D-015) is approved by Krishika as
 decided (D-016). It is **not** covered by D-009. No current fixture reaches it.
