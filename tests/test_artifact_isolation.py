@@ -79,7 +79,9 @@ class IsolationTests(unittest.TestCase):
         # Breaking its own builtins before its signature is measured can only fail the driver.
         r = self.run1(source(factory=modules + bi))
         self.assertTrue(r.get("rows") == self.clean["rows"] or
-                        r["failure"]["diagnostic"].startswith("RUNTIME_EXCEPTION|file=driver.py|phase=factory|"), r)
+                        r["failure"]["diagnostic"].startswith("RUNTIME_EXCEPTION|file=driver.py|phase=factory|") or
+                        # D-022: inspect.signature raises on broken builtins (File 30 L35)
+                        r["failure"]["diagnostic"] == "ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RUNTIME_SIGNATURE", r)
         # Patching the worker's own functions changes only what the driver itself sends.
         worker = ("sysm, osm = reach()\nm = sysm.modules['__main__']\n"
                   "m.encode = lambda *a: '[\"s\",\"COMPLETE\"]'\n")
@@ -195,13 +197,15 @@ GOOD = {"create_driver": '[["seed","POSITIONAL_OR_KEYWORD",false]]',
         "step": '[["self","POSITIONAL_OR_KEYWORD",false],["cycle_index","POSITIONAL_OR_KEYWORD",false],'
                 '["outputs_after_edge","POSITIONAL_OR_KEYWORD",false]]',
         "check": '[["trace","POSITIONAL_OR_KEYWORD",false],["metadata","POSITIONAL_OR_KEYWORD",false]]'}
-CONSTRUCTED = '{"constructed":[true,' + GOOD["create_driver"] + "," + GOOD["step"] + "]}"
-LOADED = '{"loaded":' + GOOD["check"] + "}"
+CONSTRUCTED = '{"constructed":[true,' + GOOD["create_driver"] + "," + GOOD["step"] + "," + \
+    ",".join(GOOD[k].replace(",false]", "]") for k in ("create_driver", "step")) + "]}"
+LOADED = '{"loaded":[' + GOOD["check"] + "," + GOOD["check"].replace(",false]", "]") + "]}"
 
 
 def forgeries(answer, good):
     """The auditor's routes (A9-2) and others, as statements run before the worker measures."""
-    main = "w = collections._sys.modules['__main__']\n"
+    literal = [x.replace(",false]", "]") for x in good]  # D-022: also forge the inspect.signature report
+    main = f"w = collections._sys.modules['__main__']\nh = {literal!r}\nw.literal_signature = lambda f: h.pop(0)\n"
     frame = f"b = {answer!r}.encode()\n"
     return {
         "replace parameters": main + f"g = {list(good)!r}\nw.parameters = lambda f: g.pop(0)\n",
@@ -273,7 +277,7 @@ class ForgedRuntimeCheckTests(unittest.TestCase):
         self.assertEqual(self.diag(src + STEP.format(params="self, *a") + "def create_driver(seed):\n    return Driver()\n"),
                          "ENTRY_POINT_REJECT|file=driver.py|symbol=Driver.step|reason=RUNTIME_SIGNATURE")
 
-    def test_spoofed_signature_attribute_is_ignored(self):
+    def test_spoofed_signature_attribute_cannot_make_a_wrong_definition_right(self):
         src = (STEP.format(params="self, *a") + "def create_driver(seed):\n"
                "    def good(self, cycle_index, outputs_after_edge):\n        return None\n"
                "    Driver.step.__wrapped__ = good\n    Driver.step.__signature__ = good\n    return Driver()\n")
@@ -283,6 +287,41 @@ class ForgedRuntimeCheckTests(unittest.TestCase):
                    "    Driver.step = v\n    return Driver()\n")
         self.assertEqual(self.diag(dynamic), "ENTRY_POINT_REJECT|file=driver.py|symbol=Driver.step|reason=RUNTIME_SIGNATURE")
         self.assertIsNone(static_stages(dynamic))
+
+    # --- the literal inspect.signature (D-022; File 30 L35, L37, L39)
+    SPOOFS = {"auditor's object()": "{f}.__signature__ = object()\n",
+              "variadic Signature": "I = collections._sys.modules['inspect']\n"
+                                    "{f}.__signature__ = I.Signature([I.Parameter('a', I.Parameter.VAR_POSITIONAL)])\n",
+              "variadic __wrapped__": "def v(*a, **k):\n    return 'COMPLETE'\n{f}.__wrapped__ = v\n",
+              "Signature with a hostile parameters property":
+                  "I = collections._sys.modules['inspect']\n"
+                  "{f}.__signature__ = type('S', (I.Signature,), {{'parameters': property(lambda s: 1 / 0)}})()\n",
+              "__wrapped__ cycle": "{f}.__wrapped__ = {f}\n"}
+
+    def test_literal_signature_of_a_correct_definition_must_agree(self):
+        for name, spoof in self.SPOOFS.items():
+            for f in ("create_driver", "Driver.step"):
+                with self.subTest(spoof=name, function=f):
+                    src = ("import collections\n\n" + OK_STEP + "def create_driver(seed):\n"
+                           + block(spoof.format(f=f)) + "    return Driver()\n")
+                    self.assertIsNone(static_stages(src))
+                    self.assertEqual(self.diag(src), f"ENTRY_POINT_REJECT|file=driver.py|symbol={f}|reason=RUNTIME_SIGNATURE")
+            with self.subTest(spoof=name, function="check_trace"):
+                r = runtime.checker_invocation("import collections\n\n" + CHECKER_OK + "\n" + spoof.format(f="check_trace"), [], {}, 8.0)
+                self.assertEqual(r.diagnostic, "ENTRY_POINT_REJECT|file=checker.py|symbol=check_trace|reason=RUNTIME_SIGNATURE")
+
+    def test_checker_spoof_that_passes_the_static_stages(self):
+        checker = CHECKER_OK + "\ndef h(x=check_trace.__dict__.update(__signature__=object())):\n    return x\n"
+        self.assertIsNone(static_stages(OK_STEP + "def create_driver(seed):\n    return Driver()\n", checker))
+        self.assertEqual(runtime.checker_invocation(checker, [], {}, 8.0).diagnostic,
+                         "ENTRY_POINT_REJECT|file=checker.py|symbol=check_trace|reason=RUNTIME_SIGNATURE")
+
+    def test_agreeing_literal_signature_is_accepted(self):
+        """Control: both measurements run on plain sources, and an attribute that changes nothing is harmless."""
+        self.assertIsNone(self.diag(OK_STEP + "def create_driver(seed):\n    return Driver()\n"))
+        self.assertIsNone(self.diag(OK_STEP + "def create_driver(seed):\n    def w(self, cycle_index, outputs_after_edge):\n"
+                                    "        return 1\n    Driver.step.__wrapped__ = w\n    return Driver()\n"))
+        self.assertEqual(runtime.checker_invocation(CHECKER_OK, [], {}, 8.0).verdict, "PASS")
 
     def test_class_spoof_is_not_a_driver(self):
         src = OK_STEP + ("def create_driver(seed):\n    o = type('O', (), {'__class__': Driver})()\n"
@@ -525,7 +564,7 @@ class StaticSeparationTests(unittest.TestCase):
         tree = ast.parse((HERE.parent / "sandbox/artifact_worker.py").read_text("utf-8"))
         names = {a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
         names |= {n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)}
-        self.assertLessEqual(names, {"__future__", "builtins", "dis", "os", "sys", "types", "encodings", "importlib",
+        self.assertLessEqual(names, {"__future__", "builtins", "dis", "inspect", "os", "sys", "types", "encodings", "importlib",
                                      "pkgutil", "ctypes", "resource", "struct", "json", "time"})
 
 

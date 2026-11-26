@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import builtins
 import dis
+import inspect
 import os
 import sys
 import types
@@ -48,6 +49,8 @@ _b = {k: v for k, v in vars(builtins).items() if not k.startswith("__")}
 globals().update(_b)
 _real_import = builtins.__import__
 _read, _write = os.read, os.write
+_signature = inspect.signature
+_KINDS = tuple((k, k.name) for k in inspect._ParameterKind)
 _str_all = slice(None)
 
 
@@ -323,7 +326,7 @@ def inspect_source(name: str, source: str) -> dict:
 
 
 def parameters(func) -> str:
-    """Self-reported after execution (never trusted); __signature__ is ignored."""
+    """Code-object measurement after execution: self-reported, never trusted."""
     try:
         if type(func) is not types.FunctionType:
             return "null"
@@ -331,6 +334,18 @@ def parameters(func) -> str:
         return "null" if ps is None else "[" + ",".join(
             "[" + _quote(n) + "," + _quote(k) + "," + ("true" if d else "false") + "]" for n, k, d in ps) + "]"
     except Exception:
+        return "null"
+
+
+def literal_signature(func) -> str:
+    """File 30 L35/L37, literally (D-022): names and kinds from inspect.signature after import, or
+    null if it raises. It honours __signature__ and __wrapped__. Self-reported, never trusted."""
+    try:
+        out = []
+        for p in _signature(func).parameters.values():
+            out.append("[" + _quote(_plain(p.name)) + "," + _quote(next(n for k, n in _KINDS if k is p.kind)) + "]")
+        return "[" + ",".join(out) + "]"
+    except BaseException:
         return "null"
 
 
@@ -366,8 +381,10 @@ def main() -> None:
                 continue
             cls = getattr(module, "Driver", None)
             ok = type(cls) is type and cls in type.__dict__["__mro__"].__get__(type(instance))
-            send('{"constructed":[' + ("true" if ok else "false") + "," + parameters(module.create_driver) + ","
-                 + (parameters(cls.__dict__.get("step")) if ok else "null") + "]}")
+            factory = getattr(module, "create_driver", None)
+            step = cls.__dict__.get("step") if ok else None
+            send('{"constructed":[' + ("true" if ok else "false") + "," + parameters(factory) + "," + parameters(step)
+                 + "," + literal_signature(factory) + "," + literal_signature(getattr(cls, "step", None) if ok else None) + "]}")
         elif op == "step":
             try:
                 value = instance.step(msg["cycle_index"], msg["outputs"])
@@ -382,7 +399,7 @@ def main() -> None:
                 send(raised("import", exc))
                 continue
             check = getattr(module, "check_trace", None)
-            send('{"loaded":' + parameters(check) + "}")
+            send('{"loaded":[' + parameters(check) + "," + literal_signature(check) + "]}")
         elif op == "check":
             try:
                 value = check(msg["trace"], msg["metadata"])

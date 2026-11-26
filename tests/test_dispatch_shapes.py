@@ -28,7 +28,7 @@ for p in (HERE, REPO / "src", REPO / "runner"):
     sys.path.insert(0, str(p))
 
 import run_f18  # noqa: E402
-from adapter_contracts import CONTRACTS, DOMAINS  # noqa: E402
+from adapter_contracts import CONTRACTS, DOMAINS, LITERAL, MEANING, VALUE_SUPPORT  # noqa: E402
 from adapter_vectors import BLOCKED, BOUNDARIES, JUDGED_BY_RULE, OUT_OF_DOMAIN, PASSED, VECTORS  # noqa: E402
 from openvef import envelope, stage_map  # noqa: E402
 
@@ -84,6 +84,28 @@ def vector_problems(adapters, vectors, descs) -> list[str]:
             out.append(f"{name}: a vector is a fixture input")
         if not any(isinstance(e, str) or e not in expected for _, e in vs):
             out.append(f"{name}: no outcome differs from every fixture's")
+    return out
+
+
+def value_support_problems(contracts, support) -> list[str]:
+    """D-022 (audit A1-1): each selecting value's own quote contains the words listed for that value,
+    and those words support no other value of the adapter. LITERAL words spell the value; two
+    MEANING values may not share a quote, so one condition cannot support both a case and its opposite."""
+    out = [f"{a}: values without support {sorted(set(c['values']) ^ set(support.get(a, {})))}"
+           for a, c in contracts.items() if set(c["values"]) != set(support.get(a, {}))]
+    for a, rows in support.items():
+        values = contracts.get(a, {"values": {}})["values"]
+        for v, (how, words) in rows.items():
+            quote = values[v][2] if v in values else ""
+            if not words or words not in quote:
+                out.append(f"{a}.{v}: its quote does not contain the supporting words")
+            if how not in (LITERAL, MEANING) or (how == LITERAL and v.casefold() not in words.casefold()):
+                out.append(f"{a}.{v}: the words do not spell the value")
+            if any(w != v and (words in x[1] or x[1] in words) for w, x in rows.items()):
+                out.append(f"{a}.{v}: the words support another value")
+            if how == MEANING and any(w != v and x[2] == quote and rows.get(w, (how,))[0] == MEANING
+                                      for w, x in values.items()):
+                out.append(f"{a}.{v}: the quote is another value's")
     return out
 
 
@@ -207,6 +229,27 @@ class DispatchShapeTests(unittest.TestCase):
             for value, (tag, n, _) in c["values"].items():
                 with self.subTest(adapter=adapter, value=value):
                     self.assertIn((tag, n), lines)
+
+    def test_every_selecting_value_is_supported_by_its_own_quote(self):
+        """D-022 (audit A1-1)."""
+        self.assertEqual(value_support_problems(CONTRACTS, VALUE_SUPPORT), [])
+        self.assertEqual(set(VALUE_SUPPORT), set(CONTRACTS))
+        self.assertEqual(CONTRACTS["adapt_response"]["values"]["stop"][:2], ("36", 48))
+        self.assertEqual(CONTRACTS["adapt_response"]["values"]["length"][:2], ("02", 144))
+
+    def test_scan_detects_unsupported_values(self):
+        l144 = ("02", 144, "Provider finish reason explicitly reports max-token truncation")
+        good = {"a": {"values": {"length": l144, "stop": ("36", 48, "JSON without provider truncation status.")}}}
+        table = {"a": {"length": (MEANING, "explicitly reports max-token truncation"),
+                       "stop": (MEANING, "without provider truncation status")}}
+        self.assertEqual(value_support_problems(good, table), [])
+        old = {"a": {"values": {"length": l144, "stop": l144}}}  # the audited state: in the domain, wrong condition
+        self.assertTrue(value_support_problems(old, table))
+        for words in ("Provider finish reason", "explicitly reports max-token truncation", ""):
+            self.assertTrue(value_support_problems(old, {"a": {**table["a"], "stop": (MEANING, words)}}), words)
+        self.assertTrue(value_support_problems(good, {"a": {"length": table["a"]["length"]}}))
+        self.assertTrue(value_support_problems(good, {"a": {**table["a"], "stop": (LITERAL, "without provider truncation status")}}))
+        self.assertTrue(value_support_problems(good, {}))
 
     def test_every_property_is_checked_against_its_domain(self):
         self.assertEqual({a: set(d) for a, d in OUT_OF_DOMAIN.items()}, {a: set(d) for a, d in DOMAINS.items()})

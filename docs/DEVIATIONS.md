@@ -173,9 +173,12 @@ Not an accepted deviation: recorded for the auditor, at Krishika's instruction (
    report it falsely. Closed only for sources the evaluator can prove from their text (PROVEN).
 2. **Signatures after execution (L35, L37).** The definitions are measured where no artifact code has run. A replacement
    made at run time is seen only by self-report, with the same limit.
-3. **"after import" (L39) and `inspect.signature` (L35).** The trusted measurement is made on compiled code
-   objects, before and without import, because import can run artifact expressions. It gives the same names, kinds and
-   counts for a plain undecorated `def`, the only form L35 and L37 allow. The check after import is the self-reported one.
+3. **"after import" (L39) and `inspect.signature` (L35, L37): both measurements are taken (D-022).** The trusted one is made
+   on compiled code objects, before and without import, because import can run artifact expressions. The literal
+   `inspect.signature` is called after import in the artifact process; if it raises, or its names, kinds or counts
+   differ from the trusted measurement, the artifact is rejected (`RUNTIME_SIGNATURE`). Trusted and self-reported must
+   agree. The literal result is self-reported, so the residual remains: outside the PROVEN fragment an artifact
+   can still forge it.
 4. **Consequence:** an invalid artifact may be counted valid. No trace, verdict or other artifact is affected
    ([sandbox.md](sandbox.md) "Runtime checks"). The proof rests on CPython behaving as documented, and its
    list of allowed names was written by the implementation author.
@@ -189,4 +192,4 @@ Not an accepted deviation: recorded for the auditor, at Krishika's instruction (
   count. Analysis rule in [F1-F17-plan.md](F1-F17-plan.md); see also [sandbox.md](sandbox.md) "Runtime checks".
 
 **Not re-audited.** D-020 takes the open owner decision but does not close A9-2; the forgery residual
-above stands, and D-019 + D-020 still require re-audit.
+above stands, and D-019 + D-020 still require re-audit. D-022 (item 3) is not re-audited and does not close A9-2 either.

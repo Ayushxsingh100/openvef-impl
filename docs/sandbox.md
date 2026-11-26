@@ -152,18 +152,25 @@ closures, or write to the pipe. So:
 | Check | Where measured | Can artifact code forge it? |
 |---|---|---|
 | `create_driver`, `Driver.step`, `check_trace` as defined: names, kinds, counts, defaults, plain `def`, bound once | a fresh confined process that only compiles the source (`inspect_source`) | No: no artifact code has run there |
-| the same functions as they are after execution (replaced at run time) | the artifact process, self-reported; a wrong report rejects | **Yes** |
+| the same functions' code objects as they are after execution (replaced at run time) | the artifact process, self-reported; a wrong report rejects | **Yes** |
+| the literal `inspect.signature` of the same functions, after import (File 30 L35, L37, L39; D-022): must not raise, and its names, kinds and counts must equal the first row's | the artifact process, self-reported; a wrong report rejects | **Yes** |
 | `create_driver(seed)` returned a `Driver` | the artifact process, self-reported; a wrong report rejects | **Yes** |
 | driver vectors, checker returns, verdicts | computed by the evaluator from plain data | No; the data is the artifact's own answer |
 
+**Both measurements are taken (D-022).** File 30 L35 and L37 name `inspect.signature`, so the worker calls it after
+import, as well as the trusted compile-only measurement. `__signature__` or `__wrapped__` that makes it raise or disagree is
+`RUNTIME_SIGNATURE`; one that agrees changes nothing. The comparison covers names, kinds and counts, as L35 says (A-058).
+The literal result is self-reported: outside the PROVEN fragment an artifact can still forge it, so the
+SELF_REPORTED residual below remains. An artifact that breaks its own builtins can now fail here too.
+
 **Static proof.** `src/openvef/runtime_basis.py` marks each source PROVEN or SELF_REPORTED from its text. PROVEN
 means the source uses only listed builtins and module names, no dunder, frame or namespace access, never
-rebinds or passes on `Driver` or `create_driver`, and returns only `Driver()` objects, so the two forgeable rows
+rebinds or passes on `Driver` or `create_driver`, and returns only `Driver()` objects, so the three forgeable rows
 hold by construction, if CPython behaves as documented. SELF_REPORTED means not shown; it is not evidence of forgery.
 F18 runs record it per fixture (`runtime_checks`) and list the rest (`runtime_checks_self_reported`).
 
 **Residual (not closed).** A SELF_REPORTED driver can return an object that is not a `Driver`, or replace
-`Driver.step` at run time, and report otherwise; a SELF_REPORTED checker can replace `check_trace` likewise.
+`Driver.step` (or what `inspect.signature` says of it) at run time, and report otherwise; a SELF_REPORTED checker can replace `check_trace` likewise.
 `test_residual_forged_state_after_execution` pins this.
 - **Consequence:** a structurally invalid artifact can be counted valid (no `ENTRY_POINT_REJECT`, `RETURN_TYPE` or
   `RUNTIME_SIGNATURE`), which affects the validity endpoint for that artifact.

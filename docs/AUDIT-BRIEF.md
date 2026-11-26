@@ -33,7 +33,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   author of the code also chose the reading of "defined" (A-053), and not-rejected outcomes
   count as differing outcomes for M18, M19 and M28.
 
-- **Three earlier audits, all by OpenAI GPT-6; reports and notes are in `docs/reviews/`.** The
+- **Four earlier audits (the fourth is under "Re-audit #5" below), all by OpenAI GPT-6; reports and notes are in `docs/reviews/`.** The
   second (bundle `34bc810934c4865eede3142e876efb54bd83de8ed10ec177f4f2c607744ec0c0`) ended **NOT
   CLEARED**: BLOCKERs A1-1 (M18) and A9-1, MAJOR A4-1 (and A8-2, a cross-reference). It found A8-1
   resolved. Judge each yourself. The notes are by the implementation author.
@@ -54,7 +54,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
     expressions. Is that sound against File 30 L35 and L39?
   - A-057 (`stop`) was owner review pending; it is now approved as decided (D-020). P11b depends on it.
 
-- **Re-audit #4 is scoped to D-019 + D-020 (added 25 Nov 2026, Krishika), with the D-021 fixes below.** All prior findings must
+- **Re-audit #4 (done; kept for reference) was scoped to D-019 + D-020 (added 25 Nov 2026, Krishika), with the D-021 fixes below.** All prior findings must
   stay fixed; re-audit the earlier decisions as you see fit, but prioritise:
   - **(a)** `src/openvef/runtime_basis.py`'s allow-list: find any source it marks **PROVEN** that can
     still forge the `create_driver` return type, replace `Driver.step` or `check_trace`, or reach
@@ -76,6 +76,20 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   `results.jsonl` (`runner/run_f18.py` `self_reported_parts`; `tests/test_self_reported_label.py`), and
   `tests/test_audit_bundle.py` checks the bundle builder's behaviour. No verdict changed. **Not** re-audited.
   The D-020 bundle (`0e8ea3f2…`) was not sent to an auditor, as Krishika states.
+- **Re-audit #5 is scoped to D-022, plus regression of prior findings** (added at Krishika's instruction). The
+  fourth audit (GPT-6, bundle `93b249a6…1907`) ended **NOT CLEARED**: 0 BLOCKER, MAJORs A1-1 and A9-2, 8
+  LIMITATION. Report and note: `docs/reviews/implementation-reaudit4-gpt6-2026-11-26.md` and its `-NOTE.md`.
+  **D-022 has not been audited by anyone.** Judge:
+  - **(a) A1-1:** `stop` now cites File 36 L48. Does that text support it? L48 is the catalog row of the only
+    fixture that uses `stop` (P11b), and it does not spell `stop`. `VALUE_SUPPORT` in
+    `runner/adapter_contracts.py` was written by the implementation author: check every row against its quote, and
+    look for a wrong citation that `value_support_problems` would accept.
+  - **(b) A9-2:** `literal_signature` (`sandbox/artifact_worker.py`) calls `inspect.signature` after import;
+    `runtime_signature_ok` (`sandbox/artifact_proc.py`) requires it to agree with the trusted measurement. Look for a correct
+    definition whose `inspect.signature` raises or differs and is still accepted inside the static stages. The result is
+    self-reported, so forgery outside the PROVEN fragment **remains open** and nothing here says otherwise. Is A-058 (names,
+    kinds and counts only; decided by the author, approved as decided by Krishika) right?
+  - **(c) Regression:** A1-1, A4-1, A8-1/A8-2, A9-1, A9-2 and the wall-clock findings under the current code.
 - **D-015 to D-018 were covered by the third audit.** Judge them again as you see fit:
   - A9-1 (D-015): artifact code now runs in `sandbox/artifact_worker.py`, driven by
     `artifact_proc.py`. Attack both. Is the seccomp list tight, is anything inherited, can a frame be

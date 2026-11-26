@@ -38,7 +38,7 @@ CONTRACTS = {
                    "response_object": ("30", 7, "The canonical JSON Schema is `34_OpenVEF_Response_Schema_v1.0.json`"),
                    "provider_finish_reason": ("02", 144, "Provider finish reason explicitly reports max-token truncation")},
         "values": {"length": ("02", 144, "Provider finish reason explicitly reports max-token truncation"),
-                   "stop": ("02", 144, "Provider finish reason explicitly reports max-token truncation")},
+                   "stop": ("36", 48, "Syntactically truncated JSON without provider truncation status.")},
         "outcome": _MAP},
     "adapt_source_pair": {
         "inputs": {"driver_source": ("30", 27, "For file-local stages, process each source file in this order"),
@@ -53,9 +53,9 @@ CONTRACTS = {
         "inputs": {"events": ("02", 139, "The first applicable row after the exact evaluation order below controls")},
         "values": {
             "schema_reject": ("02", 143, "`SCHEMA_REJECT|pointer=<JSON_POINTER>`"),
-            "output_truncated": ("02", 144, "Provider finish reason explicitly reports max-token truncation"),
-            "import_not_allowed": ("02", 147, "Disallowed import form/root"),
-            "compile_error": ("02", 149, "Driver compile error"),
+            "output_truncated": ("02", 144, "Provider finish reason explicitly reports max-token truncation | `PARSE_SCHEMA` | `OUTPUT_TRUNCATED`"),
+            "import_not_allowed": ("02", 125, "a disallowed root uses the separate `IMPORT_NOT_ALLOWED|module=<OFFENDING_ROOT>` diagnostic"),
+            "compile_error": ("02", 149, "Driver compile error | `COMPILE_DRIVER` | `COMPILE_ERROR`"),
             "driver_runtime": ("02", 151, "Driver factory or `step` raises"),
             "driver_vector": ("02", 152, "Driver return value/vector is invalid"),
             "driver_watchdog": ("02", 153, "Driver step watchdog expires"),
@@ -90,9 +90,12 @@ CONTRACTS = {
     "adapt_runtime_signature": {
         "inputs": {"runtime_signature": ("30", 35, "Runtime `inspect.signature` must confirm the same parameter "
                                                    "names/kinds/counts")},
-        "values": {"create_driver": ("30", 35, "It has exactly one required positional-or-keyword parameter named `seed`"),
-                   "Driver.step": ("30", 35, "named `self`, `cycle_index`, `outputs_after_edge`"),
-                   "check_trace": ("30", 37, "parameters named `trace` and `metadata`")},
+        "values": {"create_driver": ("30", 35, "function named `create_driver` must exist. It has exactly one required "
+                                             "positional-or-keyword parameter named `seed`"),
+                   "Driver.step": ("30", 35, "`Driver.step` has exactly three required positional-or-keyword parameters named "
+                                           "`self`, `cycle_index`, `outputs_after_edge`"),
+                   "check_trace": ("30", 37, "function named `check_trace` must exist, with exactly two required positional-or-keyword "
+                                           "parameters named `trace` and `metadata`")},
         "outcome": [("02", 148, "inspect-signature mismatch")]},
     "adapt_vector_keys": {
         "inputs": {"driver_return": ("30", 83, "A return value is either the exact string `COMPLETE` or a dictionary"),
@@ -103,6 +106,39 @@ CONTRACTS = {
                                               "mismatch before first raw-output divergence is terminal driver "
                                               "nondeterminism")},
         "values": {}, "outcome": [("02", 156, "Before first raw output divergence, paired next-input schedules differ")]},
+}
+
+# D-022 (audit A1-1): for every selecting value, the words of its own citation that support that
+# value, and how. LITERAL: the words spell the value (letter case aside). MEANING: the pack states
+# the case but spells no value; the spelling is only a carrier (A-053). Every quoted phrase
+# belongs to one value of its adapter only.
+LITERAL, MEANING = "LITERAL", "MEANING"
+_RUN_SUPPORT = {
+    "timeout": (MEANING, "a wall-clock watchdog is `CHECKER_TIMEOUT|phase=null_check`"),
+    "CHECKER_RUNTIME_ERROR": (LITERAL, "`CHECKER_RUNTIME_ERROR|class=<EXCEPTION_CLASS>`"),
+    "return_invalid": (MEANING, "A checker return error is classified"),
+    "PASS": (LITERAL, "`PASS`"), "FAIL": (LITERAL, "`FAIL`")}
+VALUE_SUPPORT = {
+    "adapt_response": {"length": (MEANING, "explicitly reports max-token truncation"),
+                       "stop": (MEANING, "without provider truncation status")},
+    "adapt_source_pair": {}, "adapt_null_runs": _RUN_SUPPORT, "adapt_checker_runs": _RUN_SUPPORT,
+    "adapt_events": {
+        "schema_reject": (LITERAL, "`SCHEMA_REJECT|pointer=<JSON_POINTER>`"),
+        "output_truncated": (LITERAL, "`OUTPUT_TRUNCATED`"),
+        "import_not_allowed": (LITERAL, "`IMPORT_NOT_ALLOWED|module=<OFFENDING_ROOT>`"),
+        "compile_error": (LITERAL, "`COMPILE_ERROR`"),
+        "driver_runtime": (MEANING, "Driver factory or `step` raises"),
+        "driver_vector": (MEANING, "Driver return value/vector is invalid"),
+        "driver_watchdog": (MEANING, "Driver step watchdog expires"),
+        "simulator_error": (MEANING, "Simulator error on RTL or null run"),
+        "trace_integrity": (MEANING, "Harness trace-integrity fault"),
+        "driver.py": (LITERAL, "`driver.py`"), "checker.py": (LITERAL, "`checker.py`")},
+    "adapt_halt_recurrence": {"FIFO": (LITERAL, "`FIFO`"), "UART": (LITERAL, "`UART`")},
+    "adapt_clause_ids": {}, "adapt_reserved_headings": {}, "adapt_rendered": {},
+    "adapt_runtime_signature": {"create_driver": (LITERAL, "function named `create_driver` must exist"),
+                                "Driver.step": (LITERAL, "`Driver.step` has exactly three required"),
+                                "check_trace": (LITERAL, "function named `check_trace` must exist")},
+    "adapt_vector_keys": {}, "adapt_paired_runs": {},
 }
 
 _HEADINGS = {10: "[Task instruction]", 15: "[Design specification]", 20: "[Port manifest]",
@@ -118,9 +154,9 @@ _RESP_DOMAIN = {"lines": [("30", 7)], "terms": ["one UTF-8 JSON object", "34_Ope
 DOMAINS = {
     "adapt_response": {
         "raw_response_utf8": _RESP_DOMAIN, "raw_response_base64": _RESP_DOMAIN, "response_object": _RESP_DOMAIN,
-        "provider_finish_reason": {  # "stop" is the complement of L144's condition (A-057)
-            "lines": [("02", 144), ("30", 7)],
-            "terms": ["explicitly reports max-token truncation", "Provider max-token truncation is `OUTPUT_TRUNCATED`"]}},
+        "provider_finish_reason": {  # "stop": no truncation status (36 L48; A-057, D-022)
+            "lines": [("02", 144), ("30", 7), ("36", 48)],
+            "terms": ["explicitly reports max-token truncation", "without provider truncation status", "Provider max-token truncation is `OUTPUT_TRUNCATED`"]}},
     "adapt_source_pair": {
         "driver_source": {"lines": [("30", 27)], "terms": ["strict UTF-8 decode", "`driver.py`"]},
         "checker_source": {"lines": [("30", 27)], "terms": ["strict UTF-8 decode", "`checker.py`"]}},

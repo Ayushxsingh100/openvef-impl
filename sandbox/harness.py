@@ -30,7 +30,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # `-I` leaves it off
-from artifact_proc import ArtifactFailed, ArtifactHostError, ArtifactProcess, inspect_source, signature_ok  # noqa: E402
+from artifact_proc import ArtifactFailed, ArtifactHostError, ArtifactProcess, inspect_source, runtime_signature_ok  # noqa: E402
 
 RESULT_MARKER = "OPENVEF_SANDBOX_RESULT "
 
@@ -54,21 +54,21 @@ def construct(artifact: ArtifactProcess, driver_source: str, seed: int):
     return-type and signature checks here. Returns a failure record or None.
 
     D-019: the signatures that must be right are those of `trusted`, measured where no artifact
-    code has run. The artifact process's own report is also required to be right, so it can
-    reject but never accept. The return type is known only from that report (docs/sandbox.md
+    code has run. The artifact process's own report (code objects, and the literal
+    inspect.signature of File 30 L35/L37, D-022) must agree, so it can reject but never accept. The return type is known only from that report (docs/sandbox.md
     "Runtime checks"); openvef.runtime_basis says which artifacts cannot have forged it."""
     trusted = inspect_source("driver", driver_source)
     try:
-        type_ok, create_params, step_params = artifact.construct(driver_source, seed)
+        type_ok, create, step = artifact.construct(driver_source, seed)
     except ArtifactFailed as exc:  # A-034: import is the first execution of driver code
         return failure("DRIVER_RUNTIME", "RUNTIME_EXCEPTION",
                        f"RUNTIME_EXCEPTION|file=driver.py|phase=factory|class={exc.exception_class}")
     # A-035: return type, then create_driver's signature, then Driver.step's.
     if not type_ok:
         return entry_reject("driver.py", "create_driver", "RETURN_TYPE")
-    if not (signature_ok(trusted.get("create_driver"), "create_driver") and signature_ok(create_params, "create_driver")):
+    if not runtime_signature_ok(trusted.get("create_driver"), *create, "create_driver"):
         return entry_reject("driver.py", "create_driver", "RUNTIME_SIGNATURE")
-    if not (signature_ok(trusted.get("Driver.step"), "Driver.step") and signature_ok(step_params, "Driver.step")):
+    if not runtime_signature_ok(trusted.get("Driver.step"), *step, "Driver.step"):
         return entry_reject("driver.py", "Driver.step", "RUNTIME_SIGNATURE")
     return None
 
@@ -107,9 +107,9 @@ def task_checker(request: dict) -> dict:
     trusted = inspect_source("checker", request["checker_source"])
     with ArtifactProcess() as artifact:
         try:
-            params = artifact.load_checker(request["checker_source"])
+            report = artifact.load_checker(request["checker_source"])
             # A-035: check_trace's runtime signature is checked before the first call.
-            if not (signature_ok(trusted.get("check_trace"), "check_trace") and signature_ok(params, "check_trace")):
+            if not runtime_signature_ok(trusted.get("check_trace"), *report, "check_trace"):
                 return entry_reject("checker.py", "check_trace", "RUNTIME_SIGNATURE")
             value = artifact.check(request["trace"], request["metadata"])
         except ArtifactFailed as exc:  # A-034

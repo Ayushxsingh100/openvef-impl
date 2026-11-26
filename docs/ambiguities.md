@@ -1798,3 +1798,39 @@ AUDIT-READINESS.md. The D-020 bundle (`0e8ea3f2…`) was **not sent to the audit
    is triaged.
 
 Not re-audited. F18 is not passed.
+
+## D-022 — Response to re-audit #4 (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) triage of re-audit #4 (GPT-6; NOT CLEARED,
+0 BLOCKER, 2 MAJOR, 8 LIMITATION). No pack rule changes. Takes effect under D-008; Ayush's
+ratification stays the single entry in AUDIT-READINESS.md. The freeze was lifted for D-022 only.
+
+1. **A1-1:** `stop` now cites File 36 L48, which is also in the `provider_finish_reason` domain; `length`
+   keeps File 02 L144. `VALUE_SUPPORT` (`runner/adapter_contracts.py`) lists, for each selecting value, the
+   words of its own quote that support it; `value_support_problems` (`tests/test_dispatch_shapes.py`) enforces it,
+   and the audited state fails it. Six other quotes were lengthened or moved so that they name their value.
+   **Limits:** L48 is the catalog row of the one fixture that uses `stop`, and it states the case
+   ("without provider truncation status"), not the spelling `stop` (A-053, A-057). The test checks that the
+   words are in the quote and belong to one value; that they support it is the author's judgement.
+2. **A9-2:** the literal `inspect.signature` of File 30 L35/L37 is called after import in the artifact process, in
+   addition to the trusted measurement; both must agree ([sandbox.md](sandbox.md) "Runtime checks"). Still
+   self-reported: the SELF_REPORTED residual is **not closed**.
+3. **F18:** no fixture status changed (checked before committing).
+4. **AUDIT-BRIEF.md:** re-audit #5 is scoped to D-022 and regression of prior findings.
+
+Not re-audited. F18 is not passed.
+
+## A-058 — Defaults seen only by `inspect.signature` (DECIDED BY CLAUDE — approved under D-022)
+
+> [30 L35] "Runtime `inspect.signature` must confirm the same parameter names/kinds/counts."
+
+L35 also requires parameters with no default. Readings: (i) the runtime check compares names, kinds and
+counts only; (ii) it also compares defaults. They differ only when a correct definition, with no defaults in its
+code object report, carries a `__signature__` or `__wrapped__` that shows a default. (A default in the definition, or one set
+at run time, is rejected by the other two measurements.)
+
+**Decision (decided by Claude under standing delegation, owner review pending): (i).** L35 and L37 list what
+the call must confirm, and defaults are not in the list. D-022 uses the same words. No F18 fixture depends on it.
+
+**Approved by Krishika as decided**, on Claude (claude.ai) review: L35 says names/kinds/counts, and no fixture
+depends on defaults. (Takes effect under D-008; Ayush's ratification stays the single entry in AUDIT-READINESS.md.)

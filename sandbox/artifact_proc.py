@@ -82,6 +82,11 @@ def _is_params(value: Any) -> bool:
         and isinstance(p[2], bool) for p in value))
 
 
+def _is_literal(value: Any) -> bool:
+    return value is None or (isinstance(value, list) and all(
+        isinstance(p, list) and len(p) == 2 and isinstance(p[0], str) and isinstance(p[1], str) for p in value))
+
+
 def inspect_source(name: str, source: str) -> dict:
     """{symbol: parameters or None} from a fresh process that compiles and never executes the
     source (D-019). No artifact code has run in it, so its answer can be trusted."""
@@ -98,6 +103,13 @@ def inspect_source(name: str, source: str) -> dict:
 def signature_ok(params: Optional[list], symbol: str) -> bool:
     """File 30 L35/L37: the same parameter names, kinds and counts, no defaults."""
     return params == [[n, "POSITIONAL_OR_KEYWORD", False] for n in REQUIRED_SIGNATURES[symbol]]
+
+
+def runtime_signature_ok(trusted: Optional[list], reported: Optional[list], literal: Optional[list], symbol: str) -> bool:
+    """The trusted definition and the code object after execution are as required, and
+    inspect.signature after import did not raise and gives the trusted names/kinds/counts (D-022)."""
+    return (signature_ok(trusted, symbol) and signature_ok(reported, symbol)
+            and literal == [p[:2] for p in trusted])
 
 
 class ArtifactProcess:
@@ -165,23 +177,25 @@ class ArtifactProcess:
             raise ArtifactFailed(phase, "Exception") from exc
 
     # --- operations
-    def construct(self, source: str, seed: int) -> tuple[bool, Optional[list], Optional[list]]:
-        """Import and create_driver: (return type ok, create_driver params, step params), all
-        self-reported after artifact code ran: usable only against the artifact (D-019)."""
+    def construct(self, source: str, seed: int) -> tuple[bool, tuple, tuple]:
+        """Import and create_driver: (return type ok, create_driver, step), each symbol as
+        (code-object parameters, inspect.signature), all self-reported after artifact code
+        ran: usable only against the artifact (D-019, D-022)."""
         facts = self._call("factory", {"op": "driver", "source": source, "seed": seed}, "constructed")
-        if not (isinstance(facts, list) and len(facts) == 3 and isinstance(facts[0], bool)
-                and _is_params(facts[1]) and _is_params(facts[2])):
+        if not (isinstance(facts, list) and len(facts) == 5 and isinstance(facts[0], bool)
+                and _is_params(facts[1]) and _is_params(facts[2]) and _is_literal(facts[3]) and _is_literal(facts[4])):
             raise ArtifactFailed("factory", "Exception")
-        return facts[0], facts[1], facts[2]
+        return facts[0], (facts[1], facts[3]), (facts[2], facts[4])
 
     def step(self, cycle_index: int, outputs: dict) -> Any:
         return self._call("step", {"op": "step", "cycle_index": cycle_index, "outputs": outputs}, "value")
 
-    def load_checker(self, source: str) -> Optional[list]:
-        params = self._call("import", {"op": "checker", "source": source}, "loaded")
-        if not _is_params(params):
+    def load_checker(self, source: str) -> tuple:
+        """(code-object parameters, inspect.signature) of check_trace, self-reported."""
+        facts = self._call("import", {"op": "checker", "source": source}, "loaded")
+        if not (isinstance(facts, list) and len(facts) == 2 and _is_params(facts[0]) and _is_literal(facts[1])):
             raise ArtifactFailed("import", "Exception")
-        return params
+        return facts[0], facts[1]
 
     def check(self, trace: Any, metadata: Any) -> Any:
         return self._call("check", {"op": "check", "trace": trace, "metadata": metadata}, "value")
