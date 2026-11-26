@@ -19,7 +19,8 @@
 #   evidence/controls-<UTC>. The runner script comes from this fixed list only.
 set -euo pipefail
 
-RUN_CLASS=${1:?usage: run_f18_container.sh <run_class> [f18|controls]}
+RUN_CLASS=${1:?usage: run_f18_container.sh <run_class> [f18|controls] [v1.3.6|v1.3.7-candidate]}
+PACK=${3:-v1.3.6}   # D-024: the candidate pack is for F18 only; v1.3.6 stays the default
 case "${2:-f18}" in
   f18) RUNNER_SCRIPT=run_f18.py; OUT_PREFIX=run ;;
   controls) RUNNER_SCRIPT=run_controls.py; OUT_PREFIX=controls ;;
@@ -40,7 +41,13 @@ HOST_ENV_B64=$(
   done | base64 -w0
 )
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-BASELINE="$REPO/baseline/OpenVEF_Planning_v1_3_6"
+case "$PACK" in
+  v1.3.6) BASELINE="$REPO/baseline/OpenVEF_Planning_v1_3_6"; PACK_ARGS=() ;;
+  v1.3.7-candidate)
+    [ "$RUNNER_SCRIPT" = run_f18.py ] || { echo "the candidate pack is for F18 runs only" >&2; exit 2; }
+    BASELINE="$REPO/proposals/v1.3.7/pack"; PACK_ARGS=(--pack v1.3.7-candidate); OUT_PREFIX=run-v137c ;;
+  *) echo "unknown pack '$PACK'; expected v1.3.6 or v1.3.7-candidate" >&2; exit 2 ;;
+esac
 HARNESS_DIR="$REPO/sandbox"
 
 # --- image -------------------------------------------------------------------------
@@ -65,7 +72,7 @@ read_args() {  # read_args <file> -> one flag per line, comments and blanks remo
 }
 
 GIT_COMMIT=$(git -C "$REPO" rev-parse HEAD)
-if [ -n "$(git -C "$REPO" status --porcelain -- src runner sandbox requirements.lock design docs/fifo-spec-v0.2.md)" ]; then
+if [ -n "$(git -C "$REPO" status --porcelain -- src runner sandbox requirements.lock design docs/fifo-spec-v0.2.md proposals/v1.3.7/pack)" ]; then
   GIT_COMMIT="$GIT_COMMIT+UNCOMMITTED_CHANGES"
 fi
 
@@ -132,7 +139,7 @@ cleanup() { docker rm -f "$RNAME" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 coproc RUNNER { docker run "${RUNNER_FLAGS[@]}" "${ENV_ARGS[@]}" "$TAG" \
-  python -I "/opt/openvef-repo/runner/$RUNNER_SCRIPT" /baseline /evidence "$RUN_CLASS"; }
+  python -I "/opt/openvef-repo/runner/$RUNNER_SCRIPT" /baseline /evidence "$RUN_CLASS" "${PACK_ARGS[@]}"; }
 RUNNER_IN=${RUNNER[1]}
 RPID=$RUNNER_PID
 while IFS= read -r line <&"${RUNNER[0]}"; do

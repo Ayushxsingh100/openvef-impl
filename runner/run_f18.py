@@ -8,8 +8,11 @@ Rules (CLAUDE.md): the code path is chosen from the fixture INPUT shape only, ne
 from its ID or expected output. A fixture whose path reaches a stage that is not yet
 implemented is reported NOT_IMPLEMENTED -- never PASS.
 
-Usage (evidence, D-002a):  runner/run_f18_container.sh <run_class>
-Usage (development only):  python3.11 -I runner/run_f18.py <baseline_root> <evidence_dir> <run_class>
+Usage (evidence, D-002a):  runner/run_f18_container.sh <run_class> [f18 [<pack>]]
+Usage (development only):  python3.11 -I runner/run_f18.py <pack_root> <evidence_dir> <run_class> [--pack <pack>]
+
+D-024: <pack> is `v1.3.6` (default, the baseline) or `v1.3.7-candidate` (proposals/v1.3.7/pack, v1.3.7 CANDIDATE,
+not audited). The pack selects the pinned index hash and the adapter table; v1.3.6 behaviour is unchanged.
 """
 from __future__ import annotations
 
@@ -44,6 +47,7 @@ from openvef.ledger import HaltSignature, SignatureDomainError  # noqa: E402
 from openvef.stage_map import (EventError, NotDetermined, adjudicate_checker, first_event,  # noqa: E402
                                outcome_from_record, paired_run_failure, runtime_signature_failure, validate_vector)
 from openvef.source_ast import UnsettledSpec, check_sources  # noqa: E402
+import adapters_v137  # noqa: E402  (same directory; D-024 candidate-only rows)
 
 INDEX_REL = "41_F18_Fixture_Inputs/fixture-index.json"
 INDEX_SHA256 = "f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54"
@@ -72,10 +76,13 @@ class IntegrityError(Exception):
     pass
 
 
+ACTIVE_INDEX_SHA256 = INDEX_SHA256  # D-024: set by main() from --pack
+
+
 def load_index(root: Path) -> list[dict]:
     index_path = root / INDEX_REL
     raw = index_path.read_bytes()
-    if sha256_bytes(raw) != INDEX_SHA256:
+    if sha256_bytes(raw) != ACTIVE_INDEX_SHA256:
         raise IntegrityError(f"fixture index SHA-256 mismatch: {sha256_bytes(raw)}")
     fixtures = json.loads(raw)["fixtures"]
     ids = [f["fixture_id"] for f in fixtures]
@@ -383,10 +390,21 @@ ADAPTERS = (
 )
 
 
-def find_adapters(inp: dict) -> list:
-    """Every ADAPTERS row whose key sets fit the input (at most one)."""
+# D-024: the pack selects the table. v1.3.7-candidate adds rows whose contracts cite candidate text only
+# (runner/adapters_v137.py); v1.3.6 uses ADAPTERS unchanged.
+PACKS = {
+    "v1.3.6": {"index_sha256": INDEX_SHA256, "adapters": ADAPTERS, "label": None},
+    "v1.3.7-candidate": {"index_sha256": "cd87c9c8964327e0dd5542bd2ff78575d49674c892e426da25fd523f81a47cf4",
+                         "adapters": ADAPTERS + adapters_v137.ROWS, "label": "v1.3.7 CANDIDATE, not audited",
+                         "manifest": "SHA256SUMS-v1.3.7-candidate.txt"},
+}
+ADAPTER_TABLE = ADAPTERS  # set by main() from --pack
+
+
+def find_adapters(inp: dict, table=None) -> list:
+    """Every row of the active table whose key sets fit the input (at most one)."""
     keys = set(inp)
-    return [row for row in ADAPTERS if row[0] <= keys <= row[0] | row[1]]
+    return [row for row in (ADAPTER_TABLE if table is None else table) if row[0] <= keys <= row[0] | row[1]]
 
 
 def dispatch(desc: dict, validator) -> Failure | dict | None:
@@ -453,8 +471,23 @@ def self_reported_parts(note: str, basis: dict | None) -> tuple[str, dict, list]
     return note, extra, sr
 
 
+def parse_args(argv: list[str]) -> tuple[Path, Path, str, str]:
+    args = list(argv[1:])
+    pack = "v1.3.6"
+    if "--pack" in args:
+        i = args.index("--pack")
+        pack = args[i + 1]
+        del args[i:i + 2]
+    if len(args) != 3 or pack not in PACKS:
+        raise SystemExit(f"usage: run_f18.py <pack_root> <evidence_dir> <run_class> [--pack {{{','.join(PACKS)}}}]")
+    return Path(args[0]), Path(args[1]), args[2], pack
+
+
 def main() -> int:
-    root, evidence_root, run_class = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+    global ADAPTER_TABLE, ACTIVE_INDEX_SHA256
+    root, evidence_root, run_class, pack = parse_args(sys.argv)
+    pack_info = PACKS[pack]
+    ADAPTER_TABLE, ACTIVE_INDEX_SHA256 = pack_info["adapters"], pack_info["index_sha256"]
     if broker_mode():  # D-002a: the broker created and mounted the (empty) run directory
         started = os.environ["OPENVEF_RUN_STARTED"]
         out_dir = evidence_root
@@ -487,7 +520,7 @@ def main() -> int:
         "python_executable_sha256": py_sha,
         "platform": platform.platform(),
         "machine": platform.machine(),
-        "fixture_index_sha256": INDEX_SHA256,
+        "fixture_index_sha256": pack_info["index_sha256"],
         "response_schema_sha256": SCHEMA_SHA256,
         "distributions": {name: installed_version(name) for name in PINNED_DISTRIBUTIONS},
         "git_commit": git_commit(),
@@ -495,6 +528,10 @@ def main() -> int:
         "command": [sys.executable, *sys.argv],
         "sandbox": SANDBOX,
     }
+    if pack_info["label"]:  # D-024: v1.3.6 records are unchanged; a candidate run says what it ran
+        meta["pack"] = pack
+        meta["pack_label"] = pack_info["label"]
+        meta["pack_manifest_sha256"] = sha256_file(root / pack_info["manifest"])
 
     global SIM, SIM_UNAVAILABLE, RUNTIME_BASIS
     if SANDBOX is not None:
@@ -529,6 +566,8 @@ def main() -> int:
             note, extra, sr = self_reported_parts(note, RUNTIME_BASIS)
             rec = {"fixture_id": entry["fixture_id"], "descriptor_sha256": entry["sha256"], "status": status,
                    "expected": expected, "actual": actual, "note": note, **extra}
+            if pack_info["label"]:
+                rec["pack_label"] = pack_info["label"]
             self_reported.extend(f"{entry['fixture_id']}:{name}" for name in sr)
             sim_details = PROVISIONAL.pop(id(desc), None)
             if sim_details is not None and SIM["provisional"]:  # reached L166 (7)-(11); items still open
@@ -555,7 +594,8 @@ def main() -> int:
                "deviation_labels": sorted({c["label"] for c in SIM["cleared"]}) if SIM else [],
                "results_sha256": sha256_file(out_dir / "results.jsonl")}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"out_dir": str(out_dir), "run": f"run-{started}", "counts": counts}), file=sys.stderr)
+    print(json.dumps({"out_dir": str(out_dir), "run": f"run-{started}", "pack": pack,
+                      "counts": counts}), file=sys.stderr)
     return 0 if counts["FAIL"] == 0 and counts["ERROR"] == 0 else 1
 
 

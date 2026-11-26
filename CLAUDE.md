@@ -55,6 +55,10 @@ Owner decision D-023 (Krishika; docs/ambiguities.md): the AI audit sequence #1â€
 MAJOR (fifth audit: D-022 CLEARED, 11 limitations); this supersedes the "not yet re-audited" notes above. A1-1 and A9-2
 are closed as findings; A1-1-L1 (support-table validator is not a semantic proof) and the SELF_REPORTED residual stay
 disclosed limitations. Never mark L555 (5) done on these AI audits (DEV-002), and never claim F18 passed.
+Owner decision D-024 (Krishika; docs/ambiguities.md): proposals/v1.3.7/pack is a v1.3.7 CANDIDATE (v1.3.6 + C1â€“C10),
+not audited; v1.3.6 stays the default and baseline/ is never edited. Candidate-pack corrections are changed only by a
+numbered amendment in its own commit; candidate-only adapters cite candidate text only; candidate results never count as
+v1.3.6 F18 evidence.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

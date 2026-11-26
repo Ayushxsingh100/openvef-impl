@@ -1872,3 +1872,26 @@ F18 is not passed.
   numbered commit.
 
 Not audited. F18 is not passed.
+
+### D-024 Phase B — implementation on the candidate pack (owner review pending where marked)
+
+- **Runner:** `runner/run_f18.py --pack {v1.3.6,v1.3.7-candidate}` (`runner/run_f18_container.sh <class> f18 <pack>`).
+  The pack selects the pinned index hash and the adapter table; v1.3.6 uses `ADAPTERS` unchanged and its records are
+  unchanged. A candidate run records `pack`, `pack_label` and `pack_manifest_sha256`, labels every record, and writes
+  to `evidence/run-v137c-<UTC>`.
+- **Candidate-only adapters** (`runner/adapters_v137.py`; contracts `runner/adapter_contracts_v137.py`, cited to the
+  candidate pack; vectors `tests/adapter_vectors_v137.py`; checked by `tests/test_dispatch_shapes_v137.py` with the
+  same functions as v1.3.6): `change_class` (C1–C4; `ledger.lifecycle_expectation_candidate`), `parser_unit_vector`
+  (C9; the existing column rule), check-(e) vector (C5; `stage_map.validate_vector`). No fixture ID or expected value
+  in code; general rules only (D-013, D-017).
+- **Predicate execution (decided by Claude, owner review pending).** The C5 predicate is pack text, verified by the
+  index SHA-256, and is executed in the runner as evaluator material, not in the artifact worker (D-015 concerns
+  artifact code). Any exception or non-Boolean is "evaluator failure" (candidate File 30 L83), reported as
+  NOT_IMPLEMENTED with that reason, never as an artifact verdict.
+- **Boundary-check exception (decided by Claude, owner review pending).** The `change_class` property's closed
+  domain is exactly the five candidate L176 labels, and each is a fixture input, so no in-domain edge can avoid being a
+  fixture input. For that property only, the candidate boundary test allows it, and verifies that every label is a
+  fixture input; every other D-017 condition is unchanged. The v1.3.6 test is not changed.
+- **No Phase A correction was found wrong**, so there is no amendment.
+
+Not audited. F18 is not passed.
