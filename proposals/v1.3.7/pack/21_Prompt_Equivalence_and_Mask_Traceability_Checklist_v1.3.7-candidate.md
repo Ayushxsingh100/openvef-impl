@@ -1,6 +1,6 @@
-# Prompt Equivalence, Parser, Repair, Assembly and Mask Traceability Checklist (F18) v1.3.6
+# Prompt Equivalence, Parser, Repair, Assembly and Mask Traceability Checklist (F18) v1.3.7-candidate
 
-**Controlling specifications:** `34_OpenVEF_Response_Schema_v1.0.json`, `30_Response_Parser_and_Execution_Contract_v1.3.6.md`, `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md`, `33_Prompt_Assembly_Sidecar_v1.3.6.json`, `38_Authoring_Packet_Manifest_Template_v1.3.6.json`, and `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md`.
+**Controlling specifications:** `34_OpenVEF_Response_Schema_v1.0.json`, `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md`, `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md`, `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json`, `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json`, and `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md`.
 
 ## Prompt-pair and model-visible contract
 
@@ -60,7 +60,7 @@ F18 is **NOT RUN / NOT PASSED**. This checklist is a proposed test specification
 
 ## v1.1 audit gate additions
 
-- Confirm the exact disposition/stage/error/diagnostic vocabulary in Protocol §3.4 and Catalog v1.3.6; F18-only codes are not sent to the model. M14/M17 are isolated grammar-exempt serializer primitive tests, not production acceptance tests.
+- Confirm the exact disposition/stage/error/diagnostic vocabulary in Protocol §3.4 and Catalog v1.3.7-candidate; F18-only codes are not sent to the model. M14/M17 are isolated grammar-exempt serializer primitive tests, not production acceptance tests.
 - Verify the total import node precedence fixtures P29a/P29b/P30 and P31–P43.
 - Verify `ClassDef` and `FunctionDef` stage ownership: module policy defers these nodes; AST_SIGNATURE owns decorators/classes/nesting.
 - Verify non-ASCII identifier token detection, same-statement import precedence and UTF-8 byte-column fixtures under the pinned CPython 3.11 patch.
@@ -70,3 +70,7 @@ F18 is **NOT RUN / NOT PASSED**. This checklist is a proposed test specification
 - Current release status: F18 **NOT RUN / NOT PASSED**; A1–A11 **NOT ACCEPTED**; X14 **OWNER CHOICE REQUIRED**.
 
 - [ ] M14/M17 are treated only as grammar-exempt serializer primitive tests; neither bypasses production feedback grammar validation.
+
+---
+
+**v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.

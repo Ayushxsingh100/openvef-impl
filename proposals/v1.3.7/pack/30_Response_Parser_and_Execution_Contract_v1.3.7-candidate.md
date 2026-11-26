@@ -1,4 +1,4 @@
-# OpenVEF Response Parser and Execution Contract v1.3.6
+# OpenVEF Response Parser and Execution Contract v1.3.7-candidate
 
 **Status:** Normative proposed contract for F18. Not implemented, frozen or executable until owner acceptance, independent re-audit, and runtime pinning.
 
@@ -106,7 +106,7 @@ The authoritative failure-to-stage mapping, precedence, terminal-invalid rules, 
 
 ## 8. Required parser/repair fixtures for F18
 
-F18 must execute every fixture in `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` against the pinned parser and hand-written inputs. Every fixture is materialized as literal input bytes in `41_F18_Fixture_Inputs/`, has a SHA-256 and byte length recorded in the fixture index, and has exactly one expected stage, error class, exact diagnostic bytes and disposition. Both parser fixtures P, repair fixtures R and missing-case fixtures M are mandatory; serializer/F18-only fixtures are explicitly marked grammar-exempt and are not model-feedback diagnostics. M14 tests the UTF-8 truncation primitive in isolation with a deliberately non-grammar test string; M17 tests JSON escaping in isolation with a deliberately non-grammar diagnostic string. These two primitive unit vectors bypass only the closed-grammar precondition for the isolated primitive test; they do not assert that the production serializer accepts or transmits either string. The production serializer must reject any non-normative diagnostic before invoking truncation or JSON serialization. The parser fixture suite is hand-written and does not require any LLM call. F18 fails if any fixture is absent, ambiguous, or yields a different stage/class/diagnostic or terminal disposition.
+F18 must execute every fixture in `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` against the pinned parser and hand-written inputs. Every fixture is materialized as literal input bytes in `41_F18_Fixture_Inputs/`, has a SHA-256 and byte length recorded in the fixture index, and has exactly one expected stage, error class, exact diagnostic bytes and disposition. Both parser fixtures P, repair fixtures R and missing-case fixtures M are mandatory; serializer/F18-only fixtures are explicitly marked grammar-exempt and are not model-feedback diagnostics. M14 tests the UTF-8 truncation primitive in isolation with a deliberately non-grammar test string; M17 tests JSON escaping in isolation with a deliberately non-grammar diagnostic string. These two primitive unit vectors bypass only the closed-grammar precondition for the isolated primitive test; they do not assert that the production serializer accepts or transmits either string. The production serializer must reject any non-normative diagnostic before invoking truncation or JSON serialization. The parser fixture suite is hand-written and does not require any LLM call. F18 fails if any fixture is absent, ambiguous, or yields a different stage/class/diagnostic or terminal disposition.
 
 ---
 

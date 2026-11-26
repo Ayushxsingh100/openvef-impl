@@ -1,7 +1,8 @@
-"""D-024 Phase A: proposals/v1.3.7/pack/ is v1.3.6 with only corrections C1-C10 applied (v1.3.7 CANDIDATE,
-not audited). Checks the copy, not any implementation: it is rebuilt byte for byte from the read-only baseline;
-only the listed files differ; no line of a changed file moves; checksums and the fixture index agree; the
-corrected M27 reaches check (e). Not an F18 run and not evidence."""
+"""D-024/D-025 Phase A: proposals/v1.3.7/pack/ is v1.3.6 with only the logged corrections, amendments and stale-reference
+fixes applied (v1.3.7 CANDIDATE, not audited). Checks the copy, not any implementation: it is rebuilt byte for byte
+from the read-only baseline; only the expected files differ (renamed files compared under their v1.3.6 names); no
+existing line moves and only the edited lines change; File 25's normative copy still equals the Protocol; checksums
+and the fixture index agree; the corrected M27 reaches check (e). Not an F18 run and not evidence."""
 from __future__ import annotations
 
 import hashlib
@@ -20,13 +21,8 @@ BASE = REPO / "baseline/OpenVEF_Planning_v1_3_6"
 
 from openvef.stage_map import validate_vector  # noqa: E402
 
-CHANGED = {"02_OpenVEF_Experimental_Protocol_v1.3.6.md", "30_Response_Parser_and_Execution_Contract_v1.3.6.md",
-           "36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md",
-           "10_LLM_Era_Hardware_Verification_Literature_Review.md", "11_Comparative_Research_Matrix.md",
-           "27_SHA256SUMS.txt", "41_F18_Fixture_Inputs/fixture-index.json",
-           "25_Common_System_and_Repair_Prompt_Templates.txt"} | {
-    f"41_F18_Fixture_Inputs/{n}.json" for n in ("M27", "M41", "M42", "M47")}
 ADDED = {"CHANGELOG-v1.3.7-candidate.md", "CANDIDATE-LABEL.md", "SHA256SUMS-v1.3.7-candidate.txt"}
+FX = "41_F18_Fixture_Inputs/"
 
 
 def files(root: Path) -> dict[str, bytes]:
@@ -44,41 +40,51 @@ def builder():
 class CandidatePackTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.mod = mod = builder()
         cls.pack, cls.base = files(PACK), files(BASE)
+        # Every (v1.3.6 file, line) an edit may touch, from the build's own tables.
+        edited: dict[str, set[int]] = {}
+        src, first, last, copy, shift = mod.MIRROR
+        for rel, n in [(e[3], e[4]) for e in mod.EDITS] + [(s[0], s[1]) for s in mod.STALE]:
+            edited.setdefault(rel, set()).add(n)
+            if rel == src and first <= n <= last:
+                edited.setdefault(copy, set()).add(n + shift)
+        for rel, n in mod.VERSION_LINES.items():
+            edited.setdefault(rel, set()).add(n)
+        old_hash = hashlib.sha256(cls.base[mod.P10]).hexdigest()
+        edited[mod.P22] = {i + 1 for i, l in enumerate(cls.base[mod.P22].decode().split("\n")) if old_hash in l}
+        cls.edited = edited
+        cls.changed = set(edited) | set(mod.WHOLE_FILES) | {"27_SHA256SUMS.txt", FX + "fixture-index.json"}
+
+    def name(self, rel: str) -> str:
+        """v1.3.6 name -> candidate name."""
+        return self.mod.RENAMES.get(rel, rel)
 
     def test_rebuild_is_byte_identical(self):
         with tempfile.TemporaryDirectory() as tmp:
-            builder().build(Path(tmp) / "pack")
+            self.mod.build(Path(tmp) / "pack")
             self.assertEqual(files(Path(tmp) / "pack"), self.pack)
 
-    def test_only_the_listed_files_differ(self):
-        self.assertEqual(set(self.pack) - set(self.base), ADDED)
-        self.assertEqual(set(self.base) - set(self.pack), set())
-        self.assertEqual({f for f in self.base if self.base[f] != self.pack[f]}, CHANGED)
+    def test_only_the_expected_files_differ(self):
+        self.assertEqual(set(self.pack), {self.name(f) for f in self.base} | ADDED)
+        self.assertEqual({f for f in self.base if self.base[f] != self.pack[self.name(f)]}, self.changed)
+        self.assertEqual(set(self.mod.RENAMES) - self.changed, set())  # every renamed file is also edited
 
     def test_no_line_moves_and_only_edited_lines_change(self):
-        mod = builder()
-        edited: dict[str, set[int]] = {}
-        src, first, last, copy, shift = mod.MIRROR
-        for _, _, _, rel, n, _, _ in mod.EDITS:
-            edited.setdefault(rel, set()).add(n)
-            if rel == src and first <= n <= last:  # A2: the File 25 normative copy
-                edited.setdefault(copy, set()).add(n + shift)
-        for rel in edited:
+        for rel, lines in self.edited.items():
             old = self.base[rel].decode("utf-8").split("\n")
-            new = self.pack[rel].decode("utf-8").split("\n")
+            new = self.pack[self.name(rel)].decode("utf-8").split("\n")
             with self.subTest(file=rel):
-                if rel.endswith(".md") or rel == mod.P25:
-                    self.assertEqual("\n".join(new[len(old) - 1:]), mod.TRAILER)  # trailer only after the last line
-                differ = {i + 1 for i in range(len(old) - 1) if old[i] != new[i]}
-                label_line = {mod.VERSION_LINES[rel]} if rel in mod.VERSION_LINES else set()
-                self.assertEqual(differ, edited[rel] | label_line)
+                if rel.endswith(".md") or rel == self.mod.P25:
+                    self.assertEqual("\n".join(new[len(old) - 1:]), self.mod.TRAILER)
+                else:
+                    self.assertEqual(len(new), len(old))
+                self.assertEqual({i + 1 for i in range(len(old) - 1) if old[i] != new[i]}, lines)
 
     def test_file_25_copy_still_equals_the_protocol(self):
         """A2: File 25 L32 "normative text below is identical to Protocol §3.4"."""
-        mod = builder()
-        src, first, last, copy, shift = mod.MIRROR
-        p = self.pack[src].decode("utf-8").split("\n")
+        src, first, last, copy, shift = self.mod.MIRROR
+        p = self.pack[self.name(src)].decode("utf-8").split("\n")
         c = self.pack[copy].decode("utf-8").split("\n")
         self.assertEqual(p[first - 1:last], c[first - 1 + shift:last + shift])
         # Both model-visible bodies end before the copy starts (L32); those lines are byte-identical to v1.3.6.
@@ -87,13 +93,24 @@ class CandidatePackTests(unittest.TestCase):
         self.assertEqual(c[:first - 1 + shift], base[:first - 1 + shift])
 
     def test_labels(self):
-        for rel in CHANGED - {"27_SHA256SUMS.txt"}:
-            text = self.pack[rel].decode("utf-8")
+        for rel in self.changed - {"27_SHA256SUMS.txt"}:
+            text = self.pack[self.name(rel)].decode("utf-8")
             with self.subTest(file=rel):
-                self.assertTrue("v1.3.7 CANDIDATE, not audited" in text or "1.3.7-candidate, not audited" in text)
+                self.assertTrue("v1.3.7 CANDIDATE, not audited" in text or "1.3.7-candidate, not audited" in text
+                                or "v1.3.7-candidate" in text)
         label = self.pack["CANDIDATE-LABEL.md"].decode("utf-8")
         for rel in self.pack:
             self.assertIn(f"`{rel}`", label)
+
+    def test_no_stale_name_or_hash(self):
+        renamed = set(self.mod.RENAMES)
+        old_hash = hashlib.sha256(self.base[self.mod.P10]).hexdigest()
+        current = {self.name(r) for r in renamed} | {"README.md", self.mod.P25, self.mod.P22}
+        for rel in current:
+            text = self.pack[rel].decode("utf-8")
+            with self.subTest(file=rel):
+                self.assertFalse([r for r in renamed if r in text])
+                self.assertNotIn(old_hash, text)
 
     def test_checksums_and_index(self):
         for sums in ("SHA256SUMS-v1.3.7-candidate.txt", "27_SHA256SUMS.txt"):
@@ -104,7 +121,9 @@ class CandidatePackTests(unittest.TestCase):
                         self.assertEqual(hashlib.sha256(self.pack[rel]).hexdigest(), digest)
         listed = {line.split("  ", 1)[1] for line in self.pack["SHA256SUMS-v1.3.7-candidate.txt"].decode().splitlines()}
         self.assertEqual(listed, set(self.pack) - {"SHA256SUMS-v1.3.7-candidate.txt"})
-        index = json.loads(self.pack["41_F18_Fixture_Inputs/fixture-index.json"])
+        in27 = {line.split("  ", 1)[1] for line in self.pack["27_SHA256SUMS.txt"].decode().splitlines()}
+        self.assertLessEqual({self.name(r) for r in self.mod.RENAMES}, in27)
+        index = json.loads(self.pack[FX + "fixture-index.json"])
         self.assertEqual(index["fixture_count"], 144)
         for f in index["fixtures"]:
             data = self.pack[f["path"]]
@@ -113,20 +132,19 @@ class CandidatePackTests(unittest.TestCase):
 
     def test_expected_objects_unchanged(self):
         for rel in self.base:
-            if rel.startswith("41_F18_Fixture_Inputs/") and not rel.endswith("fixture-index.json"):
+            if rel.startswith(FX) and not rel.endswith("fixture-index.json"):
                 with self.subTest(file=rel):
                     self.assertEqual(json.loads(self.pack[rel])["expected"], json.loads(self.base[rel])["expected"])
 
     def test_corrected_m27_reaches_check_e(self):
-        m27 = json.loads(self.pack["41_F18_Fixture_Inputs/M27.json"])
+        m27 = json.loads(self.pack[FX + "M27.json"])
         inp = m27["input"]
         ns: dict = {}
         exec(inp["legal_input_predicate"]["source"], ns)  # pack text, not model output
         legal = ns[inp["legal_input_predicate"]["function"]]
         widths = inp["input_port_widths"]
         check = lambda v: validate_vector(v, widths, widths, lambda x: legal(x, inp["sampled_outputs"]))
-        failure = check(inp["driver_return"])
-        self.assertEqual(failure.diagnostic, m27["expected"]["diagnostic"])
+        self.assertEqual(check(inp["driver_return"]).diagnostic, m27["expected"]["diagnostic"])
         self.assertIsNone(check({"wr_en": "0"}))  # legal at full
         self.assertIsNone(validate_vector(inp["driver_return"], widths, widths, lambda x: legal(x, {"full": "0"})))
         self.assertNotIn("FIFO", inp["legal_input_predicate"]["source"])  # A1: no design specification needed

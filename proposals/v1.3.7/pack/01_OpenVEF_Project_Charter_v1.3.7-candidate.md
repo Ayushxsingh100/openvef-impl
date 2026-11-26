@@ -1,12 +1,12 @@
-# OpenVEF Project Charter v1.3.6
+# OpenVEF Project Charter v1.3.7-candidate
 
 **Project:** OpenVEF — Open Verification Effectiveness Framework  
-**Version:** 1.3.6 (corrective evidence/metadata release; independent re-audit pending; not frozen)  
+**Version:** 1.3.7-candidate (OpenVEF Planning v1.3.6 with the corrections in `CHANGELOG-v1.3.7-candidate.md`; not audited; not frozen; not approved). Based on: 1.3.6 (corrective evidence/metadata release; independent re-audit pending; not frozen)  
 **Date:** 23 November 2026  
 **Status:** DESIGN DRAFT — OWNER ACCEPTANCE PENDING  
 **Project owner:** TO CONFIRM against the actual TEEP application; no legal-name or approver identity is inferred
 
-> **Status note.** The v1.3, v1.3.1, v1.3.2 and v1.3.3 independent document audits returned FAIL for the LLM-call gate. The v1.3.3 audit identified N13: rank 7 missed generator expressions containing `await` when all `is_async` flags were zero. The v1.3.4 corrective release extended the AST_SIGNATURE rank-7 rule to detect `ast.Await` anywhere in a comprehension subtree, defined symbols by AST ancestry, documented compile-stage handling for asynchronous constructs, restored M63 indentation and added M70. The v1.3.4 independent document audit returned FAIL on N14 (stale F18 checklist). The owner-supplied v1.3.5 audit result reports DOCUMENT AUDIT PASS (documents only), with all 144 fixtures still NOT RUN / NOT PASSED. This v1.3.6 corrective evidence/metadata release closes the v1.3.5 cleanup items and includes the exact v1.3.2 audit export, verified against its recorded size and SHA-256; independent v1.3.6 document re-audit is pending. A1–A11 remain PROPOSED / NOT ACCEPTED and X14 remains OWNER CHOICE REQUIRED. Owner/applicant/contributor/approver identities remain TO CONFIRM; signature/date remain NOT RECORDED. Nothing is authorized until the owner records A1–A11 acceptance and an explicit X14 choice; even then, only the limited hand-built FIFO scope may open. No LLM/provider call is authorized until the separate LLM-call gate passes independent re-audit.
+> **Status note.** The v1.3, v1.3.1, v1.3.2 and v1.3.3 independent document audits returned FAIL for the LLM-call gate. The v1.3.3 audit identified N13: rank 7 missed generator expressions containing `await` when all `is_async` flags were zero. The v1.3.4 corrective release extended the AST_SIGNATURE rank-7 rule to detect `ast.Await` anywhere in a comprehension subtree, defined symbols by AST ancestry, documented compile-stage handling for asynchronous constructs, restored M63 indentation and added M70. The v1.3.4 independent document audit returned FAIL on N14 (stale F18 checklist). The owner-supplied v1.3.5 audit result reports DOCUMENT AUDIT PASS (documents only), with all 144 fixtures still NOT RUN / NOT PASSED. This v1.3.6 corrective evidence/metadata release closes the v1.3.5 cleanup items and includes the exact v1.3.2 audit export, verified against its recorded size and SHA-256; independent v1.3.6 document re-audit is pending. The v1.3.7-candidate pack is not audited. A1–A11 remain PROPOSED / NOT ACCEPTED and X14 remains OWNER CHOICE REQUIRED. Owner/applicant/contributor/approver identities remain TO CONFIRM; signature/date remain NOT RECORDED. Nothing is authorized until the owner records A1–A11 acceptance and an explicit X14 choice; even then, only the limited hand-built FIFO scope may open. No LLM/provider call is authorized until the separate LLM-call gate passes independent re-audit.
 
 ## 1. Executive summary
 
@@ -181,7 +181,7 @@ The primary H2 unit is the scheduled generation slot. For joint outcomes, comput
 
 ## 16. Review provenance
 
-The v1.3.6 release retains the seven owner-approved v0.7 design directions and records the historical v0.8, v0.9, v1.0, v1.1, v1.2, v1.3, v1.3.1, v1.3.2 and v1.3.3 audit outcomes. The v1.3, v1.3.1, v1.3.2, v1.3.3 and v1.3.4 independent document audits returned FAIL for the LLM-call gate; the owner-supplied v1.3.5 audit summary reports a document-only PASS. The current formulas, outcome classes, F1–F18 controls and freeze checklist are specified in `02_OpenVEF_Experimental_Protocol_v1.3.6.md`. This v1.3.6 corrective evidence/metadata release incorporates the verified v1.3.2 audit export and the non-blocking cleanup from the v1.3.5 audit. Its own independent document re-audit remains pending. No implementation or LLM/provider call is implied.
+The v1.3.6 release retains the seven owner-approved v0.7 design directions and records the historical v0.8, v0.9, v1.0, v1.1, v1.2, v1.3, v1.3.1, v1.3.2 and v1.3.3 audit outcomes. The v1.3, v1.3.1, v1.3.2, v1.3.3 and v1.3.4 independent document audits returned FAIL for the LLM-call gate; the owner-supplied v1.3.5 audit summary reports a document-only PASS. The current formulas, outcome classes, F1–F18 controls and freeze checklist are specified in `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md`. This v1.3.6 corrective evidence/metadata release incorporates the verified v1.3.2 audit export and the non-blocking cleanup from the v1.3.5 audit. Its own independent document re-audit remains pending. No implementation or LLM/provider call is implied.
 
 
 ## 17. v0.9 audit response status (historical)
@@ -192,3 +192,7 @@ The Claude v0.9 audit found N1/N2 resolved and N3/N4/N9 partly resolved. This Ch
 ## 18. v1.0 independent audit response status
 
 The v1.0 independent audit returned FAIL for the LLM-call gate. Its nine blockers B1–B9 concern fixture input shape, intended-stage isolation, error-class agreement, module-level AST stage ownership, total import precedence, non-ASCII identifier and column rules, mid-run design-halt lifecycle, F18-only disposition/error vocabulary, and clause-ID token/near-match rules. The v1.2 package proposed document and fixture corrections only; it does not claim the blockers have passed re-audit. The strict-AST branch remains a pending owner choice (X14); A1–A11 remain unaccepted. No parser, assembler, harness or fixture suite has been executed.
+
+---
+
+**v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.

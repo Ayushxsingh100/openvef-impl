@@ -68,6 +68,6 @@
   "clause_id_near_match_policy": "Any near-match token not also a full match of clause_id_regex is a packet-freeze error.",
   "ascii_identifier_policy": "Python tokenize.NAME tokens are ASCII-only in author source; this is independent of design clause IDs.",
   "notes": [
-    "Planning-pack v1.3.6 corrective evidence/metadata release. Model-visible prompt templates, schema, system and repair messages are unchanged from v1.3.5; template-stage hashes carry forward. Current template-stage hashes were first computed in v1.3.2; model-visible text changed in v1.3.2 and has remained unchanged from v1.3.3 through v1.3.6. Template is not frozen; design payload hashes remain TO_FREEZE."
+    "Planning-pack v1.3.7-candidate (v1.3.6 corrective evidence/metadata release with the corrections in CHANGELOG-v1.3.7-candidate.md; not audited). Model-visible prompt templates, schema, system and repair messages are unchanged from v1.3.5; template-stage hashes carry forward. Current template-stage hashes were first computed in v1.3.2; model-visible text changed in v1.3.2 and has remained unchanged from v1.3.3 through v1.3.6. Template is not frozen; design payload hashes remain TO_FREEZE."
   ]
 }

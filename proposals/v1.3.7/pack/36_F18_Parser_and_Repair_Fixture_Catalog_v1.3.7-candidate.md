@@ -1,4 +1,4 @@
-# OpenVEF F18 Parser, Repair and Missing-Case Fixture Catalog v1.3.6
+# OpenVEF F18 Parser, Repair and Missing-Case Fixture Catalog v1.3.7-candidate
 
 **Status:** Mandatory proposed fixture set. All inputs are materialized under `41_F18_Fixture_Inputs/` and indexed by literal byte length and SHA-256. This catalog is a test specification, not an execution report. All fixtures remain **NOT RUN / NOT PASSED**. No LLM call is required to run the hand-written suite, but no execution is authorized until the owner-acceptance gate is met.
 

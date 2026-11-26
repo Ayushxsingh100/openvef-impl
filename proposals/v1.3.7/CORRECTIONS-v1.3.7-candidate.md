@@ -404,3 +404,26 @@ byte-identical to v1.3.6, so no prompt text and no sidecar hash changes. File 25
 last line, outside the model-visible bodies.
 
 **Rejected.** Leaving the copy stale (contradicts L32); deleting the copy (removes text the pack declares normative).
+
+## 6. Stale references (D-025 item 3; CHANGELOG entries `S`)
+
+**Rule.** A reference is stale when its correct target in the candidate differs from what it names. That covers:
+- the pack's own version, title or audit status in a current document (Files 01, 02, 21, 30, 31, 32, 33, 36, 38 and
+  the README): titles and version lines now name v1.3.7-candidate, and each version line keeps the v1.3.6 text after
+  "Based on:";
+- the names of those nine files, which carry the pack version: renamed (`…v1.3.6…` → `…v1.3.7-candidate…`), and every
+  reference to them in a current document updated, including Protocol L187's copy in File 25 (A2 applies);
+- File 22 L8–L12, which cite File 10 by SHA-256 as the literature-review record: now the candidate File 10's hash;
+- `27_SHA256SUMS.txt` (derived) and the sidecar's `sidecar_version` and `payload_manifest_file`.
+
+**Kept on purpose (not stale).**
+- **History:** the v1.3.6 change log, build, correction and audit records (Files 03, 48, 50, 56, 57, 58, 63 and the
+  audit transcripts), and statements of what v1.3.6 did or what stayed unchanged "from v1.3.3 through v1.3.6". These are
+  true of v1.3.6, and rewriting them would falsify the record.
+- **Owner records (Files 16, 23):** they record owner decisions and approvals on v1.3.6. Renaming or retitling them
+  would present the candidate as owner-reviewed, which it is not.
+- **Pack status of the implementation** (File 32 "NOT IMPLEMENTED / NOT RUN"): the pack's own statement; this
+  repository's implementation is outside the pack, and importing it would be a new claim, not a fix.
+
+**Check.** `tests/test_v137_candidate_pack.py` `test_no_stale_name_or_hash`: no current document names a renamed
+file by its old name or cites File 10's old hash.

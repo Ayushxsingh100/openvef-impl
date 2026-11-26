@@ -1,5 +1,5 @@
 {
-  "sidecar_version": "1.3.6",
+  "sidecar_version": "1.3.7-candidate, not audited",
   "model_visible": false,
   "purpose": "Maps semantic block IDs to identical visible headings and pre-specified block orders. This file and all IDs are assembler-only and must never be sent to the model.",
   "encoding": "UTF-8 without BOM",
@@ -186,7 +186,7 @@
       "status": "TO_FREEZE"
     }
   },
-  "payload_manifest_file": "38_Authoring_Packet_Manifest_Template_v1.3.6.json",
+  "payload_manifest_file": "38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json",
   "manifest_spec_version_sha256": "TO_FREEZE",
   "clause_id_regex": "^[A-Z]{2,6}-[0-9]{3}$",
   "visible_clause_id_sources": [

@@ -1,4 +1,4 @@
-# OpenVEF Prompt Assembly and Canonicalization Specification v1.3.6
+# OpenVEF Prompt Assembly and Canonicalization Specification v1.3.7-candidate
 
 **Status:** Normative proposed specification for F18. Not frozen until independent review and owner approval.
 
@@ -14,7 +14,7 @@
 
 ## 2. Block inventory and order
 
-The fixed heading-to-ID mapping and the two exact orders are in `33_Prompt_Assembly_Sidecar_v1.3.6.json`:
+The fixed heading-to-ID mapping and the two exact orders are in `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json`:
 - ORG-A: B0, B1, B2, B3, B4, B5, B6, B7, B8.
 - ORG-B: B0, B2, B5, B1, B6, B3, B7, B4, B8.
 
@@ -81,7 +81,7 @@ For each corresponding semantic block independently:
 
 The fixed B5, B7 and B8 normative text in file 30 §3.1 must be the exact byte prefix of its corresponding model-visible block body, followed by exactly two LF bytes (`\n\n`) before any design-specific lead-in or schema delimiter. For B5, the fixed-text boundary ends after the final sentence about the fixed import allow-list/no-third-party rule; the following `Design-specific API and top-level port details:` line is not part of the fixed-text byte string and must follow the two-LF separator. The fixed-text boundary is not inferred from a semantic re-parse.
 
-Hash source templates, payloads, sidecar, manifest, schema, extracted system/repair messages, assembled system/ORG-A/ORG-B/repair message bytes, per-block raw/canonical bytes and final message-role sequence with SHA-256 over the exact UTF-8 bytes. Recompute every affected hash after all v1.3.6 document and model-visible text edits are complete. This v1.3.6 release does not alter the model-visible ORG-A/ORG-B templates or the schema/system/repair messages; the verified v1.3.4 template-stage prompt hashes therefore carry forward unchanged. The v1.1, v1.2, v1.3 and v1.3.1 prompt-template-stage hashes are historical and superseded; retain their exact values in the v1.3.6 sidecar for audit history, but never use them as current prompt hashes. Record the schema SHA-256/byte length, each payload SHA-256/byte length, and the template-stage ORG-A/ORG-B hashes (with design placeholders still unresolved) in the sidecar. The sidecar field `spec_version_sha256` must equal the manifest field `spec_version_sha256` byte-for-byte after freeze; `manifest_spec_version_sha256_field` identifies that manifest field, and `manifest_spec_version_sha256` is a recorded copy for an explicit equality check. Final assembled prompts are hashed only after all seven payloads are frozen. No implicit trimming, escaping, newline conversion or metadata stripping beyond the rules above is permitted.
+Hash source templates, payloads, sidecar, manifest, schema, extracted system/repair messages, assembled system/ORG-A/ORG-B/repair message bytes, per-block raw/canonical bytes and final message-role sequence with SHA-256 over the exact UTF-8 bytes. Recompute every affected hash after all v1.3.7-candidate document and model-visible text edits are complete. This v1.3.7-candidate release does not alter the model-visible ORG-A/ORG-B templates or the schema/system/repair messages; the verified v1.3.4 template-stage prompt hashes therefore carry forward unchanged. The v1.1, v1.2, v1.3 and v1.3.1 prompt-template-stage hashes are historical and superseded; retain their exact values in the v1.3.7-candidate sidecar for audit history, but never use them as current prompt hashes. Record the schema SHA-256/byte length, each payload SHA-256/byte length, and the template-stage ORG-A/ORG-B hashes (with design placeholders still unresolved) in the sidecar. The sidecar field `spec_version_sha256` must equal the manifest field `spec_version_sha256` byte-for-byte after freeze; `manifest_spec_version_sha256_field` identifies that manifest field, and `manifest_spec_version_sha256` is a recorded copy for an explicit equality check. Final assembled prompts are hashed only after all seven payloads are frozen. No implicit trimming, escaping, newline conversion or metadata stripping beyond the rules above is permitted.
 
 
 ## 8. Clause-ID token extraction and near-match policy
@@ -95,3 +95,7 @@ The manifest contains these three regex strings (all are interpreted by the pinn
 The `clause_ids` array is unique, sorted lexicographically, and every element must fully match `clause_id_regex`. Extract exact tokens only from the seven `visible_clause_id_sources`, excluding the fixed non-citable B5/B7 contract prefixes. The extracted set must equal the manifest set exactly. An assumption clause ID is either a member of that set or the exact reserved sentinel `UNSPECIFIED`; clause rejection uses the lowest numeric failing assumptions index and pointer `/assumptions/<index>/clause_id`.
 
 F18 records the raw payload bytes, exact extracted IDs, near-match candidates, manifest IDs and comparison result. No `true` validation result may be written to the sidecar before F18 runs; pending checks must be `REQUIRED` or `null`.
+
+---
+
+**v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.

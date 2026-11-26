@@ -35,6 +35,7 @@ P30 = "30_Response_Parser_and_Execution_Contract_v1.3.6.md"
 P36 = "36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md"
 P10 = "10_LLM_Era_Hardware_Verification_Literature_Review.md"
 P11 = "11_Comparative_Research_Matrix.md"
+P22 = "22_Source_Access_Provenance_Log_v1.2.md"
 P25 = "25_Common_System_and_Repair_Prompt_Templates.txt"
 # Amendment A2 (D-025): File 25 L32 says "NORMATIVE CONTROL COPY (NOT MODEL-VISIBLE; normative text below is identical
 # to Protocol §3.4)", and its L33-L130 equal Protocol L90-L187 line for line. Every edit inside that Protocol range is
@@ -191,6 +192,78 @@ EDITS: list[tuple[str, str, str, str, int, str, str]] = [
      '"stable_error_class": "RecorderFault",', '"stable_error_class": "NONE",'),
 ]
 
+# --- D-025 item 3: stale references (logged as "S"). A reference is stale when its correct target in the candidate
+# differs: the pack's own version, title or audit status in a current document, or the name of a renamed file. A
+# reference that records history (an audit, build, approval or change of v1.3.6 or earlier) is not stale and is kept;
+# owner records (Files 16, 23) are not rewritten. Rationale: CORRECTIONS-v1.3.7-candidate.md, section 6.
+CAND = "v1.3.7-candidate"
+RENAMES = {f: f.replace("v1.3.6", CAND) for f in (
+    "01_OpenVEF_Project_Charter_v1.3.6.md", P02, "21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md",
+    P30, "31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md", "32_v1.3.6_Status_and_Gates.md",
+    "33_Prompt_Assembly_Sidecar_v1.3.6.json", P36, "38_Authoring_Packet_Manifest_Template_v1.3.6.json")}
+P01, P21, P31, P32, P33, P38 = ("01_OpenVEF_Project_Charter_v1.3.6.md",
+                                "21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md",
+                                "31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md", "32_v1.3.6_Status_and_Gates.md",
+                                "33_Prompt_Assembly_Sidecar_v1.3.6.json", "38_Authoring_Packet_Manifest_Template_v1.3.6.json")
+_VERSION = (f"**Version:** 1.3.7-candidate (OpenVEF Planning v1.3.6 with the corrections in "
+            f"`CHANGELOG-v1.3.7-candidate.md`; not audited; not frozen; not approved). Based on: ")
+_S = ("S", "—", "—")
+STALE: list[tuple[str, int, str, str]] = [
+    (P01, 1, "# OpenVEF Project Charter v1.3.6", f"# OpenVEF Project Charter {CAND}"),
+    (P01, 4, "**Version:** 1.3.6 (", _VERSION + "1.3.6 ("),
+    (P01, 9, "independent v1.3.6 document re-audit is pending.",
+     f"independent v1.3.6 document re-audit is pending. The {CAND} pack is not audited."),
+    (P01, 184, f"`{P02}`", f"`{RENAMES[P02]}`"),
+    (P02, 1, "# OpenVEF Experimental Protocol v1.3.6", f"# OpenVEF Experimental Protocol {CAND}"),
+    (P02, 4, "**Version:** 1.3.6 (", _VERSION + "1.3.6 ("),
+    (P02, 9, "current v1.3.6 re-audit-pending status are recorded in §19.",
+     f"v1.3.6 re-audit-pending status, and the not-audited {CAND} status, are recorded in §19."),
+    (P02, 81, f"`{P30}`", f"`{RENAMES[P30]}`"),
+    (P02, 81, f"`{P31}`", f"`{RENAMES[P31]}`"),
+    (P02, 83, f"`{P31}`", f"`{RENAMES[P31]}`"),
+    (P02, 187, f"`{P36}`", f"`{RENAMES[P36]}`"),
+    (P02, 288, f"`{P30}`", f"`{RENAMES[P30]}`"),
+    (P02, 555, "(1) Complete the v1.3.6 corrective document pack", f"(1) Complete the {CAND} document pack"),
+    (P02, 555, "(2) Obtain an independent document-only v1.3.6 re-audit", f"(2) Obtain an independent document-only {CAND} audit"),
+    (P02, 559, "v1.3.6 is a corrective evidence/metadata release",
+     f"{CAND} is OpenVEF Planning v1.3.6 with the corrections in `CHANGELOG-v1.3.7-candidate.md`; it is not audited, "
+     "frozen or approved, and v1.3.6 remains the default pack. v1.3.6 is a corrective evidence/metadata release"),
+    (P21, 1, "Checklist (F18) v1.3.6", f"Checklist (F18) {CAND}"),
+    *((P21, 3, f"`{old}`", f"`{RENAMES[old]}`") for old in (P30, P31, P33, P38, P36)),
+    (P21, 63, "Protocol §3.4 and Catalog v1.3.6;", f"Protocol §3.4 and Catalog {CAND};"),
+    (P30, 1, "# OpenVEF Response Parser and Execution Contract v1.3.6", f"# OpenVEF Response Parser and Execution Contract {CAND}"),
+    (P30, 109, f"`{P36}`", f"`{RENAMES[P36]}`"),
+    (P31, 1, "Canonicalization Specification v1.3.6", f"Canonicalization Specification {CAND}"),
+    (P31, 17, f"`{P33}`", f"`{RENAMES[P33]}`"),
+    (P31, 84, "after all v1.3.6 document and model-visible text edits are complete. This v1.3.6 release",
+     f"after all {CAND} document and model-visible text edits are complete. This {CAND} release"),
+    (P31, 84, "retain their exact values in the v1.3.6 sidecar", f"retain their exact values in the {CAND} sidecar"),
+    (P32, 1, "# OpenVEF v1.3.6 Status and Gates", f"# OpenVEF {CAND} Status and Gates"),
+    (P32, 3, "**Current release:** v1.3.6 corrective evidence/metadata pack.",
+     f"**Current release:** {CAND} (the v1.3.6 corrective evidence/metadata pack with the corrections in "
+     "`CHANGELOG-v1.3.7-candidate.md`; not audited, not frozen, not approved; v1.3.6 remains the default)."),
+    (P32, 5, "**Current document audit status:** PENDING INDEPENDENT RE-AUDIT.",
+     f"**Current document audit status:** {CAND} NOT AUDITED; v1.3.6 PENDING INDEPENDENT RE-AUDIT."),
+    (P32, 48, "1. Independent document-only audit of the actual v1.3.6 pack.",
+     f"1. Independent document-only audit of the actual {CAND} pack."),
+    (P33, 2, '"sidecar_version": "1.3.6",', f'"sidecar_version": "{VERSION_LABEL}",'),
+    (P33, 189, f'"payload_manifest_file": "{P38}",', f'"payload_manifest_file": "{RENAMES[P38]}",'),
+    (P36, 1, "Missing-Case Fixture Catalog v1.3.6", f"Missing-Case Fixture Catalog {CAND}"),
+    (P38, 71, '"Planning-pack v1.3.6 corrective evidence/metadata release.',
+     f'"Planning-pack {CAND} (v1.3.6 corrective evidence/metadata release with the corrections in '
+     'CHANGELOG-v1.3.7-candidate.md; not audited).'),
+    ("README.md", 1, "# OpenVEF Planning Pack v1.3.6", f"# OpenVEF Planning Pack {CAND}"),
+    ("README.md", 3, "**Status:** Corrective evidence/metadata release",
+     f"**Status:** {LABEL}: OpenVEF Planning v1.3.6 with the corrections in `CHANGELOG-v1.3.7-candidate.md` "
+     "(`CANDIDATE-LABEL.md` lists every file); v1.3.6 remains the default. v1.3.6 status: Corrective evidence/metadata release"),
+    *(("README.md", n, f"`{old}`", f"`{RENAMES[old]}`") for n, old in (
+        (7, P01), (8, P02), (11, P21), (13, P30), (14, P31), (14, P33), (16, P36), (17, P38))),
+    ("README.md", 9, "— current release changes and audit lineage.",
+     "— v1.3.6 release changes and audit lineage; the candidate's changes are in `CHANGELOG-v1.3.7-candidate.md`."),
+    ("README.md", 46, "The current v1.3.6 independent document audit is pending.",
+     f"The v1.3.6 independent document audit is pending; the {CAND} pack is not audited."),
+]
+
 # C6, as amended by A1 (D-025): the whole M27 descriptor is replaced (its input shape changes). The expected object
 # is unchanged. A1 replaces the FIFO-042 predicate of the 24 Nov draft by the v1.3.6 descriptor's own rule,
 # "wr_en must be 0 when full is 1", over a port set holding `wr_en` only, with `full` as a sampled output.
@@ -246,7 +319,7 @@ def build(out: Path) -> dict:
 
     src, first, last, copy, shift = MIRROR
     assert line_of(src)[first - 1:last] == line_of(copy)[first - 1 + shift:last + shift], "File 25 copy differs"
-    for cid, pd, fixtures, rel, n, old, new in EDITS:
+    for cid, pd, fixtures, rel, n, old, new in [*EDITS, *((*_S, f, n, o, w) for f, n, o, w in STALE)]:
         targets = [(rel, n, cid)]
         if rel == src and first <= n <= last:
             targets.append((copy, n + shift, f"A2 (copy of {cid})"))
@@ -270,6 +343,20 @@ def build(out: Path) -> dict:
             log.append({"correction": "label", "pd": "—", "fixtures": "—", "file": rel,
                         "line": len(lines) + 1, "old": "(end of file)", "new": "appended trailer: " + TRAILER.strip()})
         (out / rel).write_text(body, "utf-8")
+
+    # Stale reference (S): File 22's provenance rows cite the literature-review record, File 10, by SHA-256. C8 and the
+    # candidate label change File 10, so the rows now cite the candidate File 10 (written above).
+    old_hash, new_hash = sha((BASE / P10).read_bytes()), sha((out / P10).read_bytes())
+    lines22 = lines_of((BASE / P22).read_text("utf-8"))
+    for i, text in enumerate(lines22):
+        if old_hash in text:
+            lines22[i] = text.replace(old_hash, new_hash)
+            log.append({"correction": "S", "pd": "—", "fixtures": "—", "file": P22, "line": i + 1,
+                        "old": f"Literature review record: SHA-256 {old_hash}",
+                        "new": f"Literature review record: SHA-256 {new_hash}"})
+    (out / P22).write_text("\n".join(lines22) + "\n" + TRAILER, "utf-8")
+    log.append({"correction": "label", "pd": "—", "fixtures": "—", "file": P22, "line": len(lines22) + 1,
+                "old": "(end of file)", "new": "appended trailer: " + TRAILER.strip()})
 
     for rel, (cid, pd, fixtures) in WHOLE_FILES.items():
         old_text = (BASE / rel).read_text("utf-8")
@@ -299,14 +386,18 @@ def build(out: Path) -> dict:
                 "old": '"fixture_index_version": "1.3.6",', "new": idx[j].strip()})
     (out / idx_rel).write_text("\n".join(idx) + "\n", "utf-8")
 
+    for old, new in RENAMES.items():  # S: a current document's file name carries the pack version
+        (out / old).rename(out / new)
+        log.append({"correction": "S", "pd": "—", "fixtures": "—", "file": old, "line": "name", "old": old, "new": new})
+
     # Derived: 27_SHA256SUMS.txt lines of every changed file (the pack's own integrity list).
     sums_rel = "27_SHA256SUMS.txt"
     sums = lines_of((BASE / sums_rel).read_text("utf-8"))
     changed = sorted({e["file"] for e in log})
     for rel in changed:
         j = next(i for i, s in enumerate(sums) if s.endswith("  " + rel))
-        old = sums[j]
-        sums[j] = f"{sha((out / rel).read_bytes())}  {rel}"
+        old, name = sums[j], RENAMES.get(rel, rel)
+        sums[j] = f"{sha((out / name).read_bytes())}  {name}"
         log.append({"correction": "derived", "pd": "—", "fixtures": "—", "file": sums_rel, "line": j + 1,
                     "old": old, "new": sums[j]})
     (out / sums_rel).write_text("\n".join(sums) + "\n", "utf-8")
@@ -323,32 +414,37 @@ def fence(text: str) -> str:
     return f"{tick}text\n{text.rstrip(chr(10))}\n{tick}\n"
 
 
+def shown(rel: str) -> str:
+    return f"{RENAMES[rel]}` (was `{rel}" if rel in RENAMES else rel
+
+
 def write_changelog(out: Path, log: list[dict]) -> None:
     rows = ["# CHANGELOG — OpenVEF Planning v1.3.7 CANDIDATE (from v1.3.6)", "",
             f"**{LABEL}.** Built by `proposals/v1.3.7/build_candidate.py` from `baseline/OpenVEF_Planning_v1_3_6/`",
             "(read-only, unchanged) under owner decision D-024 (Krishika). Rationale for every correction, with the",
             "conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md`.",
             "", "- Every edit replaces text inside one line; no line moves, so line citations are the same in both packs.",
-            "- `correction` = C1–C10; `label` = the in-file candidate label; `derived` = a hash or byte length that",
-            "  follows mechanically from another edit. Old and new text are the replaced part of the line, unless",
+            "- `correction` = C1–C16; `A1`, `A2` = numbered amendments; `S` = a stale reference fixed (D-025 item 3;",
+            "  `line` `name` = a file renamed); `label` = the in-file candidate label; `derived` = a hash or byte length",
+            "  that follows mechanically from another edit. Old and new text are the replaced part of the line, unless",
             "  `line` is `all` (whole-file replacement).",
-            "- **Known stale references (not edited):** File 22 L8–L12 cite the v1.3.6 SHA-256 of File 10",
-            "  (`a79a4d68…a11a`) as the literature-review record their provenance rows refer to. C8 changes File 10;",
-            "  those rows still describe the v1.3.6 record and are left as written. `03_Change_Log_v1.3.6.md`,",
-            "  `32_v1.3.6_Status_and_Gates.md`, `README.md` and the audit records still describe v1.3.6.",
+            "- **Kept on purpose (not stale):** references that record history — the v1.3.6 change log, build, correction",
+            "  and audit records (Files 03, 48, 50, 56, 57, 58, 63 and the audit transcripts), and statements of what",
+            "  v1.3.6 did — and the owners' records (Files 16, 23), which describe owner decisions on v1.3.6 and are not",
+            "  rewritten for a candidate the owners have not approved.",
             "- The 61 `archive_*` entries of `27_SHA256SUMS.txt` are not in the extracted baseline and are not in this copy.",
             "", "| # | Correction | PD | Fixtures | File | Line |", "|---|---|---|---|---|---|"]
     for i, e in enumerate(log, 1):
-        rows.append(f"| E{i:02d} | {e['correction']} | {e['pd']} | {e['fixtures']} | `{e['file']}` | {e['line']} |")
+        rows.append(f"| E{i:02d} | {e['correction']} | {e['pd']} | {e['fixtures']} | `{shown(e['file'])}` | {e['line']} |")
     rows.append("")
     for i, e in enumerate(log, 1):
-        rows += [f"## E{i:02d} — {e['correction']} · `{e['file']}` L{e['line']} · {e['pd']} · fixtures: {e['fixtures']}",
+        rows += [f"## E{i:02d} — {e['correction']} · `{shown(e['file'])}` L{e['line']} · {e['pd']} · fixtures: {e['fixtures']}",
                  "", "Old:", "", fence(e["old"]), "New:", "", fence(e["new"])]
     (out / CHANGELOG).write_text("\n".join(rows), "utf-8")
 
 
 def write_label(out: Path, log: list[dict]) -> None:
-    changed = {e["file"] for e in log} | {CHANGELOG}
+    changed = {RENAMES.get(e["file"], e["file"]) for e in log} | {CHANGELOG}
     files = sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file())
     rows = [f"# {LABEL}", "",
             f"**Every file in this directory is part of OpenVEF Planning {LABEL}.** It is a copy of v1.3.6 with",

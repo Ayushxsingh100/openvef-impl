@@ -14,8 +14,8 @@ and not approved, and v1.3.6 (`baseline/`) remains the default pack.
 
 | File | Status |
 |---|---|
-| `01_OpenVEF_Project_Charter_v1.3.6.md` | identical to v1.3.6; labelled here |
-| `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | changed; labelled in-file |
+| `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` | changed; labelled in-file |
+| `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` | changed; labelled in-file |
 | `03_Change_Log_v1.3.1_Historical.md` | identical to v1.3.6; labelled here |
 | `03_Change_Log_v1.3.6.md` | identical to v1.3.6; labelled here |
 | `04_Verify_the_Verifier_Paper_Analysis.md` | identical to v1.3.6; labelled here |
@@ -33,8 +33,8 @@ and not approved, and v1.3.6 (`baseline/`) remains the default pack.
 | `17_Step3_Literature_Audit_Addendum_v0.7.md` | identical to v1.3.6; labelled here |
 | `19_ORG_A_Prompt_Template.txt` | identical to v1.3.6; labelled here |
 | `20_ORG_B_Prompt_Template.txt` | identical to v1.3.6; labelled here |
-| `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | identical to v1.3.6; labelled here |
-| `22_Source_Access_Provenance_Log_v1.2.md` | identical to v1.3.6; labelled here |
+| `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` | changed; labelled in-file |
+| `22_Source_Access_Provenance_Log_v1.2.md` | changed; labelled in-file |
 | `23_Owner_Approval_Record_v1.3.6.md` | identical to v1.3.6; labelled here |
 | `24_Mask_to_Specification_Traceability_Template.csv` | identical to v1.3.6; labelled here |
 | `25_Common_System_and_Repair_Prompt_Templates.txt` | changed; labelled in-file |
@@ -42,15 +42,15 @@ and not approved, and v1.3.6 (`baseline/`) remains the default pack.
 | `27_SHA256SUMS.txt` | changed (derived); labelled here |
 | `28_Claude_v0.7_Audit_Raw.txt` | identical to v1.3.6; labelled here |
 | `29_Claude_v0.8_Audit_Raw.txt` | identical to v1.3.6; labelled here |
-| `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | changed; labelled in-file |
-| `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | identical to v1.3.6; labelled here |
-| `32_v1.3.6_Status_and_Gates.md` | identical to v1.3.6; labelled here |
-| `33_Prompt_Assembly_Sidecar_v1.3.6.json` | identical to v1.3.6; labelled here |
+| `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` | changed; labelled in-file |
+| `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` | changed; labelled in-file |
+| `32_v1.3.7-candidate_Status_and_Gates.md` | changed; labelled in-file |
+| `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` | changed; labelled in-file |
 | `34_OpenVEF_Response_Schema_v1.0.json` | identical to v1.3.6; labelled here |
 | `35_Claude_v0.8_Audit_Resolution_v0.9.md` | identical to v1.3.6; labelled here |
-| `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | changed; labelled in-file |
+| `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` | changed; labelled in-file |
 | `37_Claude_v0.9_Independent_Audit_Prompt.txt` | identical to v1.3.6; labelled here |
-| `38_Authoring_Packet_Manifest_Template_v1.3.6.json` | identical to v1.3.6; labelled here |
+| `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` | changed; labelled in-file |
 | `39_Claude_v0.9_Audit_Raw.txt` | identical to v1.3.6; labelled here |
 | `41_F18_Fixture_Inputs/M01.json` | identical to v1.3.6; labelled here |
 | `41_F18_Fixture_Inputs/M02.json` | identical to v1.3.6; labelled here |
@@ -217,6 +217,6 @@ and not approved, and v1.3.6 (`baseline/`) remains the default pack.
 | `62_OpenVEF_v1.3.2_Independent_Audit.md` | identical to v1.3.6; labelled here |
 | `63_OpenVEF_v1.3.5_Audit_Summary_Owner_Supplied.md` | identical to v1.3.6; labelled here |
 | `CHANGELOG-v1.3.7-candidate.md` | candidate record; labelled in-file |
-| `README.md` | identical to v1.3.6; labelled here |
+| `README.md` | changed; labelled in-file |
 | `CANDIDATE-LABEL.md` | candidate record; labelled in-file |
 | `SHA256SUMS-v1.3.7-candidate.txt` | candidate record; labelled in-file |
