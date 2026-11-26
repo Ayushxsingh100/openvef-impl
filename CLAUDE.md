@@ -51,6 +51,10 @@ Owner decision D-022 (Krishika; docs/ambiguities.md): every adapter selecting va
 the words of its own quote that support it (tests/test_dispatch_shapes.py); the runtime signature checks also call the
 literal inspect.signature after import, which must agree with the trusted measurement (names/kinds/counts, A-058). Still
 self-reported; the SELF_REPORTED residual is not closed. Not yet re-audited.
+Owner decision D-023 (Krishika; docs/ambiguities.md): the AI audit sequence #1–#5 is complete with no open BLOCKER or
+MAJOR (fifth audit: D-022 CLEARED, 11 limitations); this supersedes the "not yet re-audited" notes above. A1-1 and A9-2
+are closed as findings; A1-1-L1 (support-table validator is not a semantic proof) and the SELF_REPORTED residual stay
+disclosed limitations. Never mark L555 (5) done on these AI audits (DEV-002), and never claim F18 passed.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose

@@ -76,7 +76,7 @@ Claude Code), the implementation author, at Krishika's instruction, 24 Nov 2026 
   `results.jsonl` (`runner/run_f18.py` `self_reported_parts`; `tests/test_self_reported_label.py`), and
   `tests/test_audit_bundle.py` checks the bundle builder's behaviour. No verdict changed. **Not** re-audited.
   The D-020 bundle (`0e8ea3f2…`) was not sent to an auditor, as Krishika states.
-- **Re-audit #5 is scoped to D-022, plus regression of prior findings** (added at Krishika's instruction). The
+- **Re-audit #5 (done: CLEARED for D-022, 11 LIMITATIONs; D-023 records the sequence #1–#5 complete; kept for reference) was scoped to D-022, plus regression of prior findings** (added at Krishika's instruction). The
   fourth audit (GPT-6, bundle `93b249a6…1907`) ended **NOT CLEARED**: 0 BLOCKER, MAJORs A1-1 and A9-2, 8
   LIMITATION. Report and note: `docs/reviews/implementation-reaudit4-gpt6-2026-11-26.md` and its `-NOTE.md`.
   **D-022 has not been audited by anyone.** Judge:

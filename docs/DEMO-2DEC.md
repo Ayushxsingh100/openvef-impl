@@ -1,118 +1,172 @@
-# OpenVEF — faculty demo, 2 December 2026
+# OpenVEF — 10-minute faculty demo, 2 December 2026
 
-**Presenter:** Krishika. **Co-owner:** Ayush Kumar Singh.
+**Presenter:** Krishika. **Co-owner:** Ayush Kumar Singh. Script prepared by Claude (Claude Code) under D-023;
+every number below comes from committed evidence or a saved report, cited by ID.
 
-## What OpenVEF is
+| Time | Part |
+|---|---|
+| 0:00–1:00 | (a) What OpenVEF is |
+| 1:00–5:00 | (b) Live commands (four) |
+| 5:00–7:30 | (c) The audit story, #1 → #5 |
+| 7:30–9:30 | (d) What is not done |
+| 9:30–10:00 | Close; questions |
 
-OpenVEF is a planned, reproducible study of **LLM-generated hardware-verification
-artifacts**.
-- **The artifact:** a model writes a paired *driver*, which steps a cycle-exact RTL
-  design, and *checker*, which judges the recorded trace.
-- **Mutation qualification:** the harness runs both on the original design and on
-  mutated versions, to measure whether the checker catches real faults without false
-  alarms.
-- **The plan:** the methodology is fixed in a frozen planning pack (v1.3.6: 58 numbered
-  documents, files 01–63, and 144 parser/harness fixtures).
-- **The gates:** the pack requires every evaluator component to be built and
-  independently audited before any LLM is called. **No LLM has been called by any code in
-  this project.**
+If any live command fails, switch to (e), the 60-second fallback, and continue with (c).
 
-## What has been built (limited FIFO feasibility scope, Protocol L555 step 4)
+**Before the demo:** open the Codespace, `cd` to the repository root, start Docker, and run
+command 4 once to warm the image. Every command in (b) is copy-paste ready.
 
-- **Parser and validator** for model responses: envelope, JSON schema, strict Python AST
-  policy, import policy, entry-point signatures and compilation.
-- **Sandbox:** generated code runs in locked-down containers (no network, read-only,
-  non-root, resource limits). The pinned runtime is CPython 3.11.18 by image digest.
-- **Simulation harness:** Icarus Verilog plus cocotb, a reactive driver loop, four-state
-  traces, paired original/null-netlist runs with a masked comparison, and checker runs
-  in separate processes.
-- **A 4-entry × 8-bit FIFO design:**
-  - specification, RTL, null-netlist export (Yosys), frozen 24 Nov 2026
-    (FREEZE-2026-11-24: Krishika's signature under governance rule D-008; Ayush's
-    ratification pending);
-  - an observation mask, accepted by the owner under deviation DEV-001 because no
-    independent reviewer is available (not independently reviewed);
-  - simultaneous read/write at full and a registered almost-full as its documented
-    corner cases.
-- **Fixture runner and evidence records:** hashes of every input, the interpreter, the
-  image and the source files. Each run re-checks the frozen files against their signed
-  hashes.
-- **Feasibility-control harness (F1–F17):** built and unit-tested. F14 (export
-  repeatability) and F15 (ledger identities) pass; each rests on a D-009 approval. The other controls wait
-  for owner-written mutants, drivers and checkers.
+---
 
-## Results (latest evidence run `run-20261126T144718Z`, pinned image)
+## (a) What OpenVEF is (1 minute)
 
-| PASS | FAIL | NOT IMPLEMENTED | ERROR | Total |
-|---|---|---|---|---|
-| 127 | 0 | 17 | 0 | 144 |
+OpenVEF is a planned, reproducible study of hardware-verification code written by language models. A model
+writes a paired *driver*, which steps a cycle-exact RTL design, and *checker*, which judges the recorded trace. The
+harness runs both on the original design and on mutated versions, to measure whether the checker catches real faults
+without false alarms. The method is fixed in advance in a frozen planning pack (v1.3.6, 144 mandatory
+parser/harness fixtures), and the pack requires every evaluator component to be built and independently audited
+**before any model is called**. What we show today is that evaluator, built only for a 4-entry × 8-bit FIFO
+(feasibility scope, Protocol L555 step 4). **No LLM has been called by any code in this project.**
 
-**What to say about these numbers:**
-- **F18 is not passed.**
-- **No pass is marked provisional, but 9 of the 127 carry a label:** "cleared under
-  DEV-001 (non-independent review saved)". No independent mask reviewer is available, so
-  Krishika accepted the mask with a saved Claude (claude.ai) review. Claude Code drafted the
-  mask, so the review is not independent. The Protocol's independent signature (L271) is still missing.
-- **Many passes rest on readings of ambiguous pack text.** Claude decided them under a
-  delegation. Krishika approved them as decided, without itemised owner review (D-009); A-053 is approved (D-014), subject to re-audit.
-  They are listed in `docs/READINGS-REVIEW.md`; R01–R13 and several M-fixtures would
-  change under a competing reading.
-- **The count went 139, 123, 127 around an AI audit. Say so.** Krishika accepted a finding
-  against runner branches only one fixture could reach, and all 15 were removed (123). The rule
-  was then replaced (D-013): an adapter now needs pack text that defines its input, plus
-  synthetic tests. Five came back and one more went (127). Changing a rule after a finding
-  needs a re-audit. It happened: the finding was **not fully resolved** (M18, since fixed, not re-audited).
-- **The 17 NOT IMPLEMENTED:** 15 have an input or outcome the pack doesn't define, and two
-  (M42, M47) supply halt signatures the Protocol doesn't allow (PD-01).
-- **The audit was by an AI model, not a human (DEV-002).** It found one
-  blocker and one major issue, and could not run Docker or the pinned Python. A re-audit followed;
-  its result was **NOT CLEARED** (two blockers). All its findings were accepted and fixed (D-015), including artifact
-  isolation, and later changes deny wall-clock reads (D-016) and test the edges of every adapter input (D-017). A third audit was also **NOT CLEARED** (two blockers): the forgery it found is only partly closed (D-019), and that change has not been re-audited. All three reports are in `docs/reviews/`.
-- **The pack has 26 recorded defects** (pack-defects.md).
-- **AI-assisted, disclosed:** the FIFO specification, RTL and mask drafts were written
-  by Claude via Claude Code. The specification and RTL were approved by Krishika in the
-  freeze; the mask is accepted under DEV-001. If a Claude model is ever
-  evaluated, that is reported as a potential familiarity confound.
-- **Benchmark overlap is disclosed.** The closest public match is GateTruth's
-  synchronous FIFO; FIFO designs are not novel, and no novelty is claimed.
+---
 
-## 5-minute live demo (run from the repository root)
+## (b) Live commands (4 minutes)
 
-**Before the demo:** Docker running; run `.venv/bin/python -I tests/test_fifo_rtl.py`
-once to warm the image (about 15 s).
+Run from the repository root. Outputs below were captured on 26 Nov 2026 (files in `docs/demo/`).
 
-1. **The frozen planning pack is byte-verified** (30 s). The 61 skipped entries are
-   historical `archive_*` files that are not extracted.
-   ```
-   (cd baseline/OpenVEF_Planning_v1_3_6 && sha256sum -c --ignore-missing --quiet 27_SHA256SUMS.txt && echo "pack verified")
-   ```
-2. **The design under test** (60 s). Show the specification clauses and the 66-line RTL.
-   ```
-   sed -n '/^## \[Design specification\]/,/^### Worked example/p' docs/fifo-spec-v0.2.md | head -60
-   cat design/fifo/rtl/ovf_fifo.v
-   ```
-3. **The spec is checked mechanically** (15 s): clause IDs, the executable legal-input
-   rule, and the worked example against a model.
-   ```
-   .venv/bin/python -I tests/test_fifo_spec.py -v
-   ```
-4. **The real RTL in the sandbox** (30 s): the worked example on the RTL, and an illegal
-   driver (a write while full) caught as `ILLEGAL_PROTOCOL_STATE`.
-   ```
-   .venv/bin/python -I tests/test_fifo_rtl.py -v FifoRtlTests.test_worked_example_on_rtl FifoRtlTests.test_check_e_rejects_write_while_full_without_read
-   ```
-5. **The evidence record** (60 s): counts, the pinned interpreter, and which results are
-   provisional or cleared under DEV-001.
-   ```
-   python3 -c "import json;s=json.load(open('evidence/run-20261126T144718Z/summary.json'));print(s['counts']);print(s['python_version']);print(s['interpreter_status']);print('provisional:',s['provisional_fixtures']);print(s['deviation_labels'],s['deviation_cleared_fixtures'])"
-   grep '"fixture_id": "M27"' evidence/run-20261126T144718Z/results.jsonl | python3 -c "import json,sys;r=json.loads(sys.stdin.read());print(r['status'],'-',r['note'])"
-   ```
-6. **What is open** (60 s): open `docs/DEVIATIONS.md` (the unmet mask review) and `docs/AUDIT-READINESS.md` (what the auditor will check; DEV-002: an AI model, not a human independent auditor).
-
-*Optional, if there is time:* start a full containerized run at the beginning, writing
-outside the evidence tree, and show its counts at the end. It takes a few minutes, so
-time it beforehand.
+### 1. The frozen pack is byte-verified (30 s)
 
 ```
-OPENVEF_EVIDENCE_ROOT=/tmp/openvef-demo runner/run_f18_container.sh demo
+(cd baseline/OpenVEF_Planning_v1_3_6 && sha256sum -c --ignore-missing --quiet 27_SHA256SUMS.txt && echo "pack verified")
 ```
+Expected output:
+```
+pack verified
+```
+Say: every pack file we use matches the published hash list; the pack is read-only.
+
+### 2. The F18 fixture run, pinned interpreter (60 s)
+
+Evidence run **`run-20261126T144718Z`** (commit `793089b`, pinned image `python:3.11.18-slim` by digest).
+```
+python3 -c "import json;s=json.load(open('evidence/run-20261126T144718Z/summary.json'));print('run',s['run_started_utc'],'commit',s['git_commit'][:7]);print(s['counts'],'total',s['total']);print('python',s['python_version'].split()[0],'-',s['interpreter_status']);print('SELF_REPORTED:',s['runtime_checks_self_reported']);print('cleared under DEV-001:',s['deviation_cleared_fixtures'])"
+```
+Expected output:
+```
+run 20261126T144718Z commit 793089b
+{'PASS': 127, 'FAIL': 0, 'NOT_IMPLEMENTED': 17, 'ERROR': 0} total 144
+python 3.11.18 - PINNED (D-002a: runner and artifacts in the pinned image)
+SELF_REPORTED: ['M06:driver.py']
+cleared under DEV-001: ['M07', 'M31', 'M32', 'M33', 'M57', 'P01', 'P14', 'P21', 'P42']
+```
+Say: 127 of 144 match the expected outcome byte for byte, none fail, 17 cannot be run because the pack does not
+define their input or outcome. **That is not an F18 pass** (see (d)). Nine passes carry a deviation label, and one
+carries a SELF_REPORTED label, shown next.
+
+### 3. One rejection: M06, a driver that lies about its type (75 s)
+
+```
+python3 -c "import json;d=json.load(open('baseline/OpenVEF_Planning_v1_3_6/41_F18_Fixture_Inputs/M06.json'));print(d['description']);print(d['input']['response_object']['driver']['source'])" && grep '"fixture_id": "M06"' evidence/run-20261126T144718Z/results.jsonl | python3 -c "import json,sys;r=json.load(sys.stdin);print('status  :',r['status']);print('expected:',r['expected']['diagnostic']);print('actual  :',r['actual']['diagnostic']);print('runtime :',r['runtime_checks']);print('note    :',r['note'])"
+```
+Expected output:
+```
+Factory returns non-Driver object
+import random
+
+def create_driver(seed):
+    driver = Driver()
+    driver.rng = random.Random(seed)
+    return object()
+
+class Driver:
+    def step(self, cycle_index, outputs_after_edge):
+        return "COMPLETE"
+
+status  : PASS
+expected: ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RETURN_TYPE
+actual  : ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RETURN_TYPE
+runtime : {'checker.py': {'basis': 'PROVEN', 'reason': 'closed fragment'}, 'driver.py': {'basis': 'SELF_REPORTED', 'reason': 'return value at line 6'}}
+note    : [SELF_REPORTED (D-020): runtime check not statically PROVEN: driver.py]
+```
+Say: the factory returns `object()` instead of a `Driver`; the evaluator rejects it with the exact diagnostic the pack
+expects. The return type is only known from the process that ran the artifact's code, so the evaluator labels the
+result **SELF_REPORTED**: a hostile artifact could have lied about it. The label is kept visible (D-020).
+
+### 4. One isolation attack (75 s)
+
+```
+.venv/bin/python -I tests/test_artifact_isolation.py -v IsolationTests.test_system_access_is_denied
+```
+Expected output (about 6 s):
+```
+test_system_access_is_denied (__main__.IsolationTests.test_system_access_is_denied) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 4.026s
+
+OK
+```
+Say: the test plays a hostile artifact that tries to escape the sandbox: open `/proc/<pid>/mem` and `environ`,
+write to another process's output, read the harness source, write files, fork, exec, kill its parent. Every attempt
+must fail, and it does. This live run uses the Codespace's development Python; the same test passes in the pinned
+image in **`container-tests-20261126T145729Z`** (387 of 387 tests pass), which is the evidence.
+
+---
+
+## (c) The audit story, #1 → #5 (2.5 minutes)
+
+No independent human implementation auditor was available, so under deviation **DEV-002** the audit was done by a
+different AI model (OpenAI GPT-6), operated by Krishika. Reports and author's notes are in `docs/reviews/`.
+
+| # | Date | Bundle (SHA-256) | Verdict | BLOCKER | MAJOR | Limitations | Response |
+|---|---|---|---|---|---|---|---|
+| 1 | 25 Nov | `e0ee23ff…fa01` | FINDINGS (no overall clearance) | 1 (A1-1: runner branches only one fixture reaches) | 1 (A8-1) | 4 | D-012 to D-014 |
+| 2 | 25 Nov | `34bc8109…c0c0` | NOT CLEARED | 2 (A1-1, A9-1: artifact code shared the evaluator's interpreter) | 1 (A4-1) + A8-2 cross-reference | 3 | D-015 to D-018 |
+| 3 | 25 Nov | `b1235ba3…327d` | NOT CLEARED | 2 (A1-1, A9-2: runtime checks the artifact could forge) | 0 | 2 | D-019 to D-021 |
+| 4 | 26 Nov | `93b249a6…1907` | NOT CLEARED | 0 | 2 (A1-1 citation, A9-2 literal `inspect.signature`) | 8 | D-022 |
+| 5 | 26 Nov | `5bdc25ea…2cc2` | **CLEARED for D-022** | 0 | 0 | 11 | D-023 |
+
+Say:
+- Audits #1–#4 each found real problems; each was accepted, fixed and sent back. Audit #5 found none, only limitations. **D-023:** the sequence #1–#5 is complete
+  with no open BLOCKER or MAJOR.
+- Audit #5's clearance is **scoped to D-022**; its own report says it is not a clearance of the whole implementation.
+- **The pass count moved 139 → 123 → 127 around audit #1.** A rule was tightened after the finding, then replaced
+  (D-013) so that five fixtures came back; changing a rule after an adverse finding is disclosed wherever the count
+  is quoted.
+- The auditor could not run Docker or the pinned Python; it read the container logs and re-checked hashes.
+
+---
+
+## (d) What is not done (2 minutes)
+
+- **L555 step (5), independent re-audit: not done.** The five audits are AI audits under DEV-002, not a human
+  independent audit, and the owners do not mark the step done.
+- **F18 is not passed.** 17 fixtures are NOT_IMPLEMENTED (15 have no input or outcome defined in the pack; M42 and
+  M47 need halt signatures the Protocol does not allow, PD-01).
+- **Independent mask review (L271): unmet.** 9 passes are "cleared under DEV-001 (non-independent review saved)";
+  the mask was drafted by Claude and accepted by Krishika with a saved, non-independent Claude review.
+- **Two disclosed limitations stay open:** the SELF_REPORTED residual (an artifact outside the provable fragment can
+  still forge its runtime report; reported as measured and with every SELF_REPORTED artifact counted invalid, D-020),
+  and A1-1-L1 (the citation-support test is not a semantic proof).
+- **Feasibility controls:** F14 and F15 pass; the other 14 wait for owner-written mutants, drivers and checkers
+  (`controls-20261126T144918Z`: 2 PASS, 14 BLOCKED_OWNER_ARTIFACTS).
+- **Readings:** many passes rest on Claude's readings of ambiguous pack text, approved as decided without itemised
+  owner review (D-009). The pack has 26 recorded defects (`docs/pack-defects.md`).
+- **Ayush's ratification** of decisions Krishika signed alone is pending (D-008).
+- **AI assistance is disclosed:** the FIFO specification, RTL and mask were drafted by Claude via Claude Code. If a
+  Claude model is ever evaluated, that is reported as a potential familiarity confound.
+- **The LLM-call gate (step 6) stays closed.**
+
+---
+
+## (e) 60-second fallback (if live commands fail)
+
+The outputs of all four commands were captured on 26 Nov 2026 and saved in `docs/demo/`, each file headed by its
+command, time and commit:
+
+```
+cat docs/demo/1-pack-verify.txt docs/demo/2-f18-summary.txt docs/demo/3-m06-rejection.txt docs/demo/4-isolation-attack.txt
+```
+If the terminal itself is unavailable, open the same files in the editor, or show the expected outputs in (b).
+Say: "These were captured from the same commands; the underlying evidence runs are `run-20261126T144718Z` and
+`container-tests-20261126T145729Z`, both in the repository." Then go on to (c).

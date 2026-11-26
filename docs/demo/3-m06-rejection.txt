@@ -1,0 +1,20 @@
+# Captured 2026-11-26T15:20:26Z in the Codespace, repository root, HEAD 803f673 (tree: D-023 doc edits uncommitted)
+$ python3 -c "import json;d=json.load(open('baseline/OpenVEF_Planning_v1_3_6/41_F18_Fixture_Inputs/M06.json'));print(d['description']);print(d['input']['response_object']['driver']['source'])" && grep '"fixture_id": "M06"' evidence/run-20261126T144718Z/results.jsonl | python3 -c "import json,sys;r=json.load(sys.stdin);print('status  :',r['status']);print('expected:',r['expected']['diagnostic']);print('actual  :',r['actual']['diagnostic']);print('runtime :',r['runtime_checks']);print('note    :',r['note'])"
+Factory returns non-Driver object
+import random
+
+def create_driver(seed):
+    driver = Driver()
+    driver.rng = random.Random(seed)
+    return object()
+
+class Driver:
+    def step(self, cycle_index, outputs_after_edge):
+        return "COMPLETE"
+
+status  : PASS
+expected: ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RETURN_TYPE
+actual  : ENTRY_POINT_REJECT|file=driver.py|symbol=create_driver|reason=RETURN_TYPE
+runtime : {'checker.py': {'basis': 'PROVEN', 'reason': 'closed fragment'}, 'driver.py': {'basis': 'SELF_REPORTED', 'reason': 'return value at line 6'}}
+note    : [SELF_REPORTED (D-020): runtime check not statically PROVEN: driver.py]
+# exit 0

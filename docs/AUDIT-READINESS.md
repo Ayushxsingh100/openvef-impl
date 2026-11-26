@@ -19,7 +19,11 @@ It is a status document: it claims no gate as passed.
   MAJOR and a cross-reference, three limitations. A third audit
   ([report](reviews/implementation-reaudit3-gpt6-2026-11-25.md), after D-015 to D-018) also ended NOT CLEARED: BLOCKERs A1-1 and
   A9-2. A fourth audit ([report](reviews/implementation-reaudit4-gpt6-2026-11-26.md), after D-019 to D-021) also ended
-  NOT CLEARED: no BLOCKER, MAJORs A1-1 and A9-2. The code changed after it (D-022), and that is not re-audited.
+  NOT CLEARED: no BLOCKER, MAJORs A1-1 and A9-2. A fifth audit ([report](reviews/implementation-reaudit5-gpt6-2026-11-26.md),
+  after D-022) ended **CLEARED for D-022**: 0 BLOCKER, 0 MAJOR, 0 MINOR, 11 LIMITATIONs. **D-023:** the AI audit
+  sequence #1–#5 is complete with no open BLOCKER or MAJOR; A1-1 and A9-2 are closed as findings; A1-1-L1 (the
+  support-table validator is not a semantic proof) and the SELF_REPORTED residual stay disclosed limitations.
+  Step (5) is still **not marked done**: an AI audit under DEV-002 is not a human independent audit.
 - **Prohibited:** no LLM or provider call has been made by any code, test or script
   (CLAUDE.md hard rule 5). The LLM-call gate, step (6), is closed.
 
@@ -34,7 +38,8 @@ Latest evidence run: **`evidence/run-20261126T144718Z`**.
   and toolchain identity are recorded in its `summary.json`.
 - Every record is identical to the previous run, `run-20261125T183002Z` (D-021), except measured
   wall-clock times. D-022 (re-audit #4: `stop` cites File 36 L48; literal `inspect.signature` after
-  import) changed no status, note or label. **D-019 to D-022 require re-audit; A9-2 is not fully closed.**
+  import) changed no status, note or label. D-019 to D-022 are audited (fourth and fifth audits); A9-2 is closed as a
+  finding, and its SELF_REPORTED residual stays a disclosed limitation (D-023).
 - **Runtime checks (D-019; SELF_REPORTED policy D-020):** 16 fixtures reach them. M06's driver is SELF_REPORTED (it returns a non-Driver and is rejected); the
   rest are PROVEN, so no accepted result rests on a report the artifact could forge. Per D-020 a SELF_REPORTED
   fixture keeps its verdict with a visible label; **SELF_REPORTED fixtures: `M06:driver.py` (PASS, labelled)**.
@@ -67,8 +72,9 @@ auditor should weigh them with that in mind.
   ambiguous, assigned an outcome not in the normative contract, or produces a different
   stage, error class, diagnostic byte string or terminal disposition".
 - 17 fixtures are not run to an outcome, L271 is unmet (DEV-001), and the independent
-  implementation re-audit (L555 (5)) is not done: the DEV-002 AI audit found a BLOCKER (A1-1), the
-  re-audit, the third and the fourth audit ended NOT CLEARED, and the code changed after all four.
+  implementation re-audit (L555 (5)) is not done: the DEV-002 AI audit sequence #1–#5 is complete with no open
+  BLOCKER or MAJOR (D-023), but it is an AI audit, not a human independent audit, and the fifth report's clearance
+  is scoped to D-022 with 11 named limitations.
 
 ## 2a. Feasibility controls F1–F15, F17 (Protocol §17)
 
@@ -114,7 +120,7 @@ Status is checked against the latest evidence run, `evidence/run-20261126T144718
 **Also available to the auditor:**
 - [traceability.md](traceability.md), [ambiguities.md](ambiguities.md),
   [pack-defects.md](pack-defects.md), [assistance-log.md](assistance-log.md);
-- the unit tests in `tests/`, 23 files, run with `.venv/bin/python -I tests/<file>`;
+- the unit tests in `tests/`, 25 files, run with `.venv/bin/python -I tests/<file>`;
 - `evidence/container-tests-*`: logs of the whole suite inside the pinned image (D-017). Inspection evidence, not an F18 run.
 
 **File 50 Python 3.11 Unicode tokenizer check (L555 (4)): recorded.** Run
@@ -140,19 +146,17 @@ this run is on the pinned one.
 
 | Item | Owner | Reference |
 |---|---|---|
-| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-021, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
+| **Ayush ratification pending** (the single entry under D-008): Ayush Kumar Singh's agreement to every decision and approval Krishika signed alone, including the freeze package (`a955245`) and every decision recorded as awaiting his confirmation (D-001–D-023, DEV-001, DEV-002, A-001–A-006, A-013, A-014, A-015 case 2, A-042). Under D-008 these take effect now | Ayush | [ambiguities.md](ambiguities.md) D-008; [FREEZE-RECORD-2026-11-24.md](FREEZE-RECORD-2026-11-24.md) |
 | Sign the overlap disclosure note's own owner-signature table (F1 in the package is approved) | owners | [fifo-benchmark-overlap-disclosure-DRAFT.md](fifo-benchmark-overlap-disclosure-DRAFT.md) |
 | Itemised review of the readings approved under D-009 (A-007–A-012, A-013 tie, A-015–A-037, A-039, A-045–A-052, F15 case table): approved as decided, **not** reviewed item by item; A-031 withdrawn (D-012). Optional for the owners | an owner | [READINGS-REVIEW.md](READINGS-REVIEW.md); D-009 |
 | Pack defects PD-01…PD-24 (settle, or accept the interim readings) | owners | [pack-defects.md](pack-defects.md) |
 | M27: a corrected fixture in a future pack release (port manifest with widths, an executable predicate consistent with the frozen FIFO rules) | owners | PD-25; A-038 (revisited) |
-| Points the re-audit left open: single-fixture shapes under the original A1 criterion are kept; owner statement: "it will not be met by design; disclosed for every audit" (D-019); the three-vector minimum is kept and boundary tests added ([note](reviews/implementation-reaudit-gpt6-2026-11-25-NOTE.md)). Re-audit needed | the auditor | DEV-002; D-013; D-017 |
-| How a SELF_REPORTED artifact is treated (A9-2 residual): **owner decision taken (D-020)** — F18 keeps the verdict with a visible label; confirmatory use reports the validity endpoint as measured (primary) and with every SELF_REPORTED artifact counted invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED count. Still not re-audited | the auditor | D-020 |
+| Disclosed for every audit: the original single-fixture-shape criterion is unmet by design (D-019 owner statement; five shapes M18, M19, M25, M26, M28 kept under D-013, as the fifth audit lists them) | owners (disclosure) | DEV-002; D-013; D-017; D-023 |
+| How a SELF_REPORTED artifact is treated (A9-2 residual): **owner decision taken (D-020)** — F18 keeps the verdict with a visible label; confirmatory use reports the validity endpoint as measured (primary) and with every SELF_REPORTED artifact counted invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED count. Judged an honest disclosure policy by the fourth audit; the residual stays a disclosed limitation (D-023) | — (done) | D-020, D-023 |
 | Review of A-057 (P11b depends on it): **approved as decided (D-020)** | — (done) | D-020 |
-| Re-audit of D-022 (A1-1 `stop` citation and support table; literal `inspect.signature`, A-058), with regression of prior findings | the auditor | D-022 |
-| Re-audit of D-019, D-020 and D-021 (fourth audit: NOT CLEARED, MAJORs A1-1 and A9-2; D-022 responds) | the auditor | D-019, D-020, D-021 |
-| Re-audit of the D-015, D-016 and D-017 changes (A-054 approved, D-016; A-055 and A-056 approved, D-018); wall-clock residuals in [DEVIATIONS.md](DEVIATIONS.md) | the auditor | D-015, D-016 |
+| AI audit sequence #1–#5: **complete, no open BLOCKER or MAJOR** (fifth audit CLEARED for D-022). Kept as disclosed limitations: A1-1-L1, the SELF_REPORTED residual, the wall-clock residuals in [DEVIATIONS.md](DEVIATIONS.md), and the fifth report's coverage limitations L-02–L-11 | — (done; limitations stay disclosed) | D-023 |
 | Input contracts and outcomes for the 15 fixtures without one (PD-03, PD-04, PD-07, PD-26) | owners | D-013 |
-| Re-audit of D-013 and A-053 (approved, D-014); the passes resting on A-053 count subject to it | the auditor | D-013, D-014, A-053 |
+| A-053 (approved, D-014) and the other historical readings were not re-examined by the fifth audit (its L-08); the passes resting on A-053 are listed in [traceability.md](traceability.md) | owners (disclosure) | D-014, A-053 |
 | Draft pack corrections for M27, M36, M42, M47, M48, M50, M54, M58, PD-22 and PD-24: `proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md` (DRAFT; needs a new independent document audit) | owners | PD-02, PD-03, PD-06, PD-22, PD-24, PD-25 |
 | M48, M50, M54, M58: the change-class fields with no supporting Protocol sentence | owners | A-033, PD-02 |
 | TechRxiv preprint: retrieve it, or record its access status; make the Charter and File 10 agree | owners | PD-24 |
@@ -162,7 +166,7 @@ this run is on the pinned one.
 | Item | Owner | Reference |
 |---|---|---|
 | Independent human mask reviewer: none available (DEV-001). Signing would end the deviation | owners to appoint if one becomes available; must not have authored the templates or the mask | L271; File 21 "Independent reviewer"; package §G |
-| Independent human implementation auditor: none available (DEV-002). A first AI audit (OpenAI GPT-6) is saved ([report](reviews/implementation-audit-gpt6-2026-11-25.md)), and the D-012 changes are not re-audited. Not a human independent audit | owners | L555 (5); [DEVIATIONS.md](DEVIATIONS.md) DEV-002; [AUDIT-BRIEF.md](AUDIT-BRIEF.md) |
+| Independent human implementation auditor: none available (DEV-002). Five AI audits (OpenAI GPT-6) are saved in [reviews/](reviews/); the sequence is complete with no open BLOCKER or MAJOR (D-023). Not a human independent audit, so step (5) is not marked done | owners | L555 (5); [DEVIATIONS.md](DEVIATIONS.md) DEV-002; [AUDIT-BRIEF.md](AUDIT-BRIEF.md) |
 
 **Human-written work (reserved by CLAUDE.md; Claude does not write it)**
 

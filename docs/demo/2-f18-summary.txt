@@ -1,0 +1,8 @@
+# Captured 2026-11-26T15:20:26Z in the Codespace, repository root, HEAD 803f673 (tree: D-023 doc edits uncommitted)
+$ python3 -c "import json;s=json.load(open('evidence/run-20261126T144718Z/summary.json'));print('run',s['run_started_utc'],'commit',s['git_commit'][:7]);print(s['counts'],'total',s['total']);print('python',s['python_version'].split()[0],'-',s['interpreter_status']);print('SELF_REPORTED:',s['runtime_checks_self_reported']);print('cleared under DEV-001:',s['deviation_cleared_fixtures'])"
+run 20261126T144718Z commit 793089b
+{'PASS': 127, 'FAIL': 0, 'NOT_IMPLEMENTED': 17, 'ERROR': 0} total 144
+python 3.11.18 - PINNED (D-002a: runner and artifacts in the pinned image)
+SELF_REPORTED: ['M06:driver.py']
+cleared under DEV-001: ['M07', 'M31', 'M32', 'M33', 'M57', 'P01', 'P14', 'P21', 'P42']
+# exit 0

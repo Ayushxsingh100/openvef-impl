@@ -1,0 +1,4 @@
+# Captured 2026-11-26T15:20:26Z in the Codespace, repository root, HEAD 803f673 (tree: D-023 doc edits uncommitted)
+$ (cd baseline/OpenVEF_Planning_v1_3_6 && sha256sum -c --ignore-missing --quiet 27_SHA256SUMS.txt && echo "pack verified")
+pack verified
+# exit 0

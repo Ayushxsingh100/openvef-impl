@@ -90,7 +90,29 @@ Disposition **NOT CLEARED**: BLOCKERs A1-1 and A9-2 (new), limitations A3-1 and 
 original A9-1 attack resolved. D-019 accepts A9-2, which is **not fully closed** ("Open residual (D-019)" below).
 Owner statement on A1-1: "The original single-fixture-shape criterion is superseded by D-013 because the
 v1.3.6 pack itself contains one-of-a-kind fixtures; it will not be met by design; disclosed for every
-audit." **D-019 is not re-audited.** Step (5) is not marked done.
+audit." D-019 was covered by the fourth audit. Step (5) is not marked done.
+
+**Fourth audit: report received and saved** (OpenAI GPT-6, operator Krishika, 26 Nov 2026, bundle
+`93b249a61eac478304162e52d856f6a5185ed32338582716103a7891585a1907`):
+[report](reviews/implementation-reaudit4-gpt6-2026-11-26.md), SHA-256
+`07508e1fc6e1f2a879176c7492251048aa77b20c7fe1dd82b71aaae8a09272a9`; [note](reviews/implementation-reaudit4-gpt6-2026-11-26-NOTE.md).
+Scope D-019 to D-021. Disposition **NOT CLEARED**: 0 BLOCKER, MAJORs A1-1 (`stop` citation) and A9-2 (code-object
+measurement instead of the literal `inspect.signature`), 8 LIMITATIONs. A4-1, A8-1, A8-2, A9-1 resolved; D-020 judged an
+honest disclosure policy; D-021 supported. D-022 responds. Step (5) is not marked done.
+
+**Fifth audit: report received and saved** (OpenAI GPT-6, operator Krishika, 26 Nov 2026, bundle
+`5bdc25ea3bf0be66f16a0aa5a47737c2b29f8c798f31495ffa670859689b2cc2`, release `audit5-5bdc25ea`):
+[report](reviews/implementation-reaudit5-gpt6-2026-11-26.md), SHA-256
+`0e56d990e388fbf140f32d6fa7dbb2bf38772e60955e5b680cd00777cb74cc00`; [note](reviews/implementation-reaudit5-gpt6-2026-11-26-NOTE.md).
+Scope D-022 plus regression. Disposition **CLEARED for D-022**: 0 BLOCKER, 0 MAJOR, 0 MINOR, 11 LIMITATIONs. A1-1 and
+the A9-2 literal-signature correction resolved; A4-1, A8-1, A8-2, A9-1 remain fixed. The clearance is scoped to D-022; the
+report says it is not a clearance of the whole implementation.
+
+**Status (D-023, Krishika, on Claude (claude.ai) triage):** the AI audit sequence #1–#5 is complete, with no open
+BLOCKER or MAJOR. A1-1 and A9-2 are closed as findings. Kept as disclosed limitations: **A1-1-L1** (the support-table
+validator is not a semantic proof) and the **SELF_REPORTED residual** (L-10; "Open residual (D-019)" below), with the
+fifth report's coverage limitations L-02 to L-11. **Step (5) is not marked done**: these are AI audits under this
+deviation, not a human independent audit. F18 is not passed.
 
 **Response (D-012):** A1-1 and A8-1 accepted and applied; limitations A2, A3, A5 and A9
 accepted and recorded, not treated as defects. The D-012 to D-014 code was then
@@ -191,5 +213,6 @@ Not an accepted deviation: recorded for the auditor, at Krishika's instruction (
   SELF_REPORTED artifact counted invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED
   count. Analysis rule in [F1-F17-plan.md](F1-F17-plan.md); see also [sandbox.md](sandbox.md) "Runtime checks".
 
-**Not re-audited.** D-020 takes the open owner decision but does not close A9-2; the forgery residual
-above stands, and D-019 + D-020 still require re-audit. D-022 (item 3) is not re-audited and does not close A9-2 either.
+**Audited; residual not closed.** D-019 to D-021 were covered by the fourth audit and D-022 (item 3) by the fifth
+(CLEARED for D-022). A9-2 is closed as a finding (D-023); the forgery residual above stands as a disclosed
+limitation (fifth audit L-10), and nothing here closes it.

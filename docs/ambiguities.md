@@ -1834,3 +1834,21 @@ the call must confirm, and defaults are not in the list. D-022 uses the same wor
 
 **Approved by Krishika as decided**, on Claude (claude.ai) review: L35 says names/kinds/counts, and no fixture
 depends on defaults. (Takes effect under D-008; Ayush's ratification stays the single entry in AUDIT-READINESS.md.)
+
+## D-023 — Status after re-audit #5 (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) triage of re-audit #5 (GPT-6, bundle `5bdc25ea…2cc2`; D-022
+CLEARED, 0 BLOCKER / 0 MAJOR / 0 MINOR, 11 LIMITATIONs; report and note in `docs/reviews/`). No pack rule changes; no code
+changes. Takes effect under D-008; Ayush's ratification stays the single entry in AUDIT-READINESS.md. The freeze after
+release `audit5-5bdc25ea` is lifted.
+
+1. **Status:** the implementation audit sequence #1–#5 is complete, with no open BLOCKER or MAJOR. A1-1 and A9-2 are closed
+   as findings. Kept as disclosed limitations: **A1-1-L1** (`value_support_problems` checks that the words are in the quote,
+   not that they support the value; it accepts `(MEANING, "JSON")` for `stop`) and the **SELF_REPORTED residual**
+   ([DEVIATIONS.md](DEVIATIONS.md) "Open residual (D-019)"; fifth audit L-10), with the fifth report's coverage
+   limitations L-02 to L-11.
+2. **Not claimed:** L555 (5) is **not** marked done (AI audits under DEV-002, not a human independent audit); F18 is
+   **not** passed; L271 stays unmet (DEV-001).
+3. `docs/DEMO-2DEC.md` is rewritten as a 10-minute faculty demo script, with pre-captured outputs in `docs/demo/`.
+
+F18 is not passed.
