@@ -186,7 +186,9 @@ EDITS: list[tuple[str, str, str, str, int, str, str]] = [
      '"stable_error_class": "RecorderFault",', '"stable_error_class": "NONE",'),
 ]
 
-# C6: the whole M27 descriptor is replaced (its input shape changes). The expected object is unchanged.
+# C6, as amended by A1 (D-025): the whole M27 descriptor is replaced (its input shape changes). The expected object
+# is unchanged. A1 replaces the FIFO-042 predicate of the 24 Nov draft by the v1.3.6 descriptor's own rule,
+# "wr_en must be 0 when full is 1", over a port set holding `wr_en` only, with `full` as a sampled output.
 M27_NEW = {
     "fixture_id": "M27",
     "fixture_version": VERSION_LABEL,
@@ -195,20 +197,19 @@ M27_NEW = {
                    "predicate",
     "manifest_clause_ids": ["FIFO-001"],
     "input": {
-        "driver_return": {"wr_en": "1", "wr_data": "00000000", "rd_en": "0"},
-        "input_port_widths": {"wr_en": 1, "wr_data": 8, "rd_en": 1},
-        "sampled_outputs": {"rd_valid": "0", "rd_data": "00000000", "full": "1", "almost_full": "1", "empty": "0"},
+        "driver_return": {"wr_en": "1"},
+        "input_port_widths": {"wr_en": 1},
+        "sampled_outputs": {"full": "1"},
         "legal_input_predicate": {
             "language": "python3.11",
             "function": "legal_input",
-            "source": "def legal_input(vector: dict[str, str], sampled: dict[str, str]) -> bool:\n"
-                      "    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\" and "
-                      "vector[\"rd_en\"] == \"0\")\n"},
+            "source": "def legal_input(vector, sampled):\n"
+                      "    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\")\n"},
     },
     "expected": {"disposition": "REPAIR", "stage_id": "DRIVER_VECTOR", "error_class": "DRIVER_VECTOR_INVALID",
                  "diagnostic": "DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE"},
 }
-WHOLE_FILES = {FX + "M27.json": ("C6", "PD-06, PD-25", "M27")}
+WHOLE_FILES = {FX + "M27.json": ("C6 + A1", "PD-06, PD-25", "M27")}
 # In-file version labels on changed descriptors (approved labelling: changed files carry the label in-file).
 VERSION_LINES = {FX + n: 3 for n in ("M41.json", "M42.json", "M47.json")}
 

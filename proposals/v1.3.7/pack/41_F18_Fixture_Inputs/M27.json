@@ -8,26 +8,18 @@
   ],
   "input": {
     "driver_return": {
-      "wr_en": "1",
-      "wr_data": "00000000",
-      "rd_en": "0"
+      "wr_en": "1"
     },
     "input_port_widths": {
-      "wr_en": 1,
-      "wr_data": 8,
-      "rd_en": 1
+      "wr_en": 1
     },
     "sampled_outputs": {
-      "rd_valid": "0",
-      "rd_data": "00000000",
-      "full": "1",
-      "almost_full": "1",
-      "empty": "0"
+      "full": "1"
     },
     "legal_input_predicate": {
       "language": "python3.11",
       "function": "legal_input",
-      "source": "def legal_input(vector: dict[str, str], sampled: dict[str, str]) -> bool:\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\" and vector[\"rd_en\"] == \"0\")\n"
+      "source": "def legal_input(vector, sampled):\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\")\n"
     }
   },
   "expected": {

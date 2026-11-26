@@ -231,6 +231,8 @@ implements. The property names were first used in the draft's own M27, written b
 
 ### C6 — M27 descriptor (PD-06, PD-25)
 
+**Amended by A1 (section 5, D-025):** the FIFO-042 predicate below is replaced by the v1.3.6 descriptor's own rule.
+
 **Conflicting v1.3.6 text.**
 
 > [41/M27.json L11] "\"wr_en\": \"1\","
@@ -349,3 +351,40 @@ supplies, so they stay NOT_IMPLEMENTED.** M41 also needs an input contract (PD-0
 6. **Stale references** left in place: File 22's File 10 hash, file names and headers still saying v1.3.6,
    `03_Change_Log` and `32_Status_and_Gates`; the `archive_*` entries of `27_SHA256SUMS.txt` are not in the copy.
 7. **Ten fixtures are not covered,** so a v1.3.7 F18 cannot pass on these corrections alone.
+
+## 5. Amendments (numbered; each in its own commit)
+
+### A1 — C6: a design-neutral predicate (D-025 item 2)
+
+**What changes.** M27's input becomes `driver_return` = `{"wr_en": "1"}`, `input_port_widths` = `{"wr_en": 1}`,
+`sampled_outputs` = `{"full": "1"}`, and the predicate `not (sampled["full"] == "1" and vector["wr_en"] == "1")`. The
+expected object, the File 36 row and C5 are unchanged.
+
+**From the pack text.** The pack already states the rule M27 is meant to exercise:
+
+> [41/M27.json L14] "\"legal_input_predicate\": \"wr_en must be 0 when full is 1\""
+
+Its defects (PD-25) were that `full` sits in the driven vector and that no port set or widths are given:
+
+> [41/M27.json L12] "\"full\": \"1\""
+
+> [30 L83] "(a) its key set equals the frozen top-level input-port set exactly"
+
+The rule names `full` only as a condition ("when full is 1"), so it is a sampled value, and `wr_en` is the only driven
+port it mentions. Executing exactly that rule over a port set of `wr_en` alone, with `full` sampled, keeps the pack's
+own predicate and fixes only what PD-25 names. A fixture executes "under pinned Python 3.11 and parser/schema
+versions" (36 L176): nothing in that list is a design specification, so a fixture should not need one.
+
+**Rejected.**
+- **FIFO-042** (the D-024 choice): it comes from the owner-frozen FIFO specification, outside the pack, written by
+  the implementation author, and ties F18 to one design's materials.
+- **Abstract port names** (`a`, `b`): further from the pack's own wording than needed.
+- **Adding `rd_en`**: brings back the question PD-25 raised (is a write with a read at full legal?), which the pack
+  answers nowhere; FIFO-030 answers it only for the FIFO.
+
+**Withdrawn.** C6's rejection "Keeping the v1.3.6 prose rule in executable form: contradicts FIFO-030" held only for a
+port set that includes `rd_en`; with `wr_en` alone there is no such case.
+
+**Fit with the current code.** None needed: the C5 adapter is general. The amended M27 passes (a)–(d) and fails (e);
+`{"wr_en": "0"}` is legal (tests/test_v137_candidate_pack.py).
+

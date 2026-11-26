@@ -1884,14 +1884,32 @@ Not audited. F18 is not passed.
   same functions as v1.3.6): `change_class` (C1–C4; `ledger.lifecycle_expectation_candidate`), `parser_unit_vector`
   (C9; the existing column rule), check-(e) vector (C5; `stage_map.validate_vector`). No fixture ID or expected value
   in code; general rules only (D-013, D-017).
-- **Predicate execution (decided by Claude, owner review pending).** The C5 predicate is pack text, verified by the
+- **Predicate execution (DECIDED: approved by Krishika under D-025, on condition that it runs only when the candidate pack's SHA256SUMS verify).** The C5 predicate is pack text, verified by the
   index SHA-256, and is executed in the runner as evaluator material, not in the artifact worker (D-015 concerns
   artifact code). Any exception or non-Boolean is "evaluator failure" (candidate File 30 L83), reported as
   NOT_IMPLEMENTED with that reason, never as an artifact verdict.
-- **Boundary-check exception (decided by Claude, owner review pending).** The `change_class` property's closed
+- **Boundary-check exception (DECIDED: approved by Krishika under D-025; domain fully covered by fixtures, disclosed).** The `change_class` property's closed
   domain is exactly the five candidate L176 labels, and each is a fixture input, so no in-domain edge can avoid being a
   fixture input. For that property only, the candidate boundary test allows it, and verifies that every label is a
   fixture input; every other D-017 condition is unchanged. The v1.3.6 test is not changed.
 - **No Phase A correction was found wrong**, so there is no amendment.
 
 Not audited. F18 is not passed.
+
+## D-025 — Review of D-024 (DECIDED)
+
+**Owner decision by Krishika**, on Claude (claude.ai) review of D-024. Takes effect under D-008; Ayush's ratification stays
+the single entry in AUDIT-READINESS.md.
+
+1. **Approved:** the runner-executed C5 predicate, on condition that it runs only when the candidate pack's SHA256SUMS
+   verify (check and test added in Phase B); the `change_class` boundary exception. Both marked decided under D-024.
+2. **Amendment A1 to C6:** a design-neutral predicate argued from pack text (`proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md`
+   section 5).
+3. **Stale references in the candidate** fixed so internal references are to v1.3.7-candidate, each listed in the CHANGELOG.
+4. **A new Phase A commit** (corrections only) drafting C11+ for PD-26, PD-07 and PD-20 for M42, M47, M41, M15, M14, M17,
+   M13, M37, P17, R07, under D-024's rules; a fixture that cannot be corrected without inventing behaviour is recorded as
+   "needs owner specification" with the exact missing decision.
+5. **Phase B** for whatever those corrections cover; amendments only as new numbered commits; v1.3.6 must stay 127/0/17/0.
+
+Not audited. F18 is not passed.
+

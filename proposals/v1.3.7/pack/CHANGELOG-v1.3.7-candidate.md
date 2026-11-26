@@ -51,7 +51,7 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E33 | label | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 110 |
 | E34 | label | — | — | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 418 |
 | E35 | label | — | — | `11_Comparative_Research_Matrix.md` | 44 |
-| E36 | C6 | PD-06, PD-25 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E36 | C6 + A1 | PD-06, PD-25 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
 | E37 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 380 |
 | E38 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 381 |
 | E39 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 562 |
@@ -572,7 +572,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E36 — C6 · `41_F18_Fixture_Inputs/M27.json` Lall · PD-06, PD-25 · fixtures: M27
+## E36 — C6 + A1 · `41_F18_Fixture_Inputs/M27.json` Lall · PD-06, PD-25 · fixtures: M27
 
 Old:
 
@@ -614,26 +614,18 @@ New:
   ],
   "input": {
     "driver_return": {
-      "wr_en": "1",
-      "wr_data": "00000000",
-      "rd_en": "0"
+      "wr_en": "1"
     },
     "input_port_widths": {
-      "wr_en": 1,
-      "wr_data": 8,
-      "rd_en": 1
+      "wr_en": 1
     },
     "sampled_outputs": {
-      "rd_valid": "0",
-      "rd_data": "00000000",
-      "full": "1",
-      "almost_full": "1",
-      "empty": "0"
+      "full": "1"
     },
     "legal_input_predicate": {
       "language": "python3.11",
       "function": "legal_input",
-      "source": "def legal_input(vector: dict[str, str], sampled: dict[str, str]) -> bool:\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\" and vector[\"rd_en\"] == \"0\")\n"
+      "source": "def legal_input(vector, sampled):\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\")\n"
     }
   },
   "expected": {
@@ -656,7 +648,7 @@ Old:
 New:
 
 ```text
-"sha256": "615c2da757b316cf16cc7a2da04ede2bba7df1ee80b80968480c6b299207ebdc",
+"sha256": "63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813",
 ```
 
 ## E38 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L381 · — · fixtures: M27
@@ -670,7 +662,7 @@ Old:
 New:
 
 ```text
-"bytes": 1136,
+"bytes": 880,
 ```
 
 ## E39 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L562 · — · fixtures: M41
@@ -852,7 +844,7 @@ fb7cd4179e9f103a1dc6f158839cd242b054f5d1e8fcf7e3c2a046c8c145e529  41_F18_Fixture
 New:
 
 ```text
-615c2da757b316cf16cc7a2da04ede2bba7df1ee80b80968480c6b299207ebdc  41_F18_Fixture_Inputs/M27.json
+63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813  41_F18_Fixture_Inputs/M27.json
 ```
 
 ## E52 — derived · `27_SHA256SUMS.txt` L80 · — · fixtures: —
@@ -908,5 +900,5 @@ f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54  41_F18_Fixture
 New:
 
 ```text
-cd87c9c8964327e0dd5542bd2ff78575d49674c892e426da25fd523f81a47cf4  41_F18_Fixture_Inputs/fixture-index.json
+3ffd4883fed3c33f00915b898a29d2f28db9d0a3b73a5bfd380a668ed7795278  41_F18_Fixture_Inputs/fixture-index.json
 ```

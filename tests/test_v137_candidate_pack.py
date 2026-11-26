@@ -111,7 +111,9 @@ class CandidatePackTests(unittest.TestCase):
         check = lambda v: validate_vector(v, widths, widths, lambda x: legal(x, inp["sampled_outputs"]))
         failure = check(inp["driver_return"])
         self.assertEqual(failure.diagnostic, m27["expected"]["diagnostic"])
-        self.assertIsNone(check(dict(inp["driver_return"], rd_en="1")))  # legal at full (FIFO-030)
+        self.assertIsNone(check({"wr_en": "0"}))  # legal at full
+        self.assertIsNone(validate_vector(inp["driver_return"], widths, widths, lambda x: legal(x, {"full": "0"})))
+        self.assertNotIn("FIFO", inp["legal_input_predicate"]["source"])  # A1: no design specification needed
 
 
 if __name__ == "__main__":

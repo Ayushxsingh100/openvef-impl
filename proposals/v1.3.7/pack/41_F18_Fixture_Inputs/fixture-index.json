@@ -377,8 +377,8 @@
       "fixture_id": "M27",
       "path": "41_F18_Fixture_Inputs/M27.json",
       "scope": "missing-case",
-      "sha256": "615c2da757b316cf16cc7a2da04ede2bba7df1ee80b80968480c6b299207ebdc",
-      "bytes": 1136,
+      "sha256": "63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813",
+      "bytes": 880,
       "expected": {
         "disposition": "REPAIR",
         "stage_id": "DRIVER_VECTOR",
