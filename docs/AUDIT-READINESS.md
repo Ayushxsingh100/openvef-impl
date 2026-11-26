@@ -18,24 +18,23 @@ It is a status document: it claims no gate as passed.
   re-audit after D-012 to D-014 ([report](reviews/implementation-reaudit-gpt6-2026-11-25.md)) ended NOT CLEARED: two BLOCKERs, one
   MAJOR and a cross-reference, three limitations. A third audit
   ([report](reviews/implementation-reaudit3-gpt6-2026-11-25.md), after D-015 to D-018) also ended NOT CLEARED: BLOCKERs A1-1 and
-  A9-2. The code changed after it (D-019), and that is not re-audited.
+  A9-2. A fourth audit ([report](reviews/implementation-reaudit4-gpt6-2026-11-26.md), after D-019 to D-021) also ended
+  NOT CLEARED: no BLOCKER, MAJORs A1-1 and A9-2. The code changed after it (D-022), and that is not re-audited.
 - **Prohibited:** no LLM or provider call has been made by any code, test or script
   (CLAUDE.md hard rule 5). The LLM-call gate, step (6), is closed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261125T183002Z`**.
-- Run class `development`; commit `d146110`, clean tree; after DEV-001
+Latest evidence run: **`evidence/run-20261126T144718Z`**.
+- Run class `development`; commit `793089b`, clean tree; after DEV-001
   ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
   The run re-verified all 20 frozen items, the DEV-001 mask files and the 39 D-009 items
   against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Every outcome, and the null-trace hash of each simulated pass, is identical to the previous
-  run, `run-20261125T173501Z` (D-020). D-020 changed no outcome: it added the per-result and
-  per-summary `SELF_REPORTED (D-020)` label and approved A-057 (P11b now counts). D-021 added the label to
-  M06's note; only that note and measured wall-clock times differ. **D-019 to D-021
-  require re-audit; A9-2 is not fully closed.**
+- Every record is identical to the previous run, `run-20261125T183002Z` (D-021), except measured
+  wall-clock times. D-022 (re-audit #4: `stop` cites File 36 L48; literal `inspect.signature` after
+  import) changed no status, note or label. **D-019 to D-022 require re-audit; A9-2 is not fully closed.**
 - **Runtime checks (D-019; SELF_REPORTED policy D-020):** 16 fixtures reach them. M06's driver is SELF_REPORTED (it returns a non-Driver and is rejected); the
   rest are PROVEN, so no accepted result rests on a report the artifact could forge. Per D-020 a SELF_REPORTED
   fixture keeps its verdict with a visible label; **SELF_REPORTED fixtures: `M06:driver.py` (PASS, labelled)**.
@@ -69,15 +68,15 @@ auditor should weigh them with that in mind.
   stage, error class, diagnostic byte string or terminal disposition".
 - 17 fixtures are not run to an outcome, L271 is unmet (DEV-001), and the independent
   implementation re-audit (L555 (5)) is not done: the DEV-002 AI audit found a BLOCKER (A1-1), the
-  re-audit and the third audit ended NOT CLEARED, and the code changed after all three.
+  re-audit, the third and the fourth audit ended NOT CLEARED, and the code changed after all four.
 
 ## 2a. Feasibility controls F1–F15, F17 (Protocol §17)
 
 Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
 [design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
 
-Latest control run: **`evidence/controls-20261125T183210Z`**, pinned image, commit
-`d146110`. It carries the same identity records as an F18 run.
+Latest control run: **`evidence/controls-20261126T144918Z`**, pinned image, commit
+`793089b`. It carries the same identity records as an F18 run.
 
 | Status | Controls |
 |---|---|
@@ -95,7 +94,7 @@ Latest control run: **`evidence/controls-20261125T183210Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261125T183002Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261126T144718Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -149,7 +148,8 @@ this run is on the pinned one.
 | Points the re-audit left open: single-fixture shapes under the original A1 criterion are kept; owner statement: "it will not be met by design; disclosed for every audit" (D-019); the three-vector minimum is kept and boundary tests added ([note](reviews/implementation-reaudit-gpt6-2026-11-25-NOTE.md)). Re-audit needed | the auditor | DEV-002; D-013; D-017 |
 | How a SELF_REPORTED artifact is treated (A9-2 residual): **owner decision taken (D-020)** — F18 keeps the verdict with a visible label; confirmatory use reports the validity endpoint as measured (primary) and with every SELF_REPORTED artifact counted invalid (pre-registered sensitivity), plus the per-arm SELF_REPORTED count. Still not re-audited | the auditor | D-020 |
 | Review of A-057 (P11b depends on it): **approved as decided (D-020)** | — (done) | D-020 |
-| Re-audit of D-019, D-020 and D-021 | the auditor | D-019, D-020, D-021 |
+| Re-audit of D-022 (A1-1 `stop` citation and support table; literal `inspect.signature`, A-058), with regression of prior findings | the auditor | D-022 |
+| Re-audit of D-019, D-020 and D-021 (fourth audit: NOT CLEARED, MAJORs A1-1 and A9-2; D-022 responds) | the auditor | D-019, D-020, D-021 |
 | Re-audit of the D-015, D-016 and D-017 changes (A-054 approved, D-016; A-055 and A-056 approved, D-018); wall-clock residuals in [DEVIATIONS.md](DEVIATIONS.md) | the auditor | D-015, D-016 |
 | Input contracts and outcomes for the 15 fixtures without one (PD-03, PD-04, PD-07, PD-26) | owners | D-013 |
 | Re-audit of D-013 and A-053 (approved, D-014); the passes resting on A-053 count subject to it | the auditor | D-013, D-014, A-053 |

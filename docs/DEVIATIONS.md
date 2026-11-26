@@ -103,7 +103,7 @@ M25, M26, M28), while removing one more (`change_class`, M53): 127 PASS. The rel
 the pass count after an adverse finding, so **it requires re-audit** and must be disclosed
 wherever the count is quoted. Whether A1-1 is resolved is for the auditor. D-017 keeps the rule and adds
 boundary tests for every input property.
-A later bundle (now with evidence run-20261125T183002Z) replaces the zip in `dist/`; the audited
+A later bundle (now with evidence run-20261126T144718Z) replaces the zip in `dist/`; the audited
 zip is in git at `9c89b1c`.
 
 | Audit input | Identity |
@@ -159,7 +159,7 @@ Every clock route found was closed and tested in the pinned container on the dev
    so such an artifact fails as a runtime error, not at IMPORT_POLICY.
 5. **Related, not a clock:** process ID, addresses and unseeded `random.Random()` vary between runs.
 
-**Not re-audited.** Evidence with this change: run-20261125T183002Z (also in the bundle in `dist/`).
+**Not re-audited.** Evidence with this change: run-20261126T144718Z (also in the bundle in `dist/`).
 
 ## Open residual (D-019) — runtime checks an artifact can forge
 

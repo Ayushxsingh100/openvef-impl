@@ -47,6 +47,10 @@ Owner decision D-019: no trust-critical measurement may be produced by a process
 executed; the rest is labelled SELF_REPORTED and recorded as a residual, never called closed. The original
 single-fixture-shape criterion is superseded by D-013 and will not be met by design; disclose it for every
 audit. Not yet re-audited.
+Owner decision D-022 (Krishika; docs/ambiguities.md): every adapter selecting value is also listed in VALUE_SUPPORT with
+the words of its own quote that support it (tests/test_dispatch_shapes.py); the runtime signature checks also call the
+literal inspect.signature after import, which must agree with the trusted measurement (names/kinds/counts, A-058). Still
+self-reported; the SELF_REPORTED residual is not closed. Not yet re-audited.
 
 Still human-written. Do NOT write: F6/F17 control checkers or drivers, the directed
 suite, control mutants. Owners write those by hand; Claude may comment on them in prose
