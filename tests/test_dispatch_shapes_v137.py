@@ -32,11 +32,13 @@ from openvef.ledger import CANDIDATE_TOKENS, LIFECYCLE_CASES, lifecycle_expectat
 
 CAND = REPO / "proposals/v1.3.7/pack"
 TABLE = run_f18.PACKS["v1.3.7-candidate"]["adapters"]
+REPLACED = {fn.__name__: adapters_v137.REPLACEMENTS[fn.__name__] for *_, fn in run_f18.ADAPTERS
+            if fn.__name__ in adapters_v137.REPLACEMENTS}
 ROWS = adapters_v137.ROWS
 SOURCES = [REPO / "runner/adapters_v137.py", REPO / "runner/adapter_contracts_v137.py"]
 # Fixtures C1-C10 do not cover (proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md section 1). M42 and M47 have an
 # adapter but stop at PD-26.
-OUT_OF_SCOPE = {"M13", "M14", "M15", "M17", "M37", "M41", "P17", "R07"}
+OUT_OF_SCOPE = {"M37", "M41", "P17"}  # need owner specification (CORRECTIONS section 8)
 
 
 def descriptors() -> dict[str, dict]:
@@ -50,7 +52,8 @@ def line(tag: str, n: int) -> str:
 
 def run(inp):
     validator = run_f18.load_schema_validator(CAND)
-    with unittest.mock.patch.object(run_f18, "ADAPTER_TABLE", TABLE):
+    with unittest.mock.patch.object(run_f18, "ADAPTER_TABLE", TABLE), \
+            unittest.mock.patch.object(adapters_v137, "PACK_VERIFIED", True):  # as main() sets it after verifying
         rows = run_f18.find_adapters(inp)
         return [r[2].__name__ for r in rows], run_f18.execute({"input": inp, "manifest_clause_ids": ["UART-001"]}, validator)
 
@@ -74,7 +77,9 @@ class CandidateDispatchTests(unittest.TestCase):
     def test_v136_table_is_unchanged_and_candidate_extends_it(self):
         self.assertEqual(run_f18.PACKS["v1.3.6"]["adapters"], run_f18.ADAPTERS)
         self.assertIs(run_f18.ADAPTER_TABLE, run_f18.ADAPTERS)
-        self.assertEqual(TABLE, run_f18.ADAPTERS + ROWS)
+        self.assertEqual(TABLE, tuple((r, o, adapters_v137.REPLACEMENTS.get(fn.__name__, fn)) for r, o, fn in run_f18.ADAPTERS)
+                         + ROWS)
+        self.assertEqual(set(REPLACED), {"adapt_halt_recurrence"})  # the only v1.3.6 row the candidate replaces
         self.assertFalse({fn for *_, fn in ROWS} & {fn for *_, fn in run_f18.ADAPTERS})
 
     def test_v136_contracts_still_verbatim_in_the_candidate(self):
@@ -88,9 +93,10 @@ class CandidateDispatchTests(unittest.TestCase):
 
     # --- (a) contracts, domains, values
     def test_every_candidate_adapter_has_a_cited_contract(self):
+        new = ROWS + tuple((r, o, REPLACED[fn.__name__]) for r, o, fn in run_f18.ADAPTERS if fn.__name__ in REPLACED)
         with unittest.mock.patch.object(v136, "PACK", CAND):
-            self.assertEqual(v136.contract_problems(ROWS, CONTRACTS), [])
-        self.assertEqual(set(CONTRACTS), {fn.__name__ for *_, fn in ROWS})
+            self.assertEqual(v136.contract_problems(new, CONTRACTS), [])
+        self.assertEqual(set(CONTRACTS), {fn.__name__ for *_, fn in new})
 
     def test_cited_text_covers_every_property_domain(self):
         self.assertEqual({a: set(c["inputs"]) for a, c in CONTRACTS.items()}, {a: set(d) for a, d in DOMAINS.items()})
@@ -130,7 +136,8 @@ class CandidateDispatchTests(unittest.TestCase):
 
     # --- (b) vectors
     def test_every_candidate_adapter_has_synthetic_vectors(self):
-        self.assertEqual(v136.vector_problems(ROWS, VECTORS, self.descs), [])
+        new = ROWS + tuple((r, o, REPLACED[fn.__name__]) for r, o, fn in run_f18.ADAPTERS if fn.__name__ in REPLACED)
+        self.assertEqual(v136.vector_problems(new, VECTORS, self.descs), [])
 
     def test_vectors_give_the_expected_outcome(self):
         for name, vectors in VECTORS.items():
@@ -147,7 +154,7 @@ class CandidateDispatchTests(unittest.TestCase):
                    for term, p, edge, _, outside, _ in pairs
                    if (a, p) in EDGE_MAY_BE_A_FIXTURE_INPUT and outside not in [d["input"] for d in self.descs.values()]}
         self.assertEqual([p for p in problems if p not in allowed], [])
-        self.assertEqual(set(BOUNDARIES), {fn.__name__ for *_, fn in ROWS})
+        self.assertEqual(set(BOUNDARIES), {fn.__name__ for *_, fn in ROWS} | {f.__name__ for f in REPLACED.values()})
 
     def test_edge_exception_holds_only_for_a_fully_used_closed_domain(self):
         self.assertEqual(EDGE_MAY_BE_A_FIXTURE_INPUT, {("adapt_change_class", "change_class")})
@@ -171,7 +178,12 @@ class CandidateDispatchTests(unittest.TestCase):
             self.assertEqual({f for f, d in self.descs.items() if not run_f18.find_adapters(d["input"])}, OUT_OF_SCOPE)
 
     def test_no_shape_branch_and_no_fixture_id(self):
-        self.assertEqual(v136.shape_branches(ast.parse(SOURCES[0].read_text("utf-8"))), [])
+        # Allowed: the two primitive adapters check their cited `test_scope` property against the one value candidate
+        # File 36 L196/L197 fixes, and refuse any other; this selects no code path (the shape already did).
+        allowed = {"adapt_truncation_primitive: inp['test_scope'] == TRUNCATION_SCOPE",
+                   "adapt_json_primitive: inp['test_scope'] == JSON_SCOPE"}
+        found = v136.shape_branches(ast.parse(SOURCES[0].read_text("utf-8")))
+        self.assertEqual([f for f in found if f not in allowed], [])
         for path in [*SOURCES, REPO / "src/openvef/ledger.py"]:
             for node in ast.walk(ast.parse(path.read_text("utf-8"))):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str):

@@ -395,9 +395,11 @@ ADAPTERS = (
 # (runner/adapters_v137.py); v1.3.6 uses ADAPTERS unchanged.
 PACKS = {
     "v1.3.6": {"index_sha256": INDEX_SHA256, "adapters": ADAPTERS, "label": None},
-    "v1.3.7-candidate": {"index_sha256": "cd87c9c8964327e0dd5542bd2ff78575d49674c892e426da25fd523f81a47cf4",
-                         "adapters": ADAPTERS + adapters_v137.ROWS, "label": "v1.3.7 CANDIDATE, not audited",
-                         "manifest": "SHA256SUMS-v1.3.7-candidate.txt"},
+    "v1.3.7-candidate": {"index_sha256": "3ffd4883fed3c33f00915b898a29d2f28db9d0a3b73a5bfd380a668ed7795278",
+                         "adapters": tuple((req, opt, adapters_v137.REPLACEMENTS.get(fn.__name__, fn))
+                                           for req, opt, fn in ADAPTERS) + adapters_v137.ROWS,
+                         "label": "v1.3.7 CANDIDATE, not audited", "manifest": "SHA256SUMS-v1.3.7-candidate.txt",
+                         "manifest_sha256": "45841232ab05214b96740c66aa71c5e63a2047e31c4e434702b3f4042152c12a"},
 }
 ADAPTER_TABLE = ADAPTERS  # set by main() from --pack
 
@@ -472,6 +474,24 @@ def self_reported_parts(note: str, basis: dict | None) -> tuple[str, dict, list]
     return note, extra, sr
 
 
+def verify_pack_manifest(root: Path, manifest: str, pinned: str) -> int:
+    """D-025 item 1: the pinned manifest's hash, every file it lists, and no unlisted file. Returns the file count."""
+    raw = (root / manifest).read_bytes()
+    if sha256_bytes(raw) != pinned:
+        raise IntegrityError(f"pack manifest SHA-256 mismatch: {sha256_bytes(raw)}")
+    listed = set()
+    for entry in raw.decode("utf-8").splitlines():
+        digest, rel = entry.split("  ", 1)
+        path = root / rel
+        if ".." in Path(rel).parts or not path.is_file() or sha256_file(path) != digest:
+            raise IntegrityError(f"pack file does not match its manifest: {rel}")
+        listed.add(rel)
+    on_disk = {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()} - {manifest}
+    if on_disk != listed:
+        raise IntegrityError(f"pack files not in the manifest, or missing: {sorted(on_disk ^ listed)}")
+    return len(listed)
+
+
 def parse_args(argv: list[str]) -> tuple[Path, Path, str, str]:
     args = list(argv[1:])
     pack = "v1.3.6"
@@ -533,6 +553,9 @@ def main() -> int:
         meta["pack"] = pack
         meta["pack_label"] = pack_info["label"]
         meta["pack_manifest_sha256"] = sha256_file(root / pack_info["manifest"])
+        # D-025 item 1: verify before any fixture runs; only then may the C5 predicate run (IntegrityError aborts).
+        meta["pack_manifest_files_verified"] = verify_pack_manifest(root, pack_info["manifest"], pack_info["manifest_sha256"])
+        adapters_v137.PACK_VERIFIED = True
 
     global SIM, SIM_UNAVAILABLE, RUNTIME_BASIS
     if SANDBOX is not None:

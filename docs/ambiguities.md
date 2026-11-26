@@ -1913,3 +1913,20 @@ the single entry in AUDIT-READINESS.md.
 
 Not audited. F18 is not passed.
 
+
+### D-025 Phase B — implementation of C11–C16 and the manifest condition
+
+- **Manifest condition (item 1):** the candidate's `SHA256SUMS-v1.3.7-candidate.txt` is pinned by SHA-256 in
+  `runner/run_f18.py` `PACKS`; `verify_pack_manifest` checks the pin, every listed file and that no file is unlisted,
+  before any fixture runs, and only then sets `adapters_v137.PACK_VERIFIED`; the C5 predicate refuses to run otherwise
+  (`tests/test_pack_manifest_v137.py`).
+- **Adapters** (candidate table only; contracts cited to candidate text; D-013/D-017/D-022 checks as before):
+  `adapt_halt_recurrence_v137` (replaces the v1.3.6 row in the candidate table only; C10, C11),
+  `adapt_serializer_grammar` (C11, C12), `adapt_truncation_primitive` (C13), `adapt_json_primitive` (C13, C14),
+  `adapt_lifecycle_halt_event` (C15), `adapt_design_preflight` (C16). The v1.3.6 table is unchanged.
+- **One test allowance (decided by Claude, owner review pending):** the shape-branch scan flags comparisons naming
+  `test_scope`; the candidate test allows exactly the two checks of that cited property against the value candidate
+  File 36 L196/L197 fixes. The v1.3.6 test is unchanged.
+- **No C11–C16 correction was found wrong**, so there is no amendment. M37, M41 and P17 still need owner specification.
+
+Not audited. F18 is not passed.
