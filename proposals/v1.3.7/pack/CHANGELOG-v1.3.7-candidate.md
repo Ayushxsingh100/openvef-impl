@@ -17,60 +17,72 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | # | Correction | PD | Fixtures | File | Line |
 |---|---|---|---|---|---|
 | E01 | C1 | PD-02 (2) | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 175 |
-| E02 | C2 | PD-02 (1) | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
-| E03 | C2 | PD-02 (1) | M50 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
-| E04 | C2 | PD-02 (1) | M53 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
-| E05 | C2 | PD-02 (1) | M54 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
-| E06 | C2 | PD-02 (1) | M58 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
-| E07 | C2 | PD-02 (1), (3) | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
-| E08 | C3 | PD-02 (3) | M54 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
-| E09 | C10 | PD-01 | M41, M42, M47 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
-| E10 | C4 | PD-03 | M14, M17, M41, M48, M50, M53, M54, M58 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 176 |
-| E11 | C5 | PD-06, PD-25 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
-| E12 | C6 | PD-06, PD-25 | M27 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 133 |
-| E13 | C7 | PD-22 | none | `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 7 |
-| E14 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 174 |
-| E15 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 308 |
-| E16 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 353 |
-| E17 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 383 |
-| E18 | C8 | PD-24 | none | `11_Comparative_Research_Matrix.md` | 37 |
-| E19 | C9 | PD-04 | M36 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 27 |
-| E20 | C9 | PD-04 | M36 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 15 |
-| E21 | C9 | PD-04 | M36 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 177 |
-| E22 | C10 | PD-01 | M41 | `41_F18_Fixture_Inputs/M41.json` | 33 |
-| E23 | C10 | PD-01 | M42 | `41_F18_Fixture_Inputs/M42.json` | 16 |
-| E24 | C10 | PD-01 | M42 | `41_F18_Fixture_Inputs/M42.json` | 23 |
-| E25 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 16 |
-| E26 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 23 |
-| E27 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 24 |
-| E28 | label | — | M41 | `41_F18_Fixture_Inputs/M41.json` | 3 |
-| E29 | label | — | M42 | `41_F18_Fixture_Inputs/M42.json` | 3 |
-| E30 | label | — | M47 | `41_F18_Fixture_Inputs/M47.json` | 3 |
-| E31 | label | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560 |
-| E32 | label | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 190 |
-| E33 | label | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 110 |
-| E34 | label | — | — | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 418 |
-| E35 | label | — | — | `11_Comparative_Research_Matrix.md` | 44 |
-| E36 | C6 + A1 | PD-06, PD-25 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
-| E37 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 380 |
-| E38 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 381 |
-| E39 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 562 |
-| E40 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 563 |
-| E41 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 579 |
-| E42 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 580 |
-| E43 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 644 |
-| E44 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 645 |
-| E45 | label | — | — | `41_F18_Fixture_Inputs/fixture-index.json` | 2 |
-| E46 | derived | — | — | `27_SHA256SUMS.txt` | 2 |
-| E47 | derived | — | — | `27_SHA256SUMS.txt` | 11 |
-| E48 | derived | — | — | `27_SHA256SUMS.txt` | 12 |
-| E49 | derived | — | — | `27_SHA256SUMS.txt` | 28 |
-| E50 | derived | — | — | `27_SHA256SUMS.txt` | 34 |
-| E51 | derived | — | — | `27_SHA256SUMS.txt` | 66 |
-| E52 | derived | — | — | `27_SHA256SUMS.txt` | 80 |
-| E53 | derived | — | — | `27_SHA256SUMS.txt` | 81 |
-| E54 | derived | — | — | `27_SHA256SUMS.txt` | 86 |
-| E55 | derived | — | — | `27_SHA256SUMS.txt` | 182 |
+| E02 | A2 (copy of C1) | PD-02 (2) | M48, M50, M53, M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 118 |
+| E03 | C2 | PD-02 (1) | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E04 | A2 (copy of C2) | PD-02 (1) | M48, M50, M53, M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E05 | C2 | PD-02 (1) | M50 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E06 | A2 (copy of C2) | PD-02 (1) | M50 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E07 | C2 | PD-02 (1) | M53 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E08 | A2 (copy of C2) | PD-02 (1) | M53 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E09 | C2 | PD-02 (1) | M54 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E10 | A2 (copy of C2) | PD-02 (1) | M54 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E11 | C2 | PD-02 (1) | M58 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E12 | A2 (copy of C2) | PD-02 (1) | M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E13 | C2 | PD-02 (1), (3) | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E14 | A2 (copy of C2) | PD-02 (1), (3) | M48, M50, M53, M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E15 | C3 | PD-02 (3) | M54 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
+| E16 | A2 (copy of C3) | PD-02 (3) | M54 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
+| E17 | C10 | PD-01 | M41, M42, M47 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
+| E18 | A2 (copy of C10) | PD-01 | M41, M42, M47 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
+| E19 | C4 | PD-03 | M14, M17, M41, M48, M50, M53, M54, M58 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 176 |
+| E20 | C5 | PD-06, PD-25 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
+| E21 | C6 | PD-06, PD-25 | M27 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 133 |
+| E22 | C7 | PD-22 | none | `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 7 |
+| E23 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 174 |
+| E24 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 308 |
+| E25 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 353 |
+| E26 | C8 | PD-24 | none | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 383 |
+| E27 | C8 | PD-24 | none | `11_Comparative_Research_Matrix.md` | 37 |
+| E28 | C9 | PD-04 | M36 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 27 |
+| E29 | C9 | PD-04 | M36 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 15 |
+| E30 | C9 | PD-04 | M36 | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 177 |
+| E31 | A2 (copy of C9) | PD-04 | M36 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 120 |
+| E32 | C10 | PD-01 | M41 | `41_F18_Fixture_Inputs/M41.json` | 33 |
+| E33 | C10 | PD-01 | M42 | `41_F18_Fixture_Inputs/M42.json` | 16 |
+| E34 | C10 | PD-01 | M42 | `41_F18_Fixture_Inputs/M42.json` | 23 |
+| E35 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 16 |
+| E36 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 23 |
+| E37 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 24 |
+| E38 | label | — | M41 | `41_F18_Fixture_Inputs/M41.json` | 3 |
+| E39 | label | — | M42 | `41_F18_Fixture_Inputs/M42.json` | 3 |
+| E40 | label | — | M47 | `41_F18_Fixture_Inputs/M47.json` | 3 |
+| E41 | label | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560 |
+| E42 | label | — | — | `25_Common_System_and_Repair_Prompt_Templates.txt` | 132 |
+| E43 | label | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 190 |
+| E44 | label | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 110 |
+| E45 | label | — | — | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 418 |
+| E46 | label | — | — | `11_Comparative_Research_Matrix.md` | 44 |
+| E47 | C6 + A1 | PD-06, PD-25 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E48 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 380 |
+| E49 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 381 |
+| E50 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 562 |
+| E51 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 563 |
+| E52 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 579 |
+| E53 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 580 |
+| E54 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 644 |
+| E55 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 645 |
+| E56 | label | — | — | `41_F18_Fixture_Inputs/fixture-index.json` | 2 |
+| E57 | derived | — | — | `27_SHA256SUMS.txt` | 2 |
+| E58 | derived | — | — | `27_SHA256SUMS.txt` | 11 |
+| E59 | derived | — | — | `27_SHA256SUMS.txt` | 12 |
+| E60 | derived | — | — | `27_SHA256SUMS.txt` | 24 |
+| E61 | derived | — | — | `27_SHA256SUMS.txt` | 28 |
+| E62 | derived | — | — | `27_SHA256SUMS.txt` | 34 |
+| E63 | derived | — | — | `27_SHA256SUMS.txt` | 66 |
+| E64 | derived | — | — | `27_SHA256SUMS.txt` | 80 |
+| E65 | derived | — | — | `27_SHA256SUMS.txt` | 81 |
+| E66 | derived | — | — | `27_SHA256SUMS.txt` | 86 |
+| E67 | derived | — | — | `27_SHA256SUMS.txt` | 182 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -86,7 +98,21 @@ New:
 Error classes of change-class control expectations are stated by rule, not by fixture: a control expectation whose diagnostic CODE is `EVALUATOR_REVISION_REQUIRED` has error class `EVALUATOR_REVISION_REQUIRED`; one whose CODE is `AUTHORING_REVISION_REQUIRED` has error class `AUTHORING_REVISION_REQUIRED`; and one whose CODE is `HALT_SIGNATURE_SCHEMA` has error class `HALT_SIGNATURE_SCHEMA`. This rule applies only to these three codes; it does not change the M41 error class `MID_RUN_REEVALUATION` or any stage-map row. The study-reset vector uses diagnostic `AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED`; the halt-signature vector uses diagnostic `HALT_SIGNATURE_SCHEMA|reason=COMPONENT_VALUES_ENUMERATED`.
 ```
 
-## E02 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M48, M50, M53, M54, M58
+## E02 — A2 (copy of C1) · `25_Common_System_and_Repair_Prompt_Templates.txt` L118 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+The `M53` study-reset vector uses error class `AUTHORING_REVISION_REQUIRED` and diagnostic `AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED`; `M54` uses error class `HALT_SIGNATURE_SCHEMA` and diagnostic `HALT_SIGNATURE_SCHEMA|reason=COMPONENT_VALUES_ENUMERATED`.
+```
+
+New:
+
+```text
+Error classes of change-class control expectations are stated by rule, not by fixture: a control expectation whose diagnostic CODE is `EVALUATOR_REVISION_REQUIRED` has error class `EVALUATOR_REVISION_REQUIRED`; one whose CODE is `AUTHORING_REVISION_REQUIRED` has error class `AUTHORING_REVISION_REQUIRED`; and one whose CODE is `HALT_SIGNATURE_SCHEMA` has error class `HALT_SIGNATURE_SCHEMA`. This rule applies only to these three codes; it does not change the M41 error class `MID_RUN_REEVALUATION` or any stage-map row. The study-reset vector uses diagnostic `AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED`; the halt-signature vector uses diagnostic `HALT_SIGNATURE_SCHEMA|reason=COMPONENT_VALUES_ENUMERATED`.
+```
+
+## E03 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M48, M50, M53, M54, M58
 
 Old:
 
@@ -100,7 +126,21 @@ New:
 **Closed `required_action` literals, by change class:** `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` = `
 ```
 
-## E03 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M50
+## E04 — A2 (copy of C2) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · PD-02 (1) · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+**Closed `required_action` literals used by lifecycle fixtures:** `M48` = `
+```
+
+New:
+
+```text
+**Closed `required_action` literals, by change class:** `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` = `
+```
+
+## E05 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M50
 
 Old:
 
@@ -114,7 +154,21 @@ New:
 `; `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` = `
 ```
 
-## E04 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M53
+## E06 — A2 (copy of C2) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · PD-02 (1) · fixtures: M50
+
+Old:
+
+```text
+`; `M50` = `
+```
+
+New:
+
+```text
+`; `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` = `
+```
+
+## E07 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M53
 
 Old:
 
@@ -128,7 +182,21 @@ New:
 `; `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` = `
 ```
 
-## E05 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M54
+## E08 — A2 (copy of C2) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · PD-02 (1) · fixtures: M53
+
+Old:
+
+```text
+`; `M53` = `
+```
+
+New:
+
+```text
+`; `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` = `
+```
+
+## E09 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M54
 
 Old:
 
@@ -142,7 +210,21 @@ New:
 `; `HALT_SIGNATURE_COMPONENT_ENUMERATION` = `
 ```
 
-## E06 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M58
+## E10 — A2 (copy of C2) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · PD-02 (1) · fixtures: M54
+
+Old:
+
+```text
+`; `M54` = `
+```
+
+New:
+
+```text
+`; `HALT_SIGNATURE_COMPONENT_ENUMERATION` = `
+```
+
+## E11 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1) · fixtures: M58
 
 Old:
 
@@ -156,7 +238,21 @@ New:
 `; and `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` = `
 ```
 
-## E07 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1), (3) · fixtures: M48, M50, M53, M54, M58
+## E12 — A2 (copy of C2) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · PD-02 (1) · fixtures: M58
+
+Old:
+
+```text
+`; and `M58` = `
+```
+
+New:
+
+```text
+`; and `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` = `
+```
+
+## E13 — C2 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · PD-02 (1), (3) · fixtures: M48, M50, M53, M54, M58
 
 Old:
 
@@ -170,7 +266,21 @@ New:
 Each literal is a closed local control expectation, not a model-feedback diagnostic. The change classes are closed and have these cases: `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` is the evaluator revision of §7b path (b); `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` is a shared-item revision; `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` is a study reset; `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` is a design-specific revision while membership, estimand and weights remain unchanged; and `HALT_SIGNATURE_COMPONENT_ENUMERATION` is the halt-signature domain check. Closed scope tokens: for an evaluator revision, `rerun_scope_rule` = `shared_evaluator_component_all_designs_and_all_arm_x_design_slots; design_specific_component_affected_design_in_both_arms` (§7b: shared component, both designs and every slot; design-specific component, that design in both arms). For a shared-item revision, `affected_slots` = `all_designs_x_all_arms` (§7b: every scheduled slot across both designs and both arms). For a design-specific revision, `affected_scope` = `affected_design_in_both_arms` and `unaffected_design_scope` = `not_invalidated_when_membership_estimand_and_weights_are_unchanged`. An evaluator revision re-evaluates the affected scope with the same frozen artifact bytes and zero new confirmatory generation calls. A shared-item revision invalidates all designs and all arm × design slots and starts a new preregistered study. A study reset resets the preregistered design set and weights and requires fresh confirmatory slots. A design-specific revision invalidates both arms for the affected design only when membership, estimand and weights remain unchanged.
 ```
 
-## E08 — C3 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · PD-02 (3) · fixtures: M54
+## E14 — A2 (copy of C2) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · PD-02 (1), (3) · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+Each literal is a closed local control expectation, not a model-feedback diagnostic. `M48` re-evaluates the affected scope with the same frozen artifact bytes and zero new confirmatory generation calls. `M50` invalidates all designs and all arm × design slots and starts a new preregistered study. `M53` resets the preregistered design set and weights and requires fresh confirmatory slots. `M58` invalidates both arms for the affected design only when membership, estimand and weights remain unchanged.
+```
+
+New:
+
+```text
+Each literal is a closed local control expectation, not a model-feedback diagnostic. The change classes are closed and have these cases: `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` is the evaluator revision of §7b path (b); `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` is a shared-item revision; `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` is a study reset; `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` is a design-specific revision while membership, estimand and weights remain unchanged; and `HALT_SIGNATURE_COMPONENT_ENUMERATION` is the halt-signature domain check. Closed scope tokens: for an evaluator revision, `rerun_scope_rule` = `shared_evaluator_component_all_designs_and_all_arm_x_design_slots; design_specific_component_affected_design_in_both_arms` (§7b: shared component, both designs and every slot; design-specific component, that design in both arms). For a shared-item revision, `affected_slots` = `all_designs_x_all_arms` (§7b: every scheduled slot across both designs and both arms). For a design-specific revision, `affected_scope` = `affected_design_in_both_arms` and `unaffected_design_scope` = `not_invalidated_when_membership_estimand_and_weights_are_unchanged`. An evaluator revision re-evaluates the affected scope with the same frozen artifact bytes and zero new confirmatory generation calls. A shared-item revision invalidates all designs and all arm × design slots and starts a new preregistered study. A study reset resets the preregistered design set and weights and requires fresh confirmatory slots. A design-specific revision invalidates both arms for the affected design only when membership, estimand and weights remain unchanged.
+```
+
+## E15 — C3 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · PD-02 (3) · fixtures: M54
 
 Old:
 
@@ -184,7 +294,21 @@ New:
 for `SIMULATOR_ERROR` and the literal `NONE` for the other two halt codes (rule token `stable_error_class_rule` = `simple_exception_class_for_SIMULATOR_ERROR_else_NONE`); `stable_diagnostic_code` is exactly the corresponding `halt_code` token (rule token `stable_diagnostic_code_rule` = `exact_halt_code_token`).
 ```
 
-## E09 — C10 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · PD-01 · fixtures: M41, M42, M47
+## E16 — A2 (copy of C3) · `25_Common_System_and_Repair_Prompt_Templates.txt` L128 · PD-02 (3) · fixtures: M54
+
+Old:
+
+```text
+for `SIMULATOR_ERROR` and the literal `NONE` for the other two halt codes; `stable_diagnostic_code` is exactly the corresponding `halt_code` token.
+```
+
+New:
+
+```text
+for `SIMULATOR_ERROR` and the literal `NONE` for the other two halt codes (rule token `stable_error_class_rule` = `simple_exception_class_for_SIMULATOR_ERROR_else_NONE`); `stable_diagnostic_code` is exactly the corresponding `halt_code` token (rule token `stable_diagnostic_code_rule` = `exact_halt_code_token`).
+```
+
+## E17 — C10 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · PD-01 · fixtures: M41, M42, M47
 
 Old:
 
@@ -198,7 +322,21 @@ New:
 (rule token `stable_diagnostic_code_rule` = `exact_halt_code_token`). A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence.
 ```
 
-## E10 — C4 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L176 · PD-03 · fixtures: M14, M17, M41, M48, M50, M53, M54, M58
+## E18 — A2 (copy of C10) · `25_Common_System_and_Repair_Prompt_Templates.txt` L128 · PD-01 · fixtures: M41, M42, M47
+
+Old:
+
+```text
+(rule token `stable_diagnostic_code_rule` = `exact_halt_code_token`).
+```
+
+New:
+
+```text
+(rule token `stable_diagnostic_code_rule` = `exact_halt_code_token`). A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence.
+```
+
+## E19 — C4 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L176 · PD-03 · fixtures: M14, M17, M41, M48, M50, M53, M54, M58
 
 Old:
 
@@ -212,7 +350,7 @@ New:
 compares the actual result with the expected object. When the expected object has exactly the keys `disposition`, `stage_id`, `error_class` and `diagnostic`, those four values are compared exactly. Any other expected object is a control-vector expectation: its whole object is compared exactly, key set included, and every property it names must be defined by a rule in the Protocol.
 ```
 
-## E11 — C5 · `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L83 · PD-06, PD-25 · fixtures: M27
+## E20 — C5 · `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L83 · PD-06, PD-25 · fixtures: M27
 
 Old:
 
@@ -226,7 +364,7 @@ New:
 (e) the full vector satisfies the design-specific legal-input predicate from the author-visible reset/legal-input specification. The predicate is frozen as one Python 3.11 function of two dictionaries, `(vector, sampled)`: the driver vector, and the outputs sampled in the same row, each mapping a port name to its bit string. It returns the exact Boolean `True` for a legal vector and `False` otherwise. Any other outcome, including an exception, is an evaluator failure and is never an artifact verdict. Within check (a), missing keys are reported before extra keys. Checks (a) to (e) run in that order and the first failure is reported. A fixture that exercises check (e) supplies the input properties `driver_return` (the vector), `input_port_widths` (each input port name mapped to its width), `sampled_outputs` (the outputs sampled in the same row) and `legal_input_predicate` (an object with `language` = `python3.11`, `function`, the function's name, and `source`, its Python source).
 ```
 
-## E12 — C6 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L133 · PD-06, PD-25 · fixtures: M27
+## E21 — C6 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L133 · PD-06, PD-25 · fixtures: M27
 
 Old:
 
@@ -240,7 +378,7 @@ New:
 | M27 | missing-case | Driver vector passes the key, type, width and symbol checks and violates the supplied legal-input predicate |
 ```
 
-## E13 — C7 · `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L7 · PD-22 · fixtures: none
+## E22 — C7 · `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L7 · PD-22 · fixtures: none
 
 Old:
 
@@ -254,7 +392,7 @@ New:
 is independent of the planning-pack version.
 ```
 
-## E14 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L174 · PD-24 · fixtures: none
+## E23 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L174 · PD-24 · fixtures: none
 
 Old:
 
@@ -268,7 +406,7 @@ New:
 **Reported proof of concept (unverified).** An earlier draft attributed a synchronous-FIFO case and numerical results to this preprint. Those details are not verified from its text (abstract-only access, File 22) and are not relied upon. The preprint is not peer reviewed.
 ```
 
-## E15 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L308 · PD-24 · fixtures: none
+## E24 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L308 · PD-24 · fixtures: none
 
 Old:
 
@@ -282,7 +420,7 @@ New:
 - The TechRxiv preprint is an unreviewed proof of concept; its numerical results and designs are not verified from its text (File 22) and are not relied upon.
 ```
 
-## E16 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L353 · PD-24 · fixtures: none
+## E25 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L353 · PD-24 · fixtures: none
 
 Old:
 
@@ -296,7 +434,7 @@ New:
 whether the TechRxiv checker-gap preprint also evaluates a synchronous FIFO is not verified (File 22);
 ```
 
-## E17 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L383 · PD-24 · fixtures: none
+## E26 — C8 · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L383 · PD-24 · fixtures: none
 
 Old:
 
@@ -310,7 +448,7 @@ New:
 | Abstract only, per File 22; the earlier statement that extracted full text was read is superseded | Low for method and limitations until the exact PDF is retrieved and inspected; unreviewed preprint; disclose as prior art |
 ```
 
-## E18 — C8 · `11_Comparative_Research_Matrix.md` L37 · PD-24 · fixtures: none
+## E27 — C8 · `11_Comparative_Research_Matrix.md` L37 · PD-24 · fixtures: none
 
 Old:
 
@@ -324,7 +462,7 @@ New:
 - TechRxiv checker-gap paper: abstract-only access is recorded (File 22); full-text and injection-method claims are not verified.
 ```
 
-## E19 — C9 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L27 · PD-04 · fixtures: M36
+## E28 — C9 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L27 · PD-04 · fixtures: M36
 
 Old:
 
@@ -338,7 +476,7 @@ New:
 Serializer, lifecycle and parser unit vectors are marked by `fixture_class` (`serializer_primitive_unit_vector_grammar_exempt`, `lifecycle_unit_vector`, `parser_unit_vector`) and are deliberately grammar-exempt; they test local utilities/policies, not model feedback. A `parser_unit_vector` input has exactly the keys `source_file` and `syntax_error`. `source_file` is `driver.py` or `checker.py`. `syntax_error` has the key `lineno`, a positive integer, and may have the key `offset`, an integer or null. The vector applies the Protocol §3.4 `SOURCE_SYNTAX_REJECT` column rule to that position. Its result has stage `SOURCE_AST`, error class `SOURCE_SYNTAX_REJECT`, the diagnostic given by the rule, and disposition `CONTROL_EXPECTATION`.
 ```
 
-## E20 — C9 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L15 · PD-04 · fixtures: M36
+## E29 — C9 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L15 · PD-04 · fixtures: M36
 
 Old:
 
@@ -352,7 +490,7 @@ New:
 - `CONTROL_EXPECTATION`: a serializer, parser, protocol or lifecycle test vector;
 ```
 
-## E21 — C9 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L177 · PD-04 · fixtures: M36
+## E30 — C9 · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L177 · PD-04 · fixtures: M36
 
 Old:
 
@@ -366,7 +504,21 @@ New:
 exercises a serializer, parser, protocol or lifecycle rule;
 ```
 
-## E22 — C10 · `41_F18_Fixture_Inputs/M41.json` L33 · PD-01 · fixtures: M41
+## E31 — A2 (copy of C9) · `25_Common_System_and_Repair_Prompt_Templates.txt` L120 · PD-04 · fixtures: M36
+
+Old:
+
+```text
+exercises a serializer, protocol or lifecycle rule;
+```
+
+New:
+
+```text
+exercises a serializer, parser, protocol or lifecycle rule;
+```
+
+## E32 — C10 · `41_F18_Fixture_Inputs/M41.json` L33 · PD-01 · fixtures: M41
 
 Old:
 
@@ -380,7 +532,7 @@ New:
 "evaluator_component": "SIMULATOR",
 ```
 
-## E23 — C10 · `41_F18_Fixture_Inputs/M42.json` L16 · PD-01 · fixtures: M42
+## E33 — C10 · `41_F18_Fixture_Inputs/M42.json` L16 · PD-01 · fixtures: M42
 
 Old:
 
@@ -394,7 +546,7 @@ New:
 "evaluator_component": "SIMULATOR",
 ```
 
-## E24 — C10 · `41_F18_Fixture_Inputs/M42.json` L23 · PD-01 · fixtures: M42
+## E34 — C10 · `41_F18_Fixture_Inputs/M42.json` L23 · PD-01 · fixtures: M42
 
 Old:
 
@@ -408,7 +560,7 @@ New:
 "evaluator_component": "SIMULATOR",
 ```
 
-## E25 — C10 · `41_F18_Fixture_Inputs/M47.json` L16 · PD-01 · fixtures: M47
+## E35 — C10 · `41_F18_Fixture_Inputs/M47.json` L16 · PD-01 · fixtures: M47
 
 Old:
 
@@ -422,7 +574,7 @@ New:
 "evaluator_component": "SIMULATOR",
 ```
 
-## E26 — C10 · `41_F18_Fixture_Inputs/M47.json` L23 · PD-01 · fixtures: M47
+## E36 — C10 · `41_F18_Fixture_Inputs/M47.json` L23 · PD-01 · fixtures: M47
 
 Old:
 
@@ -436,7 +588,7 @@ New:
 "evaluator_component": "RECORDER",
 ```
 
-## E27 — C10 · `41_F18_Fixture_Inputs/M47.json` L24 · PD-01 · fixtures: M47
+## E37 — C10 · `41_F18_Fixture_Inputs/M47.json` L24 · PD-01 · fixtures: M47
 
 Old:
 
@@ -450,7 +602,7 @@ New:
 "stable_error_class": "NONE",
 ```
 
-## E28 — label · `41_F18_Fixture_Inputs/M41.json` L3 · — · fixtures: M41
+## E38 — label · `41_F18_Fixture_Inputs/M41.json` L3 · — · fixtures: M41
 
 Old:
 
@@ -464,7 +616,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E29 — label · `41_F18_Fixture_Inputs/M42.json` L3 · — · fixtures: M42
+## E39 — label · `41_F18_Fixture_Inputs/M42.json` L3 · — · fixtures: M42
 
 Old:
 
@@ -478,7 +630,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E30 — label · `41_F18_Fixture_Inputs/M47.json` L3 · — · fixtures: M47
+## E40 — label · `41_F18_Fixture_Inputs/M47.json` L3 · — · fixtures: M47
 
 Old:
 
@@ -492,7 +644,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E31 — label · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560 · — · fixtures: —
+## E41 — label · `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560 · — · fixtures: —
 
 Old:
 
@@ -508,7 +660,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E32 — label · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L190 · — · fixtures: —
+## E42 — label · `25_Common_System_and_Repair_Prompt_Templates.txt` L132 · — · fixtures: —
 
 Old:
 
@@ -524,7 +676,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E33 — label · `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L110 · — · fixtures: —
+## E43 — label · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L190 · — · fixtures: —
 
 Old:
 
@@ -540,7 +692,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E34 — label · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L418 · — · fixtures: —
+## E44 — label · `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L110 · — · fixtures: —
 
 Old:
 
@@ -556,7 +708,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E35 — label · `11_Comparative_Research_Matrix.md` L44 · — · fixtures: —
+## E45 — label · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L418 · — · fixtures: —
 
 Old:
 
@@ -572,7 +724,23 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E36 — C6 + A1 · `41_F18_Fixture_Inputs/M27.json` Lall · PD-06, PD-25 · fixtures: M27
+## E46 — label · `11_Comparative_Research_Matrix.md` L44 · — · fixtures: —
+
+Old:
+
+```text
+(end of file)
+```
+
+New:
+
+```text
+appended trailer: ---
+
+**v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
+```
+
+## E47 — C6 + A1 · `41_F18_Fixture_Inputs/M27.json` Lall · PD-06, PD-25 · fixtures: M27
 
 Old:
 
@@ -637,7 +805,7 @@ New:
 }
 ```
 
-## E37 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L380 · — · fixtures: M27
+## E48 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L380 · — · fixtures: M27
 
 Old:
 
@@ -651,7 +819,7 @@ New:
 "sha256": "63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813",
 ```
 
-## E38 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L381 · — · fixtures: M27
+## E49 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L381 · — · fixtures: M27
 
 Old:
 
@@ -665,7 +833,7 @@ New:
 "bytes": 880,
 ```
 
-## E39 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L562 · — · fixtures: M41
+## E50 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L562 · — · fixtures: M41
 
 Old:
 
@@ -679,7 +847,7 @@ New:
 "sha256": "c2e42af7bf912c214f974d5ec371a0fe6845ee8f356d729226edf2db097723b7",
 ```
 
-## E40 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L563 · — · fixtures: M41
+## E51 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L563 · — · fixtures: M41
 
 Old:
 
@@ -693,7 +861,7 @@ New:
 "bytes": 1651,
 ```
 
-## E41 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L579 · — · fixtures: M42
+## E52 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L579 · — · fixtures: M42
 
 Old:
 
@@ -707,7 +875,7 @@ New:
 "sha256": "c86181f5e754d50a891def2cae82e194711a098e42419437c0d1985745d15d03",
 ```
 
-## E42 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L580 · — · fixtures: M42
+## E53 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L580 · — · fixtures: M42
 
 Old:
 
@@ -721,7 +889,7 @@ New:
 "bytes": 1104,
 ```
 
-## E43 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L644 · — · fixtures: M47
+## E54 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L644 · — · fixtures: M47
 
 Old:
 
@@ -735,7 +903,7 @@ New:
 "sha256": "4958c30a5d0fd2baa1b032a4104e20268a832e265a7107409a8772b9d9d7515f",
 ```
 
-## E44 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L645 · — · fixtures: M47
+## E55 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L645 · — · fixtures: M47
 
 Old:
 
@@ -749,7 +917,7 @@ New:
 "bytes": 1135,
 ```
 
-## E45 — label · `41_F18_Fixture_Inputs/fixture-index.json` L2 · — · fixtures: —
+## E56 — label · `41_F18_Fixture_Inputs/fixture-index.json` L2 · — · fixtures: —
 
 Old:
 
@@ -763,7 +931,7 @@ New:
 "fixture_index_version": "1.3.7-candidate, not audited",
 ```
 
-## E46 — derived · `27_SHA256SUMS.txt` L2 · — · fixtures: —
+## E57 — derived · `27_SHA256SUMS.txt` L2 · — · fixtures: —
 
 Old:
 
@@ -777,7 +945,7 @@ New:
 3e5e70d07d4f0dc104e9a363d93d346d93527dd962e8bba48b6da4389448a228  02_OpenVEF_Experimental_Protocol_v1.3.6.md
 ```
 
-## E47 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
+## E58 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
 
 Old:
 
@@ -791,7 +959,7 @@ New:
 0e6bd491549561d4cdf9af9c16b84980f39e3bb029dcca93477a874e4d33d974  10_LLM_Era_Hardware_Verification_Literature_Review.md
 ```
 
-## E48 — derived · `27_SHA256SUMS.txt` L12 · — · fixtures: —
+## E59 — derived · `27_SHA256SUMS.txt` L12 · — · fixtures: —
 
 Old:
 
@@ -805,7 +973,21 @@ New:
 3e40cc28eacce8289660ee8a2c5239fb66e91e20abf7409a99dd5bcb0e07d8a3  11_Comparative_Research_Matrix.md
 ```
 
-## E49 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
+## E60 — derived · `27_SHA256SUMS.txt` L24 · — · fixtures: —
+
+Old:
+
+```text
+987378853f21b108704b5d97e10a1832de7fcdeca7ed7aae65b26a5e0e04bc49  25_Common_System_and_Repair_Prompt_Templates.txt
+```
+
+New:
+
+```text
+ddff0b4fc32b9342d31aaa5d691fb95b6d0ab8ee50673522c1ba0764246711cb  25_Common_System_and_Repair_Prompt_Templates.txt
+```
+
+## E61 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
 
 Old:
 
@@ -819,7 +1001,7 @@ New:
 ae1094db1a66e2216239409c6d4106e4672f35699f5fca0ae96760b686c83625  30_Response_Parser_and_Execution_Contract_v1.3.6.md
 ```
 
-## E50 — derived · `27_SHA256SUMS.txt` L34 · — · fixtures: —
+## E62 — derived · `27_SHA256SUMS.txt` L34 · — · fixtures: —
 
 Old:
 
@@ -833,7 +1015,7 @@ New:
 7dd73d29ecf676912d0e320f48e26d17378f8b92b1ce3268b6a649c9b4319893  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md
 ```
 
-## E51 — derived · `27_SHA256SUMS.txt` L66 · — · fixtures: —
+## E63 — derived · `27_SHA256SUMS.txt` L66 · — · fixtures: —
 
 Old:
 
@@ -847,7 +1029,7 @@ New:
 63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813  41_F18_Fixture_Inputs/M27.json
 ```
 
-## E52 — derived · `27_SHA256SUMS.txt` L80 · — · fixtures: —
+## E64 — derived · `27_SHA256SUMS.txt` L80 · — · fixtures: —
 
 Old:
 
@@ -861,7 +1043,7 @@ New:
 c2e42af7bf912c214f974d5ec371a0fe6845ee8f356d729226edf2db097723b7  41_F18_Fixture_Inputs/M41.json
 ```
 
-## E53 — derived · `27_SHA256SUMS.txt` L81 · — · fixtures: —
+## E65 — derived · `27_SHA256SUMS.txt` L81 · — · fixtures: —
 
 Old:
 
@@ -875,7 +1057,7 @@ New:
 c86181f5e754d50a891def2cae82e194711a098e42419437c0d1985745d15d03  41_F18_Fixture_Inputs/M42.json
 ```
 
-## E54 — derived · `27_SHA256SUMS.txt` L86 · — · fixtures: —
+## E66 — derived · `27_SHA256SUMS.txt` L86 · — · fixtures: —
 
 Old:
 
@@ -889,7 +1071,7 @@ New:
 4958c30a5d0fd2baa1b032a4104e20268a832e265a7107409a8772b9d9d7515f  41_F18_Fixture_Inputs/M47.json
 ```
 
-## E55 — derived · `27_SHA256SUMS.txt` L182 · — · fixtures: —
+## E67 — derived · `27_SHA256SUMS.txt` L182 · — · fixtures: —
 
 Old:
 

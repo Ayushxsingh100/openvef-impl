@@ -23,7 +23,8 @@ from openvef.stage_map import validate_vector  # noqa: E402
 CHANGED = {"02_OpenVEF_Experimental_Protocol_v1.3.6.md", "30_Response_Parser_and_Execution_Contract_v1.3.6.md",
            "36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md",
            "10_LLM_Era_Hardware_Verification_Literature_Review.md", "11_Comparative_Research_Matrix.md",
-           "27_SHA256SUMS.txt", "41_F18_Fixture_Inputs/fixture-index.json"} | {
+           "27_SHA256SUMS.txt", "41_F18_Fixture_Inputs/fixture-index.json",
+           "25_Common_System_and_Repair_Prompt_Templates.txt"} | {
     f"41_F18_Fixture_Inputs/{n}.json" for n in ("M27", "M41", "M42", "M47")}
 ADDED = {"CHANGELOG-v1.3.7-candidate.md", "CANDIDATE-LABEL.md", "SHA256SUMS-v1.3.7-candidate.txt"}
 
@@ -58,17 +59,32 @@ class CandidatePackTests(unittest.TestCase):
     def test_no_line_moves_and_only_edited_lines_change(self):
         mod = builder()
         edited: dict[str, set[int]] = {}
+        src, first, last, copy, shift = mod.MIRROR
         for _, _, _, rel, n, _, _ in mod.EDITS:
             edited.setdefault(rel, set()).add(n)
+            if rel == src and first <= n <= last:  # A2: the File 25 normative copy
+                edited.setdefault(copy, set()).add(n + shift)
         for rel in edited:
             old = self.base[rel].decode("utf-8").split("\n")
             new = self.pack[rel].decode("utf-8").split("\n")
             with self.subTest(file=rel):
-                if rel.endswith(".md"):
+                if rel.endswith(".md") or rel == mod.P25:
                     self.assertEqual("\n".join(new[len(old) - 1:]), mod.TRAILER)  # trailer only after the last line
                 differ = {i + 1 for i in range(len(old) - 1) if old[i] != new[i]}
                 label_line = {mod.VERSION_LINES[rel]} if rel in mod.VERSION_LINES else set()
                 self.assertEqual(differ, edited[rel] | label_line)
+
+    def test_file_25_copy_still_equals_the_protocol(self):
+        """A2: File 25 L32 "normative text below is identical to Protocol §3.4"."""
+        mod = builder()
+        src, first, last, copy, shift = mod.MIRROR
+        p = self.pack[src].decode("utf-8").split("\n")
+        c = self.pack[copy].decode("utf-8").split("\n")
+        self.assertEqual(p[first - 1:last], c[first - 1 + shift:last + shift])
+        # Both model-visible bodies end before the copy starts (L32); those lines are byte-identical to v1.3.6.
+        base = self.base[copy].decode("utf-8").split("\n")
+        self.assertIn("--- END MODEL-VISIBLE REPAIR-MESSAGE BODY ---", "\n".join(base[:first - 1 + shift - 1]))
+        self.assertEqual(c[:first - 1 + shift], base[:first - 1 + shift])
 
     def test_labels(self):
         for rel in CHANGED - {"27_SHA256SUMS.txt"}:

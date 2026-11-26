@@ -4,8 +4,9 @@
 corrections C1–C10 applied (owner decision D-024; `CHANGELOG-v1.3.7-candidate.md`). It is not released, not audited
 and not approved, and v1.3.6 (`baseline/`) remains the default pack.
 
-- **In-file label:** every file a correction changed carries the label itself (Markdown: an appended
-  trailer; fixture JSON: `fixture_version` / `fixture_index_version`). `27_SHA256SUMS.txt` is changed
+- **In-file label:** every file a correction changed carries the label itself (Markdown and File 25: an
+  appended trailer, in File 25 after its last line and outside the model-visible bodies; fixture JSON:
+  `fixture_version` / `fixture_index_version`). `27_SHA256SUMS.txt` is changed
   (derived hashes) but cannot carry text without breaking its format; it is labelled here.
 - **Labelled by this file:** every other file is byte-identical to v1.3.6 (JSON, CSV, prompt templates
   and verbatim audit records cannot be edited without changing bytes that tools or provenance depend on).
@@ -36,7 +37,7 @@ and not approved, and v1.3.6 (`baseline/`) remains the default pack.
 | `22_Source_Access_Provenance_Log_v1.2.md` | identical to v1.3.6; labelled here |
 | `23_Owner_Approval_Record_v1.3.6.md` | identical to v1.3.6; labelled here |
 | `24_Mask_to_Specification_Traceability_Template.csv` | identical to v1.3.6; labelled here |
-| `25_Common_System_and_Repair_Prompt_Templates.txt` | identical to v1.3.6; labelled here |
+| `25_Common_System_and_Repair_Prompt_Templates.txt` | changed; labelled in-file |
 | `26_Claude_v0.6_Audit_Raw.txt` | identical to v1.3.6; labelled here |
 | `27_SHA256SUMS.txt` | changed (derived); labelled here |
 | `28_Claude_v0.7_Audit_Raw.txt` | identical to v1.3.6; labelled here |

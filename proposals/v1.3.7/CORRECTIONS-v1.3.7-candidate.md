@@ -388,3 +388,19 @@ port set that includes `rd_en`; with `wr_en` alone there is no such case.
 **Fit with the current code.** None needed: the C5 adapter is general. The amended M27 passes (a)–(d) and fails (e);
 `{"wr_en": "0"}` is legal (tests/test_v137_candidate_pack.py).
 
+
+### A2 — The File 25 normative copy of Protocol §3.4 (D-025 item 3; a defect in how D-024 applied C1–C3, C9, C10)
+
+**What was wrong.** File 25 carries a line-for-line copy of Protocol L90–L187 and says so:
+
+> [25 L32] "NORMATIVE CONTROL COPY (NOT MODEL-VISIBLE; normative text below is identical to Protocol §3.4):"
+
+D-024 changed Protocol L175, L176, L177 and L185 but not their copies (File 25 L118, L119, L120, L128), so the
+candidate contradicted its own statement. Found while checking stale references for D-025.
+
+**What changes.** Every edit inside Protocol L90–L187 is applied to File 25 at the line 57 lower; the build asserts the
+two ranges are identical before and after, and the test checks that File 25 L1–L32 (both model-visible bodies) are
+byte-identical to v1.3.6, so no prompt text and no sidecar hash changes. File 25 gets the candidate trailer after its
+last line, outside the model-visible bodies.
+
+**Rejected.** Leaving the copy stale (contradicts L32); deleting the copy (removes text the pack declares normative).

@@ -35,6 +35,11 @@ P30 = "30_Response_Parser_and_Execution_Contract_v1.3.6.md"
 P36 = "36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md"
 P10 = "10_LLM_Era_Hardware_Verification_Literature_Review.md"
 P11 = "11_Comparative_Research_Matrix.md"
+P25 = "25_Common_System_and_Repair_Prompt_Templates.txt"
+# Amendment A2 (D-025): File 25 L32 says "NORMATIVE CONTROL COPY (NOT MODEL-VISIBLE; normative text below is identical
+# to Protocol §3.4)", and its L33-L130 equal Protocol L90-L187 line for line. Every edit inside that Protocol range is
+# applied to the copy as well (logged as A2), so the copy stays identical. Outside the model-visible bodies.
+MIRROR = (P02, 90, 187, P25, -57)
 FX = "41_F18_Fixture_Inputs/"
 
 TRAILER = (f"\n---\n\n**{LABEL}.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in "
@@ -239,11 +244,18 @@ def build(out: Path) -> dict:
             texts[rel] = lines_of((BASE / rel).read_text("utf-8"))
         return texts[rel]
 
+    src, first, last, copy, shift = MIRROR
+    assert line_of(src)[first - 1:last] == line_of(copy)[first - 1 + shift:last + shift], "File 25 copy differs"
     for cid, pd, fixtures, rel, n, old, new in EDITS:
-        lines = line_of(rel)
-        assert lines[n - 1].count(old) == 1, (cid, rel, n, old[:60])
-        lines[n - 1] = lines[n - 1].replace(old, new)
-        log.append({"correction": cid, "pd": pd, "fixtures": fixtures, "file": rel, "line": n, "old": old, "new": new})
+        targets = [(rel, n, cid)]
+        if rel == src and first <= n <= last:
+            targets.append((copy, n + shift, f"A2 (copy of {cid})"))
+        for path, m, label in targets:
+            lines = line_of(path)
+            assert lines[m - 1].count(old) == 1, (label, path, m, old[:60])
+            lines[m - 1] = lines[m - 1].replace(old, new)
+            log.append({"correction": label, "pd": pd, "fixtures": fixtures, "file": path, "line": m, "old": old,
+                        "new": new})
     for rel, n in VERSION_LINES.items():
         lines = line_of(rel)
         old = lines[n - 1]
@@ -253,7 +265,7 @@ def build(out: Path) -> dict:
                     "old": old.strip(), "new": lines[n - 1].strip()})
     for rel, lines in texts.items():
         body = "\n".join(lines) + "\n"
-        if rel.endswith(".md"):
+        if rel.endswith(".md") or rel == P25:  # File 25: after its last line, outside the model-visible bodies
             body += TRAILER
             log.append({"correction": "label", "pd": "—", "fixtures": "—", "file": rel,
                         "line": len(lines) + 1, "old": "(end of file)", "new": "appended trailer: " + TRAILER.strip()})
@@ -342,8 +354,9 @@ def write_label(out: Path, log: list[dict]) -> None:
             f"**Every file in this directory is part of OpenVEF Planning {LABEL}.** It is a copy of v1.3.6 with",
             "corrections C1–C10 applied (owner decision D-024; `" + CHANGELOG + "`). It is not released, not audited",
             "and not approved, and v1.3.6 (`baseline/`) remains the default pack.", "",
-            "- **In-file label:** every file a correction changed carries the label itself (Markdown: an appended",
-            "  trailer; fixture JSON: `fixture_version` / `fixture_index_version`). `27_SHA256SUMS.txt` is changed",
+            "- **In-file label:** every file a correction changed carries the label itself (Markdown and File 25: an",
+            "  appended trailer, in File 25 after its last line and outside the model-visible bodies; fixture JSON:",
+            "  `fixture_version` / `fixture_index_version`). `27_SHA256SUMS.txt` is changed",
             "  (derived hashes) but cannot carry text without breaking its format; it is labelled here.",
             "- **Labelled by this file:** every other file is byte-identical to v1.3.6 (JSON, CSV, prompt templates",
             "  and verbatim audit records cannot be edited without changing bytes that tools or provenance depend on).",
