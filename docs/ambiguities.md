@@ -1852,3 +1852,23 @@ release `audit5-5bdc25ea` is lifted.
 3. `docs/DEMO-2DEC.md` is rewritten as a 10-minute faculty demo script, with pre-captured outputs in `docs/demo/`.
 
 F18 is not passed.
+
+## D-024 — Corrected pack v1.3.7 as a candidate (DECIDED; Phase A)
+
+**Owner decision by Krishika**, on a Claude (claude.ai) plan. v1.3.6 stays immutable and the default; nothing under
+`baseline/` changes. Takes effect under D-008; Ayush's ratification stays the single entry in AUDIT-READINESS.md.
+
+- **Phase A (corrections only, no implementation code):** `proposals/v1.3.7/pack/` is a full copy of v1.3.6 with only
+  corrections C1–C10 applied, labelled "v1.3.7 CANDIDATE, not audited"; rationale, fixture → PD → correction map and
+  rejected alternatives in `proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md`; edits in the pack's CHANGELOG; checked
+  by `tests/test_v137_candidate_pack.py`. Committed and pushed alone, before any implementation change.
+- **Choices made by Krishika when asked (26 Nov 2026):** C1–C10 only, with the 10 fixtures they do not cover flagged
+  (M13, M14, M15, M17, M37, M41, M42, M47, P17, R07); changed files labelled in-file, unchanged files by
+  `CANDIDATE-LABEL.md`.
+- **Changes against the 24 Nov draft**, argued in the rationale (section 2): C9 also aligns Protocol L177; C5 names the
+  check-(e) input properties; C8 no longer appends to File 22.
+- **Phase B (later commits):** `--pack {v1.3.6,v1.3.7-candidate}` in the runner, v1.3.6 results unchanged; the
+  covered fixtures implemented by general rules only (D-013, D-017); a correction found wrong is amended in a new,
+  numbered commit.
+
+Not audited. F18 is not passed.

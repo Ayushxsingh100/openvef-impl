@@ -1,4 +1,4 @@
-"""Every pack quotation in docs/pack-defects.md and docs/fifo-owner-checklist.md is
+"""Every pack quotation in the listed documents (DOCS) is
 verbatim: each line `> [<file> L<n>] "<text>"` must have <text> as a substring of line
 <n> of that baseline file. <file> is a pack file number (e.g. `02`) or `41/<ID>.json`.
 Inside the quotes, \\" stands for a double quote.
@@ -15,7 +15,8 @@ DOCS = ("docs/pack-defects.md", "docs/DEVIATIONS.md", "docs/fifo-owner-checklist
         "docs/fifo-spec-v0.2.md", "docs/fifo-benchmark-overlap-disclosure-DRAFT.md",
         "docs/fifo-frozen-values-proposal-DRAFT.md",
         "docs/OWNER-FREEZE-PACKAGE.md", "docs/AUDIT-READINESS.md", "docs/F1-F17-plan.md",
-        "docs/AUDIT-BRIEF.md", "proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md")
+        "docs/AUDIT-BRIEF.md", "proposals/v1.3.7/PROPOSED-CORRECTIONS-DRAFT.md",
+        "proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md")
 QUOTE = re.compile(r'^> \[(?P<file>[0-9]{2}|41/[A-Za-z0-9]+\.json) L(?P<line>[0-9]+)\] "(?P<text>.*)"$')
 
 
