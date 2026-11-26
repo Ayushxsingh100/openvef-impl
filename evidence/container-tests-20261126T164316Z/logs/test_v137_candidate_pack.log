@@ -1,0 +1,15 @@
+test_checksums_and_index (test_v137_candidate_pack.CandidatePackTests.test_checksums_and_index) ... ok
+test_corrected_m27_reaches_check_e (test_v137_candidate_pack.CandidatePackTests.test_corrected_m27_reaches_check_e) ... ok
+test_expected_objects_unchanged (test_v137_candidate_pack.CandidatePackTests.test_expected_objects_unchanged) ... ok
+test_file_25_copy_still_equals_the_protocol (test_v137_candidate_pack.CandidatePackTests.test_file_25_copy_still_equals_the_protocol)
+A2: File 25 L32 "normative text below is identical to Protocol §3.4". ... ok
+test_labels (test_v137_candidate_pack.CandidatePackTests.test_labels) ... ok
+test_no_line_moves_and_only_edited_lines_change (test_v137_candidate_pack.CandidatePackTests.test_no_line_moves_and_only_edited_lines_change) ... ok
+test_no_stale_name_or_hash (test_v137_candidate_pack.CandidatePackTests.test_no_stale_name_or_hash) ... ok
+test_only_the_expected_files_differ (test_v137_candidate_pack.CandidatePackTests.test_only_the_expected_files_differ) ... ok
+test_rebuild_is_byte_identical (test_v137_candidate_pack.CandidatePackTests.test_rebuild_is_byte_identical) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.126s
+
+OK

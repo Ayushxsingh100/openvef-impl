@@ -29,17 +29,18 @@ It is a status document: it claims no gate as passed.
 
 ## 2. Current counts
 
-Latest evidence run: **`evidence/run-20261126T155730Z`** (pack v1.3.6).
-- Run class `development`; commit `df80e32`, clean tree; after DEV-001
+Latest evidence run: **`evidence/run-20261126T163836Z`** (pack v1.3.6).
+- Run class `development`; commit `75c959c`, clean tree; after DEV-001
   ([DEVIATIONS.md](DEVIATIONS.md)) and D-009 ([READINGS-REVIEW.md](READINGS-REVIEW.md)).
   The run re-verified all 20 frozen items, the DEV-001 mask files and the 39 D-009 items
   against their recorded hashes; none changed.
 - Pinned image per D-002a: CPython 3.11.18, interpreter SHA-256 `92d7e40e…`. The image ID
   and toolchain identity are recorded in its `summary.json`.
-- Every record is identical to the previous run, `run-20261126T144718Z` (D-022), except measured
-  wall-clock times; D-024 changed no v1.3.6 status, note or label.
+- Every record is identical to the previous run, `run-20261126T155730Z`, except measured
+  wall-clock times; D-024 and D-025 changed no v1.3.6 status, note or label.
 - **Candidate pack (D-024; v1.3.7 CANDIDATE, not audited; not v1.3.6 F18 evidence, does not count toward F18):**
-  `run-v137c-20261126T155948Z`, same commit: 134 PASS, 0 FAIL, 10 NOT_IMPLEMENTED, 0 ERROR. The candidate needs an
+  `run-v137c-20261126T164050Z`, same commit: 141 PASS, 0 FAIL, 3 NOT_IMPLEMENTED (M37, M41, P17 need owner
+  specification), 0 ERROR. The candidate needs an
   independent document audit and owner approval before it could replace v1.3.6.
 - D-022 (re-audit #4: `stop` cites File 36 L48; literal `inspect.signature` after
   import) changed no status, note or label. D-019 to D-022 are audited (fourth and fifth audits); A9-2 is closed as a
@@ -85,8 +86,8 @@ auditor should weigh them with that in mind.
 Plan: [F1-F17-plan.md](F1-F17-plan.md). Owner-written control artifacts are listed in
 [design/fifo/controls/README.md](../design/fifo/controls/README.md) (D-007).
 
-Latest control run: **`evidence/controls-20261126T160156Z`**, pinned image, commit
-`df80e32`. It carries the same identity records as an F18 run.
+Latest control run: **`evidence/controls-20261126T164304Z`**, pinned image, commit
+`75c959c`. It carries the same identity records as an F18 run.
 
 | Status | Controls |
 |---|---|
@@ -104,7 +105,7 @@ Latest control run: **`evidence/controls-20261126T160156Z`**, pinned image, comm
 **Source:** the evidence-bundle list in the Owner Decision Record §5.3, an external
 document not in this repository. The list was supplied by Krishika on 24 Nov 2026.
 
-Status is checked against the latest evidence run, `evidence/run-20261126T155730Z`. **9 of 9 met.**
+Status is checked against the latest evidence run, `evidence/run-20261126T163836Z`. **9 of 9 met.**
 - **Met:** the run records it as stated.
 - **Partly met:** some of it is recorded; the gap is named. (None at present; items 4
   and 6 were partly met up to `run-20261124T112030Z`.)
@@ -124,7 +125,7 @@ Status is checked against the latest evidence run, `evidence/run-20261126T155730
 **Also available to the auditor:**
 - [traceability.md](traceability.md), [ambiguities.md](ambiguities.md),
   [pack-defects.md](pack-defects.md), [assistance-log.md](assistance-log.md);
-- the unit tests in `tests/`, 27 files, run with `.venv/bin/python -I tests/<file>`;
+- the unit tests in `tests/`, 28 files, run with `.venv/bin/python -I tests/<file>`;
 - `evidence/container-tests-*`: logs of the whole suite inside the pinned image (D-017). Inspection evidence, not an F18 run.
 
 **File 50 Python 3.11 Unicode tokenizer check (L555 (4)): recorded.** Run
