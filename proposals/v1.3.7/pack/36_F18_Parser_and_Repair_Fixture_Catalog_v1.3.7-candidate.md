@@ -188,6 +188,16 @@ Fixture descriptors in index: **144**. Mandatory count must equal the number of 
 | M69 | missing-case | Decorated async helper is rejected by decorator category rank 5 before async-definition rank 6 | `REPAIR` — `DECORATOR_REJECT|file=driver.py|symbol=helper` | `41_F18_Fixture_Inputs/M69.json` |
 | M70 | missing-case | Generator expression containing `await` is rejected by rank 7 even when every `comprehension.is_async` flag is zero | `REPAIR` — `ENTRY_POINT_REJECT|file=driver.py|symbol=helper|reason=ASYNC_COMPREHENSION` | `41_F18_Fixture_Inputs/M70.json` |
 
+## Input shapes of control and lifecycle vectors (v1.3.7 candidate, C12–C16)
+
+Each shape below is the complete input of a fixture; a property outside its stated domain is an input error, not an outcome. A property whose value the Protocol fixes must equal that value and does not change the result.
+
+- **Serializer-grammar vector** (C12): `diagnostic` (a string) and, optionally, `allowed_diagnostics` (the duplicate-free list of diagnostics the stage map emitted). It applies Protocol §3.4 feedback-serialization step (1): the closed grammar, then membership when the list is given. A failure is the `FEEDBACK_SERIALIZER_REJECT` record; a pass has no record to compare.
+- **Truncation-primitive vector** (C13): `raw_diagnostic` (a string); `raw_diagnostic_utf8_bytes` (its UTF-8 byte length); `byte_cap` = `2048`; `marker` = `...[TRUNCATED]`; `truncate_on_utf8_boundary` = `true`; `truncate_before_json_escape` = `true`; `test_scope` = `TRUNCATION_PRIMITIVE_ONLY_GRAMMAR_BYPASSED`. The result is the step (2) control vector of Protocol §3.4.
+- **JSON-escaping-primitive vector** (C14): `feedback_object` (exactly the string keys `stage_id`, `error_class`, `diagnostic`); `encoding` = `UTF-8`; `ensure_ascii` = `false`; `indent` = `2`; `line_endings` = `LF`; `terminal_newline` = `true`; `grammar_exempt_for_primitive_test` = `true`; `test_scope` = `JSON_ESCAPING_PRIMITIVE_ONLY_GRAMMAR_BYPASSED`. The result is the step (3) control vector of Protocol §3.4, keys serialized in the order `stage_id`, `error_class`, `diagnostic`.
+- **Lifecycle halt-event vector** (C15): `lifecycle` = `MID_RUN` (the halt occurs after slots have begun, §7b); `event`, one stage-map event of kind `simulator_error` (`target` `rtl` or `null`, `exception_class`) or `trace_integrity` (`reason`); `slots` with non-negative integers `scheduled` (at least 1), `previously_evaluated`, `triggering_slot` (1 to `scheduled`) and `remaining`, where `previously_evaluated` + 1 + `remaining` = `scheduled`; `evaluator_repair_attempt` = `1`, the ordinal of the recovery cycle this halt opens (§7b allows one; a halt after that cycle is a recurrence, given as two halt signatures). The result is the event's stage-map row with disposition `DESIGN_HALT_NO_SLOT_SCORED`; the slot counts do not change it.
+- **Design-preflight vector** (C16): `design_preflight`, an object with exactly the Boolean `rtl_null_masked_divergence`. `true` is the §7a baseline mismatch record; `false` passes the gate, with no record to compare.
+
 ---
 
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.

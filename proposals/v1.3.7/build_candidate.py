@@ -264,6 +264,77 @@ STALE: list[tuple[str, int, str, str]] = [
      f"The v1.3.6 independent document audit is pending; the {CAND} pack is not audited."),
 ]
 
+# --- D-025 Phase A: C11-C16 (PD-26, PD-20, PD-03, PD-07). Rationale: CORRECTIONS-v1.3.7-candidate.md section 7.
+EDITS += [
+    ("C11", "PD-26", "M42, M47", P02, 185,
+     "terminate with `DESIGN_HALT_REPEATED|reason=SECOND_HALT_AFTER_RECOVERY`.",
+     "terminate with `DESIGN_HALT_REPEATED|reason=SECOND_HALT_AFTER_RECOVERY`. Both terminations are recorded at stage "
+     "`DESIGN_HALT` with error class `DESIGN_HALT_REPEATED`."),
+    ("C11", "PD-26", "M15", P02, 174,
+     "The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`.",
+     "The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`. "
+     "`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error "
+     "class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`."),
+    ("C13", "PD-02 (1), PD-03", "M14, M17", P02, 174,
+     "The M14 truncation primitive uses error class `TRUNCATION`. The M17 JSON-escaping primitive uses error class "
+     "`JSON_SERIALIZATION`.",
+     "A truncation-primitive vector uses error class `TRUNCATION` and a JSON-escaping-primitive vector uses error class "
+     "`JSON_SERIALIZATION`; both are recorded at stage `FEEDBACK_SERIALIZER` with disposition `CONTROL_EXPECTATION`."),
+    ("C12", "PD-20", "M15", P02, 168,
+     "a path-bearing or otherwise non-normative diagnostic fails the closed-grammar check and is not sent.",
+     "a path-bearing or otherwise non-normative diagnostic fails the closed-grammar check and is not sent. When the set "
+     "of diagnostics the stage map emitted is given, a diagnostic that passes the grammar but is not in that set is also "
+     "rejected at step (1), with the same `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`."),
+    ("C13", "PD-03", "M14, M17", P02, 168,
+     "No raw exception text, validator/compiler message, file path, trace/output value or arbitrary free-form content "
+     "is sent to the model.",
+     "No raw exception text, validator/compiler message, file path, trace/output value or arbitrary free-form content "
+     "is sent to the model. A truncation-primitive vector applies step (2) alone to its input string and reports "
+     "`contains_marker` (whether the output ends with the marker), `valid_utf8` (whether the output bytes are valid "
+     "UTF-8), `output_diagnostic_bytes` (the output's UTF-8 byte length) and `marker_utf8_bytes` (the marker's UTF-8 "
+     "byte length). A JSON-escaping-primitive vector applies step (3) alone to its three-key object and reports "
+     "`diagnostic_utf8` (the serialized text), `diagnostic_sha256` (the lowercase hexadecimal SHA-256 of its UTF-8 "
+     "bytes) and `diagnostic_bytes` (their number)."),
+    ("C16", "PD-07", "R07", P02, 179,
+     "Any baseline mismatch halts the design before slots exist; no slot is scored.",
+     "Any baseline mismatch halts the design before slots exist; no slot is scored. It is recorded at stage "
+     "`DESIGN_HALT` with error class `RTL_NULL_CONTROL_FAILURE`, diagnostic "
+     "`RTL_NULL_CONTROL_FAILURE|reason=MASKED_OUTPUT_DIVERGENCE` and disposition `DESIGN_HALT_NO_SLOT_SCORED`."),
+]
+
+# Lines appended after a file's last line (no existing line moves): File 36 input-shape section (PD-07; C12-C16).
+APPENDS: dict[str, list[str]] = {P36: [
+    "",
+    "## Input shapes of control and lifecycle vectors (v1.3.7 candidate, C12–C16)",
+    "",
+    "Each shape below is the complete input of a fixture; a property outside its stated domain is an input error, not an "
+    "outcome. A property whose value the Protocol fixes must equal that value and does not change the result.",
+    "",
+    "- **Serializer-grammar vector** (C12): `diagnostic` (a string) and, optionally, `allowed_diagnostics` (the "
+    "duplicate-free list of diagnostics the stage map emitted). It applies Protocol §3.4 feedback-serialization step "
+    "(1): the closed grammar, then membership when the list is given. A failure is the `FEEDBACK_SERIALIZER_REJECT` "
+    "record; a pass has no record to compare.",
+    "- **Truncation-primitive vector** (C13): `raw_diagnostic` (a string); `raw_diagnostic_utf8_bytes` (its UTF-8 byte "
+    "length); `byte_cap` = `2048`; `marker` = `...[TRUNCATED]`; `truncate_on_utf8_boundary` = `true`; "
+    "`truncate_before_json_escape` = `true`; `test_scope` = `TRUNCATION_PRIMITIVE_ONLY_GRAMMAR_BYPASSED`. The result is "
+    "the step (2) control vector of Protocol §3.4.",
+    "- **JSON-escaping-primitive vector** (C14): `feedback_object` (exactly the string keys `stage_id`, `error_class`, "
+    "`diagnostic`); `encoding` = `UTF-8`; `ensure_ascii` = `false`; `indent` = `2`; `line_endings` = `LF`; "
+    "`terminal_newline` = `true`; `grammar_exempt_for_primitive_test` = `true`; `test_scope` = "
+    "`JSON_ESCAPING_PRIMITIVE_ONLY_GRAMMAR_BYPASSED`. The result is the step (3) control vector of Protocol §3.4, "
+    "keys serialized in the order `stage_id`, `error_class`, `diagnostic`.",
+    "- **Lifecycle halt-event vector** (C15): `lifecycle` = `MID_RUN` (the halt occurs after slots have begun, §7b); "
+    "`event`, one stage-map event of kind `simulator_error` (`target` `rtl` or `null`, `exception_class`) or "
+    "`trace_integrity` (`reason`); `slots` with non-negative integers `scheduled` (at least 1), `previously_evaluated`, "
+    "`triggering_slot` (1 to `scheduled`) and `remaining`, where `previously_evaluated` + 1 + `remaining` = "
+    "`scheduled`; `evaluator_repair_attempt` = `1`, the ordinal of the recovery cycle this halt opens (§7b allows one; "
+    "a halt after that cycle is a recurrence, given as two halt signatures). The result is the event's stage-map row "
+    "with disposition `DESIGN_HALT_NO_SLOT_SCORED`; the slot counts do not change it.",
+    "- **Design-preflight vector** (C16): `design_preflight`, an object with exactly the Boolean "
+    "`rtl_null_masked_divergence`. `true` is the §7a baseline mismatch record; `false` passes the gate, with no record "
+    "to compare.",
+]}
+
 # C6, as amended by A1 (D-025): the whole M27 descriptor is replaced (its input shape changes). The expected object
 # is unchanged. A1 replaces the FIFO-042 predicate of the 24 Nov draft by the v1.3.6 descriptor's own rule,
 # "wr_en must be 0 when full is 1", over a port set holding `wr_en` only, with `full` as a sampled output.
@@ -336,6 +407,12 @@ def build(out: Path) -> dict:
         lines[n - 1] = old[:old.index(":") + 2] + json.dumps(VERSION_LABEL) + ","
         log.append({"correction": "label", "pd": "—", "fixtures": rel[len(FX):-5], "file": rel, "line": n,
                     "old": old.strip(), "new": lines[n - 1].strip()})
+    for rel, extra in APPENDS.items():
+        lines = line_of(rel)
+        log.append({"correction": "C12–C16", "pd": "PD-07", "fixtures": "M13, M14, M15, M17, R07", "file": rel,
+                    "line": f"{len(lines) + 1}–{len(lines) + len(extra)}", "old": "(after the last line)",
+                    "new": "\n".join(extra)})
+        lines.extend(extra)
     for rel, lines in texts.items():
         body = "\n".join(lines) + "\n"
         if rel.endswith(".md") or rel == P25:  # File 25: after its last line, outside the model-visible bodies

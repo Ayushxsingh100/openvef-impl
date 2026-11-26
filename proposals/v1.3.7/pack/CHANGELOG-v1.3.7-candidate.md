@@ -54,113 +54,126 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E35 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 16 |
 | E36 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 23 |
 | E37 | C10 | PD-01 | M47 | `41_F18_Fixture_Inputs/M47.json` | 24 |
-| E38 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 1 |
-| E39 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 4 |
-| E40 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 9 |
-| E41 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 184 |
-| E42 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 1 |
-| E43 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 4 |
-| E44 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 9 |
-| E45 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 81 |
-| E46 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 81 |
-| E47 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 83 |
-| E48 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 187 |
-| E49 | A2 (copy of S) | — | — | `25_Common_System_and_Repair_Prompt_Templates.txt` | 130 |
-| E50 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 288 |
-| E51 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 555 |
-| E52 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 555 |
-| E53 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 559 |
-| E54 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 1 |
-| E55 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
-| E56 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
-| E57 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
-| E58 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
-| E59 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
-| E60 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 63 |
-| E61 | S | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 1 |
-| E62 | S | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 109 |
-| E63 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 1 |
-| E64 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 17 |
-| E65 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 84 |
-| E66 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 84 |
-| E67 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 1 |
-| E68 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 3 |
-| E69 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 5 |
-| E70 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 48 |
-| E71 | S | — | — | `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` | 2 |
-| E72 | S | — | — | `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` | 189 |
-| E73 | S | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 1 |
-| E74 | S | — | — | `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` | 71 |
-| E75 | S | — | — | `README.md` | 1 |
-| E76 | S | — | — | `README.md` | 3 |
-| E77 | S | — | — | `README.md` | 7 |
-| E78 | S | — | — | `README.md` | 8 |
-| E79 | S | — | — | `README.md` | 11 |
-| E80 | S | — | — | `README.md` | 13 |
-| E81 | S | — | — | `README.md` | 14 |
-| E82 | S | — | — | `README.md` | 14 |
-| E83 | S | — | — | `README.md` | 16 |
-| E84 | S | — | — | `README.md` | 17 |
-| E85 | S | — | — | `README.md` | 9 |
-| E86 | S | — | — | `README.md` | 46 |
-| E87 | label | — | M41 | `41_F18_Fixture_Inputs/M41.json` | 3 |
-| E88 | label | — | M42 | `41_F18_Fixture_Inputs/M42.json` | 3 |
-| E89 | label | — | M47 | `41_F18_Fixture_Inputs/M47.json` | 3 |
-| E90 | label | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560 |
-| E91 | label | — | — | `25_Common_System_and_Repair_Prompt_Templates.txt` | 132 |
-| E92 | label | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 190 |
-| E93 | label | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 110 |
-| E94 | label | — | — | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 418 |
-| E95 | label | — | — | `11_Comparative_Research_Matrix.md` | 44 |
-| E96 | label | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 195 |
-| E97 | label | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 73 |
-| E98 | label | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 98 |
-| E99 | label | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 55 |
-| E100 | label | — | — | `README.md` | 49 |
-| E101 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 8 |
-| E102 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 9 |
-| E103 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 10 |
-| E104 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 11 |
-| E105 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 12 |
-| E106 | label | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 47 |
-| E107 | C6 + A1 | PD-06, PD-25 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
-| E108 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 380 |
-| E109 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 381 |
-| E110 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 562 |
-| E111 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 563 |
-| E112 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 579 |
-| E113 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 580 |
-| E114 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 644 |
-| E115 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 645 |
-| E116 | label | — | — | `41_F18_Fixture_Inputs/fixture-index.json` | 2 |
-| E117 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | name |
-| E118 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | name |
-| E119 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | name |
-| E120 | S | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | name |
-| E121 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | name |
-| E122 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | name |
-| E123 | S | — | — | `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` | name |
-| E124 | S | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | name |
-| E125 | S | — | — | `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` | name |
-| E126 | derived | — | — | `27_SHA256SUMS.txt` | 1 |
-| E127 | derived | — | — | `27_SHA256SUMS.txt` | 2 |
-| E128 | derived | — | — | `27_SHA256SUMS.txt` | 11 |
-| E129 | derived | — | — | `27_SHA256SUMS.txt` | 12 |
-| E130 | derived | — | — | `27_SHA256SUMS.txt` | 20 |
-| E131 | derived | — | — | `27_SHA256SUMS.txt` | 21 |
-| E132 | derived | — | — | `27_SHA256SUMS.txt` | 24 |
-| E133 | derived | — | — | `27_SHA256SUMS.txt` | 28 |
-| E134 | derived | — | — | `27_SHA256SUMS.txt` | 29 |
-| E135 | derived | — | — | `27_SHA256SUMS.txt` | 30 |
-| E136 | derived | — | — | `27_SHA256SUMS.txt` | 31 |
-| E137 | derived | — | — | `27_SHA256SUMS.txt` | 34 |
-| E138 | derived | — | — | `27_SHA256SUMS.txt` | 36 |
-| E139 | derived | — | — | `27_SHA256SUMS.txt` | 66 |
-| E140 | derived | — | — | `27_SHA256SUMS.txt` | 80 |
-| E141 | derived | — | — | `27_SHA256SUMS.txt` | 81 |
-| E142 | derived | — | — | `27_SHA256SUMS.txt` | 86 |
-| E143 | derived | — | — | `27_SHA256SUMS.txt` | 182 |
-| E144 | derived | — | — | `27_SHA256SUMS.txt` | 202 |
+| E38 | C11 | PD-26 | M42, M47 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
+| E39 | A2 (copy of C11) | PD-26 | M42, M47 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
+| E40 | C11 | PD-26 | M15 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 174 |
+| E41 | A2 (copy of C11) | PD-26 | M15 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 117 |
+| E42 | C13 | PD-02 (1), PD-03 | M14, M17 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 174 |
+| E43 | A2 (copy of C13) | PD-02 (1), PD-03 | M14, M17 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 117 |
+| E44 | C12 | PD-20 | M15 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 168 |
+| E45 | A2 (copy of C12) | PD-20 | M15 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 111 |
+| E46 | C13 | PD-03 | M14, M17 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 168 |
+| E47 | A2 (copy of C13) | PD-03 | M14, M17 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 111 |
+| E48 | C16 | PD-07 | R07 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 179 |
+| E49 | A2 (copy of C16) | PD-07 | R07 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 122 |
+| E50 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 1 |
+| E51 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 4 |
+| E52 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 9 |
+| E53 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 184 |
+| E54 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 1 |
+| E55 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 4 |
+| E56 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 9 |
+| E57 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 81 |
+| E58 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 81 |
+| E59 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 83 |
+| E60 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 187 |
+| E61 | A2 (copy of S) | — | — | `25_Common_System_and_Repair_Prompt_Templates.txt` | 130 |
+| E62 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 288 |
+| E63 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 555 |
+| E64 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 555 |
+| E65 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 559 |
+| E66 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 1 |
+| E67 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
+| E68 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
+| E69 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
+| E70 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
+| E71 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 3 |
+| E72 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 63 |
+| E73 | S | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 1 |
+| E74 | S | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 109 |
+| E75 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 1 |
+| E76 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 17 |
+| E77 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 84 |
+| E78 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 84 |
+| E79 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 1 |
+| E80 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 3 |
+| E81 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 5 |
+| E82 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 48 |
+| E83 | S | — | — | `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` | 2 |
+| E84 | S | — | — | `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` | 189 |
+| E85 | S | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 1 |
+| E86 | S | — | — | `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` | 71 |
+| E87 | S | — | — | `README.md` | 1 |
+| E88 | S | — | — | `README.md` | 3 |
+| E89 | S | — | — | `README.md` | 7 |
+| E90 | S | — | — | `README.md` | 8 |
+| E91 | S | — | — | `README.md` | 11 |
+| E92 | S | — | — | `README.md` | 13 |
+| E93 | S | — | — | `README.md` | 14 |
+| E94 | S | — | — | `README.md` | 14 |
+| E95 | S | — | — | `README.md` | 16 |
+| E96 | S | — | — | `README.md` | 17 |
+| E97 | S | — | — | `README.md` | 9 |
+| E98 | S | — | — | `README.md` | 46 |
+| E99 | label | — | M41 | `41_F18_Fixture_Inputs/M41.json` | 3 |
+| E100 | label | — | M42 | `41_F18_Fixture_Inputs/M42.json` | 3 |
+| E101 | label | — | M47 | `41_F18_Fixture_Inputs/M47.json` | 3 |
+| E102 | C12–C16 | PD-07 | M13, M14, M15, M17, R07 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 190–199 |
+| E103 | label | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560 |
+| E104 | label | — | — | `25_Common_System_and_Repair_Prompt_Templates.txt` | 132 |
+| E105 | label | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 200 |
+| E106 | label | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 110 |
+| E107 | label | — | — | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 418 |
+| E108 | label | — | — | `11_Comparative_Research_Matrix.md` | 44 |
+| E109 | label | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | 195 |
+| E110 | label | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | 73 |
+| E111 | label | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | 98 |
+| E112 | label | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 55 |
+| E113 | label | — | — | `README.md` | 49 |
+| E114 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 8 |
+| E115 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 9 |
+| E116 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 10 |
+| E117 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 11 |
+| E118 | S | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 12 |
+| E119 | label | — | — | `22_Source_Access_Provenance_Log_v1.2.md` | 47 |
+| E120 | C6 + A1 | PD-06, PD-25 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E121 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 380 |
+| E122 | derived | — | M27 | `41_F18_Fixture_Inputs/fixture-index.json` | 381 |
+| E123 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 562 |
+| E124 | derived | — | M41 | `41_F18_Fixture_Inputs/fixture-index.json` | 563 |
+| E125 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 579 |
+| E126 | derived | — | M42 | `41_F18_Fixture_Inputs/fixture-index.json` | 580 |
+| E127 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 644 |
+| E128 | derived | — | M47 | `41_F18_Fixture_Inputs/fixture-index.json` | 645 |
+| E129 | label | — | — | `41_F18_Fixture_Inputs/fixture-index.json` | 2 |
+| E130 | S | — | — | `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` | name |
+| E131 | S | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | name |
+| E132 | S | — | — | `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` | name |
+| E133 | S | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | name |
+| E134 | S | — | — | `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` | name |
+| E135 | S | — | — | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | name |
+| E136 | S | — | — | `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` | name |
+| E137 | S | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | name |
+| E138 | S | — | — | `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` | name |
+| E139 | derived | — | — | `27_SHA256SUMS.txt` | 1 |
+| E140 | derived | — | — | `27_SHA256SUMS.txt` | 2 |
+| E141 | derived | — | — | `27_SHA256SUMS.txt` | 11 |
+| E142 | derived | — | — | `27_SHA256SUMS.txt` | 12 |
+| E143 | derived | — | — | `27_SHA256SUMS.txt` | 20 |
+| E144 | derived | — | — | `27_SHA256SUMS.txt` | 21 |
+| E145 | derived | — | — | `27_SHA256SUMS.txt` | 24 |
+| E146 | derived | — | — | `27_SHA256SUMS.txt` | 28 |
+| E147 | derived | — | — | `27_SHA256SUMS.txt` | 29 |
+| E148 | derived | — | — | `27_SHA256SUMS.txt` | 30 |
+| E149 | derived | — | — | `27_SHA256SUMS.txt` | 31 |
+| E150 | derived | — | — | `27_SHA256SUMS.txt` | 34 |
+| E151 | derived | — | — | `27_SHA256SUMS.txt` | 36 |
+| E152 | derived | — | — | `27_SHA256SUMS.txt` | 66 |
+| E153 | derived | — | — | `27_SHA256SUMS.txt` | 80 |
+| E154 | derived | — | — | `27_SHA256SUMS.txt` | 81 |
+| E155 | derived | — | — | `27_SHA256SUMS.txt` | 86 |
+| E156 | derived | — | — | `27_SHA256SUMS.txt` | 182 |
+| E157 | derived | — | — | `27_SHA256SUMS.txt` | 202 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -680,7 +693,175 @@ New:
 "stable_error_class": "NONE",
 ```
 
-## E38 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L1 · — · fixtures: —
+## E38 — C11 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · PD-26 · fixtures: M42, M47
+
+Old:
+
+```text
+terminate with `DESIGN_HALT_REPEATED|reason=SECOND_HALT_AFTER_RECOVERY`.
+```
+
+New:
+
+```text
+terminate with `DESIGN_HALT_REPEATED|reason=SECOND_HALT_AFTER_RECOVERY`. Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED`.
+```
+
+## E39 — A2 (copy of C11) · `25_Common_System_and_Repair_Prompt_Templates.txt` L128 · PD-26 · fixtures: M42, M47
+
+Old:
+
+```text
+terminate with `DESIGN_HALT_REPEATED|reason=SECOND_HALT_AFTER_RECOVERY`.
+```
+
+New:
+
+```text
+terminate with `DESIGN_HALT_REPEATED|reason=SECOND_HALT_AFTER_RECOVERY`. Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED`.
+```
+
+## E40 — C11 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L174 · PD-26 · fixtures: M15
+
+Old:
+
+```text
+The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`.
+```
+
+New:
+
+```text
+The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`. `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.
+```
+
+## E41 — A2 (copy of C11) · `25_Common_System_and_Repair_Prompt_Templates.txt` L117 · PD-26 · fixtures: M15
+
+Old:
+
+```text
+The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`.
+```
+
+New:
+
+```text
+The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`. `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.
+```
+
+## E42 — C13 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L174 · PD-02 (1), PD-03 · fixtures: M14, M17
+
+Old:
+
+```text
+The M14 truncation primitive uses error class `TRUNCATION`. The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`.
+```
+
+New:
+
+```text
+A truncation-primitive vector uses error class `TRUNCATION` and a JSON-escaping-primitive vector uses error class `JSON_SERIALIZATION`; both are recorded at stage `FEEDBACK_SERIALIZER` with disposition `CONTROL_EXPECTATION`.
+```
+
+## E43 — A2 (copy of C13) · `25_Common_System_and_Repair_Prompt_Templates.txt` L117 · PD-02 (1), PD-03 · fixtures: M14, M17
+
+Old:
+
+```text
+The M14 truncation primitive uses error class `TRUNCATION`. The M17 JSON-escaping primitive uses error class `JSON_SERIALIZATION`.
+```
+
+New:
+
+```text
+A truncation-primitive vector uses error class `TRUNCATION` and a JSON-escaping-primitive vector uses error class `JSON_SERIALIZATION`; both are recorded at stage `FEEDBACK_SERIALIZER` with disposition `CONTROL_EXPECTATION`.
+```
+
+## E44 — C12 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L168 · PD-20 · fixtures: M15
+
+Old:
+
+```text
+a path-bearing or otherwise non-normative diagnostic fails the closed-grammar check and is not sent.
+```
+
+New:
+
+```text
+a path-bearing or otherwise non-normative diagnostic fails the closed-grammar check and is not sent. When the set of diagnostics the stage map emitted is given, a diagnostic that passes the grammar but is not in that set is also rejected at step (1), with the same `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`.
+```
+
+## E45 — A2 (copy of C12) · `25_Common_System_and_Repair_Prompt_Templates.txt` L111 · PD-20 · fixtures: M15
+
+Old:
+
+```text
+a path-bearing or otherwise non-normative diagnostic fails the closed-grammar check and is not sent.
+```
+
+New:
+
+```text
+a path-bearing or otherwise non-normative diagnostic fails the closed-grammar check and is not sent. When the set of diagnostics the stage map emitted is given, a diagnostic that passes the grammar but is not in that set is also rejected at step (1), with the same `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`.
+```
+
+## E46 — C13 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L168 · PD-03 · fixtures: M14, M17
+
+Old:
+
+```text
+No raw exception text, validator/compiler message, file path, trace/output value or arbitrary free-form content is sent to the model.
+```
+
+New:
+
+```text
+No raw exception text, validator/compiler message, file path, trace/output value or arbitrary free-form content is sent to the model. A truncation-primitive vector applies step (2) alone to its input string and reports `contains_marker` (whether the output ends with the marker), `valid_utf8` (whether the output bytes are valid UTF-8), `output_diagnostic_bytes` (the output's UTF-8 byte length) and `marker_utf8_bytes` (the marker's UTF-8 byte length). A JSON-escaping-primitive vector applies step (3) alone to its three-key object and reports `diagnostic_utf8` (the serialized text), `diagnostic_sha256` (the lowercase hexadecimal SHA-256 of its UTF-8 bytes) and `diagnostic_bytes` (their number).
+```
+
+## E47 — A2 (copy of C13) · `25_Common_System_and_Repair_Prompt_Templates.txt` L111 · PD-03 · fixtures: M14, M17
+
+Old:
+
+```text
+No raw exception text, validator/compiler message, file path, trace/output value or arbitrary free-form content is sent to the model.
+```
+
+New:
+
+```text
+No raw exception text, validator/compiler message, file path, trace/output value or arbitrary free-form content is sent to the model. A truncation-primitive vector applies step (2) alone to its input string and reports `contains_marker` (whether the output ends with the marker), `valid_utf8` (whether the output bytes are valid UTF-8), `output_diagnostic_bytes` (the output's UTF-8 byte length) and `marker_utf8_bytes` (the marker's UTF-8 byte length). A JSON-escaping-primitive vector applies step (3) alone to its three-key object and reports `diagnostic_utf8` (the serialized text), `diagnostic_sha256` (the lowercase hexadecimal SHA-256 of its UTF-8 bytes) and `diagnostic_bytes` (their number).
+```
+
+## E48 — C16 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L179 · PD-07 · fixtures: R07
+
+Old:
+
+```text
+Any baseline mismatch halts the design before slots exist; no slot is scored.
+```
+
+New:
+
+```text
+Any baseline mismatch halts the design before slots exist; no slot is scored. It is recorded at stage `DESIGN_HALT` with error class `RTL_NULL_CONTROL_FAILURE`, diagnostic `RTL_NULL_CONTROL_FAILURE|reason=MASKED_OUTPUT_DIVERGENCE` and disposition `DESIGN_HALT_NO_SLOT_SCORED`.
+```
+
+## E49 — A2 (copy of C16) · `25_Common_System_and_Repair_Prompt_Templates.txt` L122 · PD-07 · fixtures: R07
+
+Old:
+
+```text
+Any baseline mismatch halts the design before slots exist; no slot is scored.
+```
+
+New:
+
+```text
+Any baseline mismatch halts the design before slots exist; no slot is scored. It is recorded at stage `DESIGN_HALT` with error class `RTL_NULL_CONTROL_FAILURE`, diagnostic `RTL_NULL_CONTROL_FAILURE|reason=MASKED_OUTPUT_DIVERGENCE` and disposition `DESIGN_HALT_NO_SLOT_SCORED`.
+```
+
+## E50 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L1 · — · fixtures: —
 
 Old:
 
@@ -694,7 +875,7 @@ New:
 # OpenVEF Project Charter v1.3.7-candidate
 ```
 
-## E39 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L4 · — · fixtures: —
+## E51 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L4 · — · fixtures: —
 
 Old:
 
@@ -708,7 +889,7 @@ New:
 **Version:** 1.3.7-candidate (OpenVEF Planning v1.3.6 with the corrections in `CHANGELOG-v1.3.7-candidate.md`; not audited; not frozen; not approved). Based on: 1.3.6 (
 ```
 
-## E40 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L9 · — · fixtures: —
+## E52 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L9 · — · fixtures: —
 
 Old:
 
@@ -722,7 +903,7 @@ New:
 independent v1.3.6 document re-audit is pending. The v1.3.7-candidate pack is not audited.
 ```
 
-## E41 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L184 · — · fixtures: —
+## E53 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L184 · — · fixtures: —
 
 Old:
 
@@ -736,7 +917,7 @@ New:
 `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md`
 ```
 
-## E42 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L1 · — · fixtures: —
+## E54 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L1 · — · fixtures: —
 
 Old:
 
@@ -750,7 +931,7 @@ New:
 # OpenVEF Experimental Protocol v1.3.7-candidate
 ```
 
-## E43 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L4 · — · fixtures: —
+## E55 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L4 · — · fixtures: —
 
 Old:
 
@@ -764,7 +945,7 @@ New:
 **Version:** 1.3.7-candidate (OpenVEF Planning v1.3.6 with the corrections in `CHANGELOG-v1.3.7-candidate.md`; not audited; not frozen; not approved). Based on: 1.3.6 (
 ```
 
-## E44 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L9 · — · fixtures: —
+## E56 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L9 · — · fixtures: —
 
 Old:
 
@@ -778,7 +959,7 @@ New:
 v1.3.6 re-audit-pending status, and the not-audited v1.3.7-candidate status, are recorded in §19.
 ```
 
-## E45 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L81 · — · fixtures: —
+## E57 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L81 · — · fixtures: —
 
 Old:
 
@@ -792,7 +973,7 @@ New:
 `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md`
 ```
 
-## E46 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L81 · — · fixtures: —
+## E58 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L81 · — · fixtures: —
 
 Old:
 
@@ -806,7 +987,7 @@ New:
 `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md`
 ```
 
-## E47 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L83 · — · fixtures: —
+## E59 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L83 · — · fixtures: —
 
 Old:
 
@@ -820,7 +1001,7 @@ New:
 `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md`
 ```
 
-## E48 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L187 · — · fixtures: —
+## E60 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L187 · — · fixtures: —
 
 Old:
 
@@ -834,7 +1015,7 @@ New:
 `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md`
 ```
 
-## E49 — A2 (copy of S) · `25_Common_System_and_Repair_Prompt_Templates.txt` L130 · — · fixtures: —
+## E61 — A2 (copy of S) · `25_Common_System_and_Repair_Prompt_Templates.txt` L130 · — · fixtures: —
 
 Old:
 
@@ -848,7 +1029,7 @@ New:
 `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md`
 ```
 
-## E50 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L288 · — · fixtures: —
+## E62 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L288 · — · fixtures: —
 
 Old:
 
@@ -862,7 +1043,7 @@ New:
 `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md`
 ```
 
-## E51 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L555 · — · fixtures: —
+## E63 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L555 · — · fixtures: —
 
 Old:
 
@@ -876,7 +1057,7 @@ New:
 (1) Complete the v1.3.7-candidate document pack
 ```
 
-## E52 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L555 · — · fixtures: —
+## E64 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L555 · — · fixtures: —
 
 Old:
 
@@ -890,7 +1071,7 @@ New:
 (2) Obtain an independent document-only v1.3.7-candidate audit
 ```
 
-## E53 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L559 · — · fixtures: —
+## E65 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L559 · — · fixtures: —
 
 Old:
 
@@ -904,7 +1085,7 @@ New:
 v1.3.7-candidate is OpenVEF Planning v1.3.6 with the corrections in `CHANGELOG-v1.3.7-candidate.md`; it is not audited, frozen or approved, and v1.3.6 remains the default pack. v1.3.6 is a corrective evidence/metadata release
 ```
 
-## E54 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L1 · — · fixtures: —
+## E66 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L1 · — · fixtures: —
 
 Old:
 
@@ -918,7 +1099,7 @@ New:
 Checklist (F18) v1.3.7-candidate
 ```
 
-## E55 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
+## E67 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
 
 Old:
 
@@ -932,7 +1113,7 @@ New:
 `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md`
 ```
 
-## E56 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
+## E68 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
 
 Old:
 
@@ -946,7 +1127,7 @@ New:
 `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md`
 ```
 
-## E57 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
+## E69 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
 
 Old:
 
@@ -960,7 +1141,7 @@ New:
 `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json`
 ```
 
-## E58 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
+## E70 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
 
 Old:
 
@@ -974,7 +1155,7 @@ New:
 `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json`
 ```
 
-## E59 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
+## E71 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L3 · — · fixtures: —
 
 Old:
 
@@ -988,7 +1169,7 @@ New:
 `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md`
 ```
 
-## E60 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L63 · — · fixtures: —
+## E72 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L63 · — · fixtures: —
 
 Old:
 
@@ -1002,7 +1183,7 @@ New:
 Protocol §3.4 and Catalog v1.3.7-candidate;
 ```
 
-## E61 — S · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L1 · — · fixtures: —
+## E73 — S · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L1 · — · fixtures: —
 
 Old:
 
@@ -1016,7 +1197,7 @@ New:
 # OpenVEF Response Parser and Execution Contract v1.3.7-candidate
 ```
 
-## E62 — S · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L109 · — · fixtures: —
+## E74 — S · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L109 · — · fixtures: —
 
 Old:
 
@@ -1030,7 +1211,7 @@ New:
 `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md`
 ```
 
-## E63 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L1 · — · fixtures: —
+## E75 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L1 · — · fixtures: —
 
 Old:
 
@@ -1044,7 +1225,7 @@ New:
 Canonicalization Specification v1.3.7-candidate
 ```
 
-## E64 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L17 · — · fixtures: —
+## E76 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L17 · — · fixtures: —
 
 Old:
 
@@ -1058,7 +1239,7 @@ New:
 `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json`
 ```
 
-## E65 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L84 · — · fixtures: —
+## E77 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L84 · — · fixtures: —
 
 Old:
 
@@ -1072,7 +1253,7 @@ New:
 after all v1.3.7-candidate document and model-visible text edits are complete. This v1.3.7-candidate release
 ```
 
-## E66 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L84 · — · fixtures: —
+## E78 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L84 · — · fixtures: —
 
 Old:
 
@@ -1086,7 +1267,7 @@ New:
 retain their exact values in the v1.3.7-candidate sidecar
 ```
 
-## E67 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L1 · — · fixtures: —
+## E79 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L1 · — · fixtures: —
 
 Old:
 
@@ -1100,7 +1281,7 @@ New:
 # OpenVEF v1.3.7-candidate Status and Gates
 ```
 
-## E68 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L3 · — · fixtures: —
+## E80 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L3 · — · fixtures: —
 
 Old:
 
@@ -1114,7 +1295,7 @@ New:
 **Current release:** v1.3.7-candidate (the v1.3.6 corrective evidence/metadata pack with the corrections in `CHANGELOG-v1.3.7-candidate.md`; not audited, not frozen, not approved; v1.3.6 remains the default).
 ```
 
-## E69 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L5 · — · fixtures: —
+## E81 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L5 · — · fixtures: —
 
 Old:
 
@@ -1128,7 +1309,7 @@ New:
 **Current document audit status:** v1.3.7-candidate NOT AUDITED; v1.3.6 PENDING INDEPENDENT RE-AUDIT.
 ```
 
-## E70 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L48 · — · fixtures: —
+## E82 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L48 · — · fixtures: —
 
 Old:
 
@@ -1142,7 +1323,7 @@ New:
 1. Independent document-only audit of the actual v1.3.7-candidate pack.
 ```
 
-## E71 — S · `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` L2 · — · fixtures: —
+## E83 — S · `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` L2 · — · fixtures: —
 
 Old:
 
@@ -1156,7 +1337,7 @@ New:
 "sidecar_version": "1.3.7-candidate, not audited",
 ```
 
-## E72 — S · `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` L189 · — · fixtures: —
+## E84 — S · `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` L189 · — · fixtures: —
 
 Old:
 
@@ -1170,7 +1351,7 @@ New:
 "payload_manifest_file": "38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json",
 ```
 
-## E73 — S · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L1 · — · fixtures: —
+## E85 — S · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L1 · — · fixtures: —
 
 Old:
 
@@ -1184,7 +1365,7 @@ New:
 Missing-Case Fixture Catalog v1.3.7-candidate
 ```
 
-## E74 — S · `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` L71 · — · fixtures: —
+## E86 — S · `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` L71 · — · fixtures: —
 
 Old:
 
@@ -1198,7 +1379,7 @@ New:
 "Planning-pack v1.3.7-candidate (v1.3.6 corrective evidence/metadata release with the corrections in CHANGELOG-v1.3.7-candidate.md; not audited).
 ```
 
-## E75 — S · `README.md` L1 · — · fixtures: —
+## E87 — S · `README.md` L1 · — · fixtures: —
 
 Old:
 
@@ -1212,7 +1393,7 @@ New:
 # OpenVEF Planning Pack v1.3.7-candidate
 ```
 
-## E76 — S · `README.md` L3 · — · fixtures: —
+## E88 — S · `README.md` L3 · — · fixtures: —
 
 Old:
 
@@ -1226,7 +1407,7 @@ New:
 **Status:** v1.3.7 CANDIDATE, not audited: OpenVEF Planning v1.3.6 with the corrections in `CHANGELOG-v1.3.7-candidate.md` (`CANDIDATE-LABEL.md` lists every file); v1.3.6 remains the default. v1.3.6 status: Corrective evidence/metadata release
 ```
 
-## E77 — S · `README.md` L7 · — · fixtures: —
+## E89 — S · `README.md` L7 · — · fixtures: —
 
 Old:
 
@@ -1240,7 +1421,7 @@ New:
 `01_OpenVEF_Project_Charter_v1.3.7-candidate.md`
 ```
 
-## E78 — S · `README.md` L8 · — · fixtures: —
+## E90 — S · `README.md` L8 · — · fixtures: —
 
 Old:
 
@@ -1254,7 +1435,7 @@ New:
 `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md`
 ```
 
-## E79 — S · `README.md` L11 · — · fixtures: —
+## E91 — S · `README.md` L11 · — · fixtures: —
 
 Old:
 
@@ -1268,7 +1449,7 @@ New:
 `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md`
 ```
 
-## E80 — S · `README.md` L13 · — · fixtures: —
+## E92 — S · `README.md` L13 · — · fixtures: —
 
 Old:
 
@@ -1282,7 +1463,7 @@ New:
 `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md`
 ```
 
-## E81 — S · `README.md` L14 · — · fixtures: —
+## E93 — S · `README.md` L14 · — · fixtures: —
 
 Old:
 
@@ -1296,7 +1477,7 @@ New:
 `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md`
 ```
 
-## E82 — S · `README.md` L14 · — · fixtures: —
+## E94 — S · `README.md` L14 · — · fixtures: —
 
 Old:
 
@@ -1310,7 +1491,7 @@ New:
 `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json`
 ```
 
-## E83 — S · `README.md` L16 · — · fixtures: —
+## E95 — S · `README.md` L16 · — · fixtures: —
 
 Old:
 
@@ -1324,7 +1505,7 @@ New:
 `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md`
 ```
 
-## E84 — S · `README.md` L17 · — · fixtures: —
+## E96 — S · `README.md` L17 · — · fixtures: —
 
 Old:
 
@@ -1338,7 +1519,7 @@ New:
 `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json`
 ```
 
-## E85 — S · `README.md` L9 · — · fixtures: —
+## E97 — S · `README.md` L9 · — · fixtures: —
 
 Old:
 
@@ -1352,7 +1533,7 @@ New:
 — v1.3.6 release changes and audit lineage; the candidate's changes are in `CHANGELOG-v1.3.7-candidate.md`.
 ```
 
-## E86 — S · `README.md` L46 · — · fixtures: —
+## E98 — S · `README.md` L46 · — · fixtures: —
 
 Old:
 
@@ -1366,7 +1547,7 @@ New:
 The v1.3.6 independent document audit is pending; the v1.3.7-candidate pack is not audited.
 ```
 
-## E87 — label · `41_F18_Fixture_Inputs/M41.json` L3 · — · fixtures: M41
+## E99 — label · `41_F18_Fixture_Inputs/M41.json` L3 · — · fixtures: M41
 
 Old:
 
@@ -1380,7 +1561,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E88 — label · `41_F18_Fixture_Inputs/M42.json` L3 · — · fixtures: M42
+## E100 — label · `41_F18_Fixture_Inputs/M42.json` L3 · — · fixtures: M42
 
 Old:
 
@@ -1394,7 +1575,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E89 — label · `41_F18_Fixture_Inputs/M47.json` L3 · — · fixtures: M47
+## E101 — label · `41_F18_Fixture_Inputs/M47.json` L3 · — · fixtures: M47
 
 Old:
 
@@ -1408,7 +1589,30 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E90 — label · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560 · — · fixtures: —
+## E102 — C12–C16 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L190–199 · PD-07 · fixtures: M13, M14, M15, M17, R07
+
+Old:
+
+```text
+(after the last line)
+```
+
+New:
+
+```text
+
+## Input shapes of control and lifecycle vectors (v1.3.7 candidate, C12–C16)
+
+Each shape below is the complete input of a fixture; a property outside its stated domain is an input error, not an outcome. A property whose value the Protocol fixes must equal that value and does not change the result.
+
+- **Serializer-grammar vector** (C12): `diagnostic` (a string) and, optionally, `allowed_diagnostics` (the duplicate-free list of diagnostics the stage map emitted). It applies Protocol §3.4 feedback-serialization step (1): the closed grammar, then membership when the list is given. A failure is the `FEEDBACK_SERIALIZER_REJECT` record; a pass has no record to compare.
+- **Truncation-primitive vector** (C13): `raw_diagnostic` (a string); `raw_diagnostic_utf8_bytes` (its UTF-8 byte length); `byte_cap` = `2048`; `marker` = `...[TRUNCATED]`; `truncate_on_utf8_boundary` = `true`; `truncate_before_json_escape` = `true`; `test_scope` = `TRUNCATION_PRIMITIVE_ONLY_GRAMMAR_BYPASSED`. The result is the step (2) control vector of Protocol §3.4.
+- **JSON-escaping-primitive vector** (C14): `feedback_object` (exactly the string keys `stage_id`, `error_class`, `diagnostic`); `encoding` = `UTF-8`; `ensure_ascii` = `false`; `indent` = `2`; `line_endings` = `LF`; `terminal_newline` = `true`; `grammar_exempt_for_primitive_test` = `true`; `test_scope` = `JSON_ESCAPING_PRIMITIVE_ONLY_GRAMMAR_BYPASSED`. The result is the step (3) control vector of Protocol §3.4, keys serialized in the order `stage_id`, `error_class`, `diagnostic`.
+- **Lifecycle halt-event vector** (C15): `lifecycle` = `MID_RUN` (the halt occurs after slots have begun, §7b); `event`, one stage-map event of kind `simulator_error` (`target` `rtl` or `null`, `exception_class`) or `trace_integrity` (`reason`); `slots` with non-negative integers `scheduled` (at least 1), `previously_evaluated`, `triggering_slot` (1 to `scheduled`) and `remaining`, where `previously_evaluated` + 1 + `remaining` = `scheduled`; `evaluator_repair_attempt` = `1`, the ordinal of the recovery cycle this halt opens (§7b allows one; a halt after that cycle is a recurrence, given as two halt signatures). The result is the event's stage-map row with disposition `DESIGN_HALT_NO_SLOT_SCORED`; the slot counts do not change it.
+- **Design-preflight vector** (C16): `design_preflight`, an object with exactly the Boolean `rtl_null_masked_divergence`. `true` is the §7a baseline mismatch record; `false` passes the gate, with no record to compare.
+```
+
+## E103 — label · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560 · — · fixtures: —
 
 Old:
 
@@ -1424,7 +1628,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E91 — label · `25_Common_System_and_Repair_Prompt_Templates.txt` L132 · — · fixtures: —
+## E104 — label · `25_Common_System_and_Repair_Prompt_Templates.txt` L132 · — · fixtures: —
 
 Old:
 
@@ -1440,7 +1644,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E92 — label · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L190 · — · fixtures: —
+## E105 — label · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L200 · — · fixtures: —
 
 Old:
 
@@ -1456,7 +1660,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E93 — label · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L110 · — · fixtures: —
+## E106 — label · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L110 · — · fixtures: —
 
 Old:
 
@@ -1472,7 +1676,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E94 — label · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L418 · — · fixtures: —
+## E107 — label · `10_LLM_Era_Hardware_Verification_Literature_Review.md` L418 · — · fixtures: —
 
 Old:
 
@@ -1488,7 +1692,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E95 — label · `11_Comparative_Research_Matrix.md` L44 · — · fixtures: —
+## E108 — label · `11_Comparative_Research_Matrix.md` L44 · — · fixtures: —
 
 Old:
 
@@ -1504,7 +1708,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E96 — label · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L195 · — · fixtures: —
+## E109 — label · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` L195 · — · fixtures: —
 
 Old:
 
@@ -1520,7 +1724,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E97 — label · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L73 · — · fixtures: —
+## E110 — label · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` L73 · — · fixtures: —
 
 Old:
 
@@ -1536,7 +1740,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E98 — label · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L98 · — · fixtures: —
+## E111 — label · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` L98 · — · fixtures: —
 
 Old:
 
@@ -1552,7 +1756,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E99 — label · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L55 · — · fixtures: —
+## E112 — label · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L55 · — · fixtures: —
 
 Old:
 
@@ -1568,7 +1772,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E100 — label · `README.md` L49 · — · fixtures: —
+## E113 — label · `README.md` L49 · — · fixtures: —
 
 Old:
 
@@ -1584,7 +1788,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E101 — S · `22_Source_Access_Provenance_Log_v1.2.md` L8 · — · fixtures: —
+## E114 — S · `22_Source_Access_Provenance_Log_v1.2.md` L8 · — · fixtures: —
 
 Old:
 
@@ -1598,7 +1802,7 @@ New:
 Literature review record: SHA-256 0e6bd491549561d4cdf9af9c16b84980f39e3bb029dcca93477a874e4d33d974
 ```
 
-## E102 — S · `22_Source_Access_Provenance_Log_v1.2.md` L9 · — · fixtures: —
+## E115 — S · `22_Source_Access_Provenance_Log_v1.2.md` L9 · — · fixtures: —
 
 Old:
 
@@ -1612,7 +1816,7 @@ New:
 Literature review record: SHA-256 0e6bd491549561d4cdf9af9c16b84980f39e3bb029dcca93477a874e4d33d974
 ```
 
-## E103 — S · `22_Source_Access_Provenance_Log_v1.2.md` L10 · — · fixtures: —
+## E116 — S · `22_Source_Access_Provenance_Log_v1.2.md` L10 · — · fixtures: —
 
 Old:
 
@@ -1626,7 +1830,7 @@ New:
 Literature review record: SHA-256 0e6bd491549561d4cdf9af9c16b84980f39e3bb029dcca93477a874e4d33d974
 ```
 
-## E104 — S · `22_Source_Access_Provenance_Log_v1.2.md` L11 · — · fixtures: —
+## E117 — S · `22_Source_Access_Provenance_Log_v1.2.md` L11 · — · fixtures: —
 
 Old:
 
@@ -1640,7 +1844,7 @@ New:
 Literature review record: SHA-256 0e6bd491549561d4cdf9af9c16b84980f39e3bb029dcca93477a874e4d33d974
 ```
 
-## E105 — S · `22_Source_Access_Provenance_Log_v1.2.md` L12 · — · fixtures: —
+## E118 — S · `22_Source_Access_Provenance_Log_v1.2.md` L12 · — · fixtures: —
 
 Old:
 
@@ -1654,7 +1858,7 @@ New:
 Literature review record: SHA-256 0e6bd491549561d4cdf9af9c16b84980f39e3bb029dcca93477a874e4d33d974
 ```
 
-## E106 — label · `22_Source_Access_Provenance_Log_v1.2.md` L47 · — · fixtures: —
+## E119 — label · `22_Source_Access_Provenance_Log_v1.2.md` L47 · — · fixtures: —
 
 Old:
 
@@ -1670,7 +1874,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E107 — C6 + A1 · `41_F18_Fixture_Inputs/M27.json` Lall · PD-06, PD-25 · fixtures: M27
+## E120 — C6 + A1 · `41_F18_Fixture_Inputs/M27.json` Lall · PD-06, PD-25 · fixtures: M27
 
 Old:
 
@@ -1735,7 +1939,7 @@ New:
 }
 ```
 
-## E108 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L380 · — · fixtures: M27
+## E121 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L380 · — · fixtures: M27
 
 Old:
 
@@ -1749,7 +1953,7 @@ New:
 "sha256": "63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813",
 ```
 
-## E109 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L381 · — · fixtures: M27
+## E122 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L381 · — · fixtures: M27
 
 Old:
 
@@ -1763,7 +1967,7 @@ New:
 "bytes": 880,
 ```
 
-## E110 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L562 · — · fixtures: M41
+## E123 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L562 · — · fixtures: M41
 
 Old:
 
@@ -1777,7 +1981,7 @@ New:
 "sha256": "c2e42af7bf912c214f974d5ec371a0fe6845ee8f356d729226edf2db097723b7",
 ```
 
-## E111 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L563 · — · fixtures: M41
+## E124 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L563 · — · fixtures: M41
 
 Old:
 
@@ -1791,7 +1995,7 @@ New:
 "bytes": 1651,
 ```
 
-## E112 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L579 · — · fixtures: M42
+## E125 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L579 · — · fixtures: M42
 
 Old:
 
@@ -1805,7 +2009,7 @@ New:
 "sha256": "c86181f5e754d50a891def2cae82e194711a098e42419437c0d1985745d15d03",
 ```
 
-## E113 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L580 · — · fixtures: M42
+## E126 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L580 · — · fixtures: M42
 
 Old:
 
@@ -1819,7 +2023,7 @@ New:
 "bytes": 1104,
 ```
 
-## E114 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L644 · — · fixtures: M47
+## E127 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L644 · — · fixtures: M47
 
 Old:
 
@@ -1833,7 +2037,7 @@ New:
 "sha256": "4958c30a5d0fd2baa1b032a4104e20268a832e265a7107409a8772b9d9d7515f",
 ```
 
-## E115 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L645 · — · fixtures: M47
+## E128 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L645 · — · fixtures: M47
 
 Old:
 
@@ -1847,7 +2051,7 @@ New:
 "bytes": 1135,
 ```
 
-## E116 — label · `41_F18_Fixture_Inputs/fixture-index.json` L2 · — · fixtures: —
+## E129 — label · `41_F18_Fixture_Inputs/fixture-index.json` L2 · — · fixtures: —
 
 Old:
 
@@ -1861,7 +2065,7 @@ New:
 "fixture_index_version": "1.3.7-candidate, not audited",
 ```
 
-## E117 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` Lname · — · fixtures: —
+## E130 — S · `01_OpenVEF_Project_Charter_v1.3.7-candidate.md` (was `01_OpenVEF_Project_Charter_v1.3.6.md` Lname · — · fixtures: —
 
 Old:
 
@@ -1875,7 +2079,7 @@ New:
 01_OpenVEF_Project_Charter_v1.3.7-candidate.md
 ```
 
-## E118 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` Lname · — · fixtures: —
+## E131 — S · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` Lname · — · fixtures: —
 
 Old:
 
@@ -1889,7 +2093,7 @@ New:
 02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
 ```
 
-## E119 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` Lname · — · fixtures: —
+## E132 — S · `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md` (was `21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.6.md` Lname · — · fixtures: —
 
 Old:
 
@@ -1903,7 +2107,7 @@ New:
 21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md
 ```
 
-## E120 — S · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` Lname · — · fixtures: —
+## E133 — S · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` Lname · — · fixtures: —
 
 Old:
 
@@ -1917,7 +2121,7 @@ New:
 30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md
 ```
 
-## E121 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` Lname · — · fixtures: —
+## E134 — S · `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` (was `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.6.md` Lname · — · fixtures: —
 
 Old:
 
@@ -1931,7 +2135,7 @@ New:
 31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md
 ```
 
-## E122 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` Lname · — · fixtures: —
+## E135 — S · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` Lname · — · fixtures: —
 
 Old:
 
@@ -1945,7 +2149,7 @@ New:
 32_v1.3.7-candidate_Status_and_Gates.md
 ```
 
-## E123 — S · `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` Lname · — · fixtures: —
+## E136 — S · `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` (was `33_Prompt_Assembly_Sidecar_v1.3.6.json` Lname · — · fixtures: —
 
 Old:
 
@@ -1959,7 +2163,7 @@ New:
 33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json
 ```
 
-## E124 — S · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` Lname · — · fixtures: —
+## E137 — S · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` Lname · — · fixtures: —
 
 Old:
 
@@ -1973,7 +2177,7 @@ New:
 36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
 ```
 
-## E125 — S · `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` Lname · — · fixtures: —
+## E138 — S · `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` (was `38_Authoring_Packet_Manifest_Template_v1.3.6.json` Lname · — · fixtures: —
 
 Old:
 
@@ -1987,7 +2191,7 @@ New:
 38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json
 ```
 
-## E126 — derived · `27_SHA256SUMS.txt` L1 · — · fixtures: —
+## E139 — derived · `27_SHA256SUMS.txt` L1 · — · fixtures: —
 
 Old:
 
@@ -2001,7 +2205,7 @@ New:
 a314a1cd9932208fc2df21dd1754e6c065f047b5c6989aa9cefd654ac20d6c02  01_OpenVEF_Project_Charter_v1.3.7-candidate.md
 ```
 
-## E127 — derived · `27_SHA256SUMS.txt` L2 · — · fixtures: —
+## E140 — derived · `27_SHA256SUMS.txt` L2 · — · fixtures: —
 
 Old:
 
@@ -2012,10 +2216,10 @@ Old:
 New:
 
 ```text
-d2cf16062f8ac70ff35dccf897b8e0561b3e7d7375133d846378a13c692d78d6  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
+9018eb2171e803b49bda107eb3c0639ee4fc0020bb9ea99cd2b9c6564fa99873  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
 ```
 
-## E128 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
+## E141 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
 
 Old:
 
@@ -2029,7 +2233,7 @@ New:
 0e6bd491549561d4cdf9af9c16b84980f39e3bb029dcca93477a874e4d33d974  10_LLM_Era_Hardware_Verification_Literature_Review.md
 ```
 
-## E129 — derived · `27_SHA256SUMS.txt` L12 · — · fixtures: —
+## E142 — derived · `27_SHA256SUMS.txt` L12 · — · fixtures: —
 
 Old:
 
@@ -2043,7 +2247,7 @@ New:
 3e40cc28eacce8289660ee8a2c5239fb66e91e20abf7409a99dd5bcb0e07d8a3  11_Comparative_Research_Matrix.md
 ```
 
-## E130 — derived · `27_SHA256SUMS.txt` L20 · — · fixtures: —
+## E143 — derived · `27_SHA256SUMS.txt` L20 · — · fixtures: —
 
 Old:
 
@@ -2057,7 +2261,7 @@ New:
 9137d37777bea8981a8e5ed71a4fe5b3eed0d70156ef1d8b0423a9f09ce8e585  21_Prompt_Equivalence_and_Mask_Traceability_Checklist_v1.3.7-candidate.md
 ```
 
-## E131 — derived · `27_SHA256SUMS.txt` L21 · — · fixtures: —
+## E144 — derived · `27_SHA256SUMS.txt` L21 · — · fixtures: —
 
 Old:
 
@@ -2071,7 +2275,7 @@ New:
 3705bfda6bee79e0e4f3f85848eefd32b0f46d09dd9b947e6b788c2441635ef9  22_Source_Access_Provenance_Log_v1.2.md
 ```
 
-## E132 — derived · `27_SHA256SUMS.txt` L24 · — · fixtures: —
+## E145 — derived · `27_SHA256SUMS.txt` L24 · — · fixtures: —
 
 Old:
 
@@ -2082,10 +2286,10 @@ Old:
 New:
 
 ```text
-48580bebd90917c85dc232ac7db80190ccfac490227550545ffc04d294aa5246  25_Common_System_and_Repair_Prompt_Templates.txt
+ef562ec43ce5da2166085c4741aef931e5e830b28dc503e26e17ab83559a83b7  25_Common_System_and_Repair_Prompt_Templates.txt
 ```
 
-## E133 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
+## E146 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
 
 Old:
 
@@ -2099,7 +2303,7 @@ New:
 2c8b986528d55f1f1dedceb53d0b55f4f9eb071f04fb489cf68874d9eda9ef28  30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md
 ```
 
-## E134 — derived · `27_SHA256SUMS.txt` L29 · — · fixtures: —
+## E147 — derived · `27_SHA256SUMS.txt` L29 · — · fixtures: —
 
 Old:
 
@@ -2113,7 +2317,7 @@ New:
 6af215535a5dc703b62aad64fe360fffabbfc415f7c94b4d6b6139b161c64bcc  31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md
 ```
 
-## E135 — derived · `27_SHA256SUMS.txt` L30 · — · fixtures: —
+## E148 — derived · `27_SHA256SUMS.txt` L30 · — · fixtures: —
 
 Old:
 
@@ -2127,7 +2331,7 @@ New:
 55ab8053440071fd1835255943d693a0cb0cc213c9cb2776a569c8172e2c1428  32_v1.3.7-candidate_Status_and_Gates.md
 ```
 
-## E136 — derived · `27_SHA256SUMS.txt` L31 · — · fixtures: —
+## E149 — derived · `27_SHA256SUMS.txt` L31 · — · fixtures: —
 
 Old:
 
@@ -2141,7 +2345,7 @@ New:
 a948bd1ef3f05223af0f741087b6e29795ffcb27f87428f84a13bb245f9e6792  33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json
 ```
 
-## E137 — derived · `27_SHA256SUMS.txt` L34 · — · fixtures: —
+## E150 — derived · `27_SHA256SUMS.txt` L34 · — · fixtures: —
 
 Old:
 
@@ -2152,10 +2356,10 @@ Old:
 New:
 
 ```text
-9f6c428a655030bd5f47330020c8d2fa551341c960730e5883e3cf2ac115770d  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
+9c953cd0b2757fc601ed7dfc0912727da8a77a1d6fb508365c34802a4400379b  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
 ```
 
-## E138 — derived · `27_SHA256SUMS.txt` L36 · — · fixtures: —
+## E151 — derived · `27_SHA256SUMS.txt` L36 · — · fixtures: —
 
 Old:
 
@@ -2169,7 +2373,7 @@ New:
 d841b87ee410ad462521aaa76f27cae1c2f5a7923aff6d51b4fb0a61fc7e8819  38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json
 ```
 
-## E139 — derived · `27_SHA256SUMS.txt` L66 · — · fixtures: —
+## E152 — derived · `27_SHA256SUMS.txt` L66 · — · fixtures: —
 
 Old:
 
@@ -2183,7 +2387,7 @@ New:
 63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813  41_F18_Fixture_Inputs/M27.json
 ```
 
-## E140 — derived · `27_SHA256SUMS.txt` L80 · — · fixtures: —
+## E153 — derived · `27_SHA256SUMS.txt` L80 · — · fixtures: —
 
 Old:
 
@@ -2197,7 +2401,7 @@ New:
 c2e42af7bf912c214f974d5ec371a0fe6845ee8f356d729226edf2db097723b7  41_F18_Fixture_Inputs/M41.json
 ```
 
-## E141 — derived · `27_SHA256SUMS.txt` L81 · — · fixtures: —
+## E154 — derived · `27_SHA256SUMS.txt` L81 · — · fixtures: —
 
 Old:
 
@@ -2211,7 +2415,7 @@ New:
 c86181f5e754d50a891def2cae82e194711a098e42419437c0d1985745d15d03  41_F18_Fixture_Inputs/M42.json
 ```
 
-## E142 — derived · `27_SHA256SUMS.txt` L86 · — · fixtures: —
+## E155 — derived · `27_SHA256SUMS.txt` L86 · — · fixtures: —
 
 Old:
 
@@ -2225,7 +2429,7 @@ New:
 4958c30a5d0fd2baa1b032a4104e20268a832e265a7107409a8772b9d9d7515f  41_F18_Fixture_Inputs/M47.json
 ```
 
-## E143 — derived · `27_SHA256SUMS.txt` L182 · — · fixtures: —
+## E156 — derived · `27_SHA256SUMS.txt` L182 · — · fixtures: —
 
 Old:
 
@@ -2239,7 +2443,7 @@ New:
 3ffd4883fed3c33f00915b898a29d2f28db9d0a3b73a5bfd380a668ed7795278  41_F18_Fixture_Inputs/fixture-index.json
 ```
 
-## E144 — derived · `27_SHA256SUMS.txt` L202 · — · fixtures: —
+## E157 — derived · `27_SHA256SUMS.txt` L202 · — · fixtures: —
 
 Old:
 

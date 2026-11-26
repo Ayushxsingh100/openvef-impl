@@ -75,8 +75,10 @@ class CandidatePackTests(unittest.TestCase):
             old = self.base[rel].decode("utf-8").split("\n")
             new = self.pack[self.name(rel)].decode("utf-8").split("\n")
             with self.subTest(file=rel):
-                if rel.endswith(".md") or rel == self.mod.P25:
-                    self.assertEqual("\n".join(new[len(old) - 1:]), self.mod.TRAILER)
+                if rel.endswith(".md") or rel == self.mod.P25:  # appended lines (C12-C16), then the trailer
+                    extra = self.mod.APPENDS.get(rel)
+                    tail = ("\n".join(extra) + "\n" if extra else "") + self.mod.TRAILER
+                    self.assertEqual("\n".join(new[len(old) - 1:]), tail)
                 else:
                     self.assertEqual(len(new), len(old))
                 self.assertEqual({i + 1 for i in range(len(old) - 1) if old[i] != new[i]}, lines)

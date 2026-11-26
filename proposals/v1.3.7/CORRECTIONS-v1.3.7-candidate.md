@@ -427,3 +427,214 @@ last line, outside the model-visible bodies.
 
 **Check.** `tests/test_v137_candidate_pack.py` `test_no_stale_name_or_hash`: no current document names a renamed
 file by its old name or cites File 10's old hash.
+
+## 7. C11–C16 (D-025 Phase A: PD-26, PD-20, PD-03, PD-07)
+
+Same rules as sections 1–3: each correction quotes the conflict, takes the reading most consistent with the pack, lists
+what was rejected, and states its fit with the current code; none was chosen because it suits the code. Where a fixture
+could be corrected only by inventing behaviour the pack never states, it is **not** corrected: section 8 records the
+exact owner decision it needs. All Protocol edits lie in L90–L187, so A2 applies them to File 25 too; input contracts are
+a new section after File 36's last line, so no line moves.
+
+### C11 — Error classes of `DESIGN_HALT_REPEATED` and `FEEDBACK_SERIALIZER_REJECT` (PD-26)
+
+> [02 L185] "terminate with `DESIGN_HALT_REPEATED|reason=EVALUATOR_FAILURE_REPRODUCED`"
+
+> [02 L173] "`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`"
+
+> [41/M42.json L32] "\"error_class\": \"DESIGN_HALT_REPEATED\","
+
+> [41/M15.json L18] "\"error_class\": \"FEEDBACK_SERIALIZER_REJECT\","
+
+**Fix.** L185: both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED` (the
+disposition `DESIGN_ABORTED_NO_SLOTS_SCORED` is already stated). L174: `FEEDBACK_SERIALIZER_REJECT` is recorded at stage
+`FEEDBACK_SERIALIZER` with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.
+
+**Why.** In the stage map (L141–L162), of the 14 rows whose diagnostic is one CODE of its own (the two checker-null rows
+and the two grouping rows aside), 13 have that CODE as their error class, for example:
+
+> [02 L155] "| `DESIGN_HALT` | `TRACE_INTEGRITY_FAILURE` | `TRACE_INTEGRITY_FAILURE|reason=<REASON>`"
+
+A different class appears where one class groups several codes (`IMPORT_POLICY_REJECT`, `ENTRY_POINT_REJECT`,
+`ASSEMBLY_OR_MANIFEST_FAILURE`), and once for a single code:
+
+> [02 L154] "| `DESIGN_HALT` | `EVALUATOR_INFRASTRUCTURE_FAILURE` |"
+
+Both codes here stand alone, with two reasons each at most, so the majority rule applies. The stages are the ones the
+L172 stage list provides for a design halt and for the serializer; `CONTROL_EXPECTATION` follows L177 (a serializer
+rule under test, not an artifact event).
+
+**Rejected.**
+- `EVALUATOR_INFRASTRUCTURE_FAILURE` for `DESIGN_HALT_REPEATED`: that class labels a simulator error; M47's second
+  halt is a trace-integrity fault, so a class taken from the triggering halt would differ between the two terminations
+  L185 treats alike.
+- `ASSEMBLY_OR_MANIFEST_FAILURE` for `FEEDBACK_SERIALIZER_REJECT`: L174 states it for `F18_REJECT` fixtures (assembly
+  and manifest gates); a serializer rejection is neither.
+- A general "error class = CODE" rule: contradicted by L154 and the grouping classes.
+
+**Fit with the current code.** The values equal the descriptors'; the existing recurrence adapter stops at PD-26 and
+`serializer.NON_NORMATIVE` already uses this class (A-029). The textual argument is the majority rule above.
+
+### C12 — The emitted-set rule (PD-20)
+
+> [02 L168] "The serializer accepts only a complete diagnostic emitted by the authoritative stage map."
+
+> [41/M15.json L11] "\"allowed_diagnostics\": ["
+
+**Fix.** L168: when the set of diagnostics the stage map emitted is given, a diagnostic that passes the grammar but is
+not in it is also rejected at step (1), with the same diagnostic. File 36: the serializer-grammar vector (`diagnostic`,
+optional `allowed_diagnostics`).
+
+**Why.** "Accepts only a complete diagnostic emitted by the authoritative stage map" is a membership condition; the
+grammar check is step (1) and comes first. The only reason code the pack has for a rejected diagnostic is
+`NON_NORMATIVE_DIAGNOSTIC`.
+
+**Rejected.** A new reason such as `NOT_EMITTED` (invented token); ignoring `allowed_diagnostics` (drops L168's
+membership condition); membership before grammar (step (1) names the grammar).
+
+**Fit with the current code.** A-029 (Claude-decided, approved under D-009) and `serializer.check_diagnostic` already
+read L168 this way.
+
+### C13 — The truncation-primitive vector, and the primitive error classes by rule (PD-03, PD-02 (1), PD-07)
+
+> [02 L174] "The M14 truncation primitive uses error class `TRUNCATION`."
+
+> [02 L187] "M14 tests the UTF-8 truncation function in isolation, and M17 tests JSON escaping in isolation."
+
+> [41/M14.json L22] "\"contains_marker\": true,"
+
+**Fix.** L174 states both primitive error classes for a kind of vector, not a fixture ID, and adds their stage and
+disposition. L168 defines the four step-(2) output properties. File 36 gives the input contract; the properties L168
+fixes (cap 2,048, marker `...[TRUNCATED]`, code-point boundary, before escaping) must equal L168 and do not change the
+result.
+
+**Why.** L187 says the primitive is tested in isolation, and L168 step (2) determines every reported value; C4 requires
+each control-vector property to be defined by a Protocol rule, which this supplies. The property names are the pack's
+own (the descriptor's).
+
+**Rejected.** Reporting the truncated string itself (the expected object does not contain it, and the descriptor is the
+pack's statement of what is compared); running the full pipeline (L187: isolation, and the grammar would reject it).
+
+**Fit with the current code.** `serializer.truncate` implements step (2) already.
+
+### C14 — The JSON-escaping-primitive vector (PD-03, PD-07)
+
+> [02 L168] "Serialize UTF-8 with `ensure_ascii=false`, two-space indentation, LF line endings, exactly one final LF and the same key order."
+
+> [41/M17.json L28] "\"diagnostic_sha256\": \"226a87deb777b94556d262a0e45e669ced8c80f5cf8ec1bc3d691e9d4570423f\","
+
+**Fix.** L168 defines `diagnostic_utf8`, `diagnostic_sha256` and `diagnostic_bytes` for step (3) alone; File 36 gives
+the input contract, whose formatting properties must equal L168's.
+
+**Why.** Step (3) fixes every byte of the output; the three properties are that output, its hash and its length.
+
+**Rejected.** Using the input's own formatting values to drive serialization (L168 fixes them; the input only restates
+them); naming the output `diagnostic` (the descriptors use `diagnostic_utf8`, and C4 keeps the four-key form for
+four-key objects only).
+
+**Fit with the current code.** `serializer._serialize_object` is step (3).
+
+### C15 — The lifecycle halt-event vector (PD-07)
+
+> [41/M13.json L10] "\"lifecycle\": \"MID_RUN\","
+
+> [41/M13.json L22] "\"evaluator_repair_attempt\": 1"
+
+> [41/M42.json L12] "\"recovery_cycles_used\": 1,"
+
+> [02 L183] "One recovery cycle per affected design is allowed."
+
+**Fix.** File 36: `lifecycle` = `MID_RUN`; one design-halt `event` (`simulator_error` or `trace_integrity`); `slots`
+counts that add up; `evaluator_repair_attempt` = 1, the ordinal of the recovery cycle this halt opens. The result is
+the event's stage-map row with disposition `DESIGN_HALT_NO_SLOT_SCORED`.
+
+**Why.** §7b names a design-local simulator error or trace-integrity fault "after slots have begun" as the mid-run halt,
+and the stage map gives its record. The pack itself distinguishes "attempt" from cycles used: the recurrence vectors
+count `recovery_cycles_used`, and M13 counts `evaluator_repair_attempt`. Read as the ordinal of the cycle this halt
+opens, attempt 1 is the one cycle L183 allows, and a halt after it is a recurrence (L185), which has its own shape.
+`DESIGN_HALT_NO_SLOT_SCORED` follows from L185 "Discard all pre-halt partial scores".
+
+**Rejected.** Reading `evaluator_repair_attempt` as cycles already used: then L185 would make every such halt a
+recurrence, and the field would duplicate `recovery_cycles_used`. Letting the slot counts change the record: the stage
+map gives the record from the event alone.
+
+**Fit with the current code.** `stage_map.EVENT_ROWS` already gives these rows and disposition (A-025). **Attack
+point:** the reading of `evaluator_repair_attempt` rests on the contrast between two descriptor field names.
+
+### C16 — The design-preflight vector (§7a; PD-07)
+
+> [02 L179] "Any baseline mismatch halts the design before slots exist; no slot is scored."
+
+> [02 L157] "| Same paired inputs produce a masked output divergence under the artifact's own stimulus | `DESIGN_HALT` | `RTL_NULL_CONTROL_FAILURE` |"
+
+> [41/R07.json L11] "\"rtl_null_masked_divergence\": true"
+
+**Fix.** L179: a baseline mismatch is recorded at stage `DESIGN_HALT`, error class `RTL_NULL_CONTROL_FAILURE`, diagnostic
+`RTL_NULL_CONTROL_FAILURE|reason=MASKED_OUTPUT_DIVERGENCE`, disposition `DESIGN_HALT_NO_SLOT_SCORED`. File 36: the
+`design_preflight` input contract.
+
+**Why.** §7a requires "original-RTL/null equivalence under the frozen mask", so its mismatch is a same-input masked
+divergence; L157 is the only row for that, `RTL_NULL_CONTROL_FAILURE` is also its L185 halt code, and "no slot is
+scored" names the disposition.
+
+**Rejected.** A new baseline diagnostic (no pack text); disposition `DESIGN_ABORTED_NO_SLOTS_SCORED` (L185 uses it for a
+second halt after recovery, not for a gate before slots).
+
+**Fit with the current code.** `stage_map.paired_run_failure` already produces this record for a masked divergence; R07
+passed with an earlier adapter until D-013 removed it for lack of a cited contract.
+
+## 8. Needs owner specification (not corrected)
+
+These three cannot be corrected without behaviour the pack never states. They stay NOT_IMPLEMENTED on the candidate.
+
+**M41 — operational-recovery vector.**
+
+> [41/M41.json L21] "\"required_action\": \"pause_repair_preflight_rerun_all_10_slots\","
+
+> [41/M41.json L14] "\"previously_evaluated\": 4,"
+
+> [41/M41.json L28] "\"pre_halt_scored_slots\": 3,"
+
+*Question for the owners:* what is the input contract of an operational-recovery vector? Specifically: (1) which of its
+fifteen input properties decide the outcome, and what is the outcome when one of the L183 conditions fails
+(`frozen_evaluator_hashes_unchanged` false, `f16_required` true, `same_artifact_bytes` false, or
+`author_visible_materials_changed` true)? (2) What does the input `required_action` mean? Its literal appears in no pack
+text. (3) Which count is the number of pre-halt scores: `slots.previously_evaluated` (4) or `pre_halt_scored_slots` (3)?
+
+**M37 — aliased global random access.**
+
+> [41/M37.json L30] "\"driver_source_excerpt\": \"r = random; r.random()\","
+
+> [41/M37.json L32] "\"next_input_schedules_equal\": false"
+
+*Question for the owners:* the excerpt is not in the response's driver source, which uses a seeded `random.Random(seed)`
+and is deterministic. Should M37 (a) be a supplied-outcome vector, where the response's static stages run and
+`runtime_pair` stands in for the paired run, and if so what role, if any, has `driver_source_excerpt`; or (b) carry a
+driver source that actually contains the aliased access and be run in the sandbox on a design? If (b), on which design
+and ports?
+
+**P17 — driver returns an incomplete vector at runtime.**
+
+> [41/P17.json L29] "\"port_manifest\": {"
+
+*Question for the owners:* P17 gives a response and an input-port list but no design, RTL or widths, and the Protocol runs
+a driver only in stage (7) on the original RTL. How is the driver's vector obtained? Is `create_driver` called with which
+seed, `step` called with which `cycle_index` and `outputs_after_edge`, how many times, outside any simulation? Or should
+P17 instead name a design whose RTL the harness runs?
+
+## 9. Coverage of the 17 after C1–C16
+
+| Fixture | Correction | Status on the candidate |
+|---|---|---|
+| M27 | C5, C6 + A1 | covered |
+| M36 | C9 | covered |
+| M48, M50, M53, M54, M58 | C1–C4 | covered |
+| M42, M47 | C10, C11 | covered |
+| M15 | C11, C12 | covered |
+| M14 | C13 | covered |
+| M17 | C13, C14 | covered |
+| M13 | C15 | covered (attack point: `evaluator_repair_attempt`) |
+| R07 | C16 | covered |
+| M41 | — | **needs owner specification** (section 8) |
+| M37 | — | **needs owner specification** |
+| P17 | — | **needs owner specification** |
