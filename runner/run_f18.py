@@ -30,6 +30,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
+sys.path.insert(0, str(REPO / "runner"))  # `-I` leaves the script directory off (adapters_v137)
 
 from openvef.envelope import Envelope, Failure, parse_envelope  # noqa: E402
 from openvef.schema import SCHEMA_REL, ValidatedResponse, load_validator, validate_clause_ids, validate_schema  # noqa: E402
