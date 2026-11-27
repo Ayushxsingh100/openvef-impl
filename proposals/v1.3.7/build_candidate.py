@@ -690,6 +690,24 @@ CYCLE2 += [
      "diagnostic, stage, error class or disposition, and produces no ledger record."),
 ]
 
+# A4 (D1-8; amends OS-2): M37 is a paired-outcome control vector, not a test of source-level alias detection.
+_M37_OLD = "Aliased global random access leads to paired next-input divergence at runtime"
+_M37_NEW = ("Paired-outcome control vector (OS-2): a supplied paired-run outcome with next-input divergence before the "
+            "first raw-output divergence; the documented aliased global random access is not detected from the source")
+CYCLE2 += [
+    ("A4", "D1-8", "M37", P36, 143, f"| M37 | missing-case | {_M37_OLD} |", f"| M37 | missing-case | {_M37_NEW} |"),
+    ("A4", "D1-8", "M37", P36, 206, "- **Paired-run outcome vector** (OS-2): ",
+     "- **Paired-run outcome vector** (OS-2; a paired-outcome control vector, not a test of source-level alias "
+     "detection): "),
+    ("A4", "D1-8", "M37", P36, 206,
+     "Any other pair does not determine the paired run's outcome and is outside this vector's scope.",
+     "Any other pair does not determine the paired run's outcome and is outside this vector's scope. The vector "
+     "therefore tests the supplied paired-run outcome and the precedence of the static stages; it does not show that the "
+     "response contains the access its excerpt documents."),
+    ("A4", "D1-8", "M37", FX + "M37.json", 5, f'"description": "{_M37_OLD}"', f'"description": "{_M37_NEW}"'),
+]
+CYCLE2_VERSION_LINES[FX + "M37.json"] = 3
+
 
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()

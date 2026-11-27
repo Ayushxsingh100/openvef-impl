@@ -770,6 +770,9 @@ the success record is new code, built from the values above.
 
 ### OS-2 — Paired-run outcome vector (M37)
 
+**Amended by A4 (D-027; section 11).** M37 is relabelled a paired-outcome control vector, not a test of
+source-level alias detection (D1-8). The text below is kept as written.
+
 D-026: a static-stage outcome makes it a static vector; a runtime or paired outcome uses option (a): `runtime_pair`
 stands in for the paired run, and the excerpt documents the access being tested.
 
@@ -1009,4 +1012,26 @@ M42 and M47. The rule bounds the M41, M42 and M47 input contracts and their boun
 
 **Fit with the current code.** The adapters already refuse such an input without a record; the runner reports
 NOT_IMPLEMENTED with the reason. Phase B cites A3.
+
+### A4 — M37 relabelled a paired-outcome control vector (D1-8; amends OS-2)
+
+**Finding D1-8 (MINOR).** OS-2 says that `driver_source_excerpt` "is not executed, matched or read for the outcome".
+The audit found that the fixture's name and description still suggest that the aliased access is detected in the
+response source. The v1.3.6 row:
+
+> [36 L143] "| M37 | missing-case | Aliased global random access leads to paired next-input divergence at runtime | `TERMINAL_INVALID_NO_REPAIR` — `DRIVER_NONDETERMINISM|reason=NEXT_INPUT_DIVERGENCE` | `41_F18_Fixture_Inputs/M37.json` |"
+
+**Owner decision (D-027).** "Relabel M37 a paired-outcome control vector, not a test of source-level alias detection."
+Not an OD rule: no behaviour changes.
+
+**Pack text (candidate File 36 L143, L206; M37 descriptor).**
+- The catalog row and the descriptor's `description` read: "Paired-outcome control vector (OS-2): a supplied paired-run
+  outcome with next-input divergence before the first raw-output divergence; the documented aliased global random
+  access is not detected from the source".
+- The OS-2 item is headed "a paired-outcome control vector, not a test of source-level alias detection". It ends: the
+  vector "tests the supplied paired-run outcome and the precedence of the static stages; it does not show that the
+  response contains the access its excerpt documents".
+- The input, the expected object and the OS-2 rule are unchanged.
+
+**Fixtures affected:** M37 (label only). It stays OWNER-SPECIFIED and depends on no OD rule.
 

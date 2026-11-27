@@ -207,12 +207,20 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E181 | OD-4 | D1-6 | M41 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 205 |
 | E182 | A3 | D1-7 | M41, M42, M47 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
 | E183 | A2 (copy of A3) | D1-7 | M41, M42, M47 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
-| E184 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
-| E185 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
-| E186 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
-| E187 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
-| E188 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
-| E189 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
+| E184 | A4 | D1-8 | M37 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 143 |
+| E185 | A4 | D1-8 | M37 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 206 |
+| E186 | A4 | D1-8 | M37 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 206 |
+| E187 | A4 | D1-8 | M37 | `41_F18_Fixture_Inputs/M37.json` | 5 |
+| E188 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
+| E189 | label | — | M37 | `41_F18_Fixture_Inputs/M37.json` | 3 |
+| E190 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
+| E191 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E192 | derived | — | M37 | `41_F18_Fixture_Inputs/fixture-index.json` | 510 |
+| E193 | derived | — | M37 | `41_F18_Fixture_Inputs/fixture-index.json` | 511 |
+| E194 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
+| E195 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
+| E196 | derived | — | — | `27_SHA256SUMS.txt` | 76 |
+| E197 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -2395,7 +2403,7 @@ Old:
 New:
 
 ```text
-1600c31f31381b78d829438adfd7682b111a42f0025939c9d244ca4f550b0313  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
+40ec7c0363c88277e4750aadf5ef62bdf52c43bcca8fbb9c94980791420b9806  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
 ```
 
 ## E151 — derived · `27_SHA256SUMS.txt` L36 · — · fixtures: —
@@ -2479,7 +2487,7 @@ f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54  41_F18_Fixture
 New:
 
 ```text
-19959993ff99775abd8651f662c2b77494295d47223ca488a2eb24602d7e824d  41_F18_Fixture_Inputs/fixture-index.json
+18c346368a81f8411f54ffab5c09affaa83fe8f185108656bb0c2a8b19d73523  41_F18_Fixture_Inputs/fixture-index.json
 ```
 
 ## E157 — derived · `27_SHA256SUMS.txt` L202 · — · fixtures: —
@@ -2867,7 +2875,63 @@ New:
 A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence. Such an input is outside the executable fixture contract: it is not an outcome, has no diagnostic, stage, error class or disposition, and produces no ledger record.
 ```
 
-## E184 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
+## E184 — A4 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L143 · D1-8 · fixtures: M37
+
+Old:
+
+```text
+| M37 | missing-case | Aliased global random access leads to paired next-input divergence at runtime |
+```
+
+New:
+
+```text
+| M37 | missing-case | Paired-outcome control vector (OS-2): a supplied paired-run outcome with next-input divergence before the first raw-output divergence; the documented aliased global random access is not detected from the source |
+```
+
+## E185 — A4 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L206 · D1-8 · fixtures: M37
+
+Old:
+
+```text
+- **Paired-run outcome vector** (OS-2): 
+```
+
+New:
+
+```text
+- **Paired-run outcome vector** (OS-2; a paired-outcome control vector, not a test of source-level alias detection): 
+```
+
+## E186 — A4 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L206 · D1-8 · fixtures: M37
+
+Old:
+
+```text
+Any other pair does not determine the paired run's outcome and is outside this vector's scope.
+```
+
+New:
+
+```text
+Any other pair does not determine the paired run's outcome and is outside this vector's scope. The vector therefore tests the supplied paired-run outcome and the precedence of the static stages; it does not show that the response contains the access its excerpt documents.
+```
+
+## E187 — A4 · `41_F18_Fixture_Inputs/M37.json` L5 · D1-8 · fixtures: M37
+
+Old:
+
+```text
+"description": "Aliased global random access leads to paired next-input divergence at runtime"
+```
+
+New:
+
+```text
+"description": "Paired-outcome control vector (OS-2): a supplied paired-run outcome with next-input divergence before the first raw-output divergence; the documented aliased global random access is not detected from the source"
+```
+
+## E188 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
 
 Old:
 
@@ -2881,7 +2945,21 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E185 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
+## E189 — label · `41_F18_Fixture_Inputs/M37.json` L3 · — · fixtures: M37
+
+Old:
+
+```text
+"fixture_version": "1.1",
+```
+
+New:
+
+```text
+"fixture_version": "1.3.7-candidate, not audited",
+```
+
+## E190 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
 
 Old:
 
@@ -2962,7 +3040,7 @@ New:
 The lifecycle halt-event vector (File 36 L198) and the design-preflight vector (File 36 L199) give stage-map records with the four comparison keys. They are not control-vector results.
 ```
 
-## E186 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
+## E191 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
 
 Old:
 
@@ -3037,7 +3115,35 @@ New:
 }
 ```
 
-## E187 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
+## E192 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L510 · — · fixtures: M37
+
+Old:
+
+```text
+"sha256": "1498ec86204bbc434f5baeb2f16c862ec655d161a3ff016ae717348961bfdd19",
+```
+
+New:
+
+```text
+"sha256": "3d3a1855eb0609de81ccc72349b9afdaf23768849ffb7a8546006253eb1b6300",
+```
+
+## E193 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L511 · — · fixtures: M37
+
+Old:
+
+```text
+"bytes": 1595,
+```
+
+New:
+
+```text
+"bytes": 1753,
+```
+
+## E194 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
 
 Old:
 
@@ -3051,7 +3157,7 @@ New:
 "sha256": "c6dfe1caff678f305fa8a855f49c04c209c7a494df91917415c083b482405890",
 ```
 
-## E188 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
+## E195 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
 
 Old:
 
@@ -3065,7 +3171,21 @@ New:
 "bytes": 1378,
 ```
 
-## E189 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
+## E196 — derived · `27_SHA256SUMS.txt` L76 · — · fixtures: —
+
+Old:
+
+```text
+1498ec86204bbc434f5baeb2f16c862ec655d161a3ff016ae717348961bfdd19  41_F18_Fixture_Inputs/M37.json
+```
+
+New:
+
+```text
+3d3a1855eb0609de81ccc72349b9afdaf23768849ffb7a8546006253eb1b6300  41_F18_Fixture_Inputs/M37.json
+```
+
+## E197 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
 
 Old:
 

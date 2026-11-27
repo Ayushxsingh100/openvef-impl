@@ -507,8 +507,8 @@
       "fixture_id": "M37",
       "path": "41_F18_Fixture_Inputs/M37.json",
       "scope": "missing-case",
-      "sha256": "1498ec86204bbc434f5baeb2f16c862ec655d161a3ff016ae717348961bfdd19",
-      "bytes": 1595,
+      "sha256": "3d3a1855eb0609de81ccc72349b9afdaf23768849ffb7a8546006253eb1b6300",
+      "bytes": 1753,
       "expected": {
         "disposition": "TERMINAL_INVALID_NO_REPAIR",
         "stage_id": "TERMINAL",
