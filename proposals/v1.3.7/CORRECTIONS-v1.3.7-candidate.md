@@ -416,7 +416,7 @@ last line, outside the model-visible bodies.
 - File 22 L8–L12, which cite File 10 by SHA-256 as the literature-review record: now the candidate File 10's hash;
 - `27_SHA256SUMS.txt` (derived) and the sidecar's `sidecar_version` and `payload_manifest_file`.
 
-**Kept on purpose (not stale).**
+**Kept on purpose (not stale). DECIDED: these three exceptions are approved by Krishika under D-026 item 1.**
 - **History:** the v1.3.6 change log, build, correction and audit records (Files 03, 48, 50, 56, 57, 58, 63 and the
   audit transcripts), and statements of what v1.3.6 did or what stayed unchanged "from v1.3.3 through v1.3.6". These are
   true of v1.3.6, and rewriting them would falsify the record.

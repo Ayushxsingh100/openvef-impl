@@ -1924,9 +1924,58 @@ Not audited. F18 is not passed.
   `adapt_halt_recurrence_v137` (replaces the v1.3.6 row in the candidate table only; C10, C11),
   `adapt_serializer_grammar` (C11, C12), `adapt_truncation_primitive` (C13), `adapt_json_primitive` (C13, C14),
   `adapt_lifecycle_halt_event` (C15), `adapt_design_preflight` (C16). The v1.3.6 table is unchanged.
-- **One test allowance (decided by Claude, owner review pending):** the shape-branch scan flags comparisons naming
+- **One test allowance (DECIDED: approved by Krishika under D-026 item 1):** the shape-branch scan flags comparisons naming
   `test_scope`; the candidate test allows exactly the two checks of that cited property against the value candidate
   File 36 L196/L197 fixes. The v1.3.6 test is unchanged.
 - **No C11–C16 correction was found wrong**, so there is no amendment. M37, M41 and P17 still need owner specification.
 
 Not audited. F18 is not passed.
+
+
+## D-026 — Review of D-025; OWNER-SPECIFIED M41, M37, P17; document-audit bundle (DECIDED)
+
+**Owner decision by Krishika**, on a Claude (claude.ai) review of D-025. Takes effect under D-008; Ayush's ratification
+stays the single entry in AUDIT-READINESS.md.
+
+1. **Approved and marked decided:** the D-025 item-3 exceptions (history; owner records Files 16, 23; the pack's
+   implementation status), recorded in CORRECTIONS section 6, and the two `test_scope` allowances (D-025 Phase B).
+2. **New category OWNER-SPECIFIED (OS-1..OS-3)** for M41, M37, P17. Each item is labelled in every record and counted
+   apart from the pack-derived corrections. Rule: the pack fixes the expected outcome; an OS item specifies only how the
+   vector reaches the stage that outcome names, and never adds an outcome code. Where a rule does not determine an
+   answer, the fixture stays NOT_IMPLEMENTED with the reason. M41 (OS-1): the outcome is decided by exactly the
+   properties L183's conditions name; a failed condition gets the outcome the pack states, otherwise it is unspecified;
+   `required_action` is informational; pre-halt scores are counted by `pre_halt_scored_slots`. M37 (OS-2): a
+   static-stage outcome would make it a static vector; a runtime or paired outcome uses option (a). P17 (OS-3): if its
+   stage precedes runtime, run up to that stage; otherwise it stays NOT_IMPLEMENTED. Phase A first, then Phase B.
+3. **Document-audit bundle** `dist/openvef-docaudit-bundle.zip`, with `docs/DOC-AUDIT-BRIEF.md`; published as release
+   `docaudit1-<first 8 of sha>`.
+
+### D-026 Phase A (`78e10bf`, pushed before any code)
+
+Candidate File 36 L201–L207 (CHANGELOG E158, logged last) and CORRECTIONS section 10. The readings below apply D-026's
+rules to pack text. Claude drafted them, and each is stated there with its quotes:
+- **OS-1 (M41).** The success record is L175's diagnostic and error class, at stage `DESIGN_HALT`, with the four
+  L175/L185 properties. Changed frozen hashes (with F16 required and the same bytes) give the evaluator-revision record
+  of C1–C4 (L175, L183 path (b)). An author-visible change is out of scope, because L183 sends it to one of three L181
+  revisions and the vector does not say which. A masked RTL/null halt is also out of scope (it needs a root-cause
+  review). So is `pre_halt_scored_slots` = 0, since L185 does not say whether discarding no scores counts as a discard.
+- **OS-2 (M37).** The expected stage `TERMINAL` is the L156 row of step (8), so option (a) applies. Steps (1)–(6) run.
+  The step (7) factory checks do not, which differs from A-028 (stated). Only (`true`, `false`) determines the record.
+- **OS-3 (P17).** `DRIVER_VECTOR` is checked inside step (7), so P17 stays NOT_IMPLEMENTED with that reason.
+
+### D-026 Phase B
+
+- `runner/adapters_v137.py`: `adapt_operational_recovery` (OS-1) and `adapt_paired_run_outcome` (OS-2). Contracts cite
+  candidate File 36 L205/L206 only (`runner/adapter_contracts_v137.py`); vectors and boundary pairs are in
+  `tests/adapter_vectors_v137.py`, under D-013/D-017/D-022 as before. `OPEN_SHAPES` names the OS-3 shape without an
+  adapter, and the runner reports it NOT_IMPLEMENTED with the reason.
+- **Labels and counts:** every candidate record has `category` = `PACK-DERIVED` or `OWNER-SPECIFIED`. An
+  OWNER-SPECIFIED record also has `owner_specified` = `OS-n` and its note starts with the label. The candidate summary
+  has `counts_by_category` and `owner_specified_fixtures`. v1.3.6 records are unchanged (the v1.3.6 table has no OS
+  rows).
+- **Boundary pairs for free Booleans (decided by Claude, owner review pending):** the four L183 Booleans of OS-1 have no
+  same-type value outside {`true`, `false`}. Their D-017 pair is therefore taken at the decision term L205 states (for
+  example "`f16_required` is `false`" gives success; `true` gives no stated outcome). Non-Booleans (`1`, `"false"`,
+  `None`) are refused by the out-of-domain test.
+
+Not audited. F18 is not passed. Candidate results never count as v1.3.6 F18 evidence (D-024).
