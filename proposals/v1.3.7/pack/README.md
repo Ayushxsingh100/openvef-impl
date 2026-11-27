@@ -13,7 +13,7 @@
 - `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` — response, import, AST, async-comprehension, compile, vector, checker and runtime contract.
 - `31_Prompt_Assembly_and_Canonicalization_Spec_v1.3.7-candidate.md` and `33_Prompt_Assembly_Sidecar_v1.3.7-candidate.json` — deterministic assembly and current template-stage hashes.
 - `34_OpenVEF_Response_Schema_v1.0.json` — schema version 1.0, independent of planning-pack version.
-- `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` and `41_F18_Fixture_Inputs/` — 144 mandatory fixture descriptors and index; all NOT RUN / NOT PASSED.
+- `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` and `41_F18_Fixture_Inputs/` — 144 mandatory fixture descriptors and index; formal F18 status NOT RUN / NOT PASSED (development runs are not F18 acceptance; nothing is approved).
 - `38_Authoring_Packet_Manifest_Template_v1.3.7-candidate.json` — clause-ID manifest template; payloads and hashes remain TO FREEZE.
 - `48_Claude_v1.3.6_Independent_Audit_Prompt.txt` — instructions for independent document-only re-audit.
 - `50_Python311_Unicode_Tokenizer_Check.md` — pinned-runtime Unicode test remains NOT RUN.
@@ -32,7 +32,7 @@
 
 ## Fixture inventory and execution status
 
-The current mandatory inventory is **144 descriptors (59 P, 13 R, 72 M)**. Every fixture remains **NOT RUN / NOT PASSED**. Descriptor hashes and lengths are static package metadata, not project-runner execution results.
+The current mandatory inventory is **144 descriptors (59 P, 13 R, 72 M)**. Status, in three separate parts, for every fixture: development-run evidence: fixture runs of a project implementation, recorded outside this pack, are development runs, not F18 acceptance; formal F18 status: **NOT RUN / NOT PASSED**, since no authorized F18 acceptance run exists; approval: no implementation is qualified or approved. Descriptor hashes and lengths are static package metadata, not project-runner execution results.
 
 ## Historical evidence and audit availability
 
@@ -43,7 +43,7 @@ The current mandatory inventory is **144 descriptors (59 P, 13 R, 72 M)**. Every
 
 ## Status and authorization
 
-The owner-supplied v1.3.5 audit summary reports a document-only PASS. The v1.3.6 independent document audit is pending; the v1.3.7-candidate pack is not audited. All 144 fixture descriptors remain NOT RUN / NOT PASSED. The project parser, assembler, harness, simulator and F1–F18 remain NOT IMPLEMENTED / NOT RUN. The exact pinned CPython 3.11 patch remains TO FREEZE. CPython 3.11.18 audit evidence does not substitute for a pinned-runtime implementation run.
+The owner-supplied v1.3.5 audit summary reports a document-only PASS. The v1.3.6 independent document audit is pending; the v1.3.7-candidate pack is not audited. All 144 fixture descriptors remain formally NOT RUN / NOT PASSED: a project implementation (parser, assembler, harness, simulator, F1–F18) exists outside this pack with development-run evidence only, there is no authorized F18 acceptance run, and nothing is qualified or approved. The exact pinned CPython 3.11 patch remains TO FREEZE. CPython 3.11.18 audit evidence does not substitute for a pinned-runtime implementation run.
 
 A1–A11 remain **PROPOSED / NOT ACCEPTED**; X14 remains **OWNER CHOICE REQUIRED**. Owner, TEEP applicant, contributors and approver identities remain **TO CONFIRM**. Signature/date are **NOT RECORDED**. Authorization is **NONE**. The required order remains independent document re-audit, owner decisions, implementation and fixture execution on pinned CPython 3.11, independent implementation-results audit, and only then consideration of the separate LLM-call gate. No LLM/provider calls, F16, smoke tests, provider-format probes or confirmatory generation are authorized.
 

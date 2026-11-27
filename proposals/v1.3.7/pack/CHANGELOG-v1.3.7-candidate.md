@@ -211,16 +211,24 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E185 | A4 | D1-8 | M37 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 206 |
 | E186 | A4 | D1-8 | M37 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 206 |
 | E187 | A4 | D1-8 | M37 | `41_F18_Fixture_Inputs/M37.json` | 5 |
-| E188 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
-| E189 | label | — | M37 | `41_F18_Fixture_Inputs/M37.json` | 3 |
-| E190 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
-| E191 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
-| E192 | derived | — | M37 | `41_F18_Fixture_Inputs/fixture-index.json` | 510 |
-| E193 | derived | — | M37 | `41_F18_Fixture_Inputs/fixture-index.json` | 511 |
-| E194 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
-| E195 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
-| E196 | derived | — | — | `27_SHA256SUMS.txt` | 76 |
-| E197 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
+| E188 | C17 | D1-9 | all | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 3 |
+| E189 | C17 | D1-9 | all | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 176 |
+| E190 | C17 | D1-9 | all | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 21 |
+| E191 | C17 | D1-9 | all | `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` | 33 |
+| E192 | C17 | D1-9 | all | `README.md` | 16 |
+| E193 | C17 | D1-9 | all | `README.md` | 35 |
+| E194 | C17 | D1-9 | all | `README.md` | 46 |
+| E195 | C17 | D1-9 | all | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 559 |
+| E196 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
+| E197 | label | — | M37 | `41_F18_Fixture_Inputs/M37.json` | 3 |
+| E198 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
+| E199 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E200 | derived | — | M37 | `41_F18_Fixture_Inputs/fixture-index.json` | 510 |
+| E201 | derived | — | M37 | `41_F18_Fixture_Inputs/fixture-index.json` | 511 |
+| E202 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
+| E203 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
+| E204 | derived | — | — | `27_SHA256SUMS.txt` | 76 |
+| E205 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -2263,7 +2271,7 @@ Old:
 New:
 
 ```text
-c01d368ebc1e70cd2f1c32cc29d3ee07ad560fca86e427ba37030b96c0146315  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
+55f52d1fa4012a9206bf4b66999766fd0b45b8eb47c110533d49122e500e6049  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
 ```
 
 ## E141 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
@@ -2375,7 +2383,7 @@ Old:
 New:
 
 ```text
-55ab8053440071fd1835255943d693a0cb0cc213c9cb2776a569c8172e2c1428  32_v1.3.7-candidate_Status_and_Gates.md
+c6be64aee3962196185e7298d2e02f3740e69a33cc22cb56596dfef3f3120f53  32_v1.3.7-candidate_Status_and_Gates.md
 ```
 
 ## E149 — derived · `27_SHA256SUMS.txt` L31 · — · fixtures: —
@@ -2403,7 +2411,7 @@ Old:
 New:
 
 ```text
-40ec7c0363c88277e4750aadf5ef62bdf52c43bcca8fbb9c94980791420b9806  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
+6a08b3bc2685258b5671d2a5f176f9ec3f6687f006cb13f8ed2624d86ee4e936  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
 ```
 
 ## E151 — derived · `27_SHA256SUMS.txt` L36 · — · fixtures: —
@@ -2501,7 +2509,7 @@ cd222521cb455c1eb12241a05a8f31bda908bd6b5a00efcd22ca4029c9feeca5  README.md
 New:
 
 ```text
-e80f8a9f4d1ab312e24901b0fffbe4b21aab3b979ffbbfbf10d5fa880565fca3  README.md
+18afd9d9889e8943cba0be46bfc27eec979e6890795a0a8d1dc2786957880114  README.md
 ```
 
 ## E158 — OS-1–OS-3 (OWNER-SPECIFIED, D-026) · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L200–207 · PD-07, PD-01, PD-03 · fixtures: M41, M37, P17
@@ -2931,7 +2939,119 @@ New:
 "description": "Paired-outcome control vector (OS-2): a supplied paired-run outcome with next-input divergence before the first raw-output divergence; the documented aliased global random access is not detected from the source"
 ```
 
-## E188 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
+## E188 — C17 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L3 · D1-9 · fixtures: all
+
+Old:
+
+```text
+All fixtures remain **NOT RUN / NOT PASSED**.
+```
+
+New:
+
+```text
+Status, in three separate parts: development-run evidence: fixture runs of a project implementation, recorded outside this pack, are development runs, not F18 acceptance; formal F18 status: **NOT RUN / NOT PASSED**, since no authorized F18 acceptance run exists; approval: no implementation is qualified or approved.
+```
+
+## E189 — C17 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L176 · D1-9 · fixtures: all
+
+Old:
+
+```text
+Current execution status: **NOT RUN / NOT PASSED**.
+```
+
+New:
+
+```text
+Formal F18 status: **NOT RUN / NOT PASSED** (development-run evidence is not F18 acceptance, and nothing is approved; see the status line at the top of this file).
+```
+
+## E190 — C17 · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L21 · D1-9 · fixtures: all
+
+Old:
+
+```text
+- Execution status: **NOT RUN / NOT PASSED** for every fixture.
+```
+
+New:
+
+```text
+- Status, in three separate parts, for every fixture: development-run evidence: fixture runs of a project implementation, recorded outside this pack, are development runs, not F18 acceptance; formal F18 status: **NOT RUN / NOT PASSED**, since no authorized F18 acceptance run exists; approval: no implementation is qualified or approved.
+```
+
+## E191 — C17 · `32_v1.3.7-candidate_Status_and_Gates.md` (was `32_v1.3.6_Status_and_Gates.md` L33 · D1-9 · fixtures: all
+
+Old:
+
+```text
+- Parser, assembler, harness, simulator and F1–F18: NOT IMPLEMENTED / NOT RUN.
+```
+
+New:
+
+```text
+- Parser, assembler, harness, simulator and F1–F18: a project implementation exists outside this pack and has development-run evidence only; formal F18 status NOT RUN / NOT PASSED; the implementation is not qualified or approved.
+```
+
+## E192 — C17 · `README.md` L16 · D1-9 · fixtures: all
+
+Old:
+
+```text
+all NOT RUN / NOT PASSED.
+```
+
+New:
+
+```text
+formal F18 status NOT RUN / NOT PASSED (development runs are not F18 acceptance; nothing is approved).
+```
+
+## E193 — C17 · `README.md` L35 · D1-9 · fixtures: all
+
+Old:
+
+```text
+Every fixture remains **NOT RUN / NOT PASSED**.
+```
+
+New:
+
+```text
+Status, in three separate parts, for every fixture: development-run evidence: fixture runs of a project implementation, recorded outside this pack, are development runs, not F18 acceptance; formal F18 status: **NOT RUN / NOT PASSED**, since no authorized F18 acceptance run exists; approval: no implementation is qualified or approved.
+```
+
+## E194 — C17 · `README.md` L46 · D1-9 · fixtures: all
+
+Old:
+
+```text
+All 144 fixture descriptors remain NOT RUN / NOT PASSED. The project parser, assembler, harness, simulator and F1–F18 remain NOT IMPLEMENTED / NOT RUN.
+```
+
+New:
+
+```text
+All 144 fixture descriptors remain formally NOT RUN / NOT PASSED: a project implementation (parser, assembler, harness, simulator, F1–F18) exists outside this pack with development-run evidence only, there is no authorized F18 acceptance run, and nothing is qualified or approved.
+```
+
+## E195 — C17 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L559 · D1-9 · fixtures: all
+
+Old:
+
+```text
+All 144 fixture descriptors remain NOT RUN / NOT PASSED.
+```
+
+New:
+
+```text
+All 144 fixture descriptors remain formally NOT RUN / NOT PASSED (development-run evidence of a project implementation is not F18 acceptance, and nothing is approved).
+```
+
+## E196 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
 
 Old:
 
@@ -2945,7 +3065,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E189 — label · `41_F18_Fixture_Inputs/M37.json` L3 · — · fixtures: M37
+## E197 — label · `41_F18_Fixture_Inputs/M37.json` L3 · — · fixtures: M37
 
 Old:
 
@@ -2959,7 +3079,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E190 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
+## E198 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
 
 Old:
 
@@ -3040,7 +3160,7 @@ New:
 The lifecycle halt-event vector (File 36 L198) and the design-preflight vector (File 36 L199) give stage-map records with the four comparison keys. They are not control-vector results.
 ```
 
-## E191 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
+## E199 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
 
 Old:
 
@@ -3115,7 +3235,7 @@ New:
 }
 ```
 
-## E192 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L510 · — · fixtures: M37
+## E200 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L510 · — · fixtures: M37
 
 Old:
 
@@ -3129,7 +3249,7 @@ New:
 "sha256": "3d3a1855eb0609de81ccc72349b9afdaf23768849ffb7a8546006253eb1b6300",
 ```
 
-## E193 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L511 · — · fixtures: M37
+## E201 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L511 · — · fixtures: M37
 
 Old:
 
@@ -3143,7 +3263,7 @@ New:
 "bytes": 1753,
 ```
 
-## E194 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
+## E202 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
 
 Old:
 
@@ -3157,7 +3277,7 @@ New:
 "sha256": "c6dfe1caff678f305fa8a855f49c04c209c7a494df91917415c083b482405890",
 ```
 
-## E195 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
+## E203 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
 
 Old:
 
@@ -3171,7 +3291,7 @@ New:
 "bytes": 1378,
 ```
 
-## E196 — derived · `27_SHA256SUMS.txt` L76 · — · fixtures: —
+## E204 — derived · `27_SHA256SUMS.txt` L76 · — · fixtures: —
 
 Old:
 
@@ -3185,7 +3305,7 @@ New:
 3d3a1855eb0609de81ccc72349b9afdaf23768849ffb7a8546006253eb1b6300  41_F18_Fixture_Inputs/M37.json
 ```
 
-## E197 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
+## E205 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
 
 Old:
 

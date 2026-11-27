@@ -708,6 +708,39 @@ CYCLE2 += [
 ]
 CYCLE2_VERSION_LINES[FX + "M37.json"] = 3
 
+# C17 (D1-9): status wording in three parts (development-run evidence / formal F18 status / approval).
+_DEV = ("development-run evidence: fixture runs of a project implementation, recorded outside this pack, are "
+        "development runs, not F18 acceptance")
+_F18 = "formal F18 status: **NOT RUN / NOT PASSED**, since no authorized F18 acceptance run exists"
+_APP = "approval: no implementation is qualified or approved"
+P_README = "README.md"
+CYCLE2 += [
+    ("C17", "D1-9", "all", P36, 3, "All fixtures remain **NOT RUN / NOT PASSED**.",
+     f"Status, in three separate parts: {_DEV}; {_F18}; {_APP}."),
+    ("C17", "D1-9", "all", P36, 176, "Current execution status: **NOT RUN / NOT PASSED**.",
+     "Formal F18 status: **NOT RUN / NOT PASSED** (development-run evidence is not F18 acceptance, and nothing is "
+     "approved; see the status line at the top of this file)."),
+    ("C17", "D1-9", "all", P32, 21, "- Execution status: **NOT RUN / NOT PASSED** for every fixture.",
+     f"- Status, in three separate parts, for every fixture: {_DEV}; {_F18}; {_APP}."),
+    ("C17", "D1-9", "all", P32, 33, "- Parser, assembler, harness, simulator and F1–F18: NOT IMPLEMENTED / NOT RUN.",
+     "- Parser, assembler, harness, simulator and F1–F18: a project implementation exists outside this pack and has "
+     "development-run evidence only; formal F18 status NOT RUN / NOT PASSED; the implementation is not qualified or "
+     "approved."),
+    ("C17", "D1-9", "all", P_README, 16, "all NOT RUN / NOT PASSED.",
+     "formal F18 status NOT RUN / NOT PASSED (development runs are not F18 acceptance; nothing is approved)."),
+    ("C17", "D1-9", "all", P_README, 35, "Every fixture remains **NOT RUN / NOT PASSED**.",
+     f"Status, in three separate parts, for every fixture: {_DEV}; {_F18}; {_APP}."),
+    ("C17", "D1-9", "all", P_README, 46,
+     "All 144 fixture descriptors remain NOT RUN / NOT PASSED. The project parser, assembler, harness, simulator and "
+     "F1–F18 remain NOT IMPLEMENTED / NOT RUN.",
+     "All 144 fixture descriptors remain formally NOT RUN / NOT PASSED: a project implementation (parser, assembler, "
+     "harness, simulator, F1–F18) exists outside this pack with development-run evidence only, there is no authorized "
+     "F18 acceptance run, and nothing is qualified or approved."),
+    ("C17", "D1-9", "all", P02, 559, "All 144 fixture descriptors remain NOT RUN / NOT PASSED.",
+     "All 144 fixture descriptors remain formally NOT RUN / NOT PASSED (development-run evidence of a project "
+     "implementation is not F18 acceptance, and nothing is approved)."),
+]
+
 
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()

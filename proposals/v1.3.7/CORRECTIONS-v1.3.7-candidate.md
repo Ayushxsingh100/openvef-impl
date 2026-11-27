@@ -450,6 +450,9 @@ last line, outside the model-visible bodies.
   would present the candidate as owner-reviewed, which it is not.
 - **Pack status of the implementation** (File 32 "NOT IMPLEMENTED / NOT RUN"): the pack's own statement; this
   repository's implementation is outside the pack, and importing it would be a new claim, not a fix.
+  **Qualified by C17 (D-027; section 11):** document audit #1 (D1-9) asked for this status to be split. C17 rewords
+  File 32 L21 and L33 into development-run evidence, formal F18 status and approval. It names no run of this
+  repository and claims nothing for it.
 
 **Check.** `tests/test_v137_candidate_pack.py` `test_no_stale_name_or_hash`: no current document names a renamed
 file by its old name or cites File 10's old hash.
@@ -1034,4 +1037,29 @@ Not an OD rule: no behaviour changes.
 - The input, the expected object and the OS-2 rule are unchanged.
 
 **Fixtures affected:** M37 (label only). It stays OWNER-SPECIFIED and depends on no OD rule.
+
+### C17 — Status wording in three parts (D1-9)
+
+**Finding D1-9 (MINOR).** The pack says that every fixture is NOT RUN / NOT PASSED. The bundle also contains a candidate
+development run with 143 PASS records. The two can coexist only if the distinction is explicit:
+
+> [36 L3] "All fixtures remain **NOT RUN / NOT PASSED**."
+
+> [32 L21] "- Execution status: **NOT RUN / NOT PASSED** for every fixture."
+
+**Owner decision (D-027).** "Status wording split into development-run evidence / formal F18 status / approval." Not an
+OD rule: no behaviour changes.
+
+**Pack text (candidate).** Each current status statement now has three parts:
+- **development-run evidence:** fixture runs of a project implementation, recorded outside this pack, are development
+  runs and not F18 acceptance;
+- **formal F18 status:** NOT RUN / NOT PASSED, since no authorized F18 acceptance run exists;
+- **approval:** no implementation is qualified or approved.
+
+The lines changed are File 36 L3 and L176, File 32 L21 and L33, README L16, L35 and L46, and Protocol L559 (§19), which
+repeats the fixture status. History is unchanged: the Charter L9 statement about the v1.3.5 audit records what that
+audit found. The wording names no run, so the pack does not cite this repository's evidence. It qualifies the D-025
+item-3 exception for File 32 (section 6 note).
+
+**Fixtures affected:** none (wording only).
 
