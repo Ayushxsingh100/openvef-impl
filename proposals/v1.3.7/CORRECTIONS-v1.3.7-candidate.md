@@ -105,6 +105,11 @@ that is the purpose of a correction that settles an under-specification, and the
 
 ### C2 — Change classes and scope tokens as rules (PD-02 (1), (3); PD-07 for the `change_class` input)
 
+**Amended by OD-3 (D-027; section 11).** Document audit #1 (D1-1, MAJOR) found the token vocabulary descriptor-derived,
+the `change_class` input contract incomplete, and `HALT_SIGNATURE_COMPONENT_ENUMERATION` misfiled as a change class.
+Under OD-3 the scope tokens are owner vocabulary, there are four change classes, and the halt-signature domain
+validation is a separate vector (`domain_validation`). The text below is kept as written for the record.
+
 **Conflicting v1.3.6 text.** The literals are keyed by fixture ID, the `change_class` input labels exist only in
 descriptors, and four scope tokens exist only as expected values:
 
@@ -171,6 +176,9 @@ describes them.
 **Fit with the current code.** `LIFECYCLE_CASES` marks both UNSUPPORTED today. Token strings copied from M54.
 
 ### C4 — Which comparison applies to control vectors (PD-03)
+
+**Completed by OD-3 (D-027; section 11).** D1-2 (PACK) found that the Protocol did not define the properties C4
+requires to be defined. OD-3's §20 tables now list them. C4's comparison rule is unchanged.
 
 **Conflicting v1.3.6 text.**
 
@@ -877,4 +885,60 @@ evaluator does not certify purity. This is a stated limit, not a guess.
 
 **Fit with the current code.** The runner already executes the predicate in the evaluator, and only after the candidate
 pack's SHA256SUMS verify (D-025). Phase B adds the per-predicate hash check and the OD-2 label.
+
+### OD-3 — Control-vector input contracts and result schemas (D1-1, D1-2; amends C2, completes C4)
+
+**Findings D1-1 (MAJOR) and D1-2 (PACK).** v1.3.6 keys the `required_action` literals by fixture and defines no schema
+for the other properties of those expected objects:
+
+> [02 L176] "- **Closed `required_action` literals used by lifecycle fixtures:** `M48` = `"
+
+> [02 L176] "Each literal is a closed local control expectation, not a model-feedback diagnostic."
+
+> [41/M48.json L19] "\"new_evaluator_version_hashes_required\": true,"
+
+The audit found three problems with C2: the scope-token spellings come from the descriptors, `change_class` has no
+complete input contract, and the halt-signature domain check is filed as a change class. D1-2 adds that C4 requires
+every property to be defined by a Protocol rule, but the Protocol does not define them.
+
+**Owner rule (D-027).** "A normative control-vector schema table in the Protocol for every property in M48, M50, M53,
+M54, M58 (and any other control vector): name, type, allowed values, rule. Define the change_class input contract; move
+HALT_SIGNATURE_COMPONENT_ENUMERATION out of change classes into domain validation; adopt the scope tokens explicitly as
+owner vocabulary. Any property no rule can fix: list it, don't guess."
+
+**Pack text (candidate).**
+- **Protocol §20**, appended after the last line (no line moves), labelled `OWNER-DECIDED OD-3`:
+  - §20.1 gives the two input contracts. `change_class` is exactly one of four classes; the input is the class alone,
+    so the result states the rule for that class. `domain_validation` is exactly `HALT_SIGNATURE_COMPONENT_ENUMERATION`.
+  - §20.2 gives the five properties every such result has.
+  - §20.3 gives each further property with its type, value, quoted rule and basis.
+  - §20.4 lists the other control vectors, whose schemas were already stated by C9, C12–C14 and OS-1, so the table
+    covers every control vector.
+- **Protocol L176:**
+  - four change classes;
+  - `HALT_SIGNATURE_COMPONENT_ENUMERATION` "is not a change class: it names the halt-signature domain validation";
+  - the scope tokens are labelled owner vocabulary;
+  - a pointer to §20.
+  A2 copies the L176 edits into File 25.
+- **File 36 L176:** the rule that every property needs a Protocol rule points to §20.
+- **M54 descriptor:** its input key is `domain_validation` instead of `change_class`. The value and the expected object
+  are unchanged.
+
+**Basis column.** A row is `pack` when a quoted v1.3.6 sentence fixes the value. It is `OD-3` for the four scope tokens
+and the two new input contracts. `C1`/`C3` mark the error-class rule and the rule labels. `A-033` marks the stage
+`DESIGN_HALT`, a reading approved under D-009 (no sentence names the stage of these records; §7b is the design-halt
+policy). "order OD-3" marks the domain arrays, which follow L185's listing order. The arrays are compared whole, so their
+order matters, and only the listing gives one.
+
+**Properties no rule can fix: none found.** Every property of the five expected objects has a sentence that fixes its
+value (checked by `tests/test_v137_candidate_pack.py`, which parses §20 against the descriptors). The two
+reading-based rows are named in §20 itself. The audit's example (`unaffected_design_scope` "combines multiple
+statements") is now an OD-3 token: its meaning combines the two L181 sentences that §20.3 quotes, and its spelling is
+owner vocabulary.
+
+**Fixtures that depend on OD-3:** M48, M50, M53, M54, M58. §20.4 rows rest on C9, C12–C14 and OS-1 and are not OD-3, so
+M14, M15, M17, M36 and M41 do not depend on OD-3 through them.
+
+**Fit with the current code.** The ledger already produces these values. Phase B splits the M54 input into its own
+domain-validation adapter, cites §20, and labels the records OWNER-DECIDED.
 

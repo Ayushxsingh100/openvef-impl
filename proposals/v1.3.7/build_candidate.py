@@ -481,6 +481,187 @@ def _od2_m27(d: dict) -> dict:
 
 CYCLE2_WHOLE[FX + "M27.json"] = ("OD-2", "D1-3, D1-4", "M27", _od2_m27)
 
+# OD-3 (D1-1, D1-2): the normative control-vector schema (Protocol §20, appended after the last line); the change-class
+# input contract; HALT_SIGNATURE_COMPONENT_ENUMERATION moved out of the change classes into domain validation (M54's
+# input key); the C2 scope tokens adopted as owner vocabulary.
+_CC4 = [_CC[k] for k in ("M48", "M50", "M53", "M58")]
+_DV = _CC["M54"]
+CYCLE2 += [
+    ("OD-3", "D1-1", "M54", P02, 176, "**Closed `required_action` literals, by change class:**",
+     f"**Closed `required_action` literals, by change class and, for `{_DV}`, by domain validation (OD-3):**"),
+    ("OD-3", "D1-1", "M48, M50, M53, M54, M58", P02, 176, "The change classes are closed and have these cases:",
+     "The change classes are closed and have exactly four cases (OWNER-DECIDED OD-3):"),
+    ("OD-3", "D1-1", "M54, M58", P02, 176,
+     f"is a study reset; `{_CC['M58']}` is a design-specific revision while membership, estimand and weights remain "
+     f"unchanged; and `{_DV}` is the halt-signature domain check.",
+     f"is a study reset; and `{_CC['M58']}` is a design-specific revision while membership, estimand and weights remain "
+     f"unchanged. `{_DV}` is not a change class: it names the halt-signature domain validation (§7b, L185)."),
+    ("OD-3", "D1-1", "M48, M50, M58", P02, 176, "Closed scope tokens:",
+     "Closed scope tokens (OWNER-DECIDED OD-3: owner vocabulary adopted by owner decision D-027; the spellings are not "
+     "v1.3.6 text, and each token means the §7b text cited with it):"),
+    ("OD-3", "D1-2", "M48, M50, M53, M54, M58", P02, 176,
+     "A design-specific revision invalidates both arms for the affected design only when membership, estimand and "
+     "weights remain unchanged.",
+     "A design-specific revision invalidates both arms for the affected design only when membership, estimand and "
+     "weights remain unchanged. The input contract and the complete result schema of every control vector are the "
+     "normative tables of §20 (OWNER-DECIDED OD-3)."),
+    ("OD-3", "D1-2", "M48, M50, M53, M54, M58", P36, 176,
+     "every property it names must be defined by a rule in the Protocol.",
+     "every property it names must be defined by a rule in the Protocol (Protocol §20, OWNER-DECIDED OD-3, lists every "
+     "control-vector property and its rule)."),
+    ("OD-3", "D1-1", "M54", FX + "M54.json", 11, f'"change_class": "{_DV}"', f'"domain_validation": "{_DV}"'),
+]
+CYCLE2_VERSION_LINES[FX + "M54.json"] = 3
+
+
+def _row(*cells: str) -> str:
+    return "| " + " | ".join(cells) + " |"
+
+
+def _vals(values) -> str:
+    return "[" + ", ".join(f"`{v}`" for v in values) + "]"
+
+
+_AUTH = "`AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED`"
+_L175_AUTH = "L175 \"means an author-visible or estimand-defining item changed and prior confirmatory artifacts are not reusable\""
+_NOREUSE = "L181 \"No invalidated confirmatory artifact may be reused\""
+OD3_SECTION = [
+    "",
+    "## 20. Control-vector input contracts and result schemas (v1.3.7 candidate, OWNER-DECIDED OD-3)",
+    "",
+    "**OWNER-DECIDED OD-3** (owner decision D-027). v1.3.6 names the properties of its control vectors only in fixture "
+    "descriptors and does not state their schema. The owners adopt the tables below as normative. Each row names one "
+    "property, its type, its allowed values and the Protocol text that fixes its value. Basis `pack` means that the "
+    "cited text fixes the value. `C1`, `C3`, `C9`, `C12`, `C13` and `C14` name candidate corrections, `OD-1` is the "
+    "owner rule of L174, `OS-1` is the owner specification of owner decision D-026, and `A-033` is the reading approved "
+    "under owner decision D-009. Basis `OD-3` means owner vocabulary or schema adopted by D-027: its spelling is not "
+    "v1.3.6 text, and its meaning is the text cited with it. A control-vector result has exactly the properties its "
+    "table lists and is compared whole (File 36 L176). An input with a value outside its allowed values, or with any "
+    "other property, is an input error, not an outcome.",
+    "",
+    "**Properties no rule fixes:** none. Every property of every control vector below has a rule. Two rows rest on a "
+    "reading rather than on one sentence: the stage `DESIGN_HALT` of the change-class and domain-validation results "
+    "(A-033), and the order of the three domain arrays, which is the order L185 lists them in (OD-3).",
+    "",
+    "### 20.1 Inputs of the change-class and domain-validation vectors",
+    "",
+    _row("Vector", "Property", "Type", "Allowed values", "Rule", "Basis"),
+    _row(*["---"] * 6),
+    _row("Change-class vector", "`change_class`", "string", "exactly one of " + ", ".join(f"`{c}`" for c in _CC4),
+         "L176: the four change classes. The input is the class alone, so the result states the rule for that class "
+         "and names no design, component or slot.", "OD-3"),
+    _row("Domain-validation vector", "`domain_validation`", "string", f"exactly `{_DV}`",
+         "L185: the halt-signature domains. The result states the closed component domains and the two component "
+         "rules.", "OD-3"),
+    "",
+    "### 20.2 Properties of every change-class and domain-validation result",
+    "",
+    _row("Property", "Type", "Value", "Rule", "Basis"),
+    _row(*["---"] * 5),
+    _row("`disposition`", "string", "`CONTROL_EXPECTATION`", "L176 \"Each literal is a closed local control "
+         "expectation\"; L177", "pack"),
+    _row("`stage_id`", "string", "`DESIGN_HALT`", "L172 stage list; §7b, which L251 makes normative in §3.4 "
+         "\"Mid-run design halt\" (L181–L185)", "A-033"),
+    _row("`error_class`", "string", "the CODE of `diagnostic`", "L175 error-class rule for "
+         "`EVALUATOR_REVISION_REQUIRED`, `AUTHORING_REVISION_REQUIRED` and `HALT_SIGNATURE_SCHEMA`", "C1"),
+    _row("`diagnostic`", "string", "the value given for the input in §20.3", "L175", "pack"),
+    _row("`required_action`", "string", f"the L176 literal of the change class, or of `{_DV}`", "L176", "pack"),
+    "",
+    "### 20.3 Further properties of each result",
+    "",
+    _row("Input value", "Property", "Type", "Value", "Rule", "Basis"),
+    _row(*["---"] * 6),
+    _row(f"`{_CC['M48']}`", "`diagnostic`", "string", "`EVALUATOR_REVISION_REQUIRED|reason=FROZEN_EVALUATOR_CHANGED`",
+         "L175 \"means a frozen evaluator source/binary/tool-version/command/option/configuration changed\"", "pack"),
+    _row(f"`{_CC['M48']}`", "`new_evaluator_version_hashes_required`", "Boolean", "`true`",
+         "L183 \"assign a new evaluator version and hashes\"", "pack"),
+    _row(f"`{_CC['M48']}`", "`f16_required`", "Boolean", "`true`",
+         "L183 \"run the frozen F16 eligibility procedure with fresh mutant-blind pilot seeds\"", "pack"),
+    _row(f"`{_CC['M48']}`", "`reuse_same_artifact_bytes`", "Boolean", "`true`",
+         "L183 \"using the same already-generated artifact bytes\"", "pack"),
+    _row(f"`{_CC['M48']}`", "`new_confirmatory_generation_calls`", "integer", "`0`",
+         "L183 \"and no new confirmatory generation calls\"", "pack"),
+    _row(f"`{_CC['M48']}`", "`rerun_scope_rule`", "string",
+         "`shared_evaluator_component_all_designs_and_all_arm_x_design_slots; "
+         "design_specific_component_affected_design_in_both_arms`",
+         "L183 \"If the revised evaluator component is shared across FIFO and UART, the affected scope is both designs "
+         "and every arm × design slot; if it is design-specific, the affected scope is that design in both arms\"", "OD-3"),
+    _row(f"`{_CC['M50']}`", "`diagnostic`", "string", _AUTH, _L175_AUTH, "pack"),
+    _row(f"`{_CC['M50']}`", "`reuse_old_confirmatory_artifacts`", "Boolean", "`false`", _NOREUSE, "pack"),
+    _row(f"`{_CC['M50']}`", "`new_confirmatory_generation_required`", "Boolean", "`true`",
+         "L181 \"fresh confirmatory generation for every affected slot\"", "pack"),
+    _row(f"`{_CC['M50']}`", "`affected_slots`", "string", "`all_designs_x_all_arms`",
+         "L181 \"invalidate every scheduled slot across both designs and both arms\"", "OD-3"),
+    _row(f"`{_CC['M50']}`", "`archive_and_disclose_partial_ledgers`", "Boolean", "`true`",
+         "L181 \"Preserve and archive every partial confirmatory ledger\" and \"disclose the archived partial "
+         "ledgers\"", "pack"),
+    _row(f"`{_CC['M50']}`", "`new_preregistration_required`", "Boolean", "`true`",
+         "L181 \"A shared-item revision requires a new study preregistration\"", "pack"),
+    _row(f"`{_CC['M53']}`", "`diagnostic`", "string", _AUTH, _L175_AUTH + "; L175 study-reset sentence", "pack, C1"),
+    _row(f"`{_CC['M53']}`", "`old_confirmatory_artifacts_reusable`", "Boolean", "`false`",
+         "L181 \"A study reset is not an operational recovery and cannot retain old confirmatory artifacts\"", "pack"),
+    _row(f"`{_CC['M53']}`", "`new_preregistration_required`", "Boolean", "`true`",
+         "L181 \"always requires a new preregistered study\"", "pack"),
+    _row(f"`{_CC['M53']}`", "`all_partial_ledgers_archived_and_disclosed`", "Boolean", "`true`",
+         "L181 \"archive and disclose all partial confirmatory ledgers\"", "pack"),
+    _row(f"`{_CC['M53']}`", "`fresh_confirmatory_generation_required`", "Boolean", "`true`",
+         "L181 \"generate fresh confirmatory slots under the newly preregistered design set and weights\"", "pack"),
+    _row(f"`{_CC['M58']}`", "`diagnostic`", "string", _AUTH, _L175_AUTH, "pack"),
+    _row(f"`{_CC['M58']}`", "`affected_scope`", "string", "`affected_design_in_both_arms`",
+         "L181 \"If a design-specific author-visible item changes, halt and invalidate every slot for that design in "
+         "both arms\"", "OD-3"),
+    _row(f"`{_CC['M58']}`", "`unaffected_design_scope`", "string",
+         "`not_invalidated_when_membership_estimand_and_weights_are_unchanged`",
+         "L181 \"every slot for that design in both arms\" (the other design is outside that scope) and \"A change in "
+         "design membership, estimand or any confirmatory weight after confirmatory generation starts always requires "
+         "a new preregistered study\"", "OD-3"),
+    _row(f"`{_CC['M58']}`", "`reuse_old_artifacts_for_affected_design`", "Boolean", "`false`", _NOREUSE, "pack"),
+    _row(f"`{_CC['M58']}`", "`new_study_preregistration_required_if_design_membership_estimand_or_weights_change`",
+         "Boolean", "`true`", "L181 \"always requires a new preregistered study, even if the changed item is otherwise "
+         "described as design-specific\"", "pack"),
+    _row(f"`{_DV}`", "`diagnostic`", "string", "`HALT_SIGNATURE_SCHEMA|reason=COMPONENT_VALUES_ENUMERATED`",
+         "L175 \"control-expectation diagnostic for validating the closed halt-signature component domains and "
+         "mapping\"", "pack"),
+    _row(f"`{_DV}`", "`design_id_values`", "array of strings", _vals(("FIFO", "UART")),
+         "L185 \"`design_id` is `FIFO` or `UART`\", in that order", "pack; order OD-3"),
+    _row(f"`{_DV}`", "`halt_code_values`", "array of strings",
+         _vals(("SIMULATOR_ERROR", "TRACE_INTEGRITY_FAILURE", "RTL_NULL_CONTROL_FAILURE")),
+         "L185 \"`halt_code` is `SIMULATOR_ERROR`, `TRACE_INTEGRITY_FAILURE` or `RTL_NULL_CONTROL_FAILURE`\", in that "
+         "order", "pack; order OD-3"),
+    _row(f"`{_DV}`", "`evaluator_component_values`", "array of strings",
+         _vals(("SIMULATOR", "REPLAY_VERIFIER", "RECORDER", "TRACE_ALIGNMENT_CHECKER", "TRACE_SERIALIZER",
+                "RTL_NULL_COMPARATOR")),
+         "L185 \"`evaluator_component` is `SIMULATOR`, `REPLAY_VERIFIER`, `RECORDER`, `TRACE_ALIGNMENT_CHECKER`, "
+         "`TRACE_SERIALIZER` or `RTL_NULL_COMPARATOR`\", in that order", "pack; order OD-3"),
+    _row(f"`{_DV}`", "`stable_error_class_rule`", "string", "`simple_exception_class_for_SIMULATOR_ERROR_else_NONE`",
+         "L185: the label of the `stable_error_class` rule stated there", "C3"),
+    _row(f"`{_DV}`", "`stable_diagnostic_code_rule`", "string", "`exact_halt_code_token`",
+         "L185: the label of the `stable_diagnostic_code` rule stated there", "C3"),
+    "",
+    "### 20.4 The other control vectors (schemas stated elsewhere, listed for completeness)",
+    "",
+    _row("Vector", "Result properties besides `disposition`, `stage_id` and `error_class`", "Where fixed", "Basis"),
+    _row(*["---"] * 4),
+    _row("Serializer-grammar vector (File 36 L195)",
+         "`diagnostic` = `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`", "L168, L174", "C12, OD-1"),
+    _row("Truncation-primitive vector (File 36 L196)",
+         "`contains_marker` (Boolean), `valid_utf8` (Boolean), `output_diagnostic_bytes` (integer), `marker_utf8_bytes` "
+         "(integer); no `diagnostic`", "L168, L174", "C13"),
+    _row("JSON-escaping-primitive vector (File 36 L197)",
+         "`diagnostic_utf8` (string), `diagnostic_sha256` (string of 64 lowercase hexadecimal digits), `diagnostic_bytes` "
+         "(integer); no `diagnostic`", "L168, L174", "C14"),
+    _row("Parser unit vector (File 36 L27)", "`diagnostic` by the L127 column rule", "File 36 L27", "C9"),
+    _row("Operational-recovery vector (File 36 L205)",
+         "`diagnostic` = `RERUN_ALL_SCHEDULED_SLOTS_WITH_SAME_FROZEN_ARTIFACTS`, `discard_pre_halt_scores` (Boolean "
+         "`true`), `rerun_slots` (integer, equal to the input `scheduled_slots`), `reuse_same_artifact_bytes` (Boolean "
+         f"`true`), `new_confirmatory_generation_calls` (integer `0`); or the `{_CC['M48']}` result of §20.2–§20.3",
+         "L175, L183, L185", "OS-1"),
+    "",
+    "The lifecycle halt-event vector (File 36 L198) and the design-preflight vector (File 36 L199) give stage-map records "
+    "with the four comparison keys. They are not control-vector results.",
+]
+CYCLE2_APPENDS.append(("OD-3", "D1-1, D1-2", "M48, M50, M53, M54, M58", P02, OD3_SECTION))
+
 
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()

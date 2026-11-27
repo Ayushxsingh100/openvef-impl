@@ -110,7 +110,7 @@ the default pack.
 | `41_F18_Fixture_Inputs/M51.json` | identical to v1.3.6; labelled here |
 | `41_F18_Fixture_Inputs/M52.json` | identical to v1.3.6; labelled here |
 | `41_F18_Fixture_Inputs/M53.json` | identical to v1.3.6; labelled here |
-| `41_F18_Fixture_Inputs/M54.json` | identical to v1.3.6; labelled here |
+| `41_F18_Fixture_Inputs/M54.json` | changed; labelled in-file |
 | `41_F18_Fixture_Inputs/M55.json` | identical to v1.3.6; labelled here |
 | `41_F18_Fixture_Inputs/M56.json` | identical to v1.3.6; labelled here |
 | `41_F18_Fixture_Inputs/M57.json` | identical to v1.3.6; labelled here |

@@ -126,7 +126,7 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E100 | label | — | M42 | `41_F18_Fixture_Inputs/M42.json` | 3 |
 | E101 | label | — | M47 | `41_F18_Fixture_Inputs/M47.json` | 3 |
 | E102 | C12–C16 | PD-07 | M13, M14, M15, M17, R07 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 190–199 |
-| E103 | label | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560 |
+| E103 | label | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 628 |
 | E104 | label | — | — | `25_Common_System_and_Repair_Prompt_Templates.txt` | 132 |
 | E105 | label | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 208 |
 | E106 | label | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 110 |
@@ -189,7 +189,24 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E163 | OD-2 | D1-3 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
 | E164 | OD-2 | D1-3 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
 | E165 | OD-2 | D1-3 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
-| E166 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E166 | OD-3 | D1-1 | M54 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E167 | A2 (copy of OD-3) | D1-1 | M54 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E168 | OD-3 | D1-1 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E169 | A2 (copy of OD-3) | D1-1 | M48, M50, M53, M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E170 | OD-3 | D1-1 | M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E171 | A2 (copy of OD-3) | D1-1 | M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E172 | OD-3 | D1-1 | M48, M50, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E173 | A2 (copy of OD-3) | D1-1 | M48, M50, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E174 | OD-3 | D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 176 |
+| E175 | A2 (copy of OD-3) | D1-2 | M48, M50, M53, M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
+| E176 | OD-3 | D1-2 | M48, M50, M53, M54, M58 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 176 |
+| E177 | OD-3 | D1-1 | M54 | `41_F18_Fixture_Inputs/M54.json` | 11 |
+| E178 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
+| E179 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
+| E180 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E181 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
+| E182 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
+| E183 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -1628,7 +1645,7 @@ Each shape below is the complete input of a fixture; a property outside its stat
 - **Design-preflight vector** (C16): `design_preflight`, an object with exactly the Boolean `rtl_null_masked_divergence`. `true` is the §7a baseline mismatch record; `false` passes the gate, with no record to compare.
 ```
 
-## E103 — label · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560 · — · fixtures: —
+## E103 — label · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L628 · — · fixtures: —
 
 Old:
 
@@ -2232,7 +2249,7 @@ Old:
 New:
 
 ```text
-2c29b387ecbc40b36029affa1261c39916de5c1ff88cad2484c25d3638f4e09e  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
+fbc25b88f93b6e605c417ca0dbfa748b7219faedd4c0eafcd6df3ece5f8d2254  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
 ```
 
 ## E141 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
@@ -2302,7 +2319,7 @@ Old:
 New:
 
 ```text
-09f4b2ea0a5b974868a8be9a569403d4e0cc73da7d540fbeb82bc819da9e56be  25_Common_System_and_Repair_Prompt_Templates.txt
+ed3305d0a46d6b7d4683b5f1e6b1f83d13d88cc1f9ff020694582fa7903f4a44  25_Common_System_and_Repair_Prompt_Templates.txt
 ```
 
 ## E146 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
@@ -2372,7 +2389,7 @@ Old:
 New:
 
 ```text
-58ca941e18e8b823fa70e4ce465902c1eff6cf1e631e9b2f6f1c35656c6a26c0  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
+20ff9a314501fd197632301fc33be0d385187d9eaae62b5329840ccd67ef8173  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
 ```
 
 ## E151 — derived · `27_SHA256SUMS.txt` L36 · — · fixtures: —
@@ -2456,7 +2473,7 @@ f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54  41_F18_Fixture
 New:
 
 ```text
-6bb83f79b7bc0f37ef7c6d6fae42190ede249ce3d28e7e437c4487c19ce50944  41_F18_Fixture_Inputs/fixture-index.json
+19959993ff99775abd8651f662c2b77494295d47223ca488a2eb24602d7e824d  41_F18_Fixture_Inputs/fixture-index.json
 ```
 
 ## E157 — derived · `27_SHA256SUMS.txt` L202 · — · fixtures: —
@@ -2592,7 +2609,270 @@ New:
 `function`, the function's name, `source`, its Python source, and `source_sha256`, the lowercase hexadecimal SHA-256 of `source` in UTF-8, which is the frozen hash of OD-2)
 ```
 
-## E166 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
+## E166 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · D1-1 · fixtures: M54
+
+Old:
+
+```text
+**Closed `required_action` literals, by change class:**
+```
+
+New:
+
+```text
+**Closed `required_action` literals, by change class and, for `HALT_SIGNATURE_COMPONENT_ENUMERATION`, by domain validation (OD-3):**
+```
+
+## E167 — A2 (copy of OD-3) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · D1-1 · fixtures: M54
+
+Old:
+
+```text
+**Closed `required_action` literals, by change class:**
+```
+
+New:
+
+```text
+**Closed `required_action` literals, by change class and, for `HALT_SIGNATURE_COMPONENT_ENUMERATION`, by domain validation (OD-3):**
+```
+
+## E168 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · D1-1 · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+The change classes are closed and have these cases:
+```
+
+New:
+
+```text
+The change classes are closed and have exactly four cases (OWNER-DECIDED OD-3):
+```
+
+## E169 — A2 (copy of OD-3) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · D1-1 · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+The change classes are closed and have these cases:
+```
+
+New:
+
+```text
+The change classes are closed and have exactly four cases (OWNER-DECIDED OD-3):
+```
+
+## E170 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · D1-1 · fixtures: M54, M58
+
+Old:
+
+```text
+is a study reset; `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` is a design-specific revision while membership, estimand and weights remain unchanged; and `HALT_SIGNATURE_COMPONENT_ENUMERATION` is the halt-signature domain check.
+```
+
+New:
+
+```text
+is a study reset; and `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` is a design-specific revision while membership, estimand and weights remain unchanged. `HALT_SIGNATURE_COMPONENT_ENUMERATION` is not a change class: it names the halt-signature domain validation (§7b, L185).
+```
+
+## E171 — A2 (copy of OD-3) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · D1-1 · fixtures: M54, M58
+
+Old:
+
+```text
+is a study reset; `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` is a design-specific revision while membership, estimand and weights remain unchanged; and `HALT_SIGNATURE_COMPONENT_ENUMERATION` is the halt-signature domain check.
+```
+
+New:
+
+```text
+is a study reset; and `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` is a design-specific revision while membership, estimand and weights remain unchanged. `HALT_SIGNATURE_COMPONENT_ENUMERATION` is not a change class: it names the halt-signature domain validation (§7b, L185).
+```
+
+## E172 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · D1-1 · fixtures: M48, M50, M58
+
+Old:
+
+```text
+Closed scope tokens:
+```
+
+New:
+
+```text
+Closed scope tokens (OWNER-DECIDED OD-3: owner vocabulary adopted by owner decision D-027; the spellings are not v1.3.6 text, and each token means the §7b text cited with it):
+```
+
+## E173 — A2 (copy of OD-3) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · D1-1 · fixtures: M48, M50, M58
+
+Old:
+
+```text
+Closed scope tokens:
+```
+
+New:
+
+```text
+Closed scope tokens (OWNER-DECIDED OD-3: owner vocabulary adopted by owner decision D-027; the spellings are not v1.3.6 text, and each token means the §7b text cited with it):
+```
+
+## E174 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L176 · D1-2 · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+A design-specific revision invalidates both arms for the affected design only when membership, estimand and weights remain unchanged.
+```
+
+New:
+
+```text
+A design-specific revision invalidates both arms for the affected design only when membership, estimand and weights remain unchanged. The input contract and the complete result schema of every control vector are the normative tables of §20 (OWNER-DECIDED OD-3).
+```
+
+## E175 — A2 (copy of OD-3) · `25_Common_System_and_Repair_Prompt_Templates.txt` L119 · D1-2 · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+A design-specific revision invalidates both arms for the affected design only when membership, estimand and weights remain unchanged.
+```
+
+New:
+
+```text
+A design-specific revision invalidates both arms for the affected design only when membership, estimand and weights remain unchanged. The input contract and the complete result schema of every control vector are the normative tables of §20 (OWNER-DECIDED OD-3).
+```
+
+## E176 — OD-3 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L176 · D1-2 · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+every property it names must be defined by a rule in the Protocol.
+```
+
+New:
+
+```text
+every property it names must be defined by a rule in the Protocol (Protocol §20, OWNER-DECIDED OD-3, lists every control-vector property and its rule).
+```
+
+## E177 — OD-3 · `41_F18_Fixture_Inputs/M54.json` L11 · D1-1 · fixtures: M54
+
+Old:
+
+```text
+"change_class": "HALT_SIGNATURE_COMPONENT_ENUMERATION"
+```
+
+New:
+
+```text
+"domain_validation": "HALT_SIGNATURE_COMPONENT_ENUMERATION"
+```
+
+## E178 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
+
+Old:
+
+```text
+"fixture_version": "1.3.1",
+```
+
+New:
+
+```text
+"fixture_version": "1.3.7-candidate, not audited",
+```
+
+## E179 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
+
+Old:
+
+```text
+(after the last line)
+```
+
+New:
+
+```text
+
+## 20. Control-vector input contracts and result schemas (v1.3.7 candidate, OWNER-DECIDED OD-3)
+
+**OWNER-DECIDED OD-3** (owner decision D-027). v1.3.6 names the properties of its control vectors only in fixture descriptors and does not state their schema. The owners adopt the tables below as normative. Each row names one property, its type, its allowed values and the Protocol text that fixes its value. Basis `pack` means that the cited text fixes the value. `C1`, `C3`, `C9`, `C12`, `C13` and `C14` name candidate corrections, `OD-1` is the owner rule of L174, `OS-1` is the owner specification of owner decision D-026, and `A-033` is the reading approved under owner decision D-009. Basis `OD-3` means owner vocabulary or schema adopted by D-027: its spelling is not v1.3.6 text, and its meaning is the text cited with it. A control-vector result has exactly the properties its table lists and is compared whole (File 36 L176). An input with a value outside its allowed values, or with any other property, is an input error, not an outcome.
+
+**Properties no rule fixes:** none. Every property of every control vector below has a rule. Two rows rest on a reading rather than on one sentence: the stage `DESIGN_HALT` of the change-class and domain-validation results (A-033), and the order of the three domain arrays, which is the order L185 lists them in (OD-3).
+
+### 20.1 Inputs of the change-class and domain-validation vectors
+
+| Vector | Property | Type | Allowed values | Rule | Basis |
+| --- | --- | --- | --- | --- | --- |
+| Change-class vector | `change_class` | string | exactly one of `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED`, `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED`, `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START`, `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` | L176: the four change classes. The input is the class alone, so the result states the rule for that class and names no design, component or slot. | OD-3 |
+| Domain-validation vector | `domain_validation` | string | exactly `HALT_SIGNATURE_COMPONENT_ENUMERATION` | L185: the halt-signature domains. The result states the closed component domains and the two component rules. | OD-3 |
+
+### 20.2 Properties of every change-class and domain-validation result
+
+| Property | Type | Value | Rule | Basis |
+| --- | --- | --- | --- | --- |
+| `disposition` | string | `CONTROL_EXPECTATION` | L176 "Each literal is a closed local control expectation"; L177 | pack |
+| `stage_id` | string | `DESIGN_HALT` | L172 stage list; §7b, which L251 makes normative in §3.4 "Mid-run design halt" (L181–L185) | A-033 |
+| `error_class` | string | the CODE of `diagnostic` | L175 error-class rule for `EVALUATOR_REVISION_REQUIRED`, `AUTHORING_REVISION_REQUIRED` and `HALT_SIGNATURE_SCHEMA` | C1 |
+| `diagnostic` | string | the value given for the input in §20.3 | L175 | pack |
+| `required_action` | string | the L176 literal of the change class, or of `HALT_SIGNATURE_COMPONENT_ENUMERATION` | L176 | pack |
+
+### 20.3 Further properties of each result
+
+| Input value | Property | Type | Value | Rule | Basis |
+| --- | --- | --- | --- | --- | --- |
+| `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` | `diagnostic` | string | `EVALUATOR_REVISION_REQUIRED|reason=FROZEN_EVALUATOR_CHANGED` | L175 "means a frozen evaluator source/binary/tool-version/command/option/configuration changed" | pack |
+| `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` | `new_evaluator_version_hashes_required` | Boolean | `true` | L183 "assign a new evaluator version and hashes" | pack |
+| `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` | `f16_required` | Boolean | `true` | L183 "run the frozen F16 eligibility procedure with fresh mutant-blind pilot seeds" | pack |
+| `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` | `reuse_same_artifact_bytes` | Boolean | `true` | L183 "using the same already-generated artifact bytes" | pack |
+| `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` | `new_confirmatory_generation_calls` | integer | `0` | L183 "and no new confirmatory generation calls" | pack |
+| `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` | `rerun_scope_rule` | string | `shared_evaluator_component_all_designs_and_all_arm_x_design_slots; design_specific_component_affected_design_in_both_arms` | L183 "If the revised evaluator component is shared across FIFO and UART, the affected scope is both designs and every arm × design slot; if it is design-specific, the affected scope is that design in both arms" | OD-3 |
+| `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` | `diagnostic` | string | `AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED` | L175 "means an author-visible or estimand-defining item changed and prior confirmatory artifacts are not reusable" | pack |
+| `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` | `reuse_old_confirmatory_artifacts` | Boolean | `false` | L181 "No invalidated confirmatory artifact may be reused" | pack |
+| `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` | `new_confirmatory_generation_required` | Boolean | `true` | L181 "fresh confirmatory generation for every affected slot" | pack |
+| `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` | `affected_slots` | string | `all_designs_x_all_arms` | L181 "invalidate every scheduled slot across both designs and both arms" | OD-3 |
+| `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` | `archive_and_disclose_partial_ledgers` | Boolean | `true` | L181 "Preserve and archive every partial confirmatory ledger" and "disclose the archived partial ledgers" | pack |
+| `SHARED_AUTHOR_VISIBLE_OR_ESTIMAND_DEFINING_ITEM_CHANGED` | `new_preregistration_required` | Boolean | `true` | L181 "A shared-item revision requires a new study preregistration" | pack |
+| `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` | `diagnostic` | string | `AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED` | L175 "means an author-visible or estimand-defining item changed and prior confirmatory artifacts are not reusable"; L175 study-reset sentence | pack, C1 |
+| `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` | `old_confirmatory_artifacts_reusable` | Boolean | `false` | L181 "A study reset is not an operational recovery and cannot retain old confirmatory artifacts" | pack |
+| `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` | `new_preregistration_required` | Boolean | `true` | L181 "always requires a new preregistered study" | pack |
+| `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` | `all_partial_ledgers_archived_and_disclosed` | Boolean | `true` | L181 "archive and disclose all partial confirmatory ledgers" | pack |
+| `DESIGN_MEMBERSHIP_OR_ESTIMAND_OR_WEIGHT_CHANGED_AFTER_CONFIRMATORY_START` | `fresh_confirmatory_generation_required` | Boolean | `true` | L181 "generate fresh confirmatory slots under the newly preregistered design set and weights" | pack |
+| `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` | `diagnostic` | string | `AUTHORING_REVISION_REQUIRED|reason=AUTHOR_VISIBLE_OR_ESTIMAND_CHANGED` | L175 "means an author-visible or estimand-defining item changed and prior confirmatory artifacts are not reusable" | pack |
+| `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` | `affected_scope` | string | `affected_design_in_both_arms` | L181 "If a design-specific author-visible item changes, halt and invalidate every slot for that design in both arms" | OD-3 |
+| `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` | `unaffected_design_scope` | string | `not_invalidated_when_membership_estimand_and_weights_are_unchanged` | L181 "every slot for that design in both arms" (the other design is outside that scope) and "A change in design membership, estimand or any confirmatory weight after confirmatory generation starts always requires a new preregistered study" | OD-3 |
+| `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` | `reuse_old_artifacts_for_affected_design` | Boolean | `false` | L181 "No invalidated confirmatory artifact may be reused" | pack |
+| `DESIGN_SPECIFIC_AUTHOR_VISIBLE_ITEM_CHANGED` | `new_study_preregistration_required_if_design_membership_estimand_or_weights_change` | Boolean | `true` | L181 "always requires a new preregistered study, even if the changed item is otherwise described as design-specific" | pack |
+| `HALT_SIGNATURE_COMPONENT_ENUMERATION` | `diagnostic` | string | `HALT_SIGNATURE_SCHEMA|reason=COMPONENT_VALUES_ENUMERATED` | L175 "control-expectation diagnostic for validating the closed halt-signature component domains and mapping" | pack |
+| `HALT_SIGNATURE_COMPONENT_ENUMERATION` | `design_id_values` | array of strings | [`FIFO`, `UART`] | L185 "`design_id` is `FIFO` or `UART`", in that order | pack; order OD-3 |
+| `HALT_SIGNATURE_COMPONENT_ENUMERATION` | `halt_code_values` | array of strings | [`SIMULATOR_ERROR`, `TRACE_INTEGRITY_FAILURE`, `RTL_NULL_CONTROL_FAILURE`] | L185 "`halt_code` is `SIMULATOR_ERROR`, `TRACE_INTEGRITY_FAILURE` or `RTL_NULL_CONTROL_FAILURE`", in that order | pack; order OD-3 |
+| `HALT_SIGNATURE_COMPONENT_ENUMERATION` | `evaluator_component_values` | array of strings | [`SIMULATOR`, `REPLAY_VERIFIER`, `RECORDER`, `TRACE_ALIGNMENT_CHECKER`, `TRACE_SERIALIZER`, `RTL_NULL_COMPARATOR`] | L185 "`evaluator_component` is `SIMULATOR`, `REPLAY_VERIFIER`, `RECORDER`, `TRACE_ALIGNMENT_CHECKER`, `TRACE_SERIALIZER` or `RTL_NULL_COMPARATOR`", in that order | pack; order OD-3 |
+| `HALT_SIGNATURE_COMPONENT_ENUMERATION` | `stable_error_class_rule` | string | `simple_exception_class_for_SIMULATOR_ERROR_else_NONE` | L185: the label of the `stable_error_class` rule stated there | C3 |
+| `HALT_SIGNATURE_COMPONENT_ENUMERATION` | `stable_diagnostic_code_rule` | string | `exact_halt_code_token` | L185: the label of the `stable_diagnostic_code` rule stated there | C3 |
+
+### 20.4 The other control vectors (schemas stated elsewhere, listed for completeness)
+
+| Vector | Result properties besides `disposition`, `stage_id` and `error_class` | Where fixed | Basis |
+| --- | --- | --- | --- |
+| Serializer-grammar vector (File 36 L195) | `diagnostic` = `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` | L168, L174 | C12, OD-1 |
+| Truncation-primitive vector (File 36 L196) | `contains_marker` (Boolean), `valid_utf8` (Boolean), `output_diagnostic_bytes` (integer), `marker_utf8_bytes` (integer); no `diagnostic` | L168, L174 | C13 |
+| JSON-escaping-primitive vector (File 36 L197) | `diagnostic_utf8` (string), `diagnostic_sha256` (string of 64 lowercase hexadecimal digits), `diagnostic_bytes` (integer); no `diagnostic` | L168, L174 | C14 |
+| Parser unit vector (File 36 L27) | `diagnostic` by the L127 column rule | File 36 L27 | C9 |
+| Operational-recovery vector (File 36 L205) | `diagnostic` = `RERUN_ALL_SCHEDULED_SLOTS_WITH_SAME_FROZEN_ARTIFACTS`, `discard_pre_halt_scores` (Boolean `true`), `rerun_slots` (integer, equal to the input `scheduled_slots`), `reuse_same_artifact_bytes` (Boolean `true`), `new_confirmatory_generation_calls` (integer `0`); or the `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` result of §20.2–§20.3 | L175, L183, L185 | OS-1 |
+
+The lifecycle halt-event vector (File 36 L198) and the design-preflight vector (File 36 L199) give stage-map records with the four comparison keys. They are not control-vector results.
+```
+
+## E180 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
 
 Old:
 
@@ -2665,4 +2945,46 @@ New:
     "diagnostic": "DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE"
   }
 }
+```
+
+## E181 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
+
+Old:
+
+```text
+"sha256": "96828e2572f59c74d879aa72dfef0d15f4eb6b6c7e97f3a4331db9ad46a6cac4",
+```
+
+New:
+
+```text
+"sha256": "c6dfe1caff678f305fa8a855f49c04c209c7a494df91917415c083b482405890",
+```
+
+## E182 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
+
+Old:
+
+```text
+"bytes": 1350,
+```
+
+New:
+
+```text
+"bytes": 1378,
+```
+
+## E183 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
+
+Old:
+
+```text
+96828e2572f59c74d879aa72dfef0d15f4eb6b6c7e97f3a4331db9ad46a6cac4  41_F18_Fixture_Inputs/M54.json
+```
+
+New:
+
+```text
+c6dfe1caff678f305fa8a855f49c04c209c7a494df91917415c083b482405890  41_F18_Fixture_Inputs/M54.json
 ```

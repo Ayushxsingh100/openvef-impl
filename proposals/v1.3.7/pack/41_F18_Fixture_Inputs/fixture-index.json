@@ -749,8 +749,8 @@
       "fixture_id": "M54",
       "path": "41_F18_Fixture_Inputs/M54.json",
       "scope": "missing-case",
-      "sha256": "96828e2572f59c74d879aa72dfef0d15f4eb6b6c7e97f3a4331db9ad46a6cac4",
-      "bytes": 1350,
+      "sha256": "c6dfe1caff678f305fa8a855f49c04c209c7a494df91917415c083b482405890",
+      "bytes": 1378,
       "expected": {
         "disposition": "CONTROL_EXPECTATION",
         "stage_id": "DESIGN_HALT",

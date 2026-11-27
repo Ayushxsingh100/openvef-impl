@@ -183,6 +183,41 @@ class CandidatePackTests(unittest.TestCase):
                 self.assertTrue(any(f"OWNER-DECIDED {item}" in b.decode("utf-8", "replace") for b in self.pack.values()),
                                 item)
 
+    def test_od3_schema_covers_every_change_class_property(self):
+        """OD-3 (D-027, D1-1/D1-2): Protocol §20 lists every property of the change-class and domain-validation expected
+        objects, with the same value, and no property they lack. Values: `x` strings, `true`/`false`, integers,
+        [`a`, `b`] arrays; `diagnostic` and the §20.3 rows per input value, the §20.2 rows for all."""
+        import re
+        protocol = self.pack[self.name(self.mod.P02)].decode("utf-8").split("\n")
+        start = protocol.index("### 20.3 Further properties of each result")
+        rows = [l for l in protocol[start:] if l.startswith("| `")]
+        rows = rows[:next(i for i, l in enumerate(rows) if "File 36 L" in l)] if any("File 36 L" in l for l in rows) else rows
+
+        def value(cell: str):
+            cell = cell.strip()
+            if cell.startswith("["):
+                return re.findall(r"`([^`]*)`", cell)
+            v = re.fullmatch(r"`([^`]*)`", cell).group(1)
+            return {"true": True, "false": False}.get(v, int(v) if v.isdigit() else v)
+
+        table: dict[str, dict] = {}
+        for l in rows:
+            cells = [c for c in l.strip("|").split(" | ")]
+            table.setdefault(value(cells[0]), {})[value(cells[1])] = value(cells[3])
+        l176 = protocol[175]
+        for fid in ("M48", "M50", "M53", "M54", "M58"):
+            d = json.loads(self.pack[FX + f"{fid}.json"])
+            (key, cls), = d["input"].items()
+            with self.subTest(fixture=fid):
+                self.assertEqual(key, "domain_validation" if fid == "M54" else "change_class")
+                expected = dict(d["expected"])
+                common = {"disposition": "CONTROL_EXPECTATION", "stage_id": "DESIGN_HALT",
+                          "error_class": expected["diagnostic"].split("|")[0]}
+                action = re.search(rf"`{cls}` = `([^`]*)`", l176).group(1)
+                got = {**common, **table[cls]}
+                got["required_action"] = action  # §20.2: every result has the L176 literal
+                self.assertEqual(got, expected)
+
     def test_corrected_m27_reaches_check_e(self):
         m27 = json.loads(self.pack[FX + "M27.json"])
         inp = m27["input"]
