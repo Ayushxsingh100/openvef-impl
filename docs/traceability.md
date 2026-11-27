@@ -3,7 +3,7 @@
 **Reading status, 24 Nov 2026:** every Claude-decided reading below is approved by Krishika
 (D-008), including A-057 under D-020: A-055 and A-056 under D-018; A-038 and A-040–A-044 in FREEZE-2026-11-24; A-053 under D-014;
 all others under D-009, as decided, without itemised owner review.
-Evidence runs since then: `run-20261126T163836Z` (v1.3.6), `controls-20261126T164304Z`; candidate pack (D-024, D-025; not v1.3.6 evidence): `run-v137c-20261126T164050Z`.
+Evidence runs since then: `run-20261127T052242Z` (v1.3.6), `controls-20261127T052649Z`; candidate pack (D-024 to D-026; not v1.3.6 evidence): `run-v137c-20261127T052443Z`.
 
 | Requirement | Component | Fixtures | Status |
 |---|---|---|---|
@@ -54,13 +54,13 @@ Evidence runs since then: `run-20261126T163836Z` (v1.3.6), `controls-20261126T16
 | Owner freeze and audit readiness: one signing checklist with SHA-256 per item (whole files, or per-section for decision records); status, auditor needs and open items | `docs/OWNER-FREEZE-PACKAGE.md`, `docs/AUDIT-READINESS.md`; `tests/freeze_hashes.py`, `tests/test_freeze_package.py` | — | Ready for signature (nothing signed) |
 | L555 (4); File 50: Python 3.11 Unicode identifier tokenizer check on the pinned interpreter | `runner/probe_file50.py`, `src/openvef/import_policy.py` (`scan_identifiers`) | M55, M56, M57 (PASS in the evidence runs) | **Recorded**: `evidence/probe-file50-20261124T112645Z`; matches File 54 audit-time 3.11.18 results |
 | Protocol §17 L524, L529, L405–L411; §12 L303–L328; §13.1–§13.3; inclusion table L370–L384 (F15) | `src/openvef/pairs.py` (H3), `src/openvef/metrics.py` (H4), `src/openvef/f15.py`; `tests/test_pairs_metrics.py` | F15 control (not an F18 fixture) | **PASS**: `evidence/controls-20261126T164304Z`. The case table was built by Claude and approved under D-009, without itemised owner review. No Claude-decided reading is used |
-| Protocol §17 L523, L233 (F14) | `src/openvef/f14.py`; harness task `interface` | F14 control | **PASS**: `evidence/controls-20261126T164304Z`. RTL and export script frozen (C1, C2); A-052 approved under D-009, without itemised owner review |
+| Protocol §17 L523, L233 (F14) | `src/openvef/f14.py`; harness task `interface` | F14 control | **PASS**: `evidence/controls-20261127T052649Z`. RTL and export script frozen (C1, C2); A-052 approved under D-009, without itemised owner review |
 | Protocol §8 L257–L265, §12 L306–L311, L336 (pair runs) | `src/openvef/pair_runner.py` (H2); sandbox rows kept on a watchdog kill | F3–F12, F17 (when owner artifacts exist) | Built and unit-tested on synthetic rows; A-046, A-047, A-048 Claude-decided, approved under D-009 |
 | Protocol §11 L291–L297, L278; F4 L513, F5 L514; D-007 (3) | `src/openvef/miter.py` (H5, H6); harness task `yosys` | F4, F5 | Built; tested on TEST-ONLY toy designs (shortest counterexample, replay agreement, bounded equivalence under the mask); A-045 Claude-decided, approved under D-009 |
 | Protocol §13.4 L415–L437 (panel); L529 (5) | `src/openvef/panel.py` (H7) | F17, F15 (5) | Built; synthetic tests; A-049, A-050 Claude-decided, approved under D-009 |
 | Protocol L223, L216–L221 (F2/F10 ordering); L510 (F1 repeats) | `sandbox/sim_cocotb.py` ordering probe (H9); `src/openvef/alignment.py` (H9, H10) | F1, F2, F10 | Built; toy-design runs in the sandbox; A-051 Claude-decided, approved under D-009 |
 | Charter L74; L233; D-007 (2) (control mutants) | `src/openvef/mutants.py` (H1); `design/fifo/controls/` slots (owner-written content) | F4–F10, F12, F17 | Loader built; **no mutant exists yet** (owner item 15) |
-| Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261126T164304Z`: F14, F15 PASS (D-009); 14 controls BLOCKED_OWNER_ARTIFACTS |
+| Protocol §17 (control evidence) | `runner/run_controls.py` (H8); `runner/run_f18_container.sh … controls` | F1–F15, F17 | `evidence/controls-20261127T052649Z`: F14, F15 PASS (D-009); 14 controls BLOCKED_OWNER_ARTIFACTS |
 | CLAUDE.md rule 4; D-013 (A1-1), D-017: adapters need a cited contract, synthetic vectors and a boundary pair per property | `runner/run_f18.py` `ADAPTERS`, `runner/adapter_contracts.py`; `tests/adapter_vectors.py`, `tests/test_dispatch_shapes.py` | all 144 | Implemented; evidence/run-20261126T163836Z; A-053 approved (D-014); A-055, A-056 approved (D-018; no fixture outcome depends on them); audited in the sequence #1–#5, no open BLOCKER or MAJOR (D-023) |
 | Protocol L185; D-012 (A8-1): supplied halt signatures validated | `src/openvef/ledger.py` `HaltSignature.given`; `tests/test_local_rules.py` | M42, M47 NOT_IMPLEMENTED (PD-01) | Implemented; A-031 reversed |
 | File 30 §3 L27, L39, §6; D-015 (A9-1): no artifact code in an evaluator interpreter | `sandbox/artifact_worker.py`, `sandbox/artifact_proc.py`; `tests/test_artifact_isolation.py` | every fixture reaching the runtime stage | Implemented; evidence/run-20261126T163836Z; A-054 approved (D-016); audited in the sequence #1–#5, no open BLOCKER or MAJOR (D-023) |
@@ -77,11 +77,15 @@ Evidence runs since then: `run-20261126T163836Z` (v1.3.6), `controls-20261126T16
 | D-024 Phase B: `--pack {v1.3.6,v1.3.7-candidate}`; candidate-only adapters for `change_class` (candidate 02 L175–L176, L185; C1–C4), `parser_unit_vector` (candidate 36 L27, 02 L127; C9) and the check-(e) vector (candidate 30 L83; C5) | `runner/run_f18.py` `PACKS`, `runner/adapters_v137.py`, `runner/adapter_contracts_v137.py`, `src/openvef/ledger.py` `lifecycle_expectation_candidate`; `tests/test_dispatch_shapes_v137.py`, `tests/adapter_vectors_v137.py` | M27, M36, M48, M50, M53, M54, M58 (candidate pack only) | Implemented; candidate results are not v1.3.6 F18 evidence and do not count toward F18; predicate execution and the boundary-check exception owner review pending (D-024); not audited |
 | D-025: Amendments A1 (M27 design-neutral predicate), A2 (File 25 normative copy), stale references (renames, File 22 hash), C11–C16 (candidate Protocol L168, L174, L179, L185; File 36 input-shape section L190–L199) | `proposals/v1.3.7/build_candidate.py`, `proposals/v1.3.7/pack/`, `proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md` sections 5–9; `tests/test_v137_candidate_pack.py` | M13, M14, M15, M17, M42, M47, R07 covered; M37, M41, P17 need owner specification | Phase A committed before code (`1f4a23f`, `268003f`, `8d26d80`, `cdb2cf0`); **v1.3.7 CANDIDATE, not audited** |
 | D-025 Phase B: candidate manifest verified before the C5 predicate runs; candidate-only adapters for C11–C16 | `runner/run_f18.py` `verify_pack_manifest`, `PACKS`; `runner/adapters_v137.py`, `runner/adapter_contracts_v137.py`; `tests/test_pack_manifest_v137.py`, `tests/test_dispatch_shapes_v137.py`, `tests/adapter_vectors_v137.py` | M13, M14, M15, M17, M42, M47, R07 (candidate pack only) | Implemented; candidate results do not count toward F18; not audited |
+| D-026 Phase A: OWNER-SPECIFIED OS-1–OS-3 (candidate File 36 L201–L207; not pack-derived) | `proposals/v1.3.7/build_candidate.py` `OS_BLOCK`, `proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md` section 10; `tests/test_v137_candidate_pack.py` | M41 (OS-1), M37 (OS-2), P17 (OS-3: stays NOT_IMPLEMENTED) | Committed before code (`78e10bf`); **v1.3.7 CANDIDATE, not audited** |
+| D-026 Phase B: OS-1, OS-2 adapters; OS-3 open shape; every candidate record labelled `PACK-DERIVED` or `OWNER-SPECIFIED`, counted per category | `runner/adapters_v137.py` `adapt_operational_recovery`, `adapt_paired_run_outcome`, `OWNER_SPECIFIED`, `OPEN_SHAPES`; `runner/run_f18.py` `no_adapter_reason`; `runner/adapter_contracts_v137.py`; `tests/test_dispatch_shapes_v137.py`, `tests/adapter_vectors_v137.py` | M41, M37 PASS; P17 NOT_IMPLEMENTED (candidate pack only) | Implemented; OWNER-SPECIFIED results counted apart; free-Boolean boundary pairs owner review pending; candidate results do not count toward F18; not audited |
+| D-026 item 3: document-audit bundle for the candidate | `docs/DOC-AUDIT-BRIEF.md`, `tools/build_docaudit_bundle.py`, `dist/openvef-docaudit-bundle.zip` | C1–C16, A1–A2, OS-1–OS-3 | Built and published for an independent document audit; not audited |
 | L555 (5): preparation for an external AI-assisted audit | `docs/AUDIT-BRIEF.md`, `tools/build_audit_bundle.py`, `dist/openvef-audit-bundle.zip` | all 144 (audited run: run-20261124T195537Z; bundle rebuilt with run-20261126T144718Z) | DEV-002 AI audit and re-audit (OpenAI GPT-6) saved (docs/reviews/); re-audit NOT CLEARED (two BLOCKERs, MAJOR A4-1); third audit also NOT CLEARED (A1-1, A9-2); fourth audit NOT CLEARED (MAJORs A1-1, A9-2; bundle `93b249a6…`); fifth audit **CLEARED for D-022** (0 BLOCKER/MAJOR/MINOR, 11 LIMITATIONs; bundle `5bdc25ea…`). Sequence #1–#5 complete, no open BLOCKER or MAJOR (D-023). Not a human independent audit. **Step (5) not marked done**; not claimed to satisfy L555 (5) |
 
-Latest F18 run: `evidence/run-20261126T163836Z` (pack v1.3.6). It was started by `runner/run_f18_container.sh development`
-at commit 75c959c, on a clean tree, after D-019 to D-025. Every record equals `run-20261126T155730Z` except measured
-wall-clock times (D-024 and D-025 changed no v1.3.6 status, note or label):
+Latest F18 run: `evidence/run-20261127T052242Z` (pack v1.3.6). It was started by `runner/run_f18_container.sh development`
+at commit 000f6a9, on a clean tree, after D-019 to D-026. Every record equals `run-20261126T163836Z` except measured
+wall-clock times (D-024 to D-026 changed no v1.3.6 status, note or label). `run-20261127T052200Z` was aborted before any
+result and is not evidence (its `ABORTED.md`):
 - Interpreter status **PINNED** under D-002a: CPython 3.11.18, SHA-256 92d7e40e…6b79; the
   image ID is in `summary.json`.
 - The run re-verified the 20 frozen items, the DEV-001 mask files and the 39 D-009 items.
@@ -102,12 +106,15 @@ wall-clock times (D-024 and D-025 changed no v1.3.6 status, note or label):
   M16, M18–M20, M25, M26, M28, M29, M40, R01–R06, R08–R13, M10–M12, P18, P19, P22.
 
 **Candidate pack (D-024; v1.3.7 CANDIDATE, not audited; not v1.3.6 F18 evidence, does not count toward F18):**
-`evidence/run-v137c-20261126T164050Z`, same commit and image, `--pack v1.3.7-candidate`, all 205 pack files verified
-against the pinned manifest first: 141 PASS, 0 FAIL, 3 NOT_IMPLEMENTED (M37, M41, P17: need owner specification,
-CORRECTIONS section 8), 0 ERROR. Fourteen fixtures change from NOT_IMPLEMENTED to PASS; the 127 v1.3.6 passes keep
-identical records.
+`evidence/run-v137c-20261127T052443Z`, same commit and image, `--pack v1.3.7-candidate`, all 205 pack files verified
+against the pinned manifest (`802e8be7…`) first: 143 PASS, 0 FAIL, 1 NOT_IMPLEMENTED, 0 ERROR. Counted separately
+(D-026): **PACK-DERIVED** 141 / 0 / 0 / 0 (v1.3.6 text and C1–C16); **OWNER-SPECIFIED** 2 / 0 / 1 / 0: M41 (OS-1) and
+M37 (OS-2) PASS, P17 (OS-3) NOT_IMPLEMENTED because its expected stage `DRIVER_VECTOR` is at runtime. Each of the three
+records carries `category` `OWNER-SPECIFIED` and its OS label. The 127 v1.3.6 passes keep identical records.
+Container tests: `evidence/container-tests-20261127T053222Z` (commit 83fe17d, clean, 419 pass); the earlier
+`container-tests-20261127T052653Z` ran on an uncommitted tree and is superseded (its `NOTE.md`).
 
-Latest control run: `evidence/controls-20261126T164304Z`, same commit and image:
+Latest control run: `evidence/controls-20261127T052649Z`, same commit and image:
 - F14 PASS (A-052 approved under D-009) and F15 PASS (case table approved under D-009);
 - 14 controls BLOCKED_OWNER_ARTIFACTS.
 
