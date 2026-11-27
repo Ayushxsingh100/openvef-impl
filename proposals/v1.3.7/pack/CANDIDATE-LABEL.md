@@ -1,7 +1,8 @@
 # v1.3.7 CANDIDATE, not audited
 
 **Every file in this directory is part of OpenVEF Planning v1.3.7 CANDIDATE, not audited.** It is a copy of v1.3.6 with
-corrections C1–C10 applied (owner decision D-024; `CHANGELOG-v1.3.7-candidate.md`). It is not released, not audited
+corrections C1–C16 and amendments A1–A2 applied (owner decisions D-024, D-025) and the OWNER-SPECIFIED
+items OS-1–OS-3 (owner decision D-026; `CHANGELOG-v1.3.7-candidate.md`). It is not released, not audited
 and not approved, and v1.3.6 (`baseline/`) remains the default pack.
 
 - **In-file label:** every file a correction changed carries the label itself (Markdown and File 25: an

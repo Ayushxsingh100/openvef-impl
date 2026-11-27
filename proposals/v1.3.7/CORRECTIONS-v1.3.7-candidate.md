@@ -586,6 +586,8 @@ passed with an earlier adapter until D-013 removed it for lack of a cited contra
 ## 8. Needs owner specification (not corrected)
 
 These three cannot be corrected without behaviour the pack never states. They stay NOT_IMPLEMENTED on the candidate.
+**Answered by owner decision D-026** (Krishika): the questions below are kept as asked; the answers are the
+OWNER-SPECIFIED items OS-1 to OS-3 in section 10, which are not corrections and are counted separately.
 
 **M41 — operational-recovery vector.**
 
@@ -635,6 +637,138 @@ P17 instead name a design whose RTL the harness runs?
 | M17 | C13, C14 | covered |
 | M13 | C15 | covered (attack point: `evaluator_repair_attempt`) |
 | R07 | C16 | covered |
-| M41 | — | **needs owner specification** (section 8) |
-| M37 | — | **needs owner specification** |
-| P17 | — | **needs owner specification** |
+| M41 | OS-1 (OWNER-SPECIFIED) | covered by an owner specification, not a correction (section 10) |
+| M37 | OS-2 (OWNER-SPECIFIED) | covered by an owner specification, not a correction (section 10) |
+| P17 | OS-3 (OWNER-SPECIFIED) | **NOT_IMPLEMENTED**: expected stage is at runtime (section 10) |
+
+**Counted separately (D-026):** pack-derived corrections C1–C16 (with A1, A2) cover 14 of the 17; OWNER-SPECIFIED
+items cover 2 more (M41, M37); 1 (P17) stays NOT_IMPLEMENTED under OS-3. No fixture is both.
+
+## 10. OWNER-SPECIFIED items OS-1 to OS-3 (owner decision D-026)
+
+**Category.** These are **OWNER-SPECIFIED**, not pack-derived corrections. Owner decision D-026 (Krishika) answered the
+section 8 questions with rules; the text below applies those rules, and candidate File 36 L201–L207 states the result,
+labelled OWNER-SPECIFIED. Every evidence record of a fixture they cover carries the label, and run summaries count them
+apart from C1–C16. Drafted by Claude (the implementation author) from D-026; not audited.
+
+**D-026's governing rule.** The expected outcome is fixed by the pack; an OS item specifies only how the vector reaches
+the stage that outcome names, and never adds an outcome code. If a rule does not determine an answer, the fixture stays
+NOT_IMPLEMENTED with the reason. Each expected stage was read from pack text when the items were drafted; the code never
+reads an expected object (rule 4). Each item is a general input contract for a shape, not a rule for one fixture.
+
+### OS-1 — Operational-recovery vector (M41)
+
+D-026: (1) the outcome-deciding properties are exactly those named by the L183 conditions; for a failed condition use
+the outcome the pack states, otherwise leave it unspecified; (2) `required_action` is an informational label; (3)
+pre-halt scores are counted by `pre_halt_scored_slots`, since "scored" is the pack's word.
+
+**The L183 conditions and the properties they name.**
+
+> [02 L183] "For a design-local simulator error, evaluator trace-integrity fault or same-input masked RTL/null divergence after slots have begun"
+
+The trigger names the halt (`halt_signature`, with `design_id` as the affected design) and that slots had begun
+(`slots`, with the same domain as the C15 halt-event vector).
+
+> [02 L183] "One recovery cycle per affected design is allowed."
+
+This names `evaluator_repair_attempt` = `1` (the C15 reading: the ordinal of the cycle this halt opens).
+
+> [02 L183] "it creates no new hashes, requires no new F16 and changes no artifact"
+
+These three conditions of operational recovery name `frozen_evaluator_hashes_unchanged`, `f16_required` and
+`same_artifact_bytes`; the form itself names `recovery_mode` = `OPERATIONAL_RECOVERY` (the token is the descriptor's).
+
+> [02 L183] "A change to any author-visible or estimand-defining item follows the study/design revision rules in the preceding paragraph, not the evaluator-revision path."
+
+This names `author_visible_materials_changed`.
+
+> [02 L183] "A masked RTL/null divergence may use operational recovery only when a documented root-cause review attributes it to a transient evaluator fault"
+
+The vector carries no root-cause review, so `halt_code` `RTL_NULL_CONTROL_FAILURE` is out of scope (the outcome is not
+determined).
+
+**Failed conditions (D-026 (1)).**
+
+| Condition that fails | Outcome the pack states | OS-1 result |
+|---|---|---|
+| frozen evaluator hashes changed (`frozen_evaluator_hashes_unchanged` false; `f16_required` true; artifact bytes the same; no author-visible change) | L183 path (b) and L175, below | the change-class control expectation of `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED` (C1–C4) |
+| `author_visible_materials_changed` true | L183 sends it to the L181 study or design revision rules, but a shared-item revision, a design-specific revision and a study reset are three outcomes with different records, and the vector does not say which applies | out of scope |
+| `f16_required` true with hashes unchanged; `same_artifact_bytes` false; any other mix | none | out of scope |
+| masked RTL/null divergence | operational recovery needs a review the vector lacks | out of scope |
+
+> [02 L175] "`EVALUATOR_REVISION_REQUIRED|reason=FROZEN_EVALUATOR_CHANGED` means a frozen evaluator source/binary/tool-version/command/option/configuration changed"
+
+> [02 L183] "An evaluator revision is not an operational restart"
+
+A changed frozen-evaluator hash is that change. Path (b) also requires F16 and keeps the artifact bytes, so the evaluator-revision record
+applies only when the vector agrees with path (b) (`f16_required` true, `same_artifact_bytes` true). The author-visible
+row comes first because L183 says such a change does not follow the evaluator-revision path.
+
+**Success.** All four conditions hold.
+
+> [02 L175] "`RERUN_ALL_SCHEDULED_SLOTS_WITH_SAME_FROZEN_ARTIFACTS` (error class `MID_RUN_REEVALUATION`) is the M41 control-expectation diagnostic for a successful operational recovery"
+
+> [02 L185] "Discard all pre-halt partial scores and use only the complete post-recovery rerun ledger."
+
+> [02 L185] "with the same frozen artifact bytes and slot seeds; no confirmatory generation call is made"
+
+The record is L175's diagnostic and error class, at stage `DESIGN_HALT` (the L172 stage of a §7b design halt, as in
+C11) with disposition `CONTROL_EXPECTATION` (a lifecycle rule under test, L177). Its four further properties are L175's
+own sentence ("It discards pre-halt scores, reruns preflight, and re-evaluates every scheduled slot ... with identical
+artifact bytes and seeds and zero new confirmatory generation calls"): `discard_pre_halt_scores` = `true`,
+`rerun_slots` = `scheduled_slots`, `reuse_same_artifact_bytes` = `true`, `new_confirmatory_generation_calls` = `0`. The
+property names are the descriptor's (as in C13).
+
+**Properties that do not decide the outcome.**
+- `required_action` (D-026 (2)): a string; never compared. Its literal appears in no pack text.
+- `pre_halt_scored_slots` (D-026 (3)): 1 to `slots.previously_evaluated` (the triggering slot halted, L154, so it has no
+  pre-halt score). Zero is out of scope: L185 does not say whether discarding no scores is reported as a discard.
+- `scheduled_slots` must equal `slots.scheduled`; `same_artifacts_for_all_slots` = `true`, `same_slot_seeds` = `true` and
+  `new_generation_calls` = `0` restate L185. As with C13's fixed properties, they must equal those values and do not
+  change the result.
+
+**Rejected.** `slots.previously_evaluated` as the pre-halt score count (D-026 (3)). An outcome for an author-visible
+change: the pack states three revision outcomes and the vector does not choose between them, so picking one would add
+behaviour. Reading `required_action` as an outcome input (D-026 (2)).
+
+**Fit with the current code.** The evaluator-revision record is `ledger.lifecycle_expectation_candidate` (C1–C4);
+the success record is new code, built from the values above.
+
+### OS-2 — Paired-run outcome vector (M37)
+
+D-026: a static-stage outcome makes it a static vector; a runtime or paired outcome uses option (a): `runtime_pair`
+stands in for the paired run, and the excerpt documents the access being tested.
+
+**Which case applies.** M37's expected stage is `TERMINAL`, the L156 row:
+
+> [02 L156] "| Before first raw output divergence, paired next-input schedules differ | `TERMINAL` | `DRIVER_NONDETERMINISM` |"
+
+> [02 L166] "any next-input mismatch before first raw-output divergence is terminal driver nondeterminism"
+
+That is evaluation step (8), a paired outcome, so option (a) applies; the static-vector branch of the rule is not used.
+
+**Specification.** Steps (1)–(6) (schema, source, import policy, AST signature, both compilations) run on
+`response_object`; their first failure is the result. If they all pass, `runtime_pair` stands in for steps (7)–(8). Step (7)
+includes the factory and runtime-signature checks, so those do not run either: the paired run is not executed. This differs
+from the null-runs vector (A-028), which also runs the sandboxed factory checks. D-026 option (a) says the response's
+*static* stages run, and nothing in this vector needs the sandbox. Only `before_first_raw_output_divergence` = `true` with
+`next_input_schedules_equal` = `false` gives the L156 record. A pair with equal schedules, or one after the first raw
+divergence, leaves the rest of the paired run (masked divergence, checker null runs) undetermined, so it is out of
+scope. `driver_source_excerpt` is a string and is never executed, matched or read for the outcome.
+
+**Rejected.** Checking that the excerpt occurs in the driver source (D-026: it documents the access; the response's
+driver uses `random.Random(seed)` and does not contain it). Running the factory checks (see above).
+
+### OS-3 — Runtime driver-vector input (P17): stays NOT_IMPLEMENTED
+
+D-026: if P17's expected stage precedes runtime, run up to that stage only; otherwise leave it NOT_IMPLEMENTED.
+
+> [02 L152] "| Driver return value/vector is invalid | `DRIVER_VECTOR` | `DRIVER_VECTOR_INVALID` |"
+
+> [02 L166] "(7) Execute `create_driver(seed)` and `Driver.step` on original RTL, then on null netlist"
+
+> [02 L166] "within each cycle, exception wins over vector validation"
+
+`DRIVER_VECTOR` is checked inside step (7), while the driver runs on the original RTL, so it does not precede runtime.
+The rule therefore leaves P17 NOT_IMPLEMENTED. Its record gives the reason and the OS-3 label. Candidate File 36 L207
+says so, so the input shape is labelled without code that names the fixture.

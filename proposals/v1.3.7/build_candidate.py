@@ -335,6 +335,55 @@ APPENDS: dict[str, list[str]] = {P36: [
     "to compare.",
 ]}
 
+# --- D-026 Phase A: OWNER-SPECIFIED items OS-1-OS-3 (M41, M37, P17). Not pack-derived: owner decision D-026 (Krishika)
+# fixes how each vector reaches the stage its pack-fixed outcome names, and adds no outcome code. Rationale and the
+# rule each line applies: CORRECTIONS-v1.3.7-candidate.md section 10. Appended after the C12-C16 lines (no line moves).
+OS_BLOCK = (
+    "OS-1–OS-3 (OWNER-SPECIFIED, D-026)", "PD-07, PD-01, PD-03", "M41, M37, P17", [
+        "",
+        "## Owner-specified vector inputs (v1.3.7 candidate, OWNER-SPECIFIED OS-1–OS-3, owner decision D-026)",
+        "",
+        "These items are OWNER-SPECIFIED, not derived from pack text: the Protocol fixes each expected outcome, and owner "
+        "decision D-026 specifies only how the vector reaches the stage that outcome names. They add no outcome code. A "
+        "property outside its stated domain, or an input for which neither these items nor the Protocol states an "
+        "outcome, is an input error, not an outcome.",
+        "",
+        "- **Operational-recovery vector** (OS-1, §7b): `design_id` (`FIFO` or `UART`, equal to the `design_id` of "
+        "`halt_signature`); `halt_signature`, the halt's signature in the Protocol §7b domains, with `halt_code` "
+        "`SIMULATOR_ERROR` or `TRACE_INTEGRITY_FAILURE` (a masked RTL/null divergence may use operational recovery only "
+        "after a root-cause review, which this vector does not carry); `slots` as in the lifecycle halt-event vector, so the "
+        "halt occurred after slots had begun; `evaluator_repair_attempt` = `1`; `recovery_mode` = `OPERATIONAL_RECOVERY`; "
+        "the Booleans `frozen_evaluator_hashes_unchanged`, `f16_required`, `same_artifact_bytes` and "
+        "`author_visible_materials_changed`; `pre_halt_scored_slots` (1 to `previously_evaluated`), the number of pre-halt "
+        "scores; `scheduled_slots` = `scheduled`, the scheduled slots of the affected scope; `same_artifacts_for_all_slots` "
+        "= `true`, `same_slot_seeds` = `true` and `new_generation_calls` = `0`, which restate §7b; and `required_action`, a "
+        "string that is an informational label, not an outcome input. Only the properties named by the §7b recovery "
+        "conditions decide the outcome. When `frozen_evaluator_hashes_unchanged` is `true`, `f16_required` is `false`, "
+        "`same_artifact_bytes` is `true` and `author_visible_materials_changed` is `false`, the result is the "
+        "successful-operational-recovery control expectation of Protocol §3.4 at stage `DESIGN_HALT` with disposition "
+        "`CONTROL_EXPECTATION` and the properties `discard_pre_halt_scores` = `true`, `rerun_slots` = `scheduled_slots`, "
+        "`reuse_same_artifact_bytes` = `true` and `new_confirmatory_generation_calls` = `0`. When the frozen evaluator "
+        "hashes changed (`frozen_evaluator_hashes_unchanged` is `false`, `f16_required` is `true`, `same_artifact_bytes` "
+        "is `true` and `author_visible_materials_changed` is `false`), the recovery is an evaluator revision and the result "
+        "is the change-class control expectation of `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED`. The Protocol "
+        "states no outcome for any other combination, including an author-visible change, which §7b sends to a study or "
+        "design revision that the vector does not identify; such an input is outside this vector's scope.",
+        "- **Paired-run outcome vector** (OS-2): `response_object` (a response object, as for any response input) and "
+        "`runtime_pair`, an object with exactly `driver_source_excerpt` (a string that documents the access under test; it "
+        "is not executed, matched or read for the outcome) and the Booleans `before_first_raw_output_divergence` and "
+        "`next_input_schedules_equal`. Protocol §3.4 evaluation steps (1)–(6) run on the response object, and their first "
+        "failure is the result. If all pass, `runtime_pair` stands in for steps (7)–(8), the paired run, which is not "
+        "executed: `before_first_raw_output_divergence` = `true` with `next_input_schedules_equal` = `false` is the "
+        "`DRIVER_NONDETERMINISM|reason=NEXT_INPUT_DIVERGENCE` row of the stage map. Any other pair does not determine the "
+        "paired run's outcome and is outside this vector's scope.",
+        "- **Runtime driver-vector input** (OS-3): `response_object` with `port_manifest` (`input_ports`). Its expected "
+        "stage, `DRIVER_VECTOR`, is checked within evaluation step (7), while `Driver.step` runs on the original RTL; the "
+        "input gives no design, RTL or port widths, and no rule states how the driver's vector is obtained outside that "
+        "run. This input is not specified, and a fixture with it stays NOT_IMPLEMENTED.",
+    ])
+APPENDS[P36] = APPENDS[P36] + OS_BLOCK[3]
+C12_C16_LINES = len(APPENDS[P36]) - len(OS_BLOCK[3])
+
 # C6, as amended by A1 (D-025): the whole M27 descriptor is replaced (its input shape changes). The expected object
 # is unchanged. A1 replaces the FIFO-042 predicate of the 24 Nov draft by the v1.3.6 descriptor's own rule,
 # "wr_en must be 0 when full is 1", over a port set holding `wr_en` only, with `full` as a sampled output.
@@ -407,11 +456,18 @@ def build(out: Path) -> dict:
         lines[n - 1] = old[:old.index(":") + 2] + json.dumps(VERSION_LABEL) + ","
         log.append({"correction": "label", "pd": "—", "fixtures": rel[len(FX):-5], "file": rel, "line": n,
                     "old": old.strip(), "new": lines[n - 1].strip()})
+    os_entry = None
     for rel, extra in APPENDS.items():
         lines = line_of(rel)
+        first_lines = extra[:C12_C16_LINES] if rel == P36 else extra
         log.append({"correction": "C12–C16", "pd": "PD-07", "fixtures": "M13, M14, M15, M17, R07", "file": rel,
-                    "line": f"{len(lines) + 1}–{len(lines) + len(extra)}", "old": "(after the last line)",
-                    "new": "\n".join(extra)})
+                    "line": f"{len(lines) + 1}–{len(lines) + len(first_lines)}", "old": "(after the last line)",
+                    "new": "\n".join(first_lines)})
+        if rel == P36:  # D-026: logged last, so the CHANGELOG numbers of every earlier entry stay the same
+            start = len(lines) + C12_C16_LINES + 1
+            os_entry = {"correction": OS_BLOCK[0], "pd": OS_BLOCK[1], "fixtures": OS_BLOCK[2], "file": rel,
+                        "line": f"{start}–{start + len(OS_BLOCK[3]) - 1}", "old": "(after the C12–C16 lines)",
+                        "new": "\n".join(OS_BLOCK[3])}
         lines.extend(extra)
     for rel, lines in texts.items():
         body = "\n".join(lines) + "\n"
@@ -479,6 +535,8 @@ def build(out: Path) -> dict:
                     "old": old, "new": sums[j]})
     (out / sums_rel).write_text("\n".join(sums) + "\n", "utf-8")
 
+    if os_entry is not None:
+        log.append(os_entry)
     write_changelog(out, log)
     write_label(out, log)
     files = sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file() and p.name != SUMS)
@@ -501,7 +559,8 @@ def write_changelog(out: Path, log: list[dict]) -> None:
             "(read-only, unchanged) under owner decision D-024 (Krishika). Rationale for every correction, with the",
             "conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md`.",
             "", "- Every edit replaces text inside one line; no line moves, so line citations are the same in both packs.",
-            "- `correction` = C1–C16; `A1`, `A2` = numbered amendments; `S` = a stale reference fixed (D-025 item 3;",
+            "- `correction` = C1–C16; `A1`, `A2` = numbered amendments; `OS-1–OS-3` = OWNER-SPECIFIED items (owner",
+            "  decision D-026; not pack-derived, counted separately from C1–C16); `S` = a stale reference fixed (D-025 item 3;",
             "  `line` `name` = a file renamed); `label` = the in-file candidate label; `derived` = a hash or byte length",
             "  that follows mechanically from another edit. Old and new text are the replaced part of the line, unless",
             "  `line` is `all` (whole-file replacement).",
@@ -525,7 +584,8 @@ def write_label(out: Path, log: list[dict]) -> None:
     files = sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file())
     rows = [f"# {LABEL}", "",
             f"**Every file in this directory is part of OpenVEF Planning {LABEL}.** It is a copy of v1.3.6 with",
-            "corrections C1–C10 applied (owner decision D-024; `" + CHANGELOG + "`). It is not released, not audited",
+            "corrections C1–C16 and amendments A1–A2 applied (owner decisions D-024, D-025) and the OWNER-SPECIFIED",
+            "items OS-1–OS-3 (owner decision D-026; `" + CHANGELOG + "`). It is not released, not audited",
             "and not approved, and v1.3.6 (`baseline/`) remains the default pack.", "",
             "- **In-file label:** every file a correction changed carries the label itself (Markdown and File 25: an",
             "  appended trailer, in File 25 after its last line and outside the model-visible bodies; fixture JSON:",

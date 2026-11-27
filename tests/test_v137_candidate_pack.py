@@ -138,6 +138,30 @@ class CandidatePackTests(unittest.TestCase):
                 with self.subTest(file=rel):
                     self.assertEqual(json.loads(self.pack[rel])["expected"], json.loads(self.base[rel])["expected"])
 
+    def test_owner_specified_block(self):
+        """D-026: OS-1-OS-3 are appended after the C12-C16 lines, labelled OWNER-SPECIFIED, logged as their own last
+        CHANGELOG entry, and add no outcome code: every diagnostic, error class and stage they name is in the candidate
+        Protocol."""
+        import re
+        label, pd, fixtures, block = self.mod.OS_BLOCK
+        lines = self.pack[self.name(self.mod.P36)].decode("utf-8").split("\n")
+        start = len(self.base[self.mod.P36].decode("utf-8").split("\n")) - 1 + self.mod.C12_C16_LINES
+        self.assertEqual(lines[start:start + len(block)], block)
+        items = [l for l in block if l.startswith("- **")]
+        self.assertEqual([re.search(r"\((OS-\d)", l).group(1) for l in items], ["OS-1", "OS-2", "OS-3"])
+        self.assertIn("OWNER-SPECIFIED", block[1])
+        self.assertIn("They add no outcome code.", "\n".join(block))
+        protocol = self.pack[self.name(self.mod.P02)].decode("utf-8")
+        text = "\n".join(block)
+        inputs = set(re.findall(r"`[a-z_0-9]+` = `([A-Z][A-Z0-9_]*)`", text))  # input values, e.g. recovery_mode's
+        self.assertEqual(inputs, {"OPERATIONAL_RECOVERY"})
+        for token in set(re.findall(r"`([A-Z][A-Z0-9_]*(?:\|reason=[A-Z_]+)?)`", text)) - inputs:
+            with self.subTest(token=token):
+                self.assertIn(token, protocol)
+        changelog = self.pack["CHANGELOG-v1.3.7-candidate.md"].decode("utf-8")
+        entries = re.findall(r"^\| (E\d+) \| ([^|]+) \|", changelog, re.M)
+        self.assertEqual(entries[-1][1].strip(), label)
+
     def test_corrected_m27_reaches_check_e(self):
         m27 = json.loads(self.pack[FX + "M27.json"])
         inp = m27["input"]

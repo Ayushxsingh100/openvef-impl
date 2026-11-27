@@ -5,7 +5,8 @@
 conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md`.
 
 - Every edit replaces text inside one line; no line moves, so line citations are the same in both packs.
-- `correction` = C1–C16; `A1`, `A2` = numbered amendments; `S` = a stale reference fixed (D-025 item 3;
+- `correction` = C1–C16; `A1`, `A2` = numbered amendments; `OS-1–OS-3` = OWNER-SPECIFIED items (owner
+  decision D-026; not pack-derived, counted separately from C1–C16); `S` = a stale reference fixed (D-025 item 3;
   `line` `name` = a file renamed); `label` = the in-file candidate label; `derived` = a hash or byte length
   that follows mechanically from another edit. Old and new text are the replaced part of the line, unless
   `line` is `all` (whole-file replacement).
@@ -121,7 +122,7 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E102 | C12–C16 | PD-07 | M13, M14, M15, M17, R07 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 190–199 |
 | E103 | label | — | — | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560 |
 | E104 | label | — | — | `25_Common_System_and_Repair_Prompt_Templates.txt` | 132 |
-| E105 | label | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 200 |
+| E105 | label | — | — | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 208 |
 | E106 | label | — | — | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 110 |
 | E107 | label | — | — | `10_LLM_Era_Hardware_Verification_Literature_Review.md` | 418 |
 | E108 | label | — | — | `11_Comparative_Research_Matrix.md` | 44 |
@@ -174,6 +175,7 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E155 | derived | — | — | `27_SHA256SUMS.txt` | 86 |
 | E156 | derived | — | — | `27_SHA256SUMS.txt` | 182 |
 | E157 | derived | — | — | `27_SHA256SUMS.txt` | 202 |
+| E158 | OS-1–OS-3 (OWNER-SPECIFIED, D-026) | PD-07, PD-01, PD-03 | M41, M37, P17 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 200–207 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -1644,7 +1646,7 @@ appended trailer: ---
 **v1.3.7 CANDIDATE, not audited.** This file is OpenVEF Planning v1.3.6 with only the corrections listed for it in `CHANGELOG-v1.3.7-candidate.md` (owner decision D-024). It is not part of any released, audited or approved pack; v1.3.6 remains the default.
 ```
 
-## E105 — label · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L200 · — · fixtures: —
+## E105 — label · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L208 · — · fixtures: —
 
 Old:
 
@@ -2356,7 +2358,7 @@ Old:
 New:
 
 ```text
-9c953cd0b2757fc601ed7dfc0912727da8a77a1d6fb508365c34802a4400379b  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
+58ca941e18e8b823fa70e4ce465902c1eff6cf1e631e9b2f6f1c35656c6a26c0  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
 ```
 
 ## E151 — derived · `27_SHA256SUMS.txt` L36 · — · fixtures: —
@@ -2455,4 +2457,25 @@ New:
 
 ```text
 e80f8a9f4d1ab312e24901b0fffbe4b21aab3b979ffbbfbf10d5fa880565fca3  README.md
+```
+
+## E158 — OS-1–OS-3 (OWNER-SPECIFIED, D-026) · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L200–207 · PD-07, PD-01, PD-03 · fixtures: M41, M37, P17
+
+Old:
+
+```text
+(after the C12–C16 lines)
+```
+
+New:
+
+```text
+
+## Owner-specified vector inputs (v1.3.7 candidate, OWNER-SPECIFIED OS-1–OS-3, owner decision D-026)
+
+These items are OWNER-SPECIFIED, not derived from pack text: the Protocol fixes each expected outcome, and owner decision D-026 specifies only how the vector reaches the stage that outcome names. They add no outcome code. A property outside its stated domain, or an input for which neither these items nor the Protocol states an outcome, is an input error, not an outcome.
+
+- **Operational-recovery vector** (OS-1, §7b): `design_id` (`FIFO` or `UART`, equal to the `design_id` of `halt_signature`); `halt_signature`, the halt's signature in the Protocol §7b domains, with `halt_code` `SIMULATOR_ERROR` or `TRACE_INTEGRITY_FAILURE` (a masked RTL/null divergence may use operational recovery only after a root-cause review, which this vector does not carry); `slots` as in the lifecycle halt-event vector, so the halt occurred after slots had begun; `evaluator_repair_attempt` = `1`; `recovery_mode` = `OPERATIONAL_RECOVERY`; the Booleans `frozen_evaluator_hashes_unchanged`, `f16_required`, `same_artifact_bytes` and `author_visible_materials_changed`; `pre_halt_scored_slots` (1 to `previously_evaluated`), the number of pre-halt scores; `scheduled_slots` = `scheduled`, the scheduled slots of the affected scope; `same_artifacts_for_all_slots` = `true`, `same_slot_seeds` = `true` and `new_generation_calls` = `0`, which restate §7b; and `required_action`, a string that is an informational label, not an outcome input. Only the properties named by the §7b recovery conditions decide the outcome. When `frozen_evaluator_hashes_unchanged` is `true`, `f16_required` is `false`, `same_artifact_bytes` is `true` and `author_visible_materials_changed` is `false`, the result is the successful-operational-recovery control expectation of Protocol §3.4 at stage `DESIGN_HALT` with disposition `CONTROL_EXPECTATION` and the properties `discard_pre_halt_scores` = `true`, `rerun_slots` = `scheduled_slots`, `reuse_same_artifact_bytes` = `true` and `new_confirmatory_generation_calls` = `0`. When the frozen evaluator hashes changed (`frozen_evaluator_hashes_unchanged` is `false`, `f16_required` is `true`, `same_artifact_bytes` is `true` and `author_visible_materials_changed` is `false`), the recovery is an evaluator revision and the result is the change-class control expectation of `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED`. The Protocol states no outcome for any other combination, including an author-visible change, which §7b sends to a study or design revision that the vector does not identify; such an input is outside this vector's scope.
+- **Paired-run outcome vector** (OS-2): `response_object` (a response object, as for any response input) and `runtime_pair`, an object with exactly `driver_source_excerpt` (a string that documents the access under test; it is not executed, matched or read for the outcome) and the Booleans `before_first_raw_output_divergence` and `next_input_schedules_equal`. Protocol §3.4 evaluation steps (1)–(6) run on the response object, and their first failure is the result. If all pass, `runtime_pair` stands in for steps (7)–(8), the paired run, which is not executed: `before_first_raw_output_divergence` = `true` with `next_input_schedules_equal` = `false` is the `DRIVER_NONDETERMINISM|reason=NEXT_INPUT_DIVERGENCE` row of the stage map. Any other pair does not determine the paired run's outcome and is outside this vector's scope.
+- **Runtime driver-vector input** (OS-3): `response_object` with `port_manifest` (`input_ports`). Its expected stage, `DRIVER_VECTOR`, is checked within evaluation step (7), while `Driver.step` runs on the original RTL; the input gives no design, RTL or port widths, and no rule states how the driver's vector is obtained outside that run. This input is not specified, and a fixture with it stays NOT_IMPLEMENTED.
 ```
