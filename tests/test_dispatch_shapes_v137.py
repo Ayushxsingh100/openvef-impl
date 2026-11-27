@@ -38,7 +38,8 @@ ROWS = adapters_v137.ROWS
 SOURCES = [REPO / "runner/adapters_v137.py", REPO / "runner/adapter_contracts_v137.py"]
 # Fixtures C1-C10 do not cover (proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md section 1). M42 and M47 have an
 # adapter but stop at PD-26.
-OUT_OF_SCOPE = {"M37", "M41", "P17"}  # need owner specification (CORRECTIONS section 8)
+# D-026: M41 and M37 have OWNER-SPECIFIED rows (OS-1, OS-2); P17's shape is OS-3, left unspecified (CORRECTIONS section 10).
+OUT_OF_SCOPE = {"P17"}
 
 
 def descriptors() -> dict[str, dict]:
@@ -178,8 +179,8 @@ class CandidateDispatchTests(unittest.TestCase):
             self.assertEqual({f for f, d in self.descs.items() if not run_f18.find_adapters(d["input"])}, OUT_OF_SCOPE)
 
     def test_no_shape_branch_and_no_fixture_id(self):
-        # Allowed: the two primitive adapters check their cited `test_scope` property against the one value candidate
-        # File 36 L196/L197 fixes, and refuse any other; this selects no code path (the shape already did).
+        # Allowed (approved by Krishika, D-026 item 1): the two primitive adapters check their cited `test_scope` property
+        # against the one value candidate File 36 L196/L197 fixes, and refuse any other; this selects no code path.
         allowed = {"adapt_truncation_primitive: inp['test_scope'] == TRUNCATION_SCOPE",
                    "adapt_json_primitive: inp['test_scope'] == JSON_SCOPE"}
         found = v136.shape_branches(ast.parse(SOURCES[0].read_text("utf-8")))
@@ -188,6 +189,49 @@ class CandidateDispatchTests(unittest.TestCase):
             for node in ast.walk(ast.parse(path.read_text("utf-8"))):
                 if isinstance(node, ast.Constant) and isinstance(node.value, str):
                     self.assertNotIn(node.value, self.descs, path.name)
+
+    # --- D-026: OWNER-SPECIFIED rows are labelled, counted apart, and cite only the OWNER-SPECIFIED lines
+    def test_owner_specified_rows_and_open_shapes(self):
+        names = {fn.__name__ for *_, fn in ROWS}
+        self.assertEqual(adapters_v137.OWNER_SPECIFIED, {"adapt_operational_recovery": "OS-1",
+                                                         "adapt_paired_run_outcome": "OS-2"})
+        self.assertLessEqual(set(adapters_v137.OWNER_SPECIFIED), names)
+        self.assertEqual([o[2] for o in adapters_v137.OPEN_SHAPES], ["OS-3"])
+        info = run_f18.PACKS["v1.3.7-candidate"]
+        self.assertIs(info["owner_specified"], adapters_v137.OWNER_SPECIFIED)
+        self.assertNotIn("owner_specified", run_f18.PACKS["v1.3.6"])  # v1.3.6 records carry no category
+        for name, os_id in adapters_v137.OWNER_SPECIFIED.items():
+            cited = [c for c in CONTRACTS[name]["inputs"].values()]
+            self.assertTrue(all((t, n) == ("36", {"OS-1": 205, "OS-2": 206}[os_id]) for t, n, _ in cited), name)
+            self.assertIn(f"({os_id}", line("36", 205 if os_id == "OS-1" else 206))
+        self.assertIn("(OS-3)", line("36", 207))
+        self.assertIn("OWNER-SPECIFIED", line("36", 201))
+
+    def test_owner_specified_labels_reach_the_record_reason(self):
+        validator = run_f18.load_schema_validator(CAND)
+        with unittest.mock.patch.object(run_f18, "ADAPTER_TABLE", TABLE), \
+                unittest.mock.patch.object(run_f18, "OWNER_SPECIFIED_ROWS", adapters_v137.OWNER_SPECIFIED), \
+                unittest.mock.patch.object(run_f18, "OPEN_SHAPES", adapters_v137.OPEN_SHAPES):
+            for fid, d in self.descs.items():
+                run_f18.OWNER_SPEC = None
+                status, _, note = run_f18.execute(d, validator)
+                with self.subTest(fixture=fid):
+                    if fid in OUT_OF_SCOPE:
+                        self.assertEqual((status, run_f18.OWNER_SPEC), ("NOT_IMPLEMENTED", "OS-3"))
+                        self.assertIn("OS-3 (OWNER-SPECIFIED, D-026)", note)
+                    names = [r[2].__name__ for r in run_f18.find_adapters(d["input"])]
+                    expected = adapters_v137.OWNER_SPECIFIED.get(names[0]) if names else "OS-3"
+                    self.assertEqual(run_f18.OWNER_SPEC, expected)
+            run_f18.OWNER_SPEC = None
+
+    def test_paired_run_outcome_runs_no_artifact_code(self):
+        """OS-2 runs steps (1)-(6) only: no sandbox and no factory check is reached (D-015, D-026 option (a))."""
+        from adapter_vectors_v137 import paired
+        with unittest.mock.patch.object(run_f18, "factory_checks", side_effect=AssertionError("step (7) reached")), \
+                unittest.mock.patch.object(run_f18, "SANDBOX", None):
+            names, (status, actual, _) = run(paired())
+        self.assertEqual((names, status, actual["error_class"]),
+                         (["adapt_paired_run_outcome"], "EXECUTED", "DRIVER_NONDETERMINISM"))
 
     # --- the candidate ledger: every produced value is in the candidate line that states it
     def test_candidate_lifecycle_values_are_in_their_candidate_lines(self):

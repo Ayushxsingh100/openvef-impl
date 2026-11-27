@@ -14,11 +14,14 @@ import hashlib
 from typing import Any, Callable, Mapping
 
 from openvef import serializer
+from openvef.ast_signature import check_ast_signature, check_compile
 from openvef.envelope import Failure
+from openvef.import_policy import check_import_policy
 from openvef.ledger import (DESIGN_IDS, HaltSignature, SignatureDomainError, halt_after_recovery,
                             lifecycle_expectation_candidate)
-from openvef.source_ast import syntax_reject
-from openvef.stage_map import HALT, EventError, NotDetermined, first_event, validate_vector
+from openvef.schema import ValidatedResponse, validate_clause_ids, validate_schema
+from openvef.source_ast import UnsettledSpec, check_sources, syntax_reject
+from openvef.stage_map import HALT, TERMINAL, EventError, NotDetermined, first_event, validate_vector
 
 # D-025 item 1: the C5 predicate runs only after the runner has verified every file of the candidate pack against its
 # pinned SHA256SUMS. Set by runner/run_f18.py main(); nothing else sets it.
@@ -209,9 +212,7 @@ def adapt_lifecycle_halt_event(desc: dict, validator) -> Failure:
     event, slots = inp["event"], inp["slots"]
     _in_domain(inp["lifecycle"] == "MID_RUN", "lifecycle")
     _in_domain(isinstance(event, dict) and event.get("kind") in HALT_EVENTS, "event")
-    _in_domain(isinstance(slots, dict) and set(slots) == SLOT_KEYS and all(type(v) is int and v >= 0 for v in slots.values())
-               and slots["scheduled"] >= 1 and 1 <= slots["triggering_slot"] <= slots["scheduled"]
-               and slots["previously_evaluated"] + 1 + slots["remaining"] == slots["scheduled"], "slots")
+    _in_domain(_slots(slots), "slots")
     _in_domain(type(inp["evaluator_repair_attempt"]) is int and inp["evaluator_repair_attempt"] == 1,
                "evaluator_repair_attempt")
     try:
@@ -232,6 +233,122 @@ def adapt_design_preflight(desc: dict, validator) -> Failure:
     return Failure("DESIGN_HALT", "RTL_NULL_CONTROL_FAILURE", "RTL_NULL_CONTROL_FAILURE|reason=MASKED_OUTPUT_DIVERGENCE", HALT)
 
 
+def _slots(slots: Any) -> bool:
+    """Candidate 36 L198 (C15) slot counts; OS-1 (36 L205) uses the same domain."""
+    return (isinstance(slots, dict) and set(slots) == SLOT_KEYS and all(type(v) is int and v >= 0 for v in slots.values())
+            and slots["scheduled"] >= 1 and 1 <= slots["triggering_slot"] <= slots["scheduled"]
+            and slots["previously_evaluated"] + 1 + slots["remaining"] == slots["scheduled"])
+
+
+# --- D-026 Phase B: OWNER-SPECIFIED items (candidate 36 L203-L207; not pack-derived, labelled in every record) -------
+
+# Candidate 36 L205 (OS-1): "`recovery_mode` = `OPERATIONAL_RECOVERY`"; "with `halt_code` `SIMULATOR_ERROR` or
+# `TRACE_INTEGRITY_FAILURE`".
+RECOVERY_MODE = "OPERATIONAL_RECOVERY"
+RECOVERABLE_HALT_CODES = ("SIMULATOR_ERROR", "TRACE_INTEGRITY_FAILURE")
+L183_CONDITIONS = ("frozen_evaluator_hashes_unchanged", "f16_required", "same_artifact_bytes",
+                   "author_visible_materials_changed")
+
+
+def _unstated(why: str) -> NotDetermined:
+    return NotDetermined(f"OS-1 (candidate 36 L205): the Protocol states no outcome when {why}; outside this vector's scope")
+
+
+def adapt_operational_recovery(desc: dict, validator) -> dict:
+    """Candidate 36 L205 (OS-1, OWNER-SPECIFIED, D-026): the §7b operational-recovery vector. Only the properties the
+    L183 recovery conditions name decide the outcome; `required_action` is an informational label."""
+    inp = desc["input"]
+    slots, scored = inp["slots"], inp["pre_halt_scored_slots"]
+    _in_domain(inp["design_id"] in DESIGN_IDS, "design_id")
+    _in_domain(_slots(slots), "slots")
+    _in_domain(isinstance(inp["halt_signature"], dict), "halt_signature")
+    try:
+        signature = HaltSignature.given(inp["halt_signature"])
+    except SignatureDomainError as exc:  # candidate L185: an evaluator input error
+        raise NotDetermined(f"supplied halt signature outside the Protocol L185 domains: {exc}") from exc
+    _in_domain(signature.halt_code in RECOVERABLE_HALT_CODES, "halt_signature")
+    _in_domain(signature.design_id == inp["design_id"], "design_id")
+    _in_domain(type(inp["evaluator_repair_attempt"]) is int and inp["evaluator_repair_attempt"] == 1,
+               "evaluator_repair_attempt")
+    _in_domain(inp["recovery_mode"] == RECOVERY_MODE, "recovery_mode")
+    for name in L183_CONDITIONS:
+        _in_domain(type(inp[name]) is bool, name)
+    _in_domain(type(scored) is int and 1 <= scored <= slots["previously_evaluated"], "pre_halt_scored_slots")
+    _in_domain(type(inp["scheduled_slots"]) is int and inp["scheduled_slots"] == slots["scheduled"], "scheduled_slots")
+    _in_domain(inp["same_artifacts_for_all_slots"] is True, "same_artifacts_for_all_slots")
+    _in_domain(inp["same_slot_seeds"] is True, "same_slot_seeds")
+    _in_domain(type(inp["new_generation_calls"]) is int and inp["new_generation_calls"] == 0, "new_generation_calls")
+    _in_domain(_utf8(inp["required_action"]), "required_action")  # informational; never read further (D-026 (2))
+    hashes_unchanged, f16, same_bytes, author_changed = (inp[name] for name in L183_CONDITIONS)
+    if author_changed:  # L183: not the evaluator-revision path; which revision of L181 applies is not given
+        raise _unstated("an author-visible item changed and the vector does not identify the study or design revision")
+    if not same_bytes:
+        raise _unstated("the artifact bytes changed")
+    if hashes_unchanged and not f16:
+        return {"disposition": "CONTROL_EXPECTATION", "stage_id": "DESIGN_HALT", "error_class": "MID_RUN_REEVALUATION",
+                "diagnostic": "RERUN_ALL_SCHEDULED_SLOTS_WITH_SAME_FROZEN_ARTIFACTS", "discard_pre_halt_scores": True,
+                "rerun_slots": inp["scheduled_slots"], "reuse_same_artifact_bytes": True,
+                "new_confirmatory_generation_calls": 0}
+    if not hashes_unchanged and f16:  # L183 path (b): an evaluator revision (C1-C4 record)
+        record, missing = lifecycle_expectation_candidate(CHANGE_CLASSES[0])
+        if missing:
+            raise NotDetermined(f"candidate Protocol does not support: {sorted(missing)}")
+        return record
+    raise _unstated("F16 is required with unchanged frozen evaluator hashes" if f16 else
+                    "the frozen evaluator hashes changed without F16")
+
+
+# Candidate 36 L206 (OS-2): "`runtime_pair`, an object with exactly `driver_source_excerpt` (a string ...) and the
+# Booleans `before_first_raw_output_divergence` and `next_input_schedules_equal`".
+PAIR_FIELDS = {"driver_source_excerpt", "before_first_raw_output_divergence", "next_input_schedules_equal"}
+
+
+def _static_stages(desc: dict, obj: Any, validator) -> Failure | None:
+    """Protocol §3.4 evaluation steps (1)-(6) on a response object (A-002: no envelope), as the runner's response
+    stages, without the step (7) factory checks: nothing here runs artifact code (D-015)."""
+    checked = validate_schema(validator, obj)
+    if isinstance(checked, ValidatedResponse):
+        checked = validate_clause_ids(checked, desc["manifest_clause_ids"])
+    if isinstance(checked, Failure):
+        return checked
+    sources = {"driver.py": obj["driver"]["source"], "checker.py": obj["checker"]["source"]}
+    try:
+        trees = check_sources(list(sources.items()))
+        if isinstance(trees, Failure):
+            return trees
+        return check_import_policy(sources, trees) or check_ast_signature(trees) or check_compile(sources)
+    except UnsettledSpec as exc:
+        raise NotDetermined(f"blocked on docs/ambiguities.md {exc}") from exc
+
+
+def adapt_paired_run_outcome(desc: dict, validator) -> Failure:
+    """Candidate 36 L206 (OS-2, OWNER-SPECIFIED, D-026): steps (1)-(6) run; `runtime_pair` stands in for the paired run
+    (steps (7)-(8)), which is not executed. The excerpt documents the access under test and is never read."""
+    inp = desc["input"]
+    pair = inp["runtime_pair"]
+    _in_domain(isinstance(pair, dict) and set(pair) == PAIR_FIELDS and _utf8(pair["driver_source_excerpt"])
+               and type(pair["before_first_raw_output_divergence"]) is bool
+               and type(pair["next_input_schedules_equal"]) is bool, "runtime_pair")
+    failure = _static_stages(desc, inp["response_object"], validator)
+    if failure is not None:
+        return failure
+    if pair["before_first_raw_output_divergence"] and not pair["next_input_schedules_equal"]:  # 02 L156
+        return Failure("TERMINAL", "DRIVER_NONDETERMINISM", "DRIVER_NONDETERMINISM|reason=NEXT_INPUT_DIVERGENCE", TERMINAL)
+    raise NotDetermined("OS-2 (candidate 36 L206): this pair does not determine the paired run's outcome; outside this "
+                        "vector's scope")
+
+
+# OWNER-SPECIFIED rows (D-026): adapter -> OS item, for the record label. Counted apart from pack-derived results.
+OWNER_SPECIFIED = {"adapt_operational_recovery": "OS-1", "adapt_paired_run_outcome": "OS-2"}
+# Candidate 36 L207 (OS-3): an input shape the owners left unspecified. (required, optional, OS item, reason); the
+# runner reports it NOT_IMPLEMENTED with this reason and label. No adapter exists for it.
+OPEN_SHAPES = (
+    ({"response_object", "port_manifest"}, set(), "OS-3",
+     "candidate 36 L207: the expected stage DRIVER_VECTOR is checked within evaluation step (7), while Driver.step "
+     "runs on the original RTL; no design, RTL or port widths are given and no rule states how the vector is obtained "
+     "outside that run (D-026: left NOT_IMPLEMENTED)"),
+)
+
 # v1.3.6 rows whose adapter the candidate replaces (same input shape, outcome the candidate text now gives).
 REPLACEMENTS = {"adapt_halt_recurrence": adapt_halt_recurrence_v137}
 
@@ -247,4 +364,10 @@ ROWS = (
       "grammar_exempt_for_primitive_test", "test_scope"}, set(), adapt_json_primitive),
     ({"lifecycle", "event", "slots", "evaluator_repair_attempt"}, set(), adapt_lifecycle_halt_event),
     ({"design_preflight"}, set(), adapt_design_preflight),
+    # D-026 OWNER-SPECIFIED (OS-1, OS-2)
+    ({"design_id", "slots", "evaluator_repair_attempt", "same_artifacts_for_all_slots", "new_generation_calls",
+      "required_action", "recovery_mode", "frozen_evaluator_hashes_unchanged", "same_artifact_bytes", "same_slot_seeds",
+      "f16_required", "author_visible_materials_changed", "pre_halt_scored_slots", "scheduled_slots", "halt_signature"},
+     set(), adapt_operational_recovery),
+    ({"response_object", "runtime_pair"}, set(), adapt_paired_run_outcome),
 )

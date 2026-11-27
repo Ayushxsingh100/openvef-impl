@@ -318,3 +318,118 @@ BOUNDARIES.update({
              {"rtl_null_masked_divergence": False}, PASSED, {"rtl_null_masked_divergence": "false"}, OUTSIDE),
     ],
 })
+
+
+# --- D-026 Phase B: OWNER-SPECIFIED OS-1, OS-2 (candidate 36 L205, L206) -------------------------------------------
+UNSTATED = BLOCKED + "the Protocol states no outcome when"
+UNDETERMINED_PAIR = BLOCKED + "does not determine the paired run's outcome"
+SIM_SIG = v136.sig(code="SIMULATOR_ERROR", comp="SIMULATOR", cls="OSError")  # UART
+TI_SIG = v136.sig(code="TRACE_INTEGRITY_FAILURE", comp="RECORDER")
+EVAL_REVISION = lifecycle_expectation_candidate("FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED")[0]
+
+
+def recov(**over):
+    """A synthetic UART operational recovery: 6 slots, halt in slot 3, 2 slots scored before it."""
+    base = {"design_id": "UART", "slots": dict(_SLOTS), "evaluator_repair_attempt": 1,
+            "same_artifacts_for_all_slots": True, "new_generation_calls": 0, "required_action": "restart_simulator_worker",
+            "recovery_mode": "OPERATIONAL_RECOVERY", "frozen_evaluator_hashes_unchanged": True, "same_artifact_bytes": True,
+            "same_slot_seeds": True, "f16_required": False, "author_visible_materials_changed": False,
+            "pre_halt_scored_slots": 2, "scheduled_slots": 6, "halt_signature": dict(SIM_SIG)}
+    base.update(over)
+    return base
+
+
+def rerun(n):
+    # An independent statement of candidate 36 L205 with Protocol L175: the successful-operational-recovery record.
+    return {"disposition": "CONTROL_EXPECTATION", "stage_id": "DESIGN_HALT", "error_class": "MID_RUN_REEVALUATION",
+            "diagnostic": "RERUN_ALL_SCHEDULED_SLOTS_WITH_SAME_FROZEN_ARTIFACTS", "discard_pre_halt_scores": True,
+            "rerun_slots": n, "reuse_same_artifact_bytes": True, "new_confirmatory_generation_calls": 0}
+
+
+def paired(before=True, equal=False, excerpt="g = random.random\ng()", response=None):
+    return {"response_object": response or v136.response(),
+            "runtime_pair": {"driver_source_excerpt": excerpt, "before_first_raw_output_divergence": before,
+                             "next_input_schedules_equal": equal}}
+
+
+_PAIR = paired()["runtime_pair"]
+_EIGHT = {"scheduled": 8, "previously_evaluated": 5, "triggering_slot": 6, "remaining": 2}
+
+VECTORS.update({
+    "adapt_operational_recovery": [
+        (recov(), rerun(6)),
+        (recov(halt_signature=dict(TI_SIG)), rerun(6)),
+        (recov(slots=dict(_EIGHT), scheduled_slots=8, pre_halt_scored_slots=1), rerun(8)),
+        (recov(required_action="any label at all"), rerun(6)),                       # informational (D-026 (2))
+        (recov(frozen_evaluator_hashes_unchanged=False, f16_required=True), EVAL_REVISION),  # L183 path (b)
+        (recov(author_visible_materials_changed=True), UNSTATED),
+        (recov(frozen_evaluator_hashes_unchanged=False, f16_required=True, author_visible_materials_changed=True),
+         UNSTATED),                                                                  # L183: not the revision path
+        (recov(same_artifact_bytes=False), UNSTATED),
+        (recov(f16_required=True), UNSTATED),
+        (recov(frozen_evaluator_hashes_unchanged=False), UNSTATED),
+        (recov(halt_signature=v136.sig()), OUTSIDE),                                 # masked divergence: no review
+        (recov(halt_signature=v136.sig(comp="simulator")), SIGNATURE),
+    ],
+    "adapt_paired_run_outcome": [
+        (paired(), v136.NEXT_INPUT),
+        (paired(equal=True), UNDETERMINED_PAIR),
+        (paired(before=False), UNDETERMINED_PAIR),
+        (paired(response=v136.response(language="ruby")), v136.SCHEMA("/language")),
+        (paired(response=v136.response(driver="import socket\n" + v136.DRIVER)), v136.SOCKET),
+        ({**paired(), "runtime_pair": {**_PAIR, "rows": 3}}, OUTSIDE),
+    ],
+})
+
+OUT_OF_DOMAIN.update({
+    "adapt_operational_recovery": {
+        "design_id": recov(design_id="SPI"), "halt_signature": recov(halt_signature=[]),
+        "slots": recov(slots={**_SLOTS, "remaining": 4}), "evaluator_repair_attempt": recov(evaluator_repair_attempt=0),
+        "recovery_mode": recov(recovery_mode="EVALUATOR_REVISION"),
+        "frozen_evaluator_hashes_unchanged": recov(frozen_evaluator_hashes_unchanged=1),
+        "f16_required": recov(f16_required="false"), "same_artifact_bytes": recov(same_artifact_bytes=None),
+        "author_visible_materials_changed": recov(author_visible_materials_changed=0),
+        "pre_halt_scored_slots": recov(pre_halt_scored_slots=0), "scheduled_slots": recov(scheduled_slots=7),
+        "same_artifacts_for_all_slots": recov(same_artifacts_for_all_slots=False),
+        "same_slot_seeds": recov(same_slot_seeds=False), "new_generation_calls": recov(new_generation_calls=1),
+        "required_action": recov(required_action=None)},
+    "adapt_paired_run_outcome": {
+        "response_object": {**paired(), "response_object": []},
+        "runtime_pair": {**paired(), "runtime_pair": {**_PAIR, "driver_source_excerpt": 1}}},
+})
+JUDGED_BY_RULE |= {("adapt_paired_run_outcome", "response_object")}  # schema rejection, step (1)
+
+_R = recov()
+BOUNDARIES.update({
+    "adapt_operational_recovery": [
+        pair("equal to the `design_id` of `halt_signature`", "design_id", _R, "UART", rerun(6), "FIFO", OUTSIDE),
+        pair("the halt's signature in the Protocol §7b domains", "halt_signature", _R, dict(SIM_SIG), rerun(6),
+             {**SIM_SIG, "stable_error_class": "OS Error"}, SIGNATURE),
+        pair("`slots` as in the lifecycle halt-event vector", "slots", _R, dict(_SLOTS), rerun(6),
+             {**_SLOTS, "triggering_slot": 0}, OUTSIDE),
+        pair("`evaluator_repair_attempt` = `1`", "evaluator_repair_attempt", _R, 1, rerun(6), 2, OUTSIDE),
+        pair("`recovery_mode` = `OPERATIONAL_RECOVERY`", "recovery_mode", _R, "OPERATIONAL_RECOVERY", rerun(6),
+             "OPERATIONAL_RESTART", OUTSIDE),
+        pair("When `frozen_evaluator_hashes_unchanged` is `true`", "frozen_evaluator_hashes_unchanged", _R, True,
+             rerun(6), False, UNSTATED),
+        pair("`f16_required` is `false`", "f16_required", _R, False, rerun(6), True, UNSTATED),
+        pair("`same_artifact_bytes` is `true`", "same_artifact_bytes", _R, True, rerun(6), False, UNSTATED),
+        pair("`author_visible_materials_changed` is `false`", "author_visible_materials_changed", _R, False, rerun(6),
+             True, UNSTATED),
+        pair("`pre_halt_scored_slots` (1 to `previously_evaluated`)", "pre_halt_scored_slots", _R, 2, rerun(6), 3, OUTSIDE),
+        pair("`pre_halt_scored_slots` (1 to `previously_evaluated`)", "pre_halt_scored_slots", _R, 1, rerun(6), 0, OUTSIDE),
+        pair("`scheduled_slots` = `scheduled`", "scheduled_slots", _R, 6, rerun(6), 5, OUTSIDE),
+        pair("`same_artifacts_for_all_slots` = `true`", "same_artifacts_for_all_slots", _R, True, rerun(6), False, OUTSIDE),
+        pair("`same_slot_seeds` = `true`", "same_slot_seeds", _R, True, rerun(6), False, OUTSIDE),
+        pair("`new_generation_calls` = `0`", "new_generation_calls", _R, 0, rerun(6), 1, OUTSIDE),
+        pair("`required_action`, a string", "required_action", _R, "a퟿", rerun(6), "a\ud800", OUTSIDE),
+    ],
+    "adapt_paired_run_outcome": [
+        pair("34_OpenVEF_Response_Schema_v1.0.json", "response_object", paired(), v136.response(), v136.NEXT_INPUT,
+             v136.response(schema_version="1.00"), v136.SCHEMA("/schema_version")),
+        pair("the Booleans `before_first_raw_output_divergence` and `next_input_schedules_equal`", "runtime_pair",
+             paired(), dict(_PAIR), v136.NEXT_INPUT, {**_PAIR, "next_input_schedules_equal": "false"}, OUTSIDE),
+        pair("an object with exactly `driver_source_excerpt`", "runtime_pair", paired(), dict(_PAIR), v136.NEXT_INPUT,
+             {**_PAIR, "driver_source_excerpt": None}, OUTSIDE),
+    ],
+})

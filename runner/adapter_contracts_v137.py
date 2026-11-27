@@ -185,3 +185,90 @@ DOMAINS.update({
         "evaluator_repair_attempt": _d(_L198, "`evaluator_repair_attempt` = `1`")},
     "adapt_design_preflight": {"design_preflight": _d(_L199, "an object with exactly the Boolean `rtl_null_masked_divergence`")},
 })
+
+# --- D-026 Phase B: OWNER-SPECIFIED OS-1, OS-2 (candidate 36 L205, L206; not pack-derived) ---------------------------
+from adapters_v137 import RECOVERY_MODE  # noqa: E402
+
+_L205, _L206 = ("36", 205), ("36", 206)
+_OS1_HALTS = "with `halt_code` `SIMULATOR_ERROR` or `TRACE_INTEGRITY_FAILURE`"
+
+CONTRACTS.update({
+    "adapt_operational_recovery": {
+        "inputs": {
+            "design_id": _q(_L205, "`design_id` (`FIFO` or `UART`, equal to the `design_id` of `halt_signature`)"),
+            "halt_signature": _q(_L205, "`halt_signature`, the halt's signature in the Protocol §7b domains"),
+            "slots": _q(_L205, "`slots` as in the lifecycle halt-event vector"),
+            "evaluator_repair_attempt": _q(_L205, "`evaluator_repair_attempt` = `1`"),
+            "recovery_mode": _q(_L205, f"`recovery_mode` = `{RECOVERY_MODE}`"),
+            "frozen_evaluator_hashes_unchanged": _q(_L205, "the Booleans `frozen_evaluator_hashes_unchanged`"),
+            "f16_required": _q(_L205, "the Booleans `frozen_evaluator_hashes_unchanged`, `f16_required`"),
+            "same_artifact_bytes": _q(_L205, "`f16_required`, `same_artifact_bytes` and `author_visible_materials_changed`"),
+            "author_visible_materials_changed": _q(_L205, "and `author_visible_materials_changed`;"),
+            "pre_halt_scored_slots": _q(_L205, "`pre_halt_scored_slots` (1 to `previously_evaluated`), the number of "
+                                               "pre-halt scores"),
+            "scheduled_slots": _q(_L205, "`scheduled_slots` = `scheduled`, the scheduled slots of the affected scope"),
+            "same_artifacts_for_all_slots": _q(_L205, "`same_artifacts_for_all_slots` = `true`"),
+            "same_slot_seeds": _q(_L205, "`same_slot_seeds` = `true`"),
+            "new_generation_calls": _q(_L205, "`new_generation_calls` = `0`, which restate §7b"),
+            "required_action": _q(_L205, "`required_action`, a string that is an informational label, not an outcome input")},
+        "values": {"FIFO": _q(_L205, "`design_id` (`FIFO` or `UART`"), "UART": _q(_L205, "`design_id` (`FIFO` or `UART`"),
+                   "SIMULATOR_ERROR": _q(_L205, _OS1_HALTS), "TRACE_INTEGRITY_FAILURE": _q(_L205, _OS1_HALTS),
+                   RECOVERY_MODE: _q(_L205, f"`recovery_mode` = `{RECOVERY_MODE}`")},
+        "outcome": [_q(_L205, "Only the properties named by the §7b recovery conditions decide the outcome."),
+                    _q(_L205, "the result is the successful-operational-recovery control expectation of Protocol §3.4 at "
+                              "stage `DESIGN_HALT` with disposition `CONTROL_EXPECTATION`"),
+                    _q(_L205, "the recovery is an evaluator revision and the result is the change-class control "
+                              "expectation of `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED`"),
+                    _q(_L205, "such an input is outside this vector's scope"),
+                    ("02", 175, "`RERUN_ALL_SCHEDULED_SLOTS_WITH_SAME_FROZEN_ARTIFACTS` (error class `MID_RUN_REEVALUATION`)"),
+                    ("02", 183, "it creates no new hashes, requires no new F16 and changes no artifact"),
+                    ("02", 183, "not the evaluator-revision path"),
+                    ("02", 185, "Discard all pre-halt partial scores")]},
+    "adapt_paired_run_outcome": {
+        "inputs": {"response_object": _q(_L206, "`response_object` (a response object, as for any response input)"),
+                   "runtime_pair": _q(_L206, "`runtime_pair`, an object with exactly `driver_source_excerpt`")},
+        "values": {},
+        "outcome": [_q(_L206, "Protocol §3.4 evaluation steps (1)–(6) run on the response object, and their first "
+                              "failure is the result."),
+                    _q(_L206, "`runtime_pair` stands in for steps (7)–(8), the paired run, which is not executed"),
+                    _q(_L206, "Any other pair does not determine the paired run's outcome"),
+                    ("02", 156, "| Before first raw output divergence, paired next-input schedules differ | `TERMINAL` | "
+                                "`DRIVER_NONDETERMINISM` |")]},
+})
+
+VALUE_SUPPORT.update({
+    "adapt_operational_recovery": {"FIFO": (LITERAL, "`FIFO`"), "UART": (LITERAL, "`UART`"),
+                                   "SIMULATOR_ERROR": (LITERAL, "`SIMULATOR_ERROR`"),
+                                   "TRACE_INTEGRITY_FAILURE": (LITERAL, "`TRACE_INTEGRITY_FAILURE`"),
+                                   RECOVERY_MODE: (LITERAL, f"`{RECOVERY_MODE}`")},
+    "adapt_paired_run_outcome": {},
+})
+
+DOMAINS.update({
+    "adapt_operational_recovery": {
+        "design_id": _d(_L205, "`design_id` (`FIFO` or `UART`", "equal to the `design_id` of `halt_signature`"),
+        "halt_signature": _d(_L205, "the halt's signature in the Protocol §7b domains", _OS1_HALTS),
+        "slots": _d(_L205, "`slots` as in the lifecycle halt-event vector"),
+        "evaluator_repair_attempt": _d(_L205, "`evaluator_repair_attempt` = `1`"),
+        "recovery_mode": _d(_L205, f"`recovery_mode` = `{RECOVERY_MODE}`"),
+        # Free Booleans: the boundary is the decision term L205 states (success on one side, no stated outcome on the other).
+        "frozen_evaluator_hashes_unchanged": _d(_L205, "the Booleans `frozen_evaluator_hashes_unchanged`",
+                                                "When `frozen_evaluator_hashes_unchanged` is `true`"),
+        "f16_required": _d(_L205, "the Booleans `frozen_evaluator_hashes_unchanged`, `f16_required`",
+                           "`f16_required` is `false`"),
+        "same_artifact_bytes": _d(_L205, "`same_artifact_bytes` and `author_visible_materials_changed`",
+                                  "`same_artifact_bytes` is `true`"),
+        "author_visible_materials_changed": _d(_L205, "`author_visible_materials_changed`",
+                                               "`author_visible_materials_changed` is `false`"),
+        "pre_halt_scored_slots": _d(_L205, "`pre_halt_scored_slots` (1 to `previously_evaluated`)"),
+        "scheduled_slots": _d(_L205, "`scheduled_slots` = `scheduled`"),
+        "same_artifacts_for_all_slots": _d(_L205, "`same_artifacts_for_all_slots` = `true`"),
+        "same_slot_seeds": _d(_L205, "`same_slot_seeds` = `true`"),
+        "new_generation_calls": _d(_L205, "`new_generation_calls` = `0`"),
+        "required_action": _d(_L205, "`required_action`, a string")},
+    "adapt_paired_run_outcome": {
+        "response_object": {"lines": [_L206, ("30", 7)],
+                            "terms": ["a response object, as for any response input", "34_OpenVEF_Response_Schema_v1.0.json"]},
+        "runtime_pair": _d(_L206, "an object with exactly `driver_source_excerpt`",
+                           "the Booleans `before_first_raw_output_divergence` and `next_input_schedules_equal`")},
+})

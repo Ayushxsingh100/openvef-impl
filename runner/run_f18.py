@@ -399,9 +399,16 @@ PACKS = {
                          "adapters": tuple((req, opt, adapters_v137.REPLACEMENTS.get(fn.__name__, fn))
                                            for req, opt, fn in ADAPTERS) + adapters_v137.ROWS,
                          "label": "v1.3.7 CANDIDATE, not audited", "manifest": "SHA256SUMS-v1.3.7-candidate.txt",
-                         "manifest_sha256": "45841232ab05214b96740c66aa71c5e63a2047e31c4e434702b3f4042152c12a"},
+                         "manifest_sha256": "802e8be71374ccc994e8e3dcf60f7557f953705c695df84c24699fa07f3d16c7",
+                         # D-026: OWNER-SPECIFIED rows and the input shapes the owners left unspecified
+                         "owner_specified": adapters_v137.OWNER_SPECIFIED, "open_shapes": adapters_v137.OPEN_SHAPES},
 }
 ADAPTER_TABLE = ADAPTERS  # set by main() from --pack
+OWNER_SPECIFIED_ROWS: dict = {}  # D-026: adapter name -> OS item; set by main() from --pack (empty for v1.3.6)
+OPEN_SHAPES: tuple = ()  # D-026: (required, optional, OS item, reason) the owners left unspecified
+OWNER_SPEC: str | None = None  # the OS item of the current fixture, set by dispatch(); None = pack-derived
+OWNER_SPECIFIED = "OWNER-SPECIFIED"
+PACK_DERIVED = "PACK-DERIVED"
 
 
 def find_adapters(inp: dict, table=None) -> list:
@@ -415,10 +422,22 @@ def dispatch(desc: dict, validator) -> Failure | dict | None:
 
     The code path is chosen from the input's key set only (CLAUDE.md rule 4).
     """
+    global OWNER_SPEC
     rows = find_adapters(desc["input"])
     if not rows:
-        raise Blocked(f"no adapter for this input shape: {sorted(desc['input'])}")
+        raise Blocked(no_adapter_reason(desc["input"]))
+    OWNER_SPEC = OWNER_SPECIFIED_ROWS.get(rows[0][2].__name__)
     return rows[0][2](desc, validator)
+
+
+def no_adapter_reason(inp: dict) -> str:
+    """Why an input has no adapter. D-026: an OWNER-SPECIFIED shape left unspecified (OS-3) says so, and is labelled."""
+    global OWNER_SPEC
+    open_rows = find_adapters(inp, OPEN_SHAPES)
+    if open_rows:
+        OWNER_SPEC = open_rows[0][2]
+        return f"{OWNER_SPEC} ({OWNER_SPECIFIED}, D-026): {open_rows[0][3]}"
+    return f"no adapter for this input shape: {sorted(inp)}"
 
 
 def execute(desc: dict, validator) -> tuple[str, dict | None, str]:
@@ -505,10 +524,11 @@ def parse_args(argv: list[str]) -> tuple[Path, Path, str, str]:
 
 
 def main() -> int:
-    global ADAPTER_TABLE, ACTIVE_INDEX_SHA256
+    global ADAPTER_TABLE, ACTIVE_INDEX_SHA256, OWNER_SPECIFIED_ROWS, OPEN_SHAPES, OWNER_SPEC
     root, evidence_root, run_class, pack = parse_args(sys.argv)
     pack_info = PACKS[pack]
     ADAPTER_TABLE, ACTIVE_INDEX_SHA256 = pack_info["adapters"], pack_info["index_sha256"]
+    OWNER_SPECIFIED_ROWS, OPEN_SHAPES = pack_info.get("owner_specified", {}), pack_info.get("open_shapes", ())
     if broker_mode():  # D-002a: the broker created and mounted the (empty) run directory
         started = os.environ["OPENVEF_RUN_STARTED"]
         out_dir = evidence_root
@@ -569,6 +589,8 @@ def main() -> int:
     deviation_ids: list = []
     self_reported: list = []
     counts = {"PASS": 0, "FAIL": 0, "NOT_IMPLEMENTED": 0, "ERROR": 0}
+    by_category = {PACK_DERIVED: dict.fromkeys(counts, 0), OWNER_SPECIFIED: dict.fromkeys(counts, 0)}  # D-026
+    owner_specified_ids: dict = {}
     with open(out_dir / "results.jsonl", "w", encoding="utf-8") as res, open(out_dir / "run.log", "w", encoding="utf-8") as log:
         log.write(json.dumps(meta, indent=2) + "\n")
         fixtures = load_index(root)  # IntegrityError aborts the whole run
@@ -577,6 +599,7 @@ def main() -> int:
             desc = load_descriptor(root, entry)
             expected = desc["expected"]
             RUNTIME_BASIS = None
+            OWNER_SPEC = None
             try:
                 status, actual, note = execute(desc, validator)
             except Exception as exc:  # recorded, never hidden
@@ -592,6 +615,14 @@ def main() -> int:
                    "expected": expected, "actual": actual, "note": note, **extra}
             if pack_info["label"]:
                 rec["pack_label"] = pack_info["label"]
+                # D-026: every record says whether its path is pack-derived or OWNER-SPECIFIED (OS-n)
+                rec["category"] = OWNER_SPECIFIED if OWNER_SPEC else PACK_DERIVED
+                by_category[rec["category"]][status] += 1
+                if OWNER_SPEC:
+                    rec["owner_specified"] = OWNER_SPEC
+                    owner_specified_ids[entry["fixture_id"]] = OWNER_SPEC
+                    note = f"[{OWNER_SPECIFIED} {OWNER_SPEC} (D-026)] {note}".strip()
+                    rec["note"] = note
             self_reported.extend(f"{entry['fixture_id']}:{name}" for name in sr)
             sim_details = PROVISIONAL.pop(id(desc), None)
             if sim_details is not None and SIM["provisional"]:  # reached L166 (7)-(11); items still open
@@ -617,6 +648,9 @@ def main() -> int:
                "self_reported_label": SELF_REPORTED_LABEL if self_reported else None,
                "deviation_labels": sorted({c["label"] for c in SIM["cleared"]}) if SIM else [],
                "results_sha256": sha256_file(out_dir / "results.jsonl")}
+    if pack_info["label"]:  # D-026: OWNER-SPECIFIED results are counted apart from pack-derived ones
+        summary["counts_by_category"] = by_category
+        summary["owner_specified_fixtures"] = owner_specified_ids
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"out_dir": str(out_dir), "run": f"run-{started}", "pack": pack,
                       "counts": counts}), file=sys.stderr)
