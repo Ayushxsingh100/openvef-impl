@@ -449,6 +449,38 @@ CYCLE2_VERSION_LINES: dict[str, int] = {}
 # Whole-descriptor replacements in cycle 2: rel -> (item, finding, fixtures, transform of the cycle-1 descriptor).
 CYCLE2_WHOLE: dict[str, tuple[str, str, str, Callable[[dict], dict]]] = {}
 
+# OD-2 (D1-3, D1-4): the owners adopt Python 3.11 as the predicate representation (C5 is re-based on it, A1 stands on
+# it, the original C6 stays superseded). Hash gate: the frozen source's SHA-256, checked before the evaluator runs it.
+CYCLE2 += [
+    ("OD-2", "D1-3", "M27", P30, 83,
+     "The predicate is frozen as one Python 3.11 function of two dictionaries, `(vector, sampled)`: the driver vector, and "
+     "the outputs sampled in the same row, each mapping a port name to its bit string.",
+     "**OWNER-DECIDED OD-2** (owner decision D-027; v1.3.6 does not state how the predicate is represented): the owners "
+     "adopt Python 3.11 as its representation. The predicate is frozen as one Python 3.11 function of two dictionaries, "
+     "`(vector, sampled)`: the driver vector, and the outputs sampled in the same row, each mapping a port name to its "
+     "bit string. The function is pure: its result depends only on its two arguments, and it has no other effect."),
+    ("OD-2", "D1-3", "M27", P30, 83,
+     "Any other outcome, including an exception, is an evaluator failure and is never an artifact verdict.",
+     "Any other outcome, including an exception, is an evaluator failure and is never an artifact verdict. The predicate "
+     "is evaluator material, not artifact code: the evaluator executes it, outside every artifact process. It is "
+     "hash-gated: the SHA-256 of its UTF-8 source is recorded when it is frozen, and the evaluator executes it only after "
+     "checking that the source has that hash; a mismatch is an evaluator failure."),
+    ("OD-2", "D1-3", "M27", P30, 83,
+     "`function`, the function's name, and `source`, its Python source)",
+     "`function`, the function's name, `source`, its Python source, and `source_sha256`, the lowercase hexadecimal "
+     "SHA-256 of `source` in UTF-8, which is the frozen hash of OD-2)"),
+]
+
+
+def _od2_m27(d: dict) -> dict:
+    """OD-2: M27's predicate carries its frozen hash; the source, the rest of the input and the expected object are A1's."""
+    pred = d["input"]["legal_input_predicate"]
+    pred["source_sha256"] = hashlib.sha256(pred["source"].encode("utf-8")).hexdigest()
+    return d
+
+
+CYCLE2_WHOLE[FX + "M27.json"] = ("OD-2", "D1-3, D1-4", "M27", _od2_m27)
+
 
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()

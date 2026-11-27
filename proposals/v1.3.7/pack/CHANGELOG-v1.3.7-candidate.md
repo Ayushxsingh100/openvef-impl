@@ -186,6 +186,10 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E160 | A2 (copy of OD-1) | D1-5 | M15 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 117 |
 | E161 | OD-1 | D1-5 | M42, M47 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
 | E162 | A2 (copy of OD-1) | D1-5 | M42, M47 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
+| E163 | OD-2 | D1-3 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
+| E164 | OD-2 | D1-3 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
+| E165 | OD-2 | D1-3 | M27 | `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` | 83 |
+| E166 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -1962,7 +1966,7 @@ Old:
 New:
 
 ```text
-"sha256": "63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813",
+"sha256": "b037404ddb874bd9a72e85f6ffe09a52d2b37d3f47f3e8e49a519884d0495508",
 ```
 
 ## E122 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L381 · — · fixtures: M27
@@ -1976,7 +1980,7 @@ Old:
 New:
 
 ```text
-"bytes": 880,
+"bytes": 971,
 ```
 
 ## E123 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L562 · — · fixtures: M41
@@ -2312,7 +2316,7 @@ b0b43989beb81be986caed48562c6832ca981449f82fd14f6ae8bdceed5b2ba6  30_Response_Pa
 New:
 
 ```text
-2c8b986528d55f1f1dedceb53d0b55f4f9eb071f04fb489cf68874d9eda9ef28  30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md
+afede00dc5c88ff3f3ef90bccbea3e646a3a6216662e10561fb1040379256d4c  30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md
 ```
 
 ## E147 — derived · `27_SHA256SUMS.txt` L29 · — · fixtures: —
@@ -2396,7 +2400,7 @@ fb7cd4179e9f103a1dc6f158839cd242b054f5d1e8fcf7e3c2a046c8c145e529  41_F18_Fixture
 New:
 
 ```text
-63301375a75752d1e76e93c5fb3a934e8f9359a41441f853c270fe60bbf38813  41_F18_Fixture_Inputs/M27.json
+b037404ddb874bd9a72e85f6ffe09a52d2b37d3f47f3e8e49a519884d0495508  41_F18_Fixture_Inputs/M27.json
 ```
 
 ## E153 — derived · `27_SHA256SUMS.txt` L80 · — · fixtures: —
@@ -2452,7 +2456,7 @@ f37808c7a662b8fdf164e27feaef023aadd6dfefaada35d11c3719185d1bde54  41_F18_Fixture
 New:
 
 ```text
-3ffd4883fed3c33f00915b898a29d2f28db9d0a3b73a5bfd380a668ed7795278  41_F18_Fixture_Inputs/fixture-index.json
+6bb83f79b7bc0f37ef7c6d6fae42190ede249ce3d28e7e437c4487c19ce50944  41_F18_Fixture_Inputs/fixture-index.json
 ```
 
 ## E157 — derived · `27_SHA256SUMS.txt` L202 · — · fixtures: —
@@ -2544,4 +2548,121 @@ New:
 
 ```text
 Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED` (OWNER-DECIDED OD-1, §3.4 local-ledger error classes).
+```
+
+## E163 — OD-2 · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L83 · D1-3 · fixtures: M27
+
+Old:
+
+```text
+The predicate is frozen as one Python 3.11 function of two dictionaries, `(vector, sampled)`: the driver vector, and the outputs sampled in the same row, each mapping a port name to its bit string.
+```
+
+New:
+
+```text
+**OWNER-DECIDED OD-2** (owner decision D-027; v1.3.6 does not state how the predicate is represented): the owners adopt Python 3.11 as its representation. The predicate is frozen as one Python 3.11 function of two dictionaries, `(vector, sampled)`: the driver vector, and the outputs sampled in the same row, each mapping a port name to its bit string. The function is pure: its result depends only on its two arguments, and it has no other effect.
+```
+
+## E164 — OD-2 · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L83 · D1-3 · fixtures: M27
+
+Old:
+
+```text
+Any other outcome, including an exception, is an evaluator failure and is never an artifact verdict.
+```
+
+New:
+
+```text
+Any other outcome, including an exception, is an evaluator failure and is never an artifact verdict. The predicate is evaluator material, not artifact code: the evaluator executes it, outside every artifact process. It is hash-gated: the SHA-256 of its UTF-8 source is recorded when it is frozen, and the evaluator executes it only after checking that the source has that hash; a mismatch is an evaluator failure.
+```
+
+## E165 — OD-2 · `30_Response_Parser_and_Execution_Contract_v1.3.7-candidate.md` (was `30_Response_Parser_and_Execution_Contract_v1.3.6.md` L83 · D1-3 · fixtures: M27
+
+Old:
+
+```text
+`function`, the function's name, and `source`, its Python source)
+```
+
+New:
+
+```text
+`function`, the function's name, `source`, its Python source, and `source_sha256`, the lowercase hexadecimal SHA-256 of `source` in UTF-8, which is the frozen hash of OD-2)
+```
+
+## E166 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
+
+Old:
+
+```text
+{
+  "fixture_id": "M27",
+  "fixture_version": "1.3.7-candidate, not audited",
+  "scope": "missing-case",
+  "description": "Driver vector passes the key, type, width and symbol checks and violates the supplied legal-input predicate",
+  "manifest_clause_ids": [
+    "FIFO-001"
+  ],
+  "input": {
+    "driver_return": {
+      "wr_en": "1"
+    },
+    "input_port_widths": {
+      "wr_en": 1
+    },
+    "sampled_outputs": {
+      "full": "1"
+    },
+    "legal_input_predicate": {
+      "language": "python3.11",
+      "function": "legal_input",
+      "source": "def legal_input(vector, sampled):\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\")\n"
+    }
+  },
+  "expected": {
+    "disposition": "REPAIR",
+    "stage_id": "DRIVER_VECTOR",
+    "error_class": "DRIVER_VECTOR_INVALID",
+    "diagnostic": "DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE"
+  }
+}
+```
+
+New:
+
+```text
+{
+  "fixture_id": "M27",
+  "fixture_version": "1.3.7-candidate, not audited",
+  "scope": "missing-case",
+  "description": "Driver vector passes the key, type, width and symbol checks and violates the supplied legal-input predicate",
+  "manifest_clause_ids": [
+    "FIFO-001"
+  ],
+  "input": {
+    "driver_return": {
+      "wr_en": "1"
+    },
+    "input_port_widths": {
+      "wr_en": 1
+    },
+    "sampled_outputs": {
+      "full": "1"
+    },
+    "legal_input_predicate": {
+      "language": "python3.11",
+      "function": "legal_input",
+      "source": "def legal_input(vector, sampled):\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\")\n",
+      "source_sha256": "bc3d897f8b118b6a366453a24923f1a75683472f05372907df23286653fe6154"
+    }
+  },
+  "expected": {
+    "disposition": "REPAIR",
+    "stage_id": "DRIVER_VECTOR",
+    "error_class": "DRIVER_VECTOR_INVALID",
+    "diagnostic": "DRIVER_VECTOR_INVALID|reason=ILLEGAL_PROTOCOL_STATE"
+  }
+}
 ```

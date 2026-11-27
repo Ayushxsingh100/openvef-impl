@@ -19,7 +19,8 @@
     "legal_input_predicate": {
       "language": "python3.11",
       "function": "legal_input",
-      "source": "def legal_input(vector, sampled):\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\")\n"
+      "source": "def legal_input(vector, sampled):\n    return not (sampled[\"full\"] == \"1\" and vector[\"wr_en\"] == \"1\")\n",
+      "source_sha256": "bc3d897f8b118b6a366453a24923f1a75683472f05372907df23286653fe6154"
     }
   },
   "expected": {

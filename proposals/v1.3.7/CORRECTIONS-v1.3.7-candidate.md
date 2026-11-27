@@ -197,6 +197,10 @@ follow from §7b sentences but whose names come from the descriptors.
 
 ### C5 — Legal-input predicate form, check order, check-(e) fixture inputs (PD-06, PD-25)
 
+**Re-based on OD-2 (D-027; section 11).** Document audit #1 (D1-3, MAJOR) ruled that the Python representation is a
+new contract, not a reading of v1.3.6. The representation, the purity condition, the hash gate and the
+evaluator-failure rule are now the owner rule OD-2. The check order (a)–(e) and the missing-before-extra order stay C5.
+
 **Conflicting v1.3.6 text.**
 
 > [30 L83] "(e) the full vector satisfies the design-specific legal-input predicate from the author-visible reset/legal-input specification."
@@ -233,6 +237,10 @@ the freeze) and A-027 (Claude-decided, approved under D-009), which `src/openvef
 implements. The property names were first used in the draft's own M27, written by the implementation author.
 
 ### C6 — M27 descriptor (PD-06, PD-25)
+
+**Superseded (D-027; section 11).** This original C6, the FIFO-042 predicate of the 24 Nov draft, is superseded by A1
+(section 5). Document audit #1 (D1-4) asked for that to be kept. A1 stands on OD-2. The text below is kept as written for
+the record.
 
 **Amended by A1 (section 5, D-025):** the FIFO-042 predicate below is replaced by the v1.3.6 descriptor's own rule.
 
@@ -358,6 +366,9 @@ supplies, so they stay NOT_IMPLEMENTED.** M41 also needs an input contract (PD-0
 ## 5. Amendments (numbered; each in its own commit)
 
 ### A1 — C6: a design-neutral predicate (D-025 item 2)
+
+**Stands on OD-2 (D-027; section 11).** A1's executable predicate uses the representation that OD-2 adopts. Under OD-2,
+M27's predicate also carries its frozen hash `source_sha256`, and its expected object is unchanged.
 
 **What changes.** M27's input becomes `driver_return` = `{"wr_en": "1"}`, `input_port_widths` = `{"wr_en": 1}`,
 `sampled_outputs` = `{"full": "1"}`, and the predicate `not (sampled["full"] == "1" and vector["wr_en"] == "1")`. The
@@ -834,4 +845,36 @@ expected objects are unchanged. C1's three revision codes keep their own rule (C
 
 **Fit with the current code.** The values are the ones the C11 code already produces. Only the citation and the record
 label change (Phase B).
+
+### OD-2 — The legal-input predicate is a Python 3.11 function (D1-3, D1-4; re-bases C5, A1 stands on it)
+
+**Findings D1-3 (MAJOR) and D1-4 (MAJOR).** v1.3.6 requires a predicate but no representation:
+
+> [30 L83] "(e) the full vector satisfies the design-specific legal-input predicate from the author-visible reset/legal-input specification."
+
+C5 made the predicate a Python function and presented that as the reading of this line. The audit ruled that it is an
+added contract: v1.3.6 does not prescribe the language, the source in the fixture, the two-argument interface or the
+exception rule. D1-4 asked that A1 be kept rather than the original C6.
+
+**Owner rule (D-027).** "Owners adopt Python 3.11 as the legal-input predicate representation: one pure function
+(vector, sampled) -> bool, frozen and hash-gated, executed by the evaluator; exceptions are evaluator failures."
+
+**Pack text (candidate File 30 L83).** The C5 sentence is labelled `OWNER-DECIDED OD-2` and gains the purity condition
+(the result depends only on the two arguments; no other effect). A new sentence states that the predicate is evaluator
+material, executed by the evaluator outside every artifact process, and that it is hash-gated: its SHA-256 is recorded
+when frozen, and it runs only after its source is checked against that hash, with a mismatch an evaluator failure. The
+check-(e) fixture input gains `source_sha256`. C5's other content (the Boolean result, exceptions as evaluator
+failures, check order) is unchanged.
+
+**Descriptor (M27, whole file, logged as OD-2).** A1's descriptor plus `source_sha256` =
+`sha256(source)` (UTF-8, lowercase hex). The source, the other inputs and the expected object are A1's, unchanged.
+
+**Not decided here.** Purity is a condition on the frozen predicate. The evaluator cannot prove it of arbitrary source:
+it checks the hash, the Boolean result and the absence of an exception. The owners freeze a pure predicate, and the
+evaluator does not certify purity. This is a stated limit, not a guess.
+
+**Fixtures that depend on OD-2:** M27.
+
+**Fit with the current code.** The runner already executes the predicate in the evaluator, and only after the candidate
+pack's SHA256SUMS verify (D-025). Phase B adds the per-predicate hash check and the OD-2 label.
 

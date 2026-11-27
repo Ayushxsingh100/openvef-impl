@@ -195,6 +195,8 @@ class CandidatePackTests(unittest.TestCase):
         self.assertIsNone(check({"wr_en": "0"}))  # legal at full
         self.assertIsNone(validate_vector(inp["driver_return"], widths, widths, lambda x: legal(x, {"full": "0"})))
         self.assertNotIn("FIFO", inp["legal_input_predicate"]["source"])  # A1: no design specification needed
+        pred = inp["legal_input_predicate"]  # OD-2 (D-027): the frozen predicate carries its hash
+        self.assertEqual(pred["source_sha256"], hashlib.sha256(pred["source"].encode("utf-8")).hexdigest())
 
 
 if __name__ == "__main__":
