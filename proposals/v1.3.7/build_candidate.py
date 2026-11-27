@@ -680,6 +680,16 @@ CYCLE2 += [
      "`evaluator_repair_attempt` = `1` (OWNER-DECIDED OD-4, Protocol L185); `recovery_mode`"),
 ]
 
+# A3 (D1-7; amends C10): an invalid supplied signature is outside the executable fixture contract; no new outcome.
+CYCLE2 += [
+    ("A3", "D1-7", "M41, M42, M47", P02, 185,
+     "A supplied halt signature with any component outside these domains is an evaluator input error; it is never "
+     "compared for recurrence.",
+     "A supplied halt signature with any component outside these domains is an evaluator input error; it is never "
+     "compared for recurrence. Such an input is outside the executable fixture contract: it is not an outcome, has no "
+     "diagnostic, stage, error class or disposition, and produces no ledger record."),
+]
+
 
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()

@@ -205,12 +205,14 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E179 | A2 (copy of OD-4) | D1-6 | M13, M41 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
 | E180 | OD-4 | D1-6 | M13 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 198 |
 | E181 | OD-4 | D1-6 | M41 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 205 |
-| E182 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
-| E183 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
-| E184 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
-| E185 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
-| E186 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
-| E187 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
+| E182 | A3 | D1-7 | M41, M42, M47 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
+| E183 | A2 (copy of A3) | D1-7 | M41, M42, M47 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
+| E184 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
+| E185 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
+| E186 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E187 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
+| E188 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
+| E189 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -2253,7 +2255,7 @@ Old:
 New:
 
 ```text
-80549fa22336acb57475eebe90eea93d0cf06a9c3c206c429253f9390eb84a04  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
+c01d368ebc1e70cd2f1c32cc29d3ee07ad560fca86e427ba37030b96c0146315  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
 ```
 
 ## E141 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
@@ -2323,7 +2325,7 @@ Old:
 New:
 
 ```text
-80dacc8736adc3d0911351f4c0ae41e9a804e7b99101b8ae24be5e416397d0de  25_Common_System_and_Repair_Prompt_Templates.txt
+03fb29ec36b5cb85baee9c0aa9c0a36294d59290c80a72cddb973db428244889  25_Common_System_and_Repair_Prompt_Templates.txt
 ```
 
 ## E146 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
@@ -2837,7 +2839,35 @@ New:
 `evaluator_repair_attempt` = `1` (OWNER-DECIDED OD-4, Protocol L185); `recovery_mode`
 ```
 
-## E182 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
+## E182 — A3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · D1-7 · fixtures: M41, M42, M47
+
+Old:
+
+```text
+A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence.
+```
+
+New:
+
+```text
+A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence. Such an input is outside the executable fixture contract: it is not an outcome, has no diagnostic, stage, error class or disposition, and produces no ledger record.
+```
+
+## E183 — A2 (copy of A3) · `25_Common_System_and_Repair_Prompt_Templates.txt` L128 · D1-7 · fixtures: M41, M42, M47
+
+Old:
+
+```text
+A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence.
+```
+
+New:
+
+```text
+A supplied halt signature with any component outside these domains is an evaluator input error; it is never compared for recurrence. Such an input is outside the executable fixture contract: it is not an outcome, has no diagnostic, stage, error class or disposition, and produces no ledger record.
+```
+
+## E184 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
 
 Old:
 
@@ -2851,7 +2881,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E183 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
+## E185 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
 
 Old:
 
@@ -2932,7 +2962,7 @@ New:
 The lifecycle halt-event vector (File 36 L198) and the design-preflight vector (File 36 L199) give stage-map records with the four comparison keys. They are not control-vector results.
 ```
 
-## E184 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
+## E186 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
 
 Old:
 
@@ -3007,7 +3037,7 @@ New:
 }
 ```
 
-## E185 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
+## E187 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
 
 Old:
 
@@ -3021,7 +3051,7 @@ New:
 "sha256": "c6dfe1caff678f305fa8a855f49c04c209c7a494df91917415c083b482405890",
 ```
 
-## E186 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
+## E188 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
 
 Old:
 
@@ -3035,7 +3065,7 @@ New:
 "bytes": 1378,
 ```
 
-## E187 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
+## E189 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
 
 Old:
 

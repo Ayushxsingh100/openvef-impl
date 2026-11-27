@@ -338,6 +338,10 @@ already; the contract matches the only existing vector, M36. A second vector of 
 
 ### C10 — Halt signatures outside the L185 domains (PD-01)
 
+**Amended by A3 (D-027; section 11).** Document audit #1 (D1-7, MAJOR) found the handling of an invalid
+supplied signature incomplete. A3 places it outside the executable fixture contract. The text below is kept as
+written.
+
 > [02 L185] "`evaluator_component` is `SIMULATOR`, `REPLAY_VERIFIER`, `RECORDER`, `TRACE_ALIGNMENT_CHECKER`, `TRACE_SERIALIZER` or `RTL_NULL_COMPARATOR`"
 
 > [41/M42.json L16] "\"evaluator_component\": \"simulator\","
@@ -982,4 +986,27 @@ OD-4 it is `1`, the case L185 terminates. OD-4 does not change the M42 and M47 c
 
 **Fit with the current code.** Both adapters already accept exactly `1`. Phase B changes only the citation and the
 label.
+
+### A3 — Invalid supplied halt signatures are outside the executable fixture contract (D1-7; amends C10)
+
+**Finding D1-7 (MAJOR).** C10 made an out-of-domain supplied signature "an evaluator input error" but gave it no
+diagnostic, stage, disposition or handling. The audit asked to "specify the invalid-signature outcome, or explicitly
+leave such cases outside the executable fixture contract". v1.3.6 states the domains, but nothing about inputs outside
+them:
+
+> [02 L185] "Its components have these exact domains: `design_id` is `FIFO` or `UART`;"
+
+**Owner decision (D-027).** "State that invalid supplied signatures are outside the executable fixture contract
+(evaluator input error, no ledger record); no new outcome." This is the second option the audit offered. It is not an
+OD rule, because it adds no normative behaviour: it states where the contract ends.
+
+**Pack text (candidate Protocol L185; A2 copies it into File 25).** After C10's sentence: "Such an input is outside the
+executable fixture contract: it is not an outcome, has no diagnostic, stage, error class or disposition, and produces no
+ledger record."
+
+**Fixtures affected:** none executed. No candidate descriptor carries an out-of-domain signature since C10 corrected
+M42 and M47. The rule bounds the M41, M42 and M47 input contracts and their boundary vectors.
+
+**Fit with the current code.** The adapters already refuse such an input without a record; the runner reports
+NOT_IMPLEMENTED with the reason. Phase B cites A3.
 
