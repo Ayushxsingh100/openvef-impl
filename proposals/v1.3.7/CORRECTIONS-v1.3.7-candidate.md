@@ -562,6 +562,10 @@ four-key objects only).
 
 ### C15 — The lifecycle halt-event vector (PD-07)
 
+**Defined by OD-4 (D-027; section 11).** Document audit #1 (D1-6, MAJOR) found that the meaning of
+`evaluator_repair_attempt` rested partly on the descriptor's field name. OD-4 now defines it in §7b (L185). The
+input contract below is unchanged.
+
 > [41/M13.json L10] "\"lifecycle\": \"MID_RUN\","
 
 > [41/M13.json L22] "\"evaluator_repair_attempt\": 1"
@@ -941,4 +945,41 @@ M14, M15, M17, M36 and M41 do not depend on OD-3 through them.
 
 **Fit with the current code.** The ledger already produces these values. Phase B splits the M54 input into its own
 domain-validation adapter, cites §20, and labels the records OWNER-DECIDED.
+
+### OD-4 — `evaluator_repair_attempt` defined in §7b (D1-6; underlies C15 and OS-1)
+
+**Finding D1-6 (MAJOR).** v1.3.6 allows one recovery cycle and defines the repeated-halt terminations, but never
+defines an attempt field:
+
+> [02 L183] "One recovery cycle per affected design is allowed."
+
+> [02 L185] "No second recovery cycle is permitted."
+
+> [41/M13.json L22] "\"evaluator_repair_attempt\": 1"
+
+C15 called the value "the ordinal of the recovery cycle this halt opens". The audit found that the descriptor's field
+name did part of the normative work.
+
+**Owner rule (D-027).** "Define evaluator_repair_attempt in §7b (ordinal of the recovery cycle the halt opens; relation
+to the one-cycle limit and repeated-halt condition)."
+
+**Pack text (candidate Protocol L185, labelled `OWNER-DECIDED OD-4`; A2 copies it into File 25).** §7b is normative in
+§3.4 "Mid-run design halt" (L251 says so), so the definition goes into L185, after "No second recovery cycle is
+permitted." It covers the three relations D-027 asks for:
+- **The ordinal:** the attempt of a halt is the ordinal of the recovery cycle that halt opens.
+- **The one-cycle limit:** a first halt (no cycle used) opens the only permitted cycle and has ordinal `1`, and no
+  ordinal above `1` is valid.
+- **The repeated-halt condition:** a halt after that cycle is not a second attempt but the `DESIGN_HALT_REPEATED`
+  termination.
+
+The sentence also states that the ordinal is not a signature component, consistent with L185's "attempt numbers ... are
+not signature components". File 36 L198 (C15) and L205 (OS-1) cite OD-4.
+
+**Relation to `recovery_cycles_used` (M42, M47).** That input counts the cycles used before the second halt. Under
+OD-4 it is `1`, the case L185 terminates. OD-4 does not change the M42 and M47 contracts, so they do not depend on it.
+
+**Fixtures that depend on OD-4:** M13 (C15) and M41 (OS-1; M41 also stays labelled OWNER-SPECIFIED, see A-059).
+
+**Fit with the current code.** Both adapters already accept exactly `1`. Phase B changes only the citation and the
+label.
 

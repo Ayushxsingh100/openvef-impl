@@ -201,12 +201,16 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E175 | A2 (copy of OD-3) | D1-2 | M48, M50, M53, M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 119 |
 | E176 | OD-3 | D1-2 | M48, M50, M53, M54, M58 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 176 |
 | E177 | OD-3 | D1-1 | M54 | `41_F18_Fixture_Inputs/M54.json` | 11 |
-| E178 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
-| E179 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
-| E180 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
-| E181 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
-| E182 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
-| E183 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
+| E178 | OD-4 | D1-6 | M13, M41 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
+| E179 | A2 (copy of OD-4) | D1-6 | M13, M41 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
+| E180 | OD-4 | D1-6 | M13 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 198 |
+| E181 | OD-4 | D1-6 | M41 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 205 |
+| E182 | label | — | M54 | `41_F18_Fixture_Inputs/M54.json` | 3 |
+| E183 | OD-3 | D1-1, D1-2 | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 560–627 |
+| E184 | OD-2 | D1-3, D1-4 | M27 | `41_F18_Fixture_Inputs/M27.json` | all |
+| E185 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 752 |
+| E186 | derived | — | M54 | `41_F18_Fixture_Inputs/fixture-index.json` | 753 |
+| E187 | derived | — | — | `27_SHA256SUMS.txt` | 93 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -2249,7 +2253,7 @@ Old:
 New:
 
 ```text
-fbc25b88f93b6e605c417ca0dbfa748b7219faedd4c0eafcd6df3ece5f8d2254  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
+80549fa22336acb57475eebe90eea93d0cf06a9c3c206c429253f9390eb84a04  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
 ```
 
 ## E141 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
@@ -2319,7 +2323,7 @@ Old:
 New:
 
 ```text
-ed3305d0a46d6b7d4683b5f1e6b1f83d13d88cc1f9ff020694582fa7903f4a44  25_Common_System_and_Repair_Prompt_Templates.txt
+80dacc8736adc3d0911351f4c0ae41e9a804e7b99101b8ae24be5e416397d0de  25_Common_System_and_Repair_Prompt_Templates.txt
 ```
 
 ## E146 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
@@ -2389,7 +2393,7 @@ Old:
 New:
 
 ```text
-20ff9a314501fd197632301fc33be0d385187d9eaae62b5329840ccd67ef8173  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
+1600c31f31381b78d829438adfd7682b111a42f0025939c9d244ca4f550b0313  36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md
 ```
 
 ## E151 — derived · `27_SHA256SUMS.txt` L36 · — · fixtures: —
@@ -2777,7 +2781,63 @@ New:
 "domain_validation": "HALT_SIGNATURE_COMPONENT_ENUMERATION"
 ```
 
-## E178 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
+## E178 — OD-4 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · D1-6 · fixtures: M13, M41
+
+Old:
+
+```text
+No second recovery cycle is permitted.
+```
+
+New:
+
+```text
+No second recovery cycle is permitted. **OWNER-DECIDED OD-4** (owner decision D-027; v1.3.6 does not define it): the *evaluator repair attempt* of a design halt, `evaluator_repair_attempt`, is the ordinal of the recovery cycle that halt opens. A halt that occurs while the design has used no recovery cycle opens its one permitted cycle and has `evaluator_repair_attempt` = `1`. A halt that occurs after that cycle has been used would open a second cycle, which is not permitted: it is not a new attempt but the `DESIGN_HALT_REPEATED` termination above (by recurrence of the identical signature, or as a different halt). No ordinal greater than `1` is valid. The ordinal is a lifecycle count, not a halt-signature component.
+```
+
+## E179 — A2 (copy of OD-4) · `25_Common_System_and_Repair_Prompt_Templates.txt` L128 · D1-6 · fixtures: M13, M41
+
+Old:
+
+```text
+No second recovery cycle is permitted.
+```
+
+New:
+
+```text
+No second recovery cycle is permitted. **OWNER-DECIDED OD-4** (owner decision D-027; v1.3.6 does not define it): the *evaluator repair attempt* of a design halt, `evaluator_repair_attempt`, is the ordinal of the recovery cycle that halt opens. A halt that occurs while the design has used no recovery cycle opens its one permitted cycle and has `evaluator_repair_attempt` = `1`. A halt that occurs after that cycle has been used would open a second cycle, which is not permitted: it is not a new attempt but the `DESIGN_HALT_REPEATED` termination above (by recurrence of the identical signature, or as a different halt). No ordinal greater than `1` is valid. The ordinal is a lifecycle count, not a halt-signature component.
+```
+
+## E180 — OD-4 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L198 · D1-6 · fixtures: M13
+
+Old:
+
+```text
+`evaluator_repair_attempt` = `1`, the ordinal of the recovery cycle this halt opens (§7b allows one;
+```
+
+New:
+
+```text
+`evaluator_repair_attempt` = `1`, the ordinal of the recovery cycle this halt opens (OWNER-DECIDED OD-4, Protocol §7b L185; §7b allows one;
+```
+
+## E181 — OD-4 · `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` L205 · D1-6 · fixtures: M41
+
+Old:
+
+```text
+`evaluator_repair_attempt` = `1`; `recovery_mode`
+```
+
+New:
+
+```text
+`evaluator_repair_attempt` = `1` (OWNER-DECIDED OD-4, Protocol L185); `recovery_mode`
+```
+
+## E182 — label · `41_F18_Fixture_Inputs/M54.json` L3 · — · fixtures: M54
 
 Old:
 
@@ -2791,7 +2851,7 @@ New:
 "fixture_version": "1.3.7-candidate, not audited",
 ```
 
-## E179 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
+## E183 — OD-3 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L560–627 · D1-1, D1-2 · fixtures: M48, M50, M53, M54, M58
 
 Old:
 
@@ -2872,7 +2932,7 @@ New:
 The lifecycle halt-event vector (File 36 L198) and the design-preflight vector (File 36 L199) give stage-map records with the four comparison keys. They are not control-vector results.
 ```
 
-## E180 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
+## E184 — OD-2 · `41_F18_Fixture_Inputs/M27.json` Lall · D1-3, D1-4 · fixtures: M27
 
 Old:
 
@@ -2947,7 +3007,7 @@ New:
 }
 ```
 
-## E181 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
+## E185 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L752 · — · fixtures: M54
 
 Old:
 
@@ -2961,7 +3021,7 @@ New:
 "sha256": "c6dfe1caff678f305fa8a855f49c04c209c7a494df91917415c083b482405890",
 ```
 
-## E182 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
+## E186 — derived · `41_F18_Fixture_Inputs/fixture-index.json` L753 · — · fixtures: M54
 
 Old:
 
@@ -2975,7 +3035,7 @@ New:
 "bytes": 1378,
 ```
 
-## E183 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
+## E187 — derived · `27_SHA256SUMS.txt` L93 · — · fixtures: —
 
 Old:
 

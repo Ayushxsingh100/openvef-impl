@@ -662,6 +662,24 @@ OD3_SECTION = [
 ]
 CYCLE2_APPENDS.append(("OD-3", "D1-1, D1-2", "M48, M50, M53, M54, M58", P02, OD3_SECTION))
 
+# OD-4 (D1-6): the attempt ordinal defined in §7b (normative in §3.4 "Mid-run design halt", L185), not by a field name.
+CYCLE2 += [
+    ("OD-4", "D1-6", "M13, M41", P02, 185, "No second recovery cycle is permitted.",
+     "No second recovery cycle is permitted. **OWNER-DECIDED OD-4** (owner decision D-027; v1.3.6 does not define it): "
+     "the *evaluator repair attempt* of a design halt, `evaluator_repair_attempt`, is the ordinal of the recovery cycle "
+     "that halt opens. A halt that occurs while the design has used no recovery cycle opens its one permitted cycle and "
+     "has `evaluator_repair_attempt` = `1`. A halt that occurs after that cycle has been used would open a second cycle, "
+     "which is not permitted: it is not a new attempt but the `DESIGN_HALT_REPEATED` termination above (by recurrence "
+     "of the identical signature, or as a different halt). No ordinal greater than `1` is valid. The ordinal is a "
+     "lifecycle count, not a halt-signature component."),
+    ("OD-4", "D1-6", "M13", P36, 198,
+     "`evaluator_repair_attempt` = `1`, the ordinal of the recovery cycle this halt opens (§7b allows one;",
+     "`evaluator_repair_attempt` = `1`, the ordinal of the recovery cycle this halt opens (OWNER-DECIDED OD-4, Protocol "
+     "§7b L185; §7b allows one;"),
+    ("OD-4", "D1-6", "M41", P36, 205, "`evaluator_repair_attempt` = `1`; `recovery_mode`",
+     "`evaluator_repair_attempt` = `1` (OWNER-DECIDED OD-4, Protocol L185); `recovery_mode`"),
+]
+
 
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()

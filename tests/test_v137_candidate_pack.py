@@ -80,13 +80,24 @@ class CandidatePackTests(unittest.TestCase):
             new = self.pack[self.name(rel)].decode("utf-8").split("\n")
             with self.subTest(file=rel):
                 if rel.endswith(".md") or rel == self.mod.P25:  # appended lines (C12-C16), then the trailer
-                    extra = list(self.mod.APPENDS.get(rel, []))  # cycle 1, then cycle 2 (D-027)
-                    extra += [l for c in self.mod.CYCLE2_APPENDS if c[3] == rel for l in c[4]]
+                    extra = self.appended(rel)
                     tail = ("\n".join(extra) + "\n" if extra else "") + self.mod.TRAILER
                     self.assertEqual("\n".join(new[len(old) - 1:]), tail)
                 else:
                     self.assertEqual(len(new), len(old))
-                self.assertEqual({i + 1 for i in range(len(old) - 1) if old[i] != new[i]}, lines)
+                self.assertEqual({i + 1 for i in range(len(old) - 1) if old[i] != new[i]},
+                                 {n for n in lines if n <= len(old) - 1})  # edits of appended lines: in the tail
+
+    def appended(self, rel: str) -> list[str]:
+        """The lines appended after rel's last v1.3.6 line: cycle 1's, with the cycle-2 edits of those lines applied,
+        then cycle 2's (D-027)."""
+        base_len = len(self.base[rel].decode("utf-8").split("\n")) - 1
+        extra = list(self.mod.APPENDS.get(rel, []))
+        for item, _, _, path, n, old, new in self.mod.CYCLE2:
+            if path == rel and n > base_len:
+                self.assertEqual(extra[n - base_len - 1].count(old), 1, (item, rel, n))
+                extra[n - base_len - 1] = extra[n - base_len - 1].replace(old, new)
+        return extra + [l for c in self.mod.CYCLE2_APPENDS if c[3] == rel for l in c[4]]
 
     def test_file_25_copy_still_equals_the_protocol(self):
         """A2: File 25 L32 "normative text below is identical to Protocol §3.4"."""
@@ -151,6 +162,7 @@ class CandidatePackTests(unittest.TestCase):
         label, pd, fixtures, block = self.mod.OS_BLOCK
         lines = self.pack[self.name(self.mod.P36)].decode("utf-8").split("\n")
         start = len(self.base[self.mod.P36].decode("utf-8").split("\n")) - 1 + self.mod.C12_C16_LINES
+        block = self.appended(self.mod.P36)[self.mod.C12_C16_LINES:self.mod.C12_C16_LINES + len(block)]  # with cycle 2
         self.assertEqual(lines[start:start + len(block)], block)
         items = [l for l in block if l.startswith("- **")]
         self.assertEqual([re.search(r"\((OS-\d)", l).group(1) for l in items], ["OS-1", "OS-2", "OS-3"])
