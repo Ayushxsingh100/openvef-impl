@@ -1979,3 +1979,63 @@ rules to pack text. Claude drafted them, and each is stated there with its quote
   `None`) are refused by the out-of-domain test.
 
 Not audited. F18 is not passed. Candidate results never count as v1.3.6 F18 evidence (D-024).
+
+## D-027 — Response to document audit #1: correction cycle 2 (DECIDED)
+
+**Owner decision by Krishika**, on a Claude (claude.ai) triage of document audit #1 (GPT-6, an AI model, operated by
+Krishika; bundle `c4caff40…cbd7`; NOT CLEARED: 1 BLOCKER, 5 MAJOR, 2 MINOR, 1 PACK;
+`docs/reviews/doc-audit1-gpt6-2026-11-27.md`). Takes effect under D-008; Ayush's ratification stays the single entry in
+AUDIT-READINESS.md.
+
+1. **Correction cycle 2**, numbered; nothing is edited silently.
+2. **New category OWNER-DECIDED (OD-n):** a normative rule the pack owners add that v1.3.6 does not state. It is labelled
+   in the pack text, in the CHANGELOG and in every record that depends on it. Fixture counts are reported as
+   PACK-DERIVED / OWNER-DECIDED / OWNER-SPECIFIED, and a fixture that depends on any OD rule counts as OWNER-DECIDED.
+   Expected objects stay unchanged.
+3. **D1-5 → OD-1:** a stage-map row with a single diagnostic code and no stated error class has error class = diagnostic
+   code; `SIMULATOR_ERROR` is the stated exception. Applied to `DESIGN_HALT_REPEATED` and `FEEDBACK_SERIALIZER_REJECT`.
+   C11's majority-pattern argument is retired.
+4. **D1-3 → OD-2:** the owners adopt Python 3.11 as the representation of the legal-input predicate: one pure function
+   `(vector, sampled) -> bool`, frozen and hash-gated, executed by the evaluator; exceptions are evaluator failures. A1
+   stands on OD-2, and the original C6 is marked superseded.
+5. **D1-1 + D1-2 → OD-3:** a normative control-vector schema table in the Protocol for every property in M48, M50, M53,
+   M54 and M58 (and any other control vector), giving name, type, allowed values and rule. Define the `change_class`
+   input contract. Move `HALT_SIGNATURE_COMPONENT_ENUMERATION` out of the change classes into domain validation. Adopt
+   the scope tokens explicitly as owner vocabulary. List any property that no rule can fix; do not guess.
+6. **D1-6 → OD-4:** define `evaluator_repair_attempt` in §7b: the ordinal of the recovery cycle the halt opens, and its
+   relation to the one-cycle limit and the repeated-halt condition.
+7. **D1-7:** state that invalid supplied signatures are outside the executable fixture contract (evaluator input error,
+   no ledger record); no new outcome.
+8. **D1-8:** relabel M37 a paired-outcome control vector, not a test of source-level alias detection.
+9. **D1-9:** split the status wording into development-run evidence, formal F18 status and approval.
+10. Phase A (pack text only) is committed alone, then Phase B (code). v1.3.6 must stay 127/0/17/0. Re-run both packs,
+    the controls and the container tests in the pinned image. Rebuild the document-audit bundle, with a brief scoped to
+    cycle 2 plus regression, publish it as release `docaudit2-<first 8 of sha>`, commit and push.
+
+Items, rationale and quotes: `proposals/v1.3.7/CORRECTIONS-v1.3.7-candidate.md` section 11. Numbering: OD-1 to OD-4,
+then A3 (D1-7, an amendment to C10), A4 (D1-8, an amendment to OS-2) and C17 (D1-9), each in its own Phase A commit
+(D-024: a candidate correction is changed only by a numbered amendment in its own commit).
+
+## A-059 — How far OD-1 reaches (DECIDED BY CLAUDE — owner review pending)
+
+Decided by Claude under standing delegation, owner review pending.
+
+**Quote (D-027 item 3):** "a stage-map row with a single diagnostic code and no stated error class has error class =
+diagnostic code; SIMULATOR_ERROR is the stated exception; apply to DESIGN_HALT_REPEATED and FEEDBACK_SERIALIZER_REJECT".
+
+**Competing readings.**
+1. "Stage-map row" means only the L141–L162 table. Then OD-1 reaches neither code D-027 applies it to, since both are
+   listed in the §3.4 local-ledger vocabulary (L173, L175) and §7b (L185), not in the table.
+2. It also covers the local-ledger vocabulary rows. **Chosen:** D-027 names exactly those two codes.
+3. A cell `—` ("no error class") counts as "no stated error class". Then L162 (`DIAGNOSTIC_FORMAT_WARNING`) would get
+   an error class. **Rejected:** the table states a value in that cell (none), so the class is stated. The reason is the
+   cell's text, not M12's or P22's expected object.
+
+**What changes.** Under the chosen readings OD-1 decides exactly two error classes, and every other row states its own
+class (checked line by line: L143–L162, L174, L175). The candidate L174 text says so.
+
+**Fixture counting under D-027 item 2 (part of this entry).** M41 is OWNER-SPECIFIED (OS-1) and depends on OD-4. D-027
+says that a fixture depending on any OD rule counts as OWNER-DECIDED, and states no exception for OS items. M41 is
+therefore counted OWNER-DECIDED, and its record keeps both labels (`owner_decided` and `owner_specified` = `OS-1`).
+OWNER-SPECIFIED counts only OS fixtures that depend on no OD rule. If the owners prefer OS to take precedence, only the
+category of M41 moves. No outcome changes.

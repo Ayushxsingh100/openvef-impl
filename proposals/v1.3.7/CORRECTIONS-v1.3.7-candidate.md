@@ -13,6 +13,9 @@ it needs an independent document audit. v1.3.6 (`baseline/`) is unchanged and re
 - **Scope chosen by Krishika:** C1–C10 only. Fixtures no correction covers are flagged, not corrected.
 - **Every edit stays inside one line**, so no line moves and every line citation means the same line in both packs.
 - Quoted v1.3.6 text is checked verbatim by `tests/test_doc_quotes.py`.
+- **Correction cycle 2 (owner decision D-027, after document audit #1, NOT CLEARED):** section 11. Its items are
+  numbered OD-n (OWNER-DECIDED), A3, A4 and C17. Each is in its own commit, and no earlier section is changed
+  except by a note that names the item superseding it.
 
 **Conflict to weigh.** The corrections were drafted on 24 Nov 2026 by the implementation author, after the
 v1.3.6 implementation existed, and several make executable fixtures the code does not execute now. Each
@@ -438,6 +441,10 @@ a new section after File 36's last line, so no line moves.
 
 ### C11 — Error classes of `DESIGN_HALT_REPEATED` and `FEEDBACK_SERIALIZER_REJECT` (PD-26)
 
+**Retired in part by OD-1 (D-027; section 11).** Document audit #1 (D1-5, BLOCKER) found that the majority pattern
+below is not a normative rule. The two error classes now rest on the owner convention OD-1, labelled in the pack text.
+The argument under "Why" is kept as written for the record. It is no longer the basis of these values.
+
 > [02 L185] "terminate with `DESIGN_HALT_REPEATED|reason=EVALUATOR_FAILURE_REPRODUCED`"
 
 > [02 L173] "`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`"
@@ -772,3 +779,59 @@ D-026: if P17's expected stage precedes runtime, run up to that stage only; othe
 `DRIVER_VECTOR` is checked inside step (7), while the driver runs on the original RTL, so it does not precede runtime.
 The rule therefore leaves P17 NOT_IMPLEMENTED. Its record gives the reason and the OS-3 label. Candidate File 36 L207
 says so, so the input shape is labelled without code that names the fixture.
+
+## 11. Correction cycle 2 (owner decision D-027, after document audit #1)
+
+Document audit #1 (GPT-6, an AI model, operated by Krishika, bundle `c4caff40…cbd7`;
+`docs/reviews/doc-audit1-gpt6-2026-11-27.md`) found cycle 1 NOT CLEARED: 1 BLOCKER, 5 MAJOR, 2 MINOR and 1 PACK
+finding (D1-1 to D1-9). Krishika decided D-027 on a Claude (claude.ai) triage of the report. These items answer it.
+
+- **New category OWNER-DECIDED (OD-n):** a normative rule the pack owners add that v1.3.6 does not state. Every OD rule is
+  labelled `OWNER-DECIDED OD-n` in the pack text that states it, in the CHANGELOG and in every record that depends on it.
+  A fixture that depends on any OD rule counts as OWNER-DECIDED, not as PACK-DERIVED. OD rules are not argued from the
+  v1.3.6 text. Each item below states what the pack leaves open, the rule the owners chose, and the pack text it rests on.
+- **Unchanged:** every expected object (D-027). Cycle-2 edits stay inside one line or are appended after a file's last
+  line, as in cycle 1. They are logged after E158 and edit the text as cycle 1 left it.
+- **Order:** OD-1, OD-2, OD-3, OD-4, A3 (D1-7), A4 (D1-8) and C17 (D1-9), each in its own pack-only commit, before any
+  code change (Phase A).
+
+### OD-1 — Error class of a single-code row with no stated error class (D1-5; amends C11)
+
+**Finding D1-5 (BLOCKER).** v1.3.6 names `DESIGN_HALT_REPEATED` and `FEEDBACK_SERIALIZER_REJECT` but gives neither an
+error class:
+
+> [02 L185] "If the identical halt signature recurs after recovery, terminate with `DESIGN_HALT_REPEATED|reason=EVALUATOR_FAILURE_REPRODUCED`."
+
+> [02 L173] "- F18/packet diagnostics: `PACKET_FREEZE_REJECT|reason=RESERVED_HEADING_LINE`, `ASSEMBLY_REJECT|reason=UNRESOLVED_PLACEHOLDER`, `F18_REJECT|reason=VISIBLE_CLAUSE_ID_SET_MISMATCH`, `F18_REJECT|reason=MALFORMED_CLAUSE_ID_TOKEN`, `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC`."
+
+C11 chose the classes by the pattern of the stage map. The audit ruled that a majority of rows is not a rule.
+
+**Owner rule (D-027).** "A stage-map row with a single diagnostic code and no stated error class has error class =
+diagnostic code; SIMULATOR_ERROR is the stated exception." Applied to `DESIGN_HALT_REPEATED` and
+`FEEDBACK_SERIALIZER_REJECT`. The exception is the row whose single code differs from its stated class:
+
+> [02 L154] "| Simulator error on RTL or null run | `DESIGN_HALT` | `EVALUATOR_INFRASTRUCTURE_FAILURE` | `SIMULATOR_ERROR|target=<RTL_OR_NULL>|class=<EXCEPTION_CLASS>`; halt design, repair evaluator and apply §7b; no model feedback |"
+
+**Pack text (candidate).** L174 states OD-1, labelled, and applies it to `FEEDBACK_SERIALIZER_REJECT`. L185 labels the
+`DESIGN_HALT_REPEATED` sentence `OWNER-DECIDED OD-1`. Both lines lie in L90–L187, so A2 copies them into File 25.
+
+**Two choices made in wording it (decided by Claude under standing delegation, owner review pending; A-059):**
+- *"Stage-map row" includes the local-ledger vocabulary rows.* The two codes D-027 names are not rows of the L141–L162
+  table. They are listed in the §3.4 local-ledger vocabulary (L173, L175) and in §7b (L185). D-027 applies OD-1 to
+  exactly these two, so the rule must reach those rows.
+- *A cell `—` states "no error class".* The stage map gives `—` as the error class of two rows, for example:
+
+> [02 L162] "| Malformed diagnostic item with otherwise valid top-level return and verdict | — | — | Log `DIAGNOSTIC_FORMAT_WARNING`, discard item; `ACCEPT_WITH_WARNING`; verdict retained |"
+
+  The table states a value there (none), so that row has a stated error class and OD-1 does not reach it. Read the
+  other way, OD-1 would give `DIAGNOSTIC_FORMAT_WARNING` an error class that the L162 table cell denies.
+- **Scope check.** Every other single-code row and local-ledger diagnostic states its class: L143–L161 in the table,
+  L174 for `F18_REJECT`, `PACKET_FREEZE_REJECT` and `ASSEMBLY_REJECT` fixtures, and L175 for the lifecycle codes (C1).
+  OD-1 therefore decides exactly two error classes, and the pack text says so.
+
+**Fixtures that depend on OD-1:** M15 (`FEEDBACK_SERIALIZER_REJECT`), M42 and M47 (`DESIGN_HALT_REPEATED`). Their
+expected objects are unchanged. C1's three revision codes keep their own rule (C1), so OD-1 does not re-base them.
+
+**Fit with the current code.** The values are the ones the C11 code already produces. Only the citation and the record
+label change (Phase B).
+

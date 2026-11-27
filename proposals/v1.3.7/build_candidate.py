@@ -1,4 +1,8 @@
-"""Build proposals/v1.3.7/pack/: OpenVEF Planning v1.3.6 with corrections C1-C10 applied (D-024 Phase A).
+"""Build proposals/v1.3.7/pack/: OpenVEF Planning v1.3.6 with the v1.3.7 candidate corrections applied.
+
+Cycle 1: C1-C16, amendments A1-A2, stale references S, OWNER-SPECIFIED OS-1-OS-3 (D-024, D-025, D-026; CHANGELOG
+E01-E158). Cycle 2 (D-027, after document audit #1): OWNER-DECIDED OD-n rules and numbered amendments, applied after
+every cycle-1 edit and logged after E158, so no cycle-1 entry number moves.
 
 v1.3.7 CANDIDATE, not audited. Document tooling only: no evaluator code. The baseline is read, never written.
 
@@ -17,6 +21,7 @@ import json
 import shutil
 import sys
 from pathlib import Path
+from typing import Callable
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -412,6 +417,39 @@ WHOLE_FILES = {FX + "M27.json": ("C6 + A1", "PD-06, PD-25", "M27")}
 VERSION_LINES = {FX + n: 3 for n in ("M41.json", "M42.json", "M47.json")}
 
 
+# --- D-027: correction cycle 2 (document audit #1, docs/reviews/doc-audit1-gpt6-2026-11-27.md, findings D1-1..D1-9).
+# OD-n = OWNER-DECIDED: a normative rule the owners add that v1.3.6 does not state (owner decision D-027, Krishika).
+# Every cycle-2 edit is applied to the text as cycle 1 left it, after all cycle-1 edits, and logged after E158; the
+# `pd` column holds the audit finding. Rationale: CORRECTIONS-v1.3.7-candidate.md section 11.
+# (item, finding, fixtures, file, line, old text, new text): one-line edits, mirrored into File 25 like cycle 1.
+CYCLE2: list[tuple[str, str, str, str, int, str, str]] = []
+# (item, finding, fixtures, file, lines): lines appended after the file's last line as cycle 1 left it.
+CYCLE2_APPENDS: list[tuple[str, str, str, str, list[str]]] = []
+
+# OD-1 (D1-5, the BLOCKER): the error classes C11 chose by a majority pattern now rest on an owner convention.
+_OD1 = ("**OWNER-DECIDED OD-1** (owner decision D-027; v1.3.6 does not state it): a stage-map row with a single "
+        "diagnostic code and no stated error class has the error class equal to that diagnostic code; the "
+        "`SIMULATOR_ERROR` row, whose stated error class is `EVALUATOR_INFRASTRUCTURE_FAILURE`, is the stated exception. "
+        "An error-class cell `—` states that a row has no error class, so OD-1 does not apply to it. OD-1 decides exactly "
+        "two error classes, those of the local-ledger rows `FEEDBACK_SERIALIZER_REJECT` and `DESIGN_HALT_REPEATED`; "
+        "every other row of the stage map and of this vocabulary states its error class. By OD-1, ")
+CYCLE2 += [
+    ("OD-1", "D1-5", "M15", P02, 174,
+     "`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error "
+     "class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.",
+     _OD1 + "`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` "
+     "with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`."),
+    ("OD-1", "D1-5", "M42, M47", P02, 185,
+     "Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED`.",
+     "Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED` (OWNER-DECIDED "
+     "OD-1, §3.4 local-ledger error classes)."),
+]
+# Descriptors first changed in cycle 2 get the in-file version label, logged in cycle 2.
+CYCLE2_VERSION_LINES: dict[str, int] = {}
+# Whole-descriptor replacements in cycle 2: rel -> (item, finding, fixtures, transform of the cycle-1 descriptor).
+CYCLE2_WHOLE: dict[str, tuple[str, str, str, Callable[[dict], dict]]] = {}
+
+
 def sha(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
@@ -469,11 +507,38 @@ def build(out: Path) -> dict:
                         "line": f"{start}–{start + len(OS_BLOCK[3]) - 1}", "old": "(after the C12–C16 lines)",
                         "new": "\n".join(OS_BLOCK[3])}
         lines.extend(extra)
+
+    # D-027 cycle 2: after every cycle-1 edit; logged in log2, which follows E158.
+    touched1, log2 = set(texts), []
+    for cid, pd, fixtures, rel, n, old, new in CYCLE2:
+        targets = [(rel, n, cid)]
+        if rel == src and first <= n <= last:
+            targets.append((copy, n + shift, f"A2 (copy of {cid})"))
+        for path, m, label in targets:
+            lines = line_of(path)
+            assert lines[m - 1].count(old) == 1, (label, path, m, old[:60])
+            lines[m - 1] = lines[m - 1].replace(old, new)
+            log2.append({"correction": label, "pd": pd, "fixtures": fixtures, "file": path, "line": m, "old": old,
+                         "new": new})
+    for rel, n in CYCLE2_VERSION_LINES.items():
+        lines = line_of(rel)
+        old = lines[n - 1]
+        assert old.strip().startswith('"fixture_version": ') and VERSION_LABEL not in old, (rel, old)
+        lines[n - 1] = old[:old.index(":") + 2] + json.dumps(VERSION_LABEL) + ","
+        log2.append({"correction": "label", "pd": "—", "fixtures": rel[len(FX):-5], "file": rel, "line": n,
+                     "old": old.strip(), "new": lines[n - 1].strip()})
+    for cid, pd, fixtures, rel, extra in CYCLE2_APPENDS:
+        lines = line_of(rel)
+        log2.append({"correction": cid, "pd": pd, "fixtures": fixtures, "file": rel,
+                     "line": f"{len(lines) + 1}–{len(lines) + len(extra)}", "old": "(after the last line)",
+                     "new": "\n".join(extra)})
+        lines.extend(extra)
+
     for rel, lines in texts.items():
         body = "\n".join(lines) + "\n"
         if rel.endswith(".md") or rel == P25:  # File 25: after its last line, outside the model-visible bodies
             body += TRAILER
-            log.append({"correction": "label", "pd": "—", "fixtures": "—", "file": rel,
+            (log if rel in touched1 else log2).append({"correction": "label", "pd": "—", "fixtures": "—", "file": rel,
                         "line": len(lines) + 1, "old": "(end of file)", "new": "appended trailer: " + TRAILER.strip()})
         (out / rel).write_text(body, "utf-8")
 
@@ -499,19 +564,30 @@ def build(out: Path) -> dict:
         (out / rel).write_text(new_text, "utf-8")
         log.append({"correction": cid, "pd": pd, "fixtures": fixtures, "file": rel, "line": "all",
                     "old": old_text, "new": new_text})
+    for rel, (cid, pd, fixtures, transform) in CYCLE2_WHOLE.items():  # D-027: on the descriptor cycle 1 left
+        old_text = (out / rel).read_text("utf-8")
+        old_d = json.loads(old_text)
+        new_d = transform(json.loads(old_text))
+        assert new_d["expected"] == old_d["expected"] and new_d["fixture_id"] == old_d["fixture_id"]
+        new_text = json.dumps(new_d, indent=2) + "\n"
+        (out / rel).write_text(new_text, "utf-8")
+        log2.append({"correction": cid, "pd": pd, "fixtures": fixtures, "file": rel, "line": "all",
+                     "old": old_text, "new": new_text})
 
     # Derived: the fixture index records each descriptor's SHA-256 and byte length (36 L176), and its version.
     changed_desc = sorted({e["file"] for e in log if e["file"].startswith(FX)})
+    changed_desc2 = sorted({e["file"] for e in log2 if e["file"].startswith(FX)} - set(changed_desc))
     idx_rel = FX + "fixture-index.json"
     idx = lines_of((BASE / idx_rel).read_text("utf-8"))
-    for rel in changed_desc:
+    for rel in changed_desc + changed_desc2:
+        target = log if rel in changed_desc else log2
         data = (out / rel).read_bytes()
         at = idx.index(f'      "path": "{rel}",')
         for k, v in (("sha256", json.dumps(sha(data))), ("bytes", str(len(data)))):
             j = next(i for i in range(at, at + 6) if idx[i].startswith(f'      "{k}": '))
             old = idx[j]
             idx[j] = f'      "{k}": {v},'
-            log.append({"correction": "derived", "pd": "—", "fixtures": rel[len(FX):-5], "file": idx_rel,
+            target.append({"correction": "derived", "pd": "—", "fixtures": rel[len(FX):-5], "file": idx_rel,
                         "line": j + 1, "old": old.strip(), "new": idx[j].strip()})
     j = idx.index('  "fixture_index_version": "1.3.6",')
     idx[j] = f'  "fixture_index_version": {json.dumps(VERSION_LABEL)},'
@@ -527,16 +603,18 @@ def build(out: Path) -> dict:
     sums_rel = "27_SHA256SUMS.txt"
     sums = lines_of((BASE / sums_rel).read_text("utf-8"))
     changed = sorted({e["file"] for e in log})
-    for rel in changed:
+    changed2 = sorted({e["file"] for e in log2} - set(changed))
+    for rel in changed + changed2:
         j = next(i for i, s in enumerate(sums) if s.endswith("  " + rel))
         old, name = sums[j], RENAMES.get(rel, rel)
         sums[j] = f"{sha((out / name).read_bytes())}  {name}"
-        log.append({"correction": "derived", "pd": "—", "fixtures": "—", "file": sums_rel, "line": j + 1,
+        (log if rel in changed else log2).append({"correction": "derived", "pd": "—", "fixtures": "—", "file": sums_rel, "line": j + 1,
                     "old": old, "new": sums[j]})
     (out / sums_rel).write_text("\n".join(sums) + "\n", "utf-8")
 
     if os_entry is not None:
         log.append(os_entry)
+    log.extend(log2)  # D-027: cycle 2 follows E158
     write_changelog(out, log)
     write_label(out, log)
     files = sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file() and p.name != SUMS)
@@ -564,12 +642,18 @@ def write_changelog(out: Path, log: list[dict]) -> None:
             "  `line` `name` = a file renamed); `label` = the in-file candidate label; `derived` = a hash or byte length",
             "  that follows mechanically from another edit. Old and new text are the replaced part of the line, unless",
             "  `line` is `all` (whole-file replacement).",
+            "- **Correction cycle 2 (owner decision D-027), after document audit #1 (NOT CLEARED;",
+            "  `docs/reviews/doc-audit1-gpt6-2026-11-27.md` in the implementation repository).** Its entries follow the last",
+            "  cycle-1 entry (E158) and edit the text as cycle 1 left it, so no cycle-1 entry number moves. `OD-n` =",
+            "  OWNER-DECIDED: a normative rule the owners add that v1.3.6 does not state, labelled as such in the pack text;",
+            "  every fixture that depends on one is counted OWNER-DECIDED. For cycle-2 entries the `PD` column holds the",
+            "  audit finding (`D1-n`). `derived` entries show the hashes of the final build, cycle 2 included.",
             "- **Kept on purpose (not stale):** references that record history — the v1.3.6 change log, build, correction",
             "  and audit records (Files 03, 48, 50, 56, 57, 58, 63 and the audit transcripts), and statements of what",
             "  v1.3.6 did — and the owners' records (Files 16, 23), which describe owner decisions on v1.3.6 and are not",
             "  rewritten for a candidate the owners have not approved.",
             "- The 61 `archive_*` entries of `27_SHA256SUMS.txt` are not in the extracted baseline and are not in this copy.",
-            "", "| # | Correction | PD | Fixtures | File | Line |", "|---|---|---|---|---|---|"]
+            "", "| # | Correction | PD / finding | Fixtures | File | Line |", "|---|---|---|---|---|---|"]
     for i, e in enumerate(log, 1):
         rows.append(f"| E{i:02d} | {e['correction']} | {e['pd']} | {e['fixtures']} | `{shown(e['file'])}` | {e['line']} |")
     rows.append("")
@@ -585,8 +669,10 @@ def write_label(out: Path, log: list[dict]) -> None:
     rows = [f"# {LABEL}", "",
             f"**Every file in this directory is part of OpenVEF Planning {LABEL}.** It is a copy of v1.3.6 with",
             "corrections C1–C16 and amendments A1–A2 applied (owner decisions D-024, D-025) and the OWNER-SPECIFIED",
-            "items OS-1–OS-3 (owner decision D-026; `" + CHANGELOG + "`). It is not released, not audited",
-            "and not approved, and v1.3.6 (`baseline/`) remains the default pack.", "",
+            "items OS-1–OS-3 (owner decision D-026; `" + CHANGELOG + "`), and with correction cycle 2 (owner",
+            "decision D-027: OWNER-DECIDED rules OD-n and numbered amendments) after document audit #1 of cycle 1",
+            "(NOT CLEARED). It is not released, not audit-cleared and not approved, and v1.3.6 (`baseline/`) remains",
+            "the default pack.", "",
             "- **In-file label:** every file a correction changed carries the label itself (Markdown and File 25: an",
             "  appended trailer, in File 25 after its last line and outside the model-visible bodies; fixture JSON:",
             "  `fixture_version` / `fixture_index_version`). `27_SHA256SUMS.txt` is changed",

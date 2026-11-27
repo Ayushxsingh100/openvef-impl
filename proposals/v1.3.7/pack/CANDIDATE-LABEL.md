@@ -2,8 +2,10 @@
 
 **Every file in this directory is part of OpenVEF Planning v1.3.7 CANDIDATE, not audited.** It is a copy of v1.3.6 with
 corrections C1–C16 and amendments A1–A2 applied (owner decisions D-024, D-025) and the OWNER-SPECIFIED
-items OS-1–OS-3 (owner decision D-026; `CHANGELOG-v1.3.7-candidate.md`). It is not released, not audited
-and not approved, and v1.3.6 (`baseline/`) remains the default pack.
+items OS-1–OS-3 (owner decision D-026; `CHANGELOG-v1.3.7-candidate.md`), and with correction cycle 2 (owner
+decision D-027: OWNER-DECIDED rules OD-n and numbered amendments) after document audit #1 of cycle 1
+(NOT CLEARED). It is not released, not audit-cleared and not approved, and v1.3.6 (`baseline/`) remains
+the default pack.
 
 - **In-file label:** every file a correction changed carries the label itself (Markdown and File 25: an
   appended trailer, in File 25 after its last line and outside the model-visible bodies; fixture JSON:

@@ -45,16 +45,18 @@ class CandidatePackTests(unittest.TestCase):
         # Every (v1.3.6 file, line) an edit may touch, from the build's own tables.
         edited: dict[str, set[int]] = {}
         src, first, last, copy, shift = mod.MIRROR
-        for rel, n in [(e[3], e[4]) for e in mod.EDITS] + [(s[0], s[1]) for s in mod.STALE]:
+        for rel, n in ([(e[3], e[4]) for e in mod.EDITS] + [(s[0], s[1]) for s in mod.STALE]
+                       + [(e[3], e[4]) for e in mod.CYCLE2]):  # D-027 cycle 2 edits lines in place too
             edited.setdefault(rel, set()).add(n)
             if rel == src and first <= n <= last:
                 edited.setdefault(copy, set()).add(n + shift)
-        for rel, n in mod.VERSION_LINES.items():
+        for rel, n in {**mod.VERSION_LINES, **mod.CYCLE2_VERSION_LINES}.items():
             edited.setdefault(rel, set()).add(n)
         old_hash = hashlib.sha256(cls.base[mod.P10]).hexdigest()
         edited[mod.P22] = {i + 1 for i, l in enumerate(cls.base[mod.P22].decode().split("\n")) if old_hash in l}
         cls.edited = edited
-        cls.changed = set(edited) | set(mod.WHOLE_FILES) | {"27_SHA256SUMS.txt", FX + "fixture-index.json"}
+        cls.changed = (set(edited) | set(mod.WHOLE_FILES) | set(mod.CYCLE2_WHOLE)
+                       | {e[3] for e in mod.CYCLE2_APPENDS} | {"27_SHA256SUMS.txt", FX + "fixture-index.json"})
 
     def name(self, rel: str) -> str:
         """v1.3.6 name -> candidate name."""
@@ -71,12 +73,15 @@ class CandidatePackTests(unittest.TestCase):
         self.assertEqual(set(self.mod.RENAMES) - self.changed, set())  # every renamed file is also edited
 
     def test_no_line_moves_and_only_edited_lines_change(self):
+        for rel in {e[3] for e in self.mod.CYCLE2_APPENDS} - set(self.edited):
+            self.edited[rel] = set()
         for rel, lines in self.edited.items():
             old = self.base[rel].decode("utf-8").split("\n")
             new = self.pack[self.name(rel)].decode("utf-8").split("\n")
             with self.subTest(file=rel):
                 if rel.endswith(".md") or rel == self.mod.P25:  # appended lines (C12-C16), then the trailer
-                    extra = self.mod.APPENDS.get(rel)
+                    extra = list(self.mod.APPENDS.get(rel, []))  # cycle 1, then cycle 2 (D-027)
+                    extra += [l for c in self.mod.CYCLE2_APPENDS if c[3] == rel for l in c[4]]
                     tail = ("\n".join(extra) + "\n" if extra else "") + self.mod.TRAILER
                     self.assertEqual("\n".join(new[len(old) - 1:]), tail)
                 else:
@@ -160,7 +165,23 @@ class CandidatePackTests(unittest.TestCase):
                 self.assertIn(token, protocol)
         changelog = self.pack["CHANGELOG-v1.3.7-candidate.md"].decode("utf-8")
         entries = re.findall(r"^\| (E\d+) \| ([^|]+) \|", changelog, re.M)
-        self.assertEqual(entries[-1][1].strip(), label)
+        self.assertEqual(entries[157], ("E158", label))  # the last cycle-1 entry; cycle 2 (D-027) follows it
+
+    def test_cycle2_follows_cycle1(self):
+        """D-027: cycle-2 entries come after E158 and every cycle-1 entry keeps its number and correction."""
+        import re
+        changelog = self.pack["CHANGELOG-v1.3.7-candidate.md"].decode("utf-8")
+        entries = re.findall(r"^\| (E\d+) \| ([^|]+) \|", changelog, re.M)
+        cycle2 = {c[0] for c in self.mod.CYCLE2} | {c[0] for c in self.mod.CYCLE2_APPENDS} | {
+            v[0] for v in self.mod.CYCLE2_WHOLE.values()}
+        first2 = next((i for i, (_, c) in enumerate(entries) if c.strip().split(" ")[0] in cycle2
+                       or c.strip().startswith("A2 (copy of OD") or c.strip().startswith("A2 (copy of A")), None)
+        if cycle2:
+            self.assertEqual(first2, 158)
+        for item in cycle2:  # every OD rule is labelled in the pack text it adds
+            if item.startswith("OD-"):
+                self.assertTrue(any(f"OWNER-DECIDED {item}" in b.decode("utf-8", "replace") for b in self.pack.values()),
+                                item)
 
     def test_corrected_m27_reaches_check_e(self):
         m27 = json.loads(self.pack[FX + "M27.json"])

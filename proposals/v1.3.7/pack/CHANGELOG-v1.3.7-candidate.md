@@ -10,13 +10,19 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
   `line` `name` = a file renamed); `label` = the in-file candidate label; `derived` = a hash or byte length
   that follows mechanically from another edit. Old and new text are the replaced part of the line, unless
   `line` is `all` (whole-file replacement).
+- **Correction cycle 2 (owner decision D-027), after document audit #1 (NOT CLEARED;
+  `docs/reviews/doc-audit1-gpt6-2026-11-27.md` in the implementation repository).** Its entries follow the last
+  cycle-1 entry (E158) and edit the text as cycle 1 left it, so no cycle-1 entry number moves. `OD-n` =
+  OWNER-DECIDED: a normative rule the owners add that v1.3.6 does not state, labelled as such in the pack text;
+  every fixture that depends on one is counted OWNER-DECIDED. For cycle-2 entries the `PD` column holds the
+  audit finding (`D1-n`). `derived` entries show the hashes of the final build, cycle 2 included.
 - **Kept on purpose (not stale):** references that record history — the v1.3.6 change log, build, correction
   and audit records (Files 03, 48, 50, 56, 57, 58, 63 and the audit transcripts), and statements of what
   v1.3.6 did — and the owners' records (Files 16, 23), which describe owner decisions on v1.3.6 and are not
   rewritten for a candidate the owners have not approved.
 - The 61 `archive_*` entries of `27_SHA256SUMS.txt` are not in the extracted baseline and are not in this copy.
 
-| # | Correction | PD | Fixtures | File | Line |
+| # | Correction | PD / finding | Fixtures | File | Line |
 |---|---|---|---|---|---|
 | E01 | C1 | PD-02 (2) | M48, M50, M53, M54, M58 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 175 |
 | E02 | A2 (copy of C1) | PD-02 (2) | M48, M50, M53, M54, M58 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 118 |
@@ -176,6 +182,10 @@ conflicting v1.3.6 text and the alternatives rejected: `proposals/v1.3.7/CORRECT
 | E156 | derived | — | — | `27_SHA256SUMS.txt` | 182 |
 | E157 | derived | — | — | `27_SHA256SUMS.txt` | 202 |
 | E158 | OS-1–OS-3 (OWNER-SPECIFIED, D-026) | PD-07, PD-01, PD-03 | M41, M37, P17 | `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.7-candidate.md` (was `36_F18_Parser_and_Repair_Fixture_Catalog_v1.3.6.md` | 200–207 |
+| E159 | OD-1 | D1-5 | M15 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 174 |
+| E160 | A2 (copy of OD-1) | D1-5 | M15 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 117 |
+| E161 | OD-1 | D1-5 | M42, M47 | `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` | 185 |
+| E162 | A2 (copy of OD-1) | D1-5 | M42, M47 | `25_Common_System_and_Repair_Prompt_Templates.txt` | 128 |
 
 ## E01 — C1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L175 · PD-02 (2) · fixtures: M48, M50, M53, M54, M58
 
@@ -2218,7 +2228,7 @@ Old:
 New:
 
 ```text
-9018eb2171e803b49bda107eb3c0639ee4fc0020bb9ea99cd2b9c6564fa99873  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
+2c29b387ecbc40b36029affa1261c39916de5c1ff88cad2484c25d3638f4e09e  02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md
 ```
 
 ## E141 — derived · `27_SHA256SUMS.txt` L11 · — · fixtures: —
@@ -2288,7 +2298,7 @@ Old:
 New:
 
 ```text
-ef562ec43ce5da2166085c4741aef931e5e830b28dc503e26e17ab83559a83b7  25_Common_System_and_Repair_Prompt_Templates.txt
+09f4b2ea0a5b974868a8be9a569403d4e0cc73da7d540fbeb82bc819da9e56be  25_Common_System_and_Repair_Prompt_Templates.txt
 ```
 
 ## E146 — derived · `27_SHA256SUMS.txt` L28 · — · fixtures: —
@@ -2478,4 +2488,60 @@ These items are OWNER-SPECIFIED, not derived from pack text: the Protocol fixes 
 - **Operational-recovery vector** (OS-1, §7b): `design_id` (`FIFO` or `UART`, equal to the `design_id` of `halt_signature`); `halt_signature`, the halt's signature in the Protocol §7b domains, with `halt_code` `SIMULATOR_ERROR` or `TRACE_INTEGRITY_FAILURE` (a masked RTL/null divergence may use operational recovery only after a root-cause review, which this vector does not carry); `slots` as in the lifecycle halt-event vector, so the halt occurred after slots had begun; `evaluator_repair_attempt` = `1`; `recovery_mode` = `OPERATIONAL_RECOVERY`; the Booleans `frozen_evaluator_hashes_unchanged`, `f16_required`, `same_artifact_bytes` and `author_visible_materials_changed`; `pre_halt_scored_slots` (1 to `previously_evaluated`), the number of pre-halt scores; `scheduled_slots` = `scheduled`, the scheduled slots of the affected scope; `same_artifacts_for_all_slots` = `true`, `same_slot_seeds` = `true` and `new_generation_calls` = `0`, which restate §7b; and `required_action`, a string that is an informational label, not an outcome input. Only the properties named by the §7b recovery conditions decide the outcome. When `frozen_evaluator_hashes_unchanged` is `true`, `f16_required` is `false`, `same_artifact_bytes` is `true` and `author_visible_materials_changed` is `false`, the result is the successful-operational-recovery control expectation of Protocol §3.4 at stage `DESIGN_HALT` with disposition `CONTROL_EXPECTATION` and the properties `discard_pre_halt_scores` = `true`, `rerun_slots` = `scheduled_slots`, `reuse_same_artifact_bytes` = `true` and `new_confirmatory_generation_calls` = `0`. When the frozen evaluator hashes changed (`frozen_evaluator_hashes_unchanged` is `false`, `f16_required` is `true`, `same_artifact_bytes` is `true` and `author_visible_materials_changed` is `false`), the recovery is an evaluator revision and the result is the change-class control expectation of `FROZEN_EVALUATOR_SOURCE_BINARY_OR_CONFIG_CHANGED`. The Protocol states no outcome for any other combination, including an author-visible change, which §7b sends to a study or design revision that the vector does not identify; such an input is outside this vector's scope.
 - **Paired-run outcome vector** (OS-2): `response_object` (a response object, as for any response input) and `runtime_pair`, an object with exactly `driver_source_excerpt` (a string that documents the access under test; it is not executed, matched or read for the outcome) and the Booleans `before_first_raw_output_divergence` and `next_input_schedules_equal`. Protocol §3.4 evaluation steps (1)–(6) run on the response object, and their first failure is the result. If all pass, `runtime_pair` stands in for steps (7)–(8), the paired run, which is not executed: `before_first_raw_output_divergence` = `true` with `next_input_schedules_equal` = `false` is the `DRIVER_NONDETERMINISM|reason=NEXT_INPUT_DIVERGENCE` row of the stage map. Any other pair does not determine the paired run's outcome and is outside this vector's scope.
 - **Runtime driver-vector input** (OS-3): `response_object` with `port_manifest` (`input_ports`). Its expected stage, `DRIVER_VECTOR`, is checked within evaluation step (7), while `Driver.step` runs on the original RTL; the input gives no design, RTL or port widths, and no rule states how the driver's vector is obtained outside that run. This input is not specified, and a fixture with it stays NOT_IMPLEMENTED.
+```
+
+## E159 — OD-1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L174 · D1-5 · fixtures: M15
+
+Old:
+
+```text
+`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.
+```
+
+New:
+
+```text
+**OWNER-DECIDED OD-1** (owner decision D-027; v1.3.6 does not state it): a stage-map row with a single diagnostic code and no stated error class has the error class equal to that diagnostic code; the `SIMULATOR_ERROR` row, whose stated error class is `EVALUATOR_INFRASTRUCTURE_FAILURE`, is the stated exception. An error-class cell `—` states that a row has no error class, so OD-1 does not apply to it. OD-1 decides exactly two error classes, those of the local-ledger rows `FEEDBACK_SERIALIZER_REJECT` and `DESIGN_HALT_REPEATED`; every other row of the stage map and of this vocabulary states its error class. By OD-1, `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.
+```
+
+## E160 — A2 (copy of OD-1) · `25_Common_System_and_Repair_Prompt_Templates.txt` L117 · D1-5 · fixtures: M15
+
+Old:
+
+```text
+`FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.
+```
+
+New:
+
+```text
+**OWNER-DECIDED OD-1** (owner decision D-027; v1.3.6 does not state it): a stage-map row with a single diagnostic code and no stated error class has the error class equal to that diagnostic code; the `SIMULATOR_ERROR` row, whose stated error class is `EVALUATOR_INFRASTRUCTURE_FAILURE`, is the stated exception. An error-class cell `—` states that a row has no error class, so OD-1 does not apply to it. OD-1 decides exactly two error classes, those of the local-ledger rows `FEEDBACK_SERIALIZER_REJECT` and `DESIGN_HALT_REPEATED`; every other row of the stage map and of this vocabulary states its error class. By OD-1, `FEEDBACK_SERIALIZER_REJECT|reason=NON_NORMATIVE_DIAGNOSTIC` is recorded at stage `FEEDBACK_SERIALIZER` with error class `FEEDBACK_SERIALIZER_REJECT` and disposition `CONTROL_EXPECTATION`.
+```
+
+## E161 — OD-1 · `02_OpenVEF_Experimental_Protocol_v1.3.7-candidate.md` (was `02_OpenVEF_Experimental_Protocol_v1.3.6.md` L185 · D1-5 · fixtures: M42, M47
+
+Old:
+
+```text
+Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED`.
+```
+
+New:
+
+```text
+Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED` (OWNER-DECIDED OD-1, §3.4 local-ledger error classes).
+```
+
+## E162 — A2 (copy of OD-1) · `25_Common_System_and_Repair_Prompt_Templates.txt` L128 · D1-5 · fixtures: M42, M47
+
+Old:
+
+```text
+Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED`.
+```
+
+New:
+
+```text
+Both terminations are recorded at stage `DESIGN_HALT` with error class `DESIGN_HALT_REPEATED` (OWNER-DECIDED OD-1, §3.4 local-ledger error classes).
 ```
